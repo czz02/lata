@@ -826,6 +826,8 @@ for opt do
   ;;
   --disable-containers) use_containers="no"
   ;;
+  --enable-android) android="yes"
+  ;;
   --enable-lata) lata="yes"
   ;;
   --disable-lata) lata="no"
@@ -911,6 +913,9 @@ if [ "$linux_user" = "yes" ]; then
 fi
 if [ "$bsd_user" = "yes" ]; then
     mak_wilds="${mak_wilds} $source_path/configs/targets/*-bsd-user.mak"
+fi
+if [ "$android" = "yes" ]; then
+    mak_wilds="${mak_wilds} $source_path/configs/targets/*-android.mak"
 fi
 
 for config in $mak_wilds; do
@@ -1842,6 +1847,9 @@ if test "$lata" = "yes" ; then
   fi
   if test "$split_tb_opt" = "yes" ; then
     echo "CONFIG_SPLIT_TB=y" >> $config_host_mak
+  fi
+  if test "$android" = "yes" ; then
+    echo "CONFIG_ANDROID=y" >> $config_host_mak
   fi
 fi
 

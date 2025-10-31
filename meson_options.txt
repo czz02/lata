@@ -350,3 +350,6 @@ option('slirp_smbd', type : 'feature', value : 'auto',
 
 option('hexagon_idef_parser', type : 'boolean', value : true,
        description: 'use idef-parser to automatically generate TCG code for the Hexagon frontend')
+
+option('glib_path', type : 'string', value : '/home/zhangchuanzi/android-cross-compile/glib-2.84.0/build/glib', description : 'use for building android support, loongarch-glib path')
+option('gmodule_path', type : 'string', value : '/home/zhangchuanzi/android-cross-compile/glib-2.84.0/build/gmodule', description : 'use for building android support, loongarch-gmodule path')

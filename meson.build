@@ -61,15 +61,17 @@ supported_cpus = ['ppc', 'ppc64', 's390x', 'riscv32', 'riscv64', 'x86', 'x86_64'
 cpu = host_machine.cpu_family()
 
 target_dirs = config_host['TARGET_DIRS'].split()
+have_android = false
 have_linux_user = false
 have_bsd_user = false
 have_system = false
 foreach target : target_dirs
+  have_android = have_android or target.endswith('android')
   have_linux_user = have_linux_user or target.endswith('linux-user')
   have_bsd_user = have_bsd_user or target.endswith('bsd-user')
   have_system = have_system or target.endswith('-softmmu')
 endforeach
-have_user = have_linux_user or have_bsd_user
+have_user = have_linux_user or have_bsd_user or have_android
 have_tools = get_option('tools') \
   .disable_auto_if(not have_system) \
   .allowed()
@@ -578,7 +580,7 @@ have_tpm = get_option('tpm') \
 have_vhost_user = get_option('vhost_user') \
   .disable_auto_if(targetos != 'linux') \
   .require(targetos != 'windows',
-           error_message: 'vhost-user is not available on Windows').allowed()
+           error_message: 'vhost-user is not available on Windows').allowed() and not have_android
 have_vhost_vdpa = get_option('vhost_vdpa') \
   .require(targetos == 'linux',
            error_message: 'vhost-vdpa is only available on Linux').allowed()
@@ -726,15 +728,25 @@ endif
 # When bumping glib minimum version, please check also whether to increase
 # the _WIN32_WINNT setting in osdep.h according to the value from glib
 glib_req_ver = '>=2.56.0'
-glib_pc = dependency('glib-2.0', version: glib_req_ver, required: true,
+if have_android
+  glib_pc = declare_dependency(
+    link_args: ['-L' + get_option('glib_path'), '-lglib-2.0'],
+  )
+else
+  glib_pc = dependency('glib-2.0', version: glib_req_ver, required: true,
                     method: 'pkg-config')
+endif
 glib_cflags = []
 if enable_modules
   gmodule = dependency('gmodule-export-2.0', version: glib_req_ver, required: true,
                        method: 'pkg-config')
 elif config_host.has_key('CONFIG_PLUGIN')
+if have_android
+  gmodule = declare_dependency(link_args: ['-L' + get_option('gmodule_path'), '-lgmodule-2.0'])
+else
   gmodule = dependency('gmodule-no-export-2.0', version: glib_req_ver, required: true,
                        method: 'pkg-config')
+endif
 else
   gmodule = not_found
 endif
@@ -1844,7 +1856,7 @@ if get_option('fuse_lseek').allowed()
   endif
 endif
 
-have_libvduse = (targetos == 'linux')
+have_libvduse = (targetos == 'linux') and not have_android
 if get_option('libvduse').enabled()
     if targetos != 'linux'
         error('libvduse requires linux')
@@ -2861,6 +2873,15 @@ foreach target : target_dirs
       error('Target @0@ is only available on a Linux host'.format(target))
     endif
     config_target += { 'CONFIG_LINUX_USER': 'y' }
+  elif target.endswith('android')
+    if targetos != 'linux'
+      if default_targets
+        continue
+      endif
+      error('Target @0@ is only available on a Linux host'.format(target))
+    endif
+    config_target += { 'CONFIG_ANDROID': 'y' }
+    config_target += { 'CONFIG_LINUX_USER': 'y' }
   elif target.endswith('bsd-user')
     if 'CONFIG_BSD' not in config_host
       if default_targets
@@ -2880,7 +2901,11 @@ foreach target : target_dirs
         get_option('interp_prefix').replace('%M', config_target['TARGET_NAME'])
     }
   endif
-
+  if target.endswith('-android')
+    config_target += {
+      'CONFIG_USER_ONLY': 'y',
+    }
+  endif
   accel_kconfig = []
   foreach sym: accelerators
     if sym == 'CONFIG_TCG' or target in accelerator_targets.get(sym, [])
@@ -2999,6 +3024,7 @@ config_all += {
   'CONFIG_XEN': xen.found(),
   'CONFIG_SYSTEM_ONLY': have_system,
   'CONFIG_USER_ONLY': have_user,
+  'CONFIG_ANDROID': have_android,
   'CONFIG_ALL': true,
 }
 
@@ -3329,11 +3355,14 @@ subdir('stubs')
 subdir('trace')
 subdir('util')
 subdir('qom')
-subdir('authz')
-subdir('crypto')
-subdir('ui')
 subdir('hw')
+subdir('crypto')
+
+if not have_android
 subdir('gdbstub')
+subdir('ui')
+subdir('authz')
+endif
 
 if enable_modules
   libmodulecommon = static_library('module-common', files('module-common.c') + genh, pic: true, c_args: '-DBUILD_DSO')
@@ -3343,6 +3372,7 @@ endif
 qom_ss = qom_ss.apply(config_host, strict: false)
 libqom = static_library('qom', qom_ss.sources() + genh,
                         dependencies: [qom_ss.dependencies()],
+                        pic: have_android,
                         name_suffix: 'fa')
 qom = declare_dependency(link_whole: libqom)
 
@@ -3358,6 +3388,7 @@ util_ss.add_all(trace_ss)
 util_ss = util_ss.apply(config_all, strict: false)
 libqemuutil = static_library('qemuutil',
                              sources: util_ss.sources() + stub_ss.sources() + genh,
+                             pic: have_android,
                              dependencies: [util_ss.dependencies(), libm, threads, glib, socket, malloc, pixman])
 qemuutil = declare_dependency(link_with: libqemuutil,
                               sources: genh + version_res,
@@ -3449,6 +3480,7 @@ common_user_inc = []
 subdir('common-user')
 subdir('bsd-user')
 subdir('linux-user')
+subdir('android')
 
 # needed for fuzzing binaries
 subdir('tests/qtest/libqos')
@@ -3647,7 +3679,9 @@ chardev = declare_dependency(link_whole: libchardev)
 hwcore_ss = hwcore_ss.apply(config_host, strict: false)
 libhwcore = static_library('hwcore', sources: hwcore_ss.sources() + genh,
                            name_suffix: 'fa',
-                           build_by_default: false)
+                           build_by_default: false,
+                           pic:have_android)
+
 hwcore = declare_dependency(link_whole: libhwcore)
 common_ss.add(hwcore)
 
@@ -3679,6 +3713,7 @@ common_all = static_library('common',
                             build_by_default: false,
                             sources: common_all.sources() + genh,
                             include_directories: common_user_inc,
+                            pic: have_android,
                             implicit_include_directories: false,
                             dependencies: common_all.dependencies(),
                             name_suffix: 'fa')
@@ -3730,6 +3765,9 @@ foreach target : target_dirs
     endif
     if 'CONFIG_LINUX_USER' in config_target
       base_dir = 'linux-user'
+    endif
+    if 'CONFIG_ANDROID' in config_target
+      base_dir = 'android'
     endif
     if 'CONFIG_BSD_USER' in config_target
       base_dir = 'bsd-user'
@@ -3786,6 +3824,17 @@ foreach target : target_dirs
                  c_args: c_args,
                  build_by_default: false,
                  name_suffix: 'fa')
+  liblata = shared_library('lata-' + target,
+                 sources: arch_srcs + genh,
+                 dependencies: arch_deps,
+                 objects: objects,
+                 include_directories: target_inc,
+                 c_args: c_args,
+                 build_by_default: true,
+                 install: true,
+                 link_with:[libtcg_user, libqom, libqemuutil],
+                 link_whole:[libhwcore]
+                 )
 
   if target.endswith('-softmmu')
     execs = [{
@@ -3828,71 +3877,73 @@ foreach target : target_dirs
       }]
     endif
   endif
-  foreach exe: execs
-    exe_name = exe['name']
-    if targetos == 'darwin'
-      exe_name += '-unsigned'
-    endif
-
-    emulator = executable(exe_name, exe['sources'],
-               install: true,
-               c_args: c_args,
-               dependencies: arch_deps + deps + exe['dependencies'],
-               objects: lib.extract_all_objects(recursive: true),
-               link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
-               link_args: link_args,
-               win_subsystem: exe['win_subsystem'])
-
-    if targetos == 'darwin'
-      icon = 'pc-bios/qemu.rsrc'
-      build_input = [emulator, files(icon)]
-      install_input = [
-        get_option('bindir') / exe_name,
-        meson.current_source_dir() / icon
-      ]
-      if 'CONFIG_HVF' in config_target
-        entitlements = 'accel/hvf/entitlements.plist'
-        build_input += files(entitlements)
-        install_input += meson.current_source_dir() / entitlements
+  if not have_android
+    foreach exe: execs
+      exe_name = exe['name']
+      if targetos == 'darwin'
+        exe_name += '-unsigned'
       endif
 
-      emulators += {exe['name'] : custom_target(exe['name'],
-                   input: build_input,
-                   output: exe['name'],
-                   command: [entitlement, '@OUTPUT@', '@INPUT@'])
-      }
+      emulator = executable(exe_name, exe['sources'],
+                 install: true,
+                 c_args: c_args,
+                 dependencies: arch_deps + deps + exe['dependencies'],
+                 objects: lib.extract_all_objects(recursive: true),
+                 link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
+                 link_args: link_args,
+                 win_subsystem: exe['win_subsystem'])
 
-      meson.add_install_script(entitlement, '--install',
-                               get_option('bindir') / exe['name'],
-                               install_input)
-    else
-      emulators += {exe['name']: emulator}
-    endif
+      if targetos == 'darwin'
+        icon = 'pc-bios/qemu.rsrc'
+        build_input = [emulator, files(icon)]
+        install_input = [
+          get_option('bindir') / exe_name,
+          meson.current_source_dir() / icon
+        ]
+        if 'CONFIG_HVF' in config_target
+          entitlements = 'accel/hvf/entitlements.plist'
+          build_input += files(entitlements)
+          install_input += meson.current_source_dir() / entitlements
+        endif
 
-    if stap.found()
-      foreach stp: [
-        {'ext': '.stp-build', 'fmt': 'stap', 'bin': meson.current_build_dir() / exe['name'], 'install': false},
-        {'ext': '.stp', 'fmt': 'stap', 'bin': get_option('prefix') / get_option('bindir') / exe['name'], 'install': true},
-        {'ext': '-simpletrace.stp', 'fmt': 'simpletrace-stap', 'bin': '', 'install': true},
-        {'ext': '-log.stp', 'fmt': 'log-stap', 'bin': '', 'install': true},
-      ]
-        custom_target(exe['name'] + stp['ext'],
-                      input: trace_events_all,
-                      output: exe['name'] + stp['ext'],
-                      install: stp['install'],
-                      install_dir: get_option('datadir') / 'systemtap/tapset',
-                      command: [
-                        tracetool, '--group=all', '--format=' + stp['fmt'],
-                        '--binary=' + stp['bin'],
-                        '--target-name=' + target_name,
-                        '--target-type=' + target_type,
-                        '--probe-prefix=qemu.' + target_type + '.' + target_name,
-                        '@INPUT@', '@OUTPUT@'
-                      ],
-                      depend_files: tracetool_depends)
-      endforeach
-    endif
-  endforeach
+        emulators += {exe['name'] : custom_target(exe['name'],
+                     input: build_input,
+                     output: exe['name'],
+                     command: [entitlement, '@OUTPUT@', '@INPUT@'])
+        }
+
+        meson.add_install_script(entitlement, '--install',
+                                 get_option('bindir') / exe['name'],
+                                 install_input)
+      else
+        emulators += {exe['name']: emulator}
+      endif
+
+      if stap.found()
+        foreach stp: [
+          {'ext': '.stp-build', 'fmt': 'stap', 'bin': meson.current_build_dir() / exe['name'], 'install': false},
+          {'ext': '.stp', 'fmt': 'stap', 'bin': get_option('prefix') / get_option('bindir') / exe['name'], 'install': true},
+          {'ext': '-simpletrace.stp', 'fmt': 'simpletrace-stap', 'bin': '', 'install': true},
+          {'ext': '-log.stp', 'fmt': 'log-stap', 'bin': '', 'install': true},
+        ]
+          custom_target(exe['name'] + stp['ext'],
+                        input: trace_events_all,
+                        output: exe['name'] + stp['ext'],
+                        install: stp['install'],
+                        install_dir: get_option('datadir') / 'systemtap/tapset',
+                        command: [
+                          tracetool, '--group=all', '--format=' + stp['fmt'],
+                          '--binary=' + stp['bin'],
+                          '--target-name=' + target_name,
+                          '--target-type=' + target_type,
+                          '--probe-prefix=qemu.' + target_type + '.' + target_name,
+                          '@INPUT@', '@OUTPUT@'
+                        ],
+                        depend_files: tracetool_depends)
+        endforeach
+      endif
+    endforeach
+  endif
 endforeach
 
 # Other build targets
@@ -3953,11 +4004,13 @@ if have_tools
   endif
 endif
 
-subdir('scripts')
-subdir('tools')
-subdir('pc-bios')
 subdir('docs')
-subdir('tests')
+if not have_android
+  subdir('scripts')
+  subdir('tools')
+  subdir('pc-bios')
+  subdir('tests')
+endif
 if gtk.found()
   subdir('po')
 endif
