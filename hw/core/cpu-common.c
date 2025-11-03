@@ -19,6 +19,7 @@
  */
 
 #include "qemu/osdep.h"
+#include "exec/translation-block.h"
 #include "qapi/error.h"
 #include "hw/core/cpu.h"
 #include "sysemu/hw_accel.h"
@@ -238,6 +239,7 @@ static void cpu_common_initfn(Object *obj)
     cpu->nr_threads = 1;
     cpu->cflags_next_tb = -1;
 
+    cpu->tcg_cflags = CF_PARALLEL;
 #ifdef CONFIG_ANDROID
     cpu->jmp_env_vec = malloc(sizeof(sigjmp_buf) * JNI_MAX_DEPTH);
 #endif

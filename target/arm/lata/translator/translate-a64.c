@@ -938,10 +938,11 @@ static bool trans_CLREX(DisasContext *s)
 
 static void lata_gen_mb(void)
 {
-    bool parallel = tcg_ctx->gen_tb->cflags & CF_PARALLEL;
-    if (parallel) {
-        la_dbar(0);
-    }
+    // bool parallel = tcg_ctx->gen_tb->cflags & CF_PARALLEL;
+    // if (parallel) {
+    //     la_dbar(0);
+    // }
+    la_dbar(0);
 }
 
 static bool trans_DSB_DMB(DisasContext *s)
