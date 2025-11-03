@@ -19,20 +19,20 @@
 #include "qemu/osdep.h"
 
 #ifdef CONFIG_LATA
-#include "clear-high.h"
-#include "ir1-arg.h"
-#include "ir1.h"
+#include "target/arm/lata/include/translate.h"
 #include "target/arm/lata/include/arm_ldst.h"
 #include "target/arm/lata/include/insts-pattern.h"
-#include "target/arm/lata/include/translate.h"
+#include "ir1.h"
+#include "ir1-arg.h"
 #include "translate-a64.h"
 #include "tu.h"
+#include "clear-high.h"
 #endif
 
-#include "disas/disas.h"
 #include "qemu/log.h"
-#include "cpregs.h"
+#include "disas/disas.h"
 #include "semihosting/semihost.h"
+#include "cpregs.h"
 
 enum a64_shift_type {
     A64_SHIFT_TYPE_LSL = 0,
