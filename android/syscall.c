@@ -53,7 +53,7 @@
 #include <utime.h>
 #include <sys/sysinfo.h>
 #include <sys/signalfd.h>
-//#include <sys/user.h>
+#include <sys/user.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
@@ -133,7 +133,6 @@
 #include "user-internals.h"
 #include "strace.h"
 #include "signal-common.h"
-#include "loader.h"
 #include "user-mmap.h"
 #include "user/safe-syscall.h"
 #include "qemu/guest-random.h"
@@ -144,6 +143,10 @@
 #include "fd-trans.h"
 #include "tcg/tcg.h"
 #include "cpu_loop-common.h"
+
+#include "linux/android/binder.h"
+#include "ashmem.h"
+#include "linux/dma-heap.h"
 
 
 #include "android.h"
@@ -6718,8 +6721,6 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
         cpu_clone_regs_parent(env, flags);
         new_cpu = env_cpu(new_env);
         new_cpu->opaque = ts;
-        ts->bprm = parent_ts->bprm;
-        ts->info = parent_ts->info;
         ts->signal_mask = parent_ts->signal_mask;
 
         if (flags & CLONE_CHILD_CLEARTID) {

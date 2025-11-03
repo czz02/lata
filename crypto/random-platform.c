@@ -45,7 +45,9 @@ int qcrypto_random_init(Error **errp)
     }
 #else
 # ifdef CONFIG_GETRANDOM
-    if (getrandom(NULL, 0, 0) == 0) {
+    // make android-toolchain happy
+    char dummy_addr;
+    if (getrandom(&dummy_addr, 0, 0) == 0) {
         /* Use getrandom() */
         fd = -1;
         return 0;

@@ -83,6 +83,7 @@ extern __thread CPUState *thread_cpu;
 
 __thread bool in_jni_run = 0;
 __thread int jni_call_depth = -1;
+pthread_mutex_t b2q_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void android_jni_run(void *state)
 {

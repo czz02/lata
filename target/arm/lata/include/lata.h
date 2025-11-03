@@ -65,6 +65,7 @@ typedef struct ENV {
 
 
 void lata_tr_data_init(CPUArchState *env);
+void lsenv_register_thread(CPUArchState *env);
 void tr_init(void*);
 void tr_fini(void);
 

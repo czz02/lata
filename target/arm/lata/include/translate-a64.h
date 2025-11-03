@@ -14,6 +14,10 @@ void translate_aarch64_insn(DisasContext *s, CPUState *cpu);
 void get_last_info(TranslationBlock *tb, DisasContext *s);
 #endif
 
+#ifdef CONFIG_ANDROID
+void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func, uint64_t callee);
+#endif
+
 static inline void assert_fp_access_checked(DisasContext *s)
 {
 #ifdef CONFIG_DEBUG_TCG

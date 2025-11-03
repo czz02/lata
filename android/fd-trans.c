@@ -1272,8 +1272,13 @@ static abi_long host_to_target_data_route(struct nlmsghdr *nlh)
                                         nlmsg_len - NLMSG_LENGTH(sizeof(*rtm)));
         }
         break;
+    case RTM_NEWRULE:
+    case RTM_DELRULE:
+        break;
     default:
-        return -TARGET_EINVAL;
+        qemu_log_mask(LOG_UNIMP, "Unknown host route message type %d\n",
+                      nlh->nlmsg_type);
+        // return -TARGET_EINVAL;
     }
     return 0;
 }
@@ -1495,8 +1500,13 @@ static abi_long target_to_host_data_route(struct nlmsghdr *nlh)
                                         NLMSG_LENGTH(sizeof(*rtm)));
         }
         break;
+    case RTM_NEWRULE:
+    case RTM_DELRULE:
+        break;
     default:
-        return -TARGET_EOPNOTSUPP;
+        qemu_log_mask(LOG_UNIMP, "Unknown target route message type %d\n",
+                      nlh->nlmsg_type);
+        // return -TARGET_EOPNOTSUPP;
     }
     return 0;
 }
@@ -1513,7 +1523,7 @@ static abi_long host_to_target_data_audit(struct nlmsghdr *nlh)
     default:
         qemu_log_mask(LOG_UNIMP, "Unknown host audit message type %d\n",
                       nlh->nlmsg_type);
-        return -TARGET_EINVAL;
+        // return -TARGET_EINVAL;
     }
     return 0;
 }
@@ -1534,7 +1544,7 @@ static abi_long target_to_host_data_audit(struct nlmsghdr *nlh)
     default:
         qemu_log_mask(LOG_UNIMP, "Unknown target audit message type %d\n",
                       nlh->nlmsg_type);
-        return -TARGET_EINVAL;
+        // return -TARGET_EINVAL;
     }
 
     return 0;

@@ -23,7 +23,6 @@
 #include "exec/tb-flush.h"
 #include "qemu/log.h"
 
-extern char *exec_path;
 void init_task_state(TaskState *ts);
 void task_settid(TaskState *);
 void stop_all_tasks(void);

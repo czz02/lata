@@ -25,6 +25,7 @@
 #include "internal.h"
 
 bool tcg_allowed;
+extern __thread int jni_call_depth;
 
 /* exit the current TB, but without causing any exception to be raised */
 void cpu_loop_exit_noexc(CPUState *cpu)
@@ -69,7 +70,7 @@ void cpu_loop_exit(CPUState *cpu)
     cpu->can_do_io = 1;
     /* Undo any setting in generated code.  */
     qemu_plugin_disable_mem_helpers(cpu);
-    siglongjmp(cpu->jmp_env, 1);
+    siglongjmp(cpu->jmp_env_vec[jni_call_depth], 1);
 }
 
 void cpu_loop_exit_restore(CPUState *cpu, uintptr_t pc)

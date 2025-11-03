@@ -2170,7 +2170,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
     }
 
     register_cp_regs_for_features(cpu);
-    arm_cpu_register_gdb_regs_for_features(cpu);
+    // arm_cpu_register_gdb_regs_for_features(cpu);
 
     init_cpreg_list(cpu);
 
@@ -2348,17 +2348,17 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
     cc->dump_state = arm_cpu_dump_state;
     cc->set_pc = arm_cpu_set_pc;
     cc->get_pc = arm_cpu_get_pc;
-    cc->gdb_read_register = arm_cpu_gdb_read_register;
-    cc->gdb_write_register = arm_cpu_gdb_write_register;
+    // cc->gdb_read_register = arm_cpu_gdb_read_register;
+    // cc->gdb_write_register = arm_cpu_gdb_write_register;
 #ifndef CONFIG_USER_ONLY
     cc->sysemu_ops = &arm_sysemu_ops;
 #endif
-    cc->gdb_num_core_regs = 26;
-    cc->gdb_core_xml_file = "arm-core.xml";
-    cc->gdb_arch_name = arm_gdb_arch_name;
-    cc->gdb_get_dynamic_xml = arm_gdb_get_dynamic_xml;
-    cc->gdb_stop_before_watchpoint = true;
-    cc->disas_set_info = arm_disas_set_info;
+    // cc->gdb_num_core_regs = 26;
+    // cc->gdb_core_xml_file = "arm-core.xml";
+    // cc->gdb_arch_name = arm_gdb_arch_name;
+    // cc->gdb_get_dynamic_xml = arm_gdb_get_dynamic_xml;
+    // cc->gdb_stop_before_watchpoint = true;
+    // cc->disas_set_info = arm_disas_set_info;
 
 #ifdef CONFIG_TCG
     cc->tcg_ops = &arm_tcg_ops;

@@ -9,10 +9,6 @@ void *lock_user(int type, abi_ulong guest_addr, ssize_t len, bool copy)
 {
     void *host_addr;
 
-    // assert(thread_cpu);
-    // printf("thread_cpu : %p\n", &thread_cpu);
-    // printf("id : %d, thread_cpu : %p\n", pthread_self(), &thread_cpu);
-
     guest_addr = cpu_untagged_addr(thread_cpu, guest_addr);
     if (!access_ok_untagged(type, guest_addr, len)) {
         return NULL;

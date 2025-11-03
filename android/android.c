@@ -72,9 +72,13 @@
 char *exec_path;
 char real_exec_path[PATH_MAX];
 
-#ifdef CONFIG_LATA_INDIRECT_JMP
+#ifdef CONFIG_LATA
 int indirect_jmp_opt_profile = 0;
+#ifdef CONFIG_LATA_INDIRECT_JMP
+int option_fam_jmp_cache = 1;
+#else
 int option_fam_jmp_cache = 0;
+#endif
 #endif
 
 static bool opt_one_insn_per_tb;
@@ -149,7 +153,6 @@ void fork_end(int child)
             }
         }
         qemu_init_cpu_list();
-        // gdbserver_fork(thread_cpu);
     } else {
         cpu_list_unlock();
     }
@@ -318,17 +321,6 @@ struct AndroidRuntimeCallbacks {
 // Config by berberis
 AndroidConfig android_config;
 
-static guint uint64_hash(gconstpointer key) {
-    const uint64_t *ptr = (const uint64_t *)key;
-    return (guint)(*ptr ^ (*ptr >> 32)); 
-}
-
-static gboolean uint64_equal(gconstpointer a, gconstpointer b) {
-    const uint64_t *ptr_a = (const uint64_t *)a;
-    const uint64_t *ptr_b = (const uint64_t *)b;
-    return *ptr_a == *ptr_b;
-}
-
 void *android_init(BerberisCallbacks *cbs)
 {
     assert(cbs);
@@ -400,21 +392,6 @@ void *android_init(BerberisCallbacks *cbs)
         g_hash_table_new(g_direct_hash, g_direct_equal);
     berberis_guest_callee =
         g_hash_table_new(g_direct_hash, g_direct_equal);
-    // size_t malloc_size = MAP_SIZE * 8 * 2;
-    // berberis_code_map = malloc(malloc_size);
-    // if(!berberis_code_map){
-    //     assert(0);
-    //     printf("down down\n");
-    // }
-    // memset(berberis_code_map, 0, malloc_size);
-    //
 
-    // android_runtime_callbacks.epilogue = tcg_code_gen_epilogue;
-    android_runtime_callbacks.epilogue = (void*)context_switch_native_to_bt_ret_0;
     return main_cpu->env_ptr;
-}
-
-int main(void)
-{
-    return 0;
 }

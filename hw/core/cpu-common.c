@@ -220,6 +220,10 @@ static void cpu_common_unrealizefn(DeviceState *dev)
     cpu_exec_unrealizefn(cpu);
 }
 
+#ifdef CONFIG_ANDROID
+#include "android/param.h"
+#endif
+
 static void cpu_common_initfn(Object *obj)
 {
     CPUState *cpu = CPU(obj);
@@ -234,6 +238,9 @@ static void cpu_common_initfn(Object *obj)
     cpu->nr_threads = 1;
     cpu->cflags_next_tb = -1;
 
+#ifdef CONFIG_ANDROID
+    cpu->jmp_env_vec = malloc(sizeof(sigjmp_buf) * JNI_MAX_DEPTH);
+#endif
     qemu_mutex_init(&cpu->work_mutex);
     qemu_lockcnt_init(&cpu->in_ioctl_lock);
     QSIMPLEQ_INIT(&cpu->work_list);
@@ -247,6 +254,9 @@ static void cpu_common_finalize(Object *obj)
 {
     CPUState *cpu = CPU(obj);
 
+#ifdef CONFIG_ANDROID
+    free(cpu->jmp_env_vec);
+#endif
     qemu_lockcnt_destroy(&cpu->in_ioctl_lock);
     qemu_mutex_destroy(&cpu->work_mutex);
 }

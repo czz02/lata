@@ -1,0 +1,4 @@
+cp liblata-aarch64-android.so /home/zzz/data/zhangchuanzi/loongson/aosp.la/frameworks/libs/binary_translation/lata/prebuild/la64.lata/
+cp liblata-aarch64-android.so /home/zzz/data/zhangchuanzi/loongson/aosp.la/out/target/product/loongson_3a5000/symbols/system/lib64/
+cp liblata-aarch64-android.so /home/zzz/data/zhangchuanzi/loongson/aosp.la/workspace/adb_push/
+adb -s 10.90.51.211 push liblata-aarch64-android.so /data/local/tmp/

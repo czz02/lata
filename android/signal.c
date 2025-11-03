@@ -26,9 +26,6 @@
 
 #include "qemu.h"
 #include "user-internals.h"
-// #include "strace.h"
-#include "loader.h"
-// #include "trace.h"
 #include "signal-common.h"
 #include "host-signal.h"
 #include "user/safe-syscall.h"
@@ -180,7 +177,8 @@ int block_signals(void)
     return qatomic_xchg(&ts->signal_pending, 1);
 }
 
-
+// android sigorset is not implemented
+// borrow from musl-libc : src/signal/sigorset.c
 #define SST_SIZE (_NSIG / 8 / sizeof(long))
 
 static inline int sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
@@ -191,7 +189,7 @@ static inline int sigorset(sigset_t *dest, const sigset_t *left, const sigset_t 
         d[i] = l[i] | r[i];
     return 0;
 }
- 
+
 /* Wrapper for sigprocmask function
  * Emulates a sigprocmask in a safe way for the guest. Note that set and oldset
  * are host signal set, not guest ones. Returns -QEMU_ERESTARTSYS if
@@ -520,25 +518,25 @@ static int fatal_signal (int sig)
 }
 
 /* returns 1 if given signal should dump core if not handled */
-static int core_dump_signal(int sig)
-{
-    switch (sig) {
-    case TARGET_SIGABRT:
-    case TARGET_SIGFPE:
-    case TARGET_SIGILL:
-    case TARGET_SIGQUIT:
-    case TARGET_SIGSEGV:
-    case TARGET_SIGTRAP:
-    case TARGET_SIGBUS:
-        return (1);
-    default:
-        return (0);
-    }
-}
+// static int core_dump_signal(int sig)
+// {
+//     switch (sig) {
+//     case TARGET_SIGABRT:
+//     case TARGET_SIGFPE:
+//     case TARGET_SIGILL:
+//     case TARGET_SIGQUIT:
+//     case TARGET_SIGSEGV:
+//     case TARGET_SIGTRAP:
+//     case TARGET_SIGBUS:
+//         return (1);
+//     default:
+//         return (0);
+//     }
+// }
 
 static void signal_table_init(void)
 {
-    int host_sig, target_sig, count;
+    int host_sig, target_sig;
 
     /*
      * Signals are supported starting from TARGET_SIGRTMIN and going up
@@ -571,15 +569,6 @@ static void signal_table_init(void)
             target_to_host_signal_table[target_sig] = host_sig;
         }
     }
-
-    // if (trace_event_get_state_backends(TRACE_SIGNAL_TABLE_INIT)) {
-    //     for (target_sig = 1, count = 0; target_sig <= TARGET_NSIG; target_sig++) {
-    //         if (target_to_host_signal_table[target_sig] == _NSIG) {
-    //             count++;
-    //         }
-    //     }
-    //     trace_signal_table_init(count);
-    // }
 }
 
 void signal_init(void)
@@ -709,32 +698,10 @@ void cpu_loop_exit_sigbus(CPUState *cpu, target_ulong addr,
 static G_NORETURN
 void dump_core_and_abort(CPUArchState *cpu_env, int target_sig)
 {
-    CPUState *cpu = thread_cpu;
-    CPUArchState *env = cpu->env_ptr;
-    TaskState *ts = (TaskState *)cpu->opaque;
-    int host_sig, core_dumped = 0;
+    int host_sig = 0;
     struct sigaction act;
 
     host_sig = target_to_host_signal(target_sig);
-    // trace_user_dump_core_and_abort(env, target_sig, host_sig);
-    // gdb_signalled(env, target_sig);
-
-    /* dump core if supported by target binary format */
-    if (core_dump_signal(target_sig) && (ts->bprm->core_dump != NULL)) {
-        stop_all_tasks();
-        core_dumped =
-            ((*ts->bprm->core_dump)(target_sig, env) == 0);
-    }
-    if (core_dumped) {
-        /* we already dumped the core of target process, we don't want
-         * a coredump of qemu itself */
-        struct rlimit nodump;
-        getrlimit(RLIMIT_CORE, &nodump);
-        nodump.rlim_cur=0;
-        setrlimit(RLIMIT_CORE, &nodump);
-        (void) fprintf(stderr, "qemu: uncaught target signal %d (%s) - %s\n",
-            target_sig, strsignal(host_sig), "core dumped" );
-    }
 
     preexit_cleanup(cpu_env, 128 + target_sig);
 
@@ -1059,10 +1026,6 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
         sa = &sigact_table[sig - 1];
         handler = sa->_sa_handler;
     }
-
-    // if (unlikely(qemu_loglevel_mask(LOG_STRACE))) {
-    //     print_taken_signal(sig, &k->info);
-    // }
 
     if (handler == TARGET_SIG_DFL) {
         /* default handler : ignore some signal. The other are job control or fatal */

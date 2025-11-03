@@ -571,6 +571,7 @@ static void cpu_exec_longjmp_cleanup(CPUState *cpu)
 
 void cpu_exec_step_atomic(CPUState *cpu)
 {
+#ifndef CONFIG_ANDROID
     CPUArchState *env = cpu->env_ptr;
     TranslationBlock *tb;
     vaddr pc;
@@ -622,6 +623,7 @@ void cpu_exec_step_atomic(CPUState *cpu)
     g_assert(cpu_in_exclusive_context(cpu));
     cpu->running = false;
     end_exclusive();
+#endif
 }
 
 void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
@@ -985,6 +987,29 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
     }
 #endif
 }
+#ifdef CONFIG_ANDROID
+
+#include "android.h"
+
+pthread_mutex_t tb_add_mutex = PTHREAD_MUTEX_INITIALIZER;
+static vaddr exit_pc;
+
+void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg)
+{
+
+    if(host_pc == -1){
+       exit_pc = guest_pc;
+    }
+
+    pthread_mutex_lock(&tb_add_mutex);
+    g_hash_table_insert(berberis_guest_host, (gpointer)guest_pc,
+                        (gpointer)host_pc);
+    g_hash_table_insert(berberis_guest_callee, (gpointer)guest_pc,
+                        (gpointer)arg);
+    pthread_mutex_unlock(&tb_add_mutex);
+}
+
+#endif
 
 /* main execution loop */
 
@@ -993,6 +1018,8 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
 {
     int ret;
 
+    tcg_register_thread();
+    lsenv_register_thread(cpu->env_ptr);
     /* if an exception is pending, we execute it here */
     while (!cpu_handle_exception(cpu, &ret)) {
         TranslationBlock *last_tb = NULL;
@@ -1006,6 +1033,11 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
 
             cpu_get_tb_cpu_state(cpu->env_ptr, &pc, &cs_base, &flags);
 
+#ifdef CONFIG_ANDROID
+            if (unlikely((uint64_t)pc == exit_pc)){
+                return -1;
+            }
+#endif
             /*
              * When requested, use an exact setting for cflags for the next
              * execution.  This is used for icount, precise smc, and stop-
@@ -1013,7 +1045,7 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
              * have CF_INVALID set, -1 is a convenient invalid value that
              * does not require tcg headers for cpu_common_reset.
              */
-            cflags = cpu->cflags_next_tb;
+            cflags = cpu->cflags_next_tb | CF_PARALLEL;
             if (cflags == -1) {
                 cflags = curr_cflags(cpu);
             } else {
@@ -1086,7 +1118,11 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
 static int cpu_exec_setjmp(CPUState *cpu, SyncClocks *sc)
 {
     /* Prepare setjmp context for exception handling. */
+#ifdef CONFIG_ANDROID
+    if (unlikely(sigsetjmp(cpu->jmp_env_vec[jni_call_depth], 0) != 0)) {
+#else
     if (unlikely(sigsetjmp(cpu->jmp_env, 0) != 0)) {
+#endif
         cpu_exec_longjmp_cleanup(cpu);
     }
 

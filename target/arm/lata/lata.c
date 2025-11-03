@@ -244,6 +244,13 @@ void lata_tr_data_init(CPUArchState *env)
     global_register_init();
 }
 
+void lsenv_register_thread(CPUArchState *env)
+{
+    lsenv = &lsenv_real;
+    lsenv->cpu_state = env;
+    lsenv->tr_data = &tr_data_real;
+}
+
 void tr_init(void* tb)
 {
     TRANSLATION_DATA *t = lsenv->tr_data;
