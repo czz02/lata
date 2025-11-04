@@ -9352,8 +9352,8 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
             g_assert_not_reached();
         }
     } else {
-        assert(0);
         if (size == MO_16) {
+            assert(0);
             switch (opcode) {
             case 0xc: /* FMAXNMP */
                 break;
@@ -9369,23 +9369,28 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
                 g_assert_not_reached();
             }
         } else {
+            la_vreplvei_w(vtemp, vreg_n, 1);
+
             switch (opcode) {
             case 0xc: /* FMAXNMP */
+                la_vfmax_s(vreg_d, vreg_n, vtemp);
                 break;
             case 0xd: /* FADDP */
+                la_vfadd_s(vreg_d, vtemp, vreg_n);
                 break;
             case 0xf: /* FMAXP */
-                break;
+                assert(0);
             case 0x2c: /* FMINNMP */
+                la_vfmin_s(vreg_d, vreg_n, vtemp);
                 break;
             case 0x2f: /* FMINP */
-                break;
+                assert(0);
             default:
                 g_assert_not_reached();
             }
         }
 
-        la_vand_v(vreg_d, vreg_d, fsmask_ir2_opnd);
+        // la_vand_v(vreg_d, vreg_d, fsmask_ir2_opnd);
     }
 
     store_fpr_dst(rd, vreg_d);
