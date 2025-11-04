@@ -6923,6 +6923,9 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
 {
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
+    IR2_OPND temp = ra_alloc_itemp();
+    IR2_OPND vreg_temp = ra_alloc_ftemp();
+    IR2_OPND vreg_abs = ra_alloc_ftemp();
 
     switch (opcode) {
     case 0x0: /* FMOV */
@@ -6941,8 +6944,12 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
         // gen_fpst = gen_helper_bfcvt;
         break;
     case 0x8: /* FRINTN */
+        la_vfrintrne_s(vreg_d, vreg_n);
+        goto done;
         break;
     case 0x9: /* FRINTP */
+        la_vfrintrp_s(vreg_d, vreg_n);
+        goto done;
         break;
     case 0xa: /* FRINTM */
         la_vfrintrm_s(vreg_d, vreg_n);
@@ -6953,8 +6960,14 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
         goto done;
         break;
     case 0xc: /* FRINTA */
-        // rmode = opcode & 7;
-        // gen_fpst = gen_helper_rints;
+        // res = sign(x) * floor(|x| + 0.5)
+        li_d(temp, 0x3f000000); // 0.5
+        la_movgr2fr_w(vreg_temp, temp);
+        la_fabs_s(vreg_abs, vreg_n);
+        la_fadd_s(vreg_abs, vreg_abs, vreg_temp);
+        la_vfrintrm_s(vreg_abs, vreg_abs);
+        la_fcopysign_s(vreg_d, vreg_abs, vreg_n);
+        goto done;
         break;
     case 0xe: /* FRINTX */
         // gen_fpst = gen_helper_rints_exact;
@@ -6988,6 +7001,9 @@ done:
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
+    free_alloc_gpr(temp);
+    free_alloc_fpr(vreg_temp);
+    free_alloc_fpr(vreg_abs);
 }
 
 /* Floating-point data-processing (1 source) - double precision */
@@ -6995,6 +7011,9 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
 {
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
+    IR2_OPND temp = ra_alloc_itemp();
+    IR2_OPND vreg_temp = ra_alloc_ftemp();
+    IR2_OPND vreg_abs = ra_alloc_ftemp();
 
     switch (opcode) {
     case 0x0: /* FMOV */
@@ -7010,6 +7029,8 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
         la_fsqrt_d(vreg_d, vreg_n);
         goto done;
     case 0x8: /* FRINTN */
+        la_vfrintrne_d(vreg_d, vreg_n);
+        goto done;
         break;
     case 0x9: /* FRINTP */
         la_vfrintrp_d(vreg_d, vreg_n);
@@ -7024,8 +7045,14 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
         goto done;
         break;
     case 0xc: /* FRINTA */
-        // rmode = opcode & 7;
-        // gen_fpst = gen_helper_rintd;
+        // res = sign(x) * floor(|x| + 0.5)
+        li_d(temp, 0x3fe0000000000000); // 0.5
+        la_movgr2fr_d(vreg_temp, temp);
+        la_fabs_d(vreg_abs, vreg_n);
+        la_fadd_d(vreg_abs, vreg_abs, vreg_temp);
+        la_vfrintrm_d(vreg_abs, vreg_abs);
+        la_fcopysign_d(vreg_d, vreg_abs, vreg_n);
+        goto done;
         break;
     case 0xe: /* FRINTX */
         // gen_fpst = gen_helper_rintd_exact;
@@ -7060,6 +7087,9 @@ done:
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
+    free_alloc_gpr(temp);
+    free_alloc_fpr(vreg_temp);
+    free_alloc_fpr(vreg_abs);
 }
 
 static void handle_fp_fcvt(DisasContext *s, int opcode, int rd, int rn,
