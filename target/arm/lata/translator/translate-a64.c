@@ -6970,7 +6970,8 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
         goto done;
         break;
     case 0xe: /* FRINTX */
-        // gen_fpst = gen_helper_rints_exact;
+        la_vfrint_s(vreg_d, vreg_n);
+        goto done;
         break;
     case 0xf: /* FRINTI */
         // gen_fpst = gen_helper_rints;
@@ -7055,7 +7056,8 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
         goto done;
         break;
     case 0xe: /* FRINTX */
-        // gen_fpst = gen_helper_rintd_exact;
+        la_vfrint_d(vreg_d, vreg_n);
+        goto done;
         break;
     case 0xf: /* FRINTI */
         // gen_fpst = gen_helper_rintd;
@@ -10302,6 +10304,88 @@ static void handle_2misc_reciprocal(DisasContext *s, int opcode, bool is_scalar,
     assert(0);
 }
 
+static void handle_fcvt(DisasContext *s, int opcode, bool is_u, int size, int rn, int rd)
+{
+    IR2_OPND vreg_d = alloc_fpr_src(rd);
+    IR2_OPND vreg_n = alloc_fpr_src(rn);
+
+    if (size == MO_64) {
+        switch (opcode) {
+        case 0x1a: /* FCVTNS */
+            assert(0);
+            break;
+        case 0x1b: /* FCVTMS */
+            assert(0);
+            break;
+        case 0x3a: /* FCVTPS */
+            assert(0);
+            break;
+        case 0x3b: /* FCVTZS */
+            assert(0);
+            break;
+        case 0x5a: /* FCVTNU */
+            assert(0);
+            break;
+        case 0x5b: /* FCVTMU */
+            assert(0);
+            break;
+        case 0x7a: /* FCVTPU */
+            assert(0);
+            break;
+        case 0x7b: /* FCVTZU */
+            assert(0);
+            break;
+        case 0x1c: /* FCVTAS */
+            assert(0);
+            break;
+        case 0x5c: /* FCVTAU */
+            assert(0);
+            break;
+        default:
+            assert(0);
+        }
+    } else {
+        switch (opcode) {
+        case 0x1a: /* FCVTNS */
+            assert(0);
+            break;
+        case 0x1b: /* FCVTMS */
+            assert(0);
+            break;
+        case 0x3a: /* FCVTPS */
+            assert(0);
+            break;
+        case 0x3b: /* FCVTZS */
+            la_vftintrz_w_s(vreg_d, vreg_n);
+            break;
+        case 0x5a: /* FCVTNU */
+            assert(0);
+            break;
+        case 0x5b: /* FCVTMU */
+            assert(0);
+            break;
+        case 0x7a: /* FCVTPU */
+            assert(0);
+            break;
+        case 0x7b: /* FCVTZU */
+            assert(0);
+            break;
+        case 0x1c: /* FCVTAS */
+            assert(0);
+            break;
+        case 0x5c: /* FCVTAU */
+            assert(0);
+            break;
+        default:
+            assert(0);
+        }
+    }
+
+
+    free_alloc_fpr(vreg_d);
+    free_alloc_fpr(vreg_n);
+}
+
 static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
                                 bool u, bool is_q, int size, int rn, int rd)
 {
@@ -10508,9 +10592,8 @@ static void disas_simd_scalar_two_reg_misc(DisasContext *s, uint32_t insn)
         case 0x7b: /* FCVTZU */
         case 0x1c: /* FCVTAS */
         case 0x5c: /* FCVTAU */
-            /* TIEAWAY doesn't fit in the usual rounding mode encoding */
-            assert(0);
-            break;
+            handle_fcvt(s, opcode, u, size, rn, rd);
+            return;
         case 0x56: /* FCVTXN, FCVTXN2 */
             if (size == 2) {
                 lata_unallocated_encoding(s);
