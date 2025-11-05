@@ -9470,8 +9470,6 @@ static void handle_scalar_simd_shri(DisasContext *s, bool is_u, int immh,
 static void handle_scalar_simd_shli(DisasContext *s, bool insert, int immh,
                                     int immb, int opcode, int rn, int rd)
 {
-    assert(!insert);
-
     int size = 32 - clz32(immh) - 1;
     int immhb = immh << 3 | immb;
     int shift = immhb - (8 << size);
@@ -9487,14 +9485,27 @@ static void handle_scalar_simd_shli(DisasContext *s, bool insert, int immh,
 
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
+    IR2_OPND vreg_mask = ra_alloc_ftemp();
+    IR2_OPND vreg_temp = ra_alloc_ftemp();
 
-    la_vslli_d(vreg_d, vreg_n, shift);
+    if(!insert){
+        la_vslli_d(vreg_d, vreg_n, shift);
+    } else {
+        la_vfcmp_cond_d(vreg_mask, vreg_n, vreg_n, FCMP_COND_SEQ);
+        la_vsrli_d(vreg_mask, vreg_mask, 64 - shift);
+
+        la_vand_v(vreg_temp, vreg_d, vreg_mask);
+        la_vslli_d(vreg_d, vreg_n, shift);
+        la_vor_v(vreg_d, vreg_d, vreg_temp);
+    }
     /* 高64位清零 */
     la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
 
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
+    free_alloc_fpr(vreg_mask);
+    free_alloc_fpr(vreg_temp);
 }
 
 /* SQSHRN/SQSHRUN - Saturating (signed/unsigned) shift right with
@@ -10728,8 +10739,6 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
 static void handle_vec_simd_shli(DisasContext *s, bool is_q, bool insert,
                                  int immh, int immb, int opcode, int rn, int rd)
 {
-    assert(!insert);
-
     int size = 32 - clz32(immh) - 1;
     int immhb = immh << 3 | immb;
     int shift = immhb - (8 << size);
@@ -10744,22 +10753,53 @@ static void handle_vec_simd_shli(DisasContext *s, bool is_q, bool insert,
 
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
+    IR2_OPND vreg_mask = ra_alloc_ftemp();
+    IR2_OPND vreg_temp = ra_alloc_ftemp();
 
-    switch (size) {
-    case 0:
-        la_vslli_b(vreg_d, vreg_n, shift);
-        break;
-    case 1:
-        la_vslli_h(vreg_d, vreg_n, shift);
-        break;
-    case 2:
-        la_vslli_w(vreg_d, vreg_n, shift);
-        break;
-    case 3:
-        la_vslli_d(vreg_d, vreg_n, shift);
-        break;
-    default:
-        break;
+    if (!insert) {
+        switch (size) {
+        case 0:
+            la_vslli_b(vreg_d, vreg_n, shift);
+            break;
+        case 1:
+            la_vslli_h(vreg_d, vreg_n, shift);
+            break;
+        case 2:
+            la_vslli_w(vreg_d, vreg_n, shift);
+            break;
+        case 3:
+            la_vslli_d(vreg_d, vreg_n, shift);
+            break;
+        default:
+            break;
+        }
+    } else {
+        la_vfcmp_cond_d(vreg_mask, vreg_n, vreg_n, FCMP_COND_SEQ);
+        switch (size) {
+        case 0:
+            la_vsrli_b(vreg_mask, vreg_mask, 8 - shift);
+            la_vand_v(vreg_temp, vreg_d, vreg_mask);
+            la_vslli_b(vreg_d, vreg_n, shift);
+            break;
+        case 1:
+            la_vsrli_h(vreg_mask, vreg_mask, 16 - shift);
+            la_vand_v(vreg_temp, vreg_d, vreg_mask);
+            la_vslli_h(vreg_d, vreg_n, shift);
+            break;
+        case 2:
+            la_vsrli_w(vreg_mask, vreg_mask, 32 - shift);
+            la_vand_v(vreg_temp, vreg_d, vreg_mask);
+            la_vslli_w(vreg_d, vreg_n, shift);
+            break;
+        case 3:
+            la_vsrli_d(vreg_mask, vreg_mask, 64 - shift);
+            la_vand_v(vreg_temp, vreg_d, vreg_mask);
+            la_vslli_d(vreg_d, vreg_n, shift);
+            break;
+        default:
+            break;
+        }
+        la_vor_v(vreg_d, vreg_d, vreg_temp);
     }
 
     if (!is_q) {
@@ -10769,6 +10809,8 @@ static void handle_vec_simd_shli(DisasContext *s, bool is_q, bool insert,
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
+    free_alloc_fpr(vreg_mask);
+    free_alloc_fpr(vreg_temp);
 }
 
 /* USHLL/SSHLL - Vector shift left with widening */
