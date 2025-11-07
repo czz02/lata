@@ -7122,10 +7122,12 @@ static void handle_fp_fcvt(DisasContext *s, int opcode, int rd, int rn,
         break;
     }
     case 0x3: {
-        assert(0);
         if (dtype == 0) {
+            la_vfcvtl_s_h(vreg_d, vreg_n);
+            la_vand_v(vreg_d, vreg_d, fsmask_ir2_opnd);
             /* Half to single */
         } else {
+            assert(0);
             /* Half to double */
         }
         break;
