@@ -272,6 +272,100 @@ static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
     }
 }
 
+static inline void gen_signed_sat_q(IR2_OPND vreg, int size, int N){
+    IR2_OPND vmask1 = ra_alloc_ftemp();
+    IR2_OPND vmask2 = ra_alloc_ftemp();
+    IR2_OPND const_vector_upper = ra_alloc_ftemp();
+    IR2_OPND const_vector_lower = ra_alloc_ftemp();
+    IR2_OPND const_val_upper = ra_alloc_itemp();
+    IR2_OPND const_val_lower = ra_alloc_itemp();
+
+    IR2_OPND l_done = ir2_opnd_new_type(IR2_OPND_LABEL);
+
+    li_d(const_val_upper, (1 << (N - 1)) - 1);
+    li_d(const_val_lower, - (1 << (N - 1)));
+
+    switch (size) {
+    case 0:
+        la_vinsgr2vr_h(const_vector_upper, const_val_upper, 0);
+        la_vreplvei_h(const_vector_upper, const_vector_upper, 0);
+        la_vinsgr2vr_h(const_vector_lower, const_val_lower, 0);
+        la_vreplvei_h(const_vector_lower, const_vector_lower, 0);
+        la_vsle_h(vmask1, const_vector_upper, vreg);
+        la_vsle_h(vmask2, const_vector_lower, vreg);
+        break;
+    case 1:
+        la_vinsgr2vr_w(const_vector_upper, const_val_upper, 0);
+        la_vreplvei_w(const_vector_upper, const_vector_upper, 0);
+        la_vinsgr2vr_w(const_vector_lower, const_val_lower, 0);
+        la_vreplvei_w(const_vector_lower, const_vector_lower, 0);
+        la_vsle_w(vmask1, const_vector_upper, vreg);
+        la_vsle_w(vmask2, const_vector_lower, vreg);
+        break;
+    case 2:
+        la_vinsgr2vr_d(const_vector_upper, const_val_upper, 0);
+        la_vreplvei_d(const_vector_upper, const_vector_upper, 0);
+        la_vinsgr2vr_d(const_vector_lower, const_val_lower, 0);
+        la_vreplvei_d(const_vector_lower, const_vector_lower, 0);
+        la_vsle_d(vmask1, const_vector_upper, vreg);
+        la_vsle_d(vmask2, const_vector_lower, vreg);
+        break;
+    case 3:
+        assert(0);
+        break;
+    default:
+        assert(0);
+    }
+    la_vor_v(vmask1, vmask1, vmask2);
+    la_vseteqz_v(fcc0_ir2_opnd, vmask1);
+    la_bcnez(fcc0_ir2_opnd, l_done);
+
+    IR2_OPND tmp = const_val_lower;
+    IR2_OPND tmp2 = const_val_upper;
+    li_d(tmp, env_offset_QC());
+    li_d(tmp2, 1);
+    la_stx_w(tmp2, env_ir2_opnd, tmp);
+
+    la_label(l_done);
+
+    switch (size) {
+    case 0:
+        la_vmin_h(vreg, const_vector_upper, vreg);
+        la_vmax_h(vreg, const_vector_lower, vreg);
+        break;
+    case 1:
+        la_vmin_w(vreg, const_vector_upper, vreg);
+        la_vmax_w(vreg, const_vector_lower, vreg);
+        break;
+    case 2:
+        la_vmin_d(vreg, const_vector_upper, vreg);
+        la_vmax_d(vreg, const_vector_lower, vreg);
+        break;
+    case 3:
+        assert(0);
+        break;
+    default:
+        assert(0);
+    }
+    free_alloc_gpr(const_val_upper);
+    free_alloc_gpr(const_val_lower);
+    free_alloc_fpr(vmask1);
+    free_alloc_fpr(vmask2);
+    free_alloc_fpr(const_vector_upper);
+    free_alloc_fpr(const_vector_lower);
+}
+
+static inline void gen_unsigned_sat_q(IR2_OPND vreg, int size, int N){
+    assert(0);
+}
+
+static void lata_gen_sat_q(IR2_OPND vreg, int size, int N, bool is_u) {
+    if(!is_u)
+        gen_signed_sat_q(vreg, size, N);
+    else
+        gen_unsigned_sat_q(vreg, size, N);
+}
+
 static void gen_goto_tb_indirect(DisasContext *s, uint32_t rn)
 {
     IR2_OPND reg_n = alloc_gpr_src(rn);
@@ -9390,9 +9484,9 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
             default:
                 g_assert_not_reached();
             }
+            la_vand_v(vreg_d, vreg_d, fsmask_ir2_opnd);
         }
 
-        // la_vand_v(vreg_d, vreg_d, fsmask_ir2_opnd);
     }
 
     store_fpr_dst(rd, vreg_d);
@@ -9490,7 +9584,7 @@ static void handle_scalar_simd_shli(DisasContext *s, bool insert, int immh,
     IR2_OPND vreg_mask = ra_alloc_ftemp();
     IR2_OPND vreg_temp = ra_alloc_ftemp();
 
-    if(!insert){
+    if (!insert) {
         la_vslli_d(vreg_d, vreg_n, shift);
     } else {
         la_vfcmp_cond_d(vreg_mask, vreg_n, vreg_n, FCMP_COND_SEQ);
@@ -10322,7 +10416,8 @@ static void handle_2misc_reciprocal(DisasContext *s, int opcode, bool is_scalar,
     assert(0);
 }
 
-static void handle_fcvt(DisasContext *s, int opcode, bool is_u, int size, int rn, int rd)
+static void handle_fcvt(DisasContext *s, int opcode, bool is_u, int size,
+                        int rn, int rd)
 {
     IR2_OPND vreg_d = alloc_fpr_src(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
@@ -11141,7 +11236,59 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         }
         break;
     case 0x9: /* SQDMLAL, SQDMLAL2 */
-        assert(0);
+        vreg_d = alloc_fpr_dst(rd);
+        if (!is_q) {
+            la_vilvl_b(vtemp, vzero, vreg_n);
+            la_vilvl_b(vtemp1, vzero, vreg_m);
+            switch (size) {
+            case 0:
+                la_vmulwev_h_b(vzero, vtemp, vtemp1);
+                la_vslli_b(vzero, vzero, 1);
+                lata_gen_sat_q(vzero, size, 16, false);
+                la_vadd_q(vreg_d, vreg_d, vzero);
+                lata_gen_sat_q(vzero, size, 16, false);
+                break;
+            case 1:
+                la_vmulwev_w_h(vzero, vtemp, vtemp1);
+                la_vslli_w(vzero, vzero, 1);
+                lata_gen_sat_q(vzero, size, 32, false);
+                la_vadd_q(vreg_d, vreg_d, vzero);
+                lata_gen_sat_q(vzero, size, 32, false);
+                break;
+            case 2:
+                la_vmulwev_d_w(vzero, vtemp, vtemp1);
+                la_vslli_d(vzero, vzero, 1);
+                lata_gen_sat_q(vzero, size, 64, false);
+                la_vadd_q(vreg_d, vreg_d, vzero);
+                lata_gen_sat_q(vzero, size, 64, false);
+                break;
+            case 3:
+                assert(0);
+                la_vmulwev_q_d(vzero, vtemp, vtemp1);
+                la_vslli_d(vzero, vzero, 1);
+                lata_gen_sat_q(vzero, size, 128, false);
+                la_vadd_q(vreg_d, vreg_d, vzero);
+                lata_gen_sat_q(vzero, size, 128, false);
+                break;
+            default:
+                assert(0);
+            }
+
+        } else {
+            assert(0);
+            switch (size) {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                assert(0);
+            }
+        }
         break;
     case 0xb: /* SQDMLSL, SQDMLSL2 */
         assert(0);
