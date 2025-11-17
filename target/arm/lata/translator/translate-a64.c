@@ -17,6 +17,9 @@
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 #include "qemu/osdep.h"
+#include "cpu.h"
+#include "reg-alloc.h"
+#include "tcg/translate.h"
 
 #ifdef CONFIG_LATA
 #include "target/arm/lata/include/translate.h"
@@ -270,6 +273,88 @@ static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
             g_assert_not_reached();
         }
     }
+}
+
+static inline void gen_signed_sat_q(IR2_OPND vreg, int size, int N){
+    assert(0);
+}
+
+static inline void gen_unsigned_sat_q(IR2_OPND vreg, int size, int N){
+    assert(0);
+}
+
+static void lata_gen_sat_q(IR2_OPND vreg, int size, int N, bool is_u) {
+    if(!is_u)
+        gen_signed_sat_q(vreg, size, N);
+    else
+        gen_unsigned_sat_q(vreg, size, N);
+}
+
+static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
+                                          IR2_OPND vreg2)
+{
+    IR2_OPND temp = ra_alloc_itemp();
+
+    // li_d(temp, ctx->base->pc_next);
+    // la_st_d(temp, env_ir2_opnd, env_offset_pc());
+
+    lata_gen_call_helper_prologue(tcg_ctx);
+    li_d(temp, (uint64_t)helper_neon_addl_saturate_s64);
+
+    la_mov64(a0_ir2_opnd, env_ir2_opnd);
+    la_vpickve2gr_d(a1_ir2_opnd, vreg1, 0);
+    la_vpickve2gr_d(a2_ir2_opnd, vreg2, 0);
+    la_jirl(ra_ir2_opnd, temp, 0);
+    la_vinsgr2vr_d(vreg_d, a0_ir2_opnd, 0);
+
+    la_mov64(a0_ir2_opnd, env_ir2_opnd);
+    la_vpickve2gr_d(a1_ir2_opnd, vreg1, 1);
+    la_vpickve2gr_d(a2_ir2_opnd, vreg2, 1);
+    la_jirl(ra_ir2_opnd, temp, 0);
+    la_vinsgr2vr_d(vreg_d, a0_ir2_opnd, 1);
+    lata_gen_call_helper_epilogue(tcg_ctx);
+
+    free_alloc_gpr(temp);
+}
+
+static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
+                                          IR2_OPND vreg2)
+{
+    IR2_OPND temp = ra_alloc_itemp();
+
+    // li_d(temp, ctx->base->pc_next);
+    // la_st_d(temp, env_ir2_opnd, env_offset_pc());
+
+    lata_gen_call_helper_prologue(tcg_ctx);
+
+    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
+
+    la_mov64(a0_ir2_opnd, env_ir2_opnd);
+    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 0);
+    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 0);
+    la_jirl(ra_ir2_opnd, temp, 0);
+    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 0);
+
+    la_mov64(a0_ir2_opnd, env_ir2_opnd);
+    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 1);
+    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 1);
+    la_jirl(ra_ir2_opnd, temp, 0);
+    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 1);
+
+    la_mov64(a0_ir2_opnd, env_ir2_opnd);
+    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 2);
+    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 2);
+    la_jirl(ra_ir2_opnd, temp, 0);
+    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 2);
+
+    la_mov64(a0_ir2_opnd, env_ir2_opnd);
+    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 3);
+    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 3);
+    la_jirl(ra_ir2_opnd, temp, 0);
+    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 3);
+
+    lata_gen_call_helper_epilogue(tcg_ctx);
+    free_alloc_gpr(temp);
 }
 
 static void gen_goto_tb_indirect(DisasContext *s, uint32_t rn)
@@ -11142,9 +11227,53 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         }
         break;
     case 0x9: /* SQDMLAL, SQDMLAL2 */
+        vreg_d = alloc_fpr_dst(rd);
+        if (!is_q) {
+            switch (size) {
+            case 0:
+                assert(0);
+                break;
+            case 1:
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vreg_m);
+                la_vmulwev_w_h(vzero, vtemp, vtemp1);
+                lata_helper_addl_saturate_s32(s, vzero, vzero, vzero);
+                lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero);
+                break;
+            case 2:
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vreg_m);
+                la_vmulwev_d_w(vzero, vtemp, vtemp1);
+                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero);
+                lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero);
+                break;
+            case 3:
+                assert(0);
+                break;
+            default:
+                assert(0);
+            }
+
+        } else {
+            assert(0);
+            switch (size) {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                assert(0);
+            }
+        }
+        break;
     case 0xb: /* SQDMLSL, SQDMLSL2 */
+        assert(0);
+        break;
     case 0xd: /* SQDMULL, SQDMULL2 */
-        assert(size == 1);
         assert(0);
         break;
     case 0x10: /* UADDL, UADDL2 */
