@@ -9689,10 +9689,11 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
     int size = 32 - clz32(immh) - 1;
     int esize = 8 << size;
     int shift = (2 * esize) - immhb;
-    int elements = is_scalar ? 1 : (64 / esize);
     bool round = extract32(opcode, 0, 1);
 
     assert(size < 4);
+
+    assert(is_q == false);
 
     if (extract32(immh, 3, 1)) {
         lata_unallocated_encoding(s);
