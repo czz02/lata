@@ -291,7 +291,7 @@ static void lata_gen_sat_q(IR2_OPND vreg, int size, int N, bool is_u) {
 }
 
 static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
-                                          IR2_OPND vreg2)
+                                          IR2_OPND vreg2, int rd)
 {
     IR2_OPND temp = ra_alloc_itemp();
 
@@ -312,13 +312,17 @@ static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR
     la_vpickve2gr_d(a2_ir2_opnd, vreg2, 1);
     la_jirl(ra_ir2_opnd, temp, 0);
     la_vinsgr2vr_d(vreg_d, a0_ir2_opnd, 1);
+
+    if (rd != -1)
+        la_vst(vreg_d, env_ir2_opnd, env_offset_fpr(rd));
+
     lata_gen_call_helper_epilogue(tcg_ctx);
 
     free_alloc_gpr(temp);
 }
 
 static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
-                                          IR2_OPND vreg2)
+                                          IR2_OPND vreg2, int rd)
 {
     IR2_OPND temp = ra_alloc_itemp();
 
@@ -352,6 +356,8 @@ static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d, IR
     la_vpickve2gr_w(a2_ir2_opnd, vreg2, 3);
     la_jirl(ra_ir2_opnd, temp, 0);
     la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 3);
+    if (rd != -1)
+        la_vst(vreg_d, env_ir2_opnd, env_offset_fpr(rd));
 
     lata_gen_call_helper_epilogue(tcg_ctx);
     free_alloc_gpr(temp);
@@ -11237,15 +11243,15 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s32(s, vzero, vzero, vzero);
-                lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero);
+                lata_helper_addl_saturate_s32(s, vzero, vzero, vzero, -1);
+                lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero, rd);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero);
-                lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero);
+                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, -1);
+                lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero, rd);
                 break;
             case 3:
                 assert(0);
