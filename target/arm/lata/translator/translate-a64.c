@@ -12469,11 +12469,16 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
         vreg_d = alloc_fpr_dst(rd);
     }
     /* 分别执行左移和右移 */
-    IR2_OPND vtemp, vleft, vright;
+    IR2_OPND vtemp, vleft, vright, vtemp1, vzero;
     if (opcode == 0x08) {
         vtemp = ra_alloc_ftemp();
         vleft = ra_alloc_ftemp();
         vright = ra_alloc_ftemp();
+    } else if(opcode == 0x16){
+        vtemp = ra_alloc_ftemp();
+        vtemp1 = ra_alloc_ftemp();
+        vzero = ra_alloc_ftemp();
+        la_vandi_b(vzero, vzero, 0);
     }
 
     switch (opcode) {
@@ -12834,8 +12839,42 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
         }
         goto do_gvec_end;
     case 0x16: /* SQDMULH, SQRDMULH */
-        assert(0);
-        return;
+        if (u) {
+            switch (size) {
+            case 1:
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vreg_m);
+                la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
+                la_vssrarni_h_w(vreg_d, vreg_d, 16);
+                break;
+            case 2:
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vreg_m);
+                la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
+                la_vssrarni_w_d(vreg_d, vreg_d, 32);
+                break;
+            default:
+                assert(0);
+            }
+        } else {
+            switch (size) {
+            case 1:
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vreg_m);
+                la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
+                la_vssrani_h_w(vreg_d, vreg_d, 16);
+                break;
+            case 2:
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vreg_m);
+                la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
+                la_vssrani_w_d(vreg_d, vreg_d, 32);
+                break;
+            default:
+                assert(0);
+            }
+        }
+        goto do_gvec_end;
     case 0x11: /* CMEQ, CMTST */
         if (u) { /* CMEQ */
             switch (size) {
@@ -12961,6 +13000,10 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
             free_alloc_fpr(vtemp);
             free_alloc_fpr(vleft);
             free_alloc_fpr(vright);
+        } else if (opcode == 0x16) {
+            free_alloc_fpr(vtemp);
+            free_alloc_fpr(vtemp1);
+            free_alloc_fpr(vzero);
         }
         return;
     }
