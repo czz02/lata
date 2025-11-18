@@ -17,9 +17,9 @@
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 #include "qemu/osdep.h"
-#include "cpu.h"
+#include "env.h"
+#include "la-ir2.h"
 #include "reg-alloc.h"
-#include "tcg/translate.h"
 
 #ifdef CONFIG_LATA
 #include "target/arm/lata/include/translate.h"
@@ -275,19 +275,97 @@ static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
     }
 }
 
-static inline void gen_signed_sat_q(IR2_OPND vreg, int size, int N){
-    assert(0);
-}
 
-static inline void gen_unsigned_sat_q(IR2_OPND vreg, int size, int N){
-    assert(0);
-}
+// check saturate
+static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
+{
+    IR2_OPND vtemp = ra_alloc_ftemp();
+    IR2_OPND temp = ra_alloc_itemp();
+    IR2_OPND set_qc = ir2_opnd_new_type(IR2_OPND_LABEL);
+    IR2_OPND exit = ir2_opnd_new_type(IR2_OPND_LABEL);
 
-static void lata_gen_sat_q(IR2_OPND vreg, int size, int N, bool is_u) {
-    if(!is_u)
-        gen_signed_sat_q(vreg, size, N);
+    uint64_t *upper;
+    uint64_t *lower;
+
+    static uint64_t s_upper[] = { INT8_MAX, INT16_MAX, INT32_MAX, INT64_MAX };
+    static uint64_t s_lower[] = { INT8_MIN, INT16_MIN, INT32_MIN, INT64_MIN };
+
+    static uint64_t u_upper[] = { UINT8_MAX, UINT16_MAX, UINT32_MAX,
+                                  UINT64_MAX };
+    static uint64_t u_lower[] = { 0, 0, 0, 0 };
+
+    if (!is_u)
+        upper = s_upper, lower = s_lower;
     else
-        gen_unsigned_sat_q(vreg, size, N);
+        upper = u_upper, lower = u_lower;
+
+    li_d(temp, upper[size]);
+    la_vinsgr2vr_d(vtemp, temp, 0);
+
+    switch (size) {
+    case 0:
+        la_vpickve2gr_b(vtemp, vtemp, 0);
+        la_vseq_b(vtemp, vtemp, vreg);
+        break;
+    case 1:
+        la_vpickve2gr_h(vtemp, vtemp, 0);
+        la_vseq_h(vtemp, vtemp, vreg);
+        break;
+    case 2:
+        la_vpickve2gr_w(vtemp, vtemp, 0);
+        la_vseq_w(vtemp, vtemp, vreg);
+        break;
+    case 3:
+        la_vpickve2gr_d(vtemp, vtemp, 0);
+        la_vseq_d(vtemp, vtemp, vreg);
+        break;
+    default:
+        assert(0);
+    }
+
+    la_vseteqz_v(fcc1_ir2_opnd, vtemp);
+    la_bcnez(fcc1_ir2_opnd, set_qc);
+    
+    li_d(temp, lower[size]);
+    la_vinsgr2vr_d(vtemp, temp, 0);
+
+    switch (size) {
+    case 0:
+        la_vpickve2gr_b(vtemp, vtemp, 0);
+        la_vseq_b(vtemp, vtemp, vreg);
+        break;
+    case 1:
+        la_vpickve2gr_h(vtemp, vtemp, 0);
+        la_vseq_h(vtemp, vtemp, vreg);
+        break;
+    case 2:
+        la_vpickve2gr_w(vtemp, vtemp, 0);
+        la_vseq_w(vtemp, vtemp, vreg);
+        break;
+    case 3:
+        la_vpickve2gr_d(vtemp, vtemp, 0);
+        la_vseq_d(vtemp, vtemp, vreg);
+        break;
+    default:
+        assert(0);
+    }
+
+    la_vseteqz_v(fcc1_ir2_opnd, vtemp);
+    la_bcnez(fcc1_ir2_opnd, set_qc);
+
+    la_b(exit);
+    
+
+    la_label(set_qc);    
+
+    li_d(temp, 1);
+    la_st_w(temp, env_ir2_opnd, env_offset_QC());
+
+    la_label(exit);
+    
+
+    free_alloc_gpr(temp);
+    free_alloc_fpr(vtemp);
 }
 
 static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
@@ -9607,7 +9685,81 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
                                    bool is_u_shift, bool is_u_narrow, int immh,
                                    int immb, int opcode, int rn, int rd)
 {
-    assert(0);
+    int immhb = immh << 3 | immb;
+    int size = 32 - clz32(immh) - 1;
+    int esize = 8 << size;
+    int shift = (2 * esize) - immhb;
+    int elements = is_scalar ? 1 : (64 / esize);
+    bool round = extract32(opcode, 0, 1);
+
+    assert(size < 4);
+
+    if (extract32(immh, 3, 1)) {
+        lata_unallocated_encoding(s);
+        return;
+    }
+
+    if (!fp_access_check(s)) {
+        return;
+    }
+
+
+    IR2_OPND vreg_d = alloc_fpr_dst(rd);
+    IR2_OPND vreg_n = alloc_fpr_src(rn);
+
+    if (round) {
+        if (is_u_shift) {
+            switch (size) {
+            case 0:
+                la_vssrlrni_bu_h(vreg_d, vreg_n, shift);
+                gen_sat_q(vreg_d, 0, true);
+                break;
+            case 1:
+                la_vssrlrni_hu_w(vreg_d, vreg_n, shift);
+                gen_sat_q(vreg_d, 1, true);
+                break;
+            case 2:
+                la_vssrlrni_wu_d(vreg_d, vreg_n, shift);
+                gen_sat_q(vreg_d, 2, true);
+                break;
+            case 3:
+                assert(0);
+                break;
+            default:
+                assert(0);
+            }
+        } else {
+            if (!is_u_narrow) {
+                switch (size) {
+                case 0:
+                    la_vssrarni_b_h(vreg_d, vreg_n, shift);
+                    gen_sat_q(vreg_d, 0, false);
+                    break;
+                case 1:
+                    la_vssrarni_h_w(vreg_d, vreg_n, shift);
+                    gen_sat_q(vreg_d, 1, false);
+                    break;
+                case 2:
+                    la_vssrarni_w_d(vreg_d, vreg_n, shift);
+                    gen_sat_q(vreg_d, 2, false);
+                    break;
+                case 3:
+                    assert(0);
+                    break;
+                default:
+                    assert(0);
+                }
+            } else {
+                assert(0);
+            }
+        }
+
+    } else {
+        assert(0);
+    }
+
+    free_alloc_fpr(vreg_d);
+    free_alloc_fpr(vreg_n);
 }
 
 /* SQSHLU, UQSHL, SQSHL: saturating left shifts */
@@ -11288,16 +11440,24 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vzero, vtemp, vtemp1);
                 lata_helper_addl_saturate_s32(s, vzero, vzero, vzero, -1);
+                // la_vsadd_w(vzero, vzero, vzero);
+                // gen_sat_q(vzero, 1, false);
                 la_vneg_w(vzero, vzero);
                 lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero, rd);
+                // la_vsadd_w(vreg_d, vreg_d, vzero);
+                // gen_sat_q(vreg_d, 1, false);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vzero, vtemp, vtemp1);
                 lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, -1);
+                // la_vsadd_d(vzero, vzero, vzero);
+                // gen_sat_q(vreg_d, 2, false);
                 la_vneg_d(vzero, vzero);
                 lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero, rd);
+                // la_vsadd_d(vreg_d, vreg_d, vzero);
+                // gen_sat_q(vreg_d, 2, false);
                 break;
             case 3:
                 assert(0);
