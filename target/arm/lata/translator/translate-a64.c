@@ -377,14 +377,15 @@ static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR
     // la_st_d(temp, env_ir2_opnd, env_offset_pc());
 
     lata_gen_call_helper_prologue(tcg_ctx);
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s64);
 
+    li_d(temp, (uint64_t)helper_neon_addl_saturate_s64);
     la_mov64(a0_ir2_opnd, env_ir2_opnd);
     la_vpickve2gr_d(a1_ir2_opnd, vreg1, 0);
     la_vpickve2gr_d(a2_ir2_opnd, vreg2, 0);
     la_jirl(ra_ir2_opnd, temp, 0);
     la_vinsgr2vr_d(vreg_d, a0_ir2_opnd, 0);
 
+    li_d(temp, (uint64_t)helper_neon_addl_saturate_s64);
     la_mov64(a0_ir2_opnd, env_ir2_opnd);
     la_vpickve2gr_d(a1_ir2_opnd, vreg1, 1);
     la_vpickve2gr_d(a2_ir2_opnd, vreg2, 1);
@@ -410,25 +411,27 @@ static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d, IR
     lata_gen_call_helper_prologue(tcg_ctx);
 
     li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-
     la_mov64(a0_ir2_opnd, env_ir2_opnd);
     la_vpickve2gr_w(a1_ir2_opnd, vreg1, 0);
     la_vpickve2gr_w(a2_ir2_opnd, vreg2, 0);
     la_jirl(ra_ir2_opnd, temp, 0);
     la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 0);
 
+    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
     la_mov64(a0_ir2_opnd, env_ir2_opnd);
     la_vpickve2gr_w(a1_ir2_opnd, vreg1, 1);
     la_vpickve2gr_w(a2_ir2_opnd, vreg2, 1);
     la_jirl(ra_ir2_opnd, temp, 0);
     la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 1);
 
+    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
     la_mov64(a0_ir2_opnd, env_ir2_opnd);
     la_vpickve2gr_w(a1_ir2_opnd, vreg1, 2);
     la_vpickve2gr_w(a2_ir2_opnd, vreg2, 2);
     la_jirl(ra_ir2_opnd, temp, 0);
     la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 2);
 
+    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
     la_mov64(a0_ir2_opnd, env_ir2_opnd);
     la_vpickve2gr_w(a1_ir2_opnd, vreg1, 3);
     la_vpickve2gr_w(a2_ir2_opnd, vreg2, 3);
@@ -9967,7 +9970,13 @@ static void handle_3same_64(DisasContext *s, int opcode, bool u, int rd, int rn,
         assert(0);
         break;
     case 0x5: /* SQSUB */
-        assert(0);
+        // TODO : need handle saturate
+        if (u) {
+            la_vssub_d(vreg_d, vreg_n, vreg_m);
+        } else {
+            la_vssub_d(vreg_d, vreg_n, vreg_m);
+        }
+        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
         break;
     case 0x6: /* CMGT, CMHI */
         assert(0);
@@ -12469,10 +12478,49 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
 
     switch (opcode) {
     case 0x01: /* SQADD, UQADD */
-        assert(0);
+        if (u) {
+          assert(0);
+        } else {
+          assert(0);
+        }
         return;
     case 0x05: /* SQSUB, UQSUB */
-        assert(0);
+          // TODO : need handle saturate
+        if (u) {
+          switch(size){
+          case 0:
+              la_vssub_bu(vreg_d, vreg_n, vreg_m);              
+              break;
+          case 1:
+              la_vssub_hu(vreg_d, vreg_n, vreg_m);              
+              break;
+          case 2:
+              la_vssub_wu(vreg_d, vreg_n, vreg_m);              
+              break;
+          case 3:
+              la_vssub_du(vreg_d, vreg_n, vreg_m);
+              break;
+          default:
+              assert(0);
+          }
+        } else {
+          switch(size){
+          case 0:
+              la_vssub_b(vreg_d, vreg_n, vreg_m);              
+              break;
+          case 1:
+              la_vssub_h(vreg_d, vreg_n, vreg_m);              
+              break;
+          case 2:
+              la_vssub_w(vreg_d, vreg_n, vreg_m);              
+              break;
+          case 3:
+              la_vssub_d(vreg_d, vreg_n, vreg_m);              
+              break;
+          default:
+              assert(0);
+          }
+        }
         return;
     case 0x08: /* SSHL, USHL */
         switch (size) {

@@ -368,6 +368,8 @@ struct CPUState {
     uint64_t random_seed;
 #ifdef CONFIG_ANDROID
     sigjmp_buf *jmp_env_vec;
+#else
+    sigjmp_buf jmp_env;
 #endif
 
     QemuMutex work_mutex;

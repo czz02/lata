@@ -3824,17 +3824,20 @@ foreach target : target_dirs
                  c_args: c_args,
                  build_by_default: false,
                  name_suffix: 'fa')
-  liblata = shared_library('lata-' + target,
-                 sources: arch_srcs + genh,
-                 dependencies: arch_deps,
-                 objects: objects,
-                 include_directories: target_inc,
-                 c_args: c_args,
-                 build_by_default: true,
-                 install: true,
-                 link_with:[libtcg_user, libqom, libqemuutil],
-                 link_whole:[libhwcore]
-                 )
+
+  if have_android
+    liblata = shared_library('lata-' + target,
+                   sources: arch_srcs + genh,
+                   dependencies: arch_deps,
+                   objects: objects,
+                   include_directories: target_inc,
+                   c_args: c_args,
+                   build_by_default: true,
+                   install: true,
+                   link_with:[libtcg_user, libqom, libqemuutil],
+                   link_whole:[libhwcore]
+                   )
+  endif
 
   if target.endswith('-softmmu')
     execs = [{

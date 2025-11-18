@@ -1018,8 +1018,10 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
 {
     int ret;
 
+#ifdef CONFIG_ANDROID
     tcg_register_thread();
     lsenv_register_thread(cpu->env_ptr);
+#endif
     /* if an exception is pending, we execute it here */
     while (!cpu_handle_exception(cpu, &ret)) {
         TranslationBlock *last_tb = NULL;
