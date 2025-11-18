@@ -11277,7 +11277,50 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         }
         break;
     case 0xb: /* SQDMLSL, SQDMLSL2 */
-        assert(0);
+        vreg_d = alloc_fpr_dst(rd);
+        if (!is_q) {
+            switch (size) {
+            case 0:
+                assert(0);
+                break;
+            case 1:
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vreg_m);
+                la_vmulwev_w_h(vzero, vtemp, vtemp1);
+                lata_helper_addl_saturate_s32(s, vzero, vzero, vzero, -1);
+                la_vneg_w(vzero, vzero);
+                lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero, rd);
+                break;
+            case 2:
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vreg_m);
+                la_vmulwev_d_w(vzero, vtemp, vtemp1);
+                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, -1);
+                la_vneg_d(vzero, vzero);
+                lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero, rd);
+                break;
+            case 3:
+                assert(0);
+                break;
+            default:
+                assert(0);
+            }
+
+        } else {
+            assert(0);
+            switch (size) {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                assert(0);
+            }
+        }
         break;
     case 0xd: /* SQDMULL, SQDMULL2 */
         assert(0);
