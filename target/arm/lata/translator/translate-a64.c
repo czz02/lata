@@ -14139,6 +14139,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
     IR2_OPND vreg_m = alloc_fpr_src(rm);
     IR2_OPND vtemp = ra_alloc_ftemp();
     IR2_OPND vtemp1 = ra_alloc_ftemp();
+    IR2_OPND vzero = ra_alloc_ftemp();
 
     switch (16 * u + opcode) {
     case 0x0e: /* SDOT */
@@ -14247,14 +14248,6 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
          * rely on the fact that 0 op 0 == 0 with no side effects.
          */
 
-        if (size == 1 && !is_scalar) {
-            /* The simplest way to handle the 16x16 indexed ops is to duplicate
-             * the index into both halves of the 32 bit tcg_idx and then use
-             * the usual Neon helpers.
-             */
-            assert(0);
-        }
-
         switch (16 * u + opcode) {
         case 0x08: /* MUL */
         case 0x10: /* MLA */
@@ -14302,7 +14295,29 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
             assert(0);
             break;
         case 0x0c: /* SQDMULH */
-            assert(0);
+            // TODO : need handle saturate
+            switch (size) {
+            case 1:
+                vreg_d = alloc_fpr_src(rd);
+                la_vreplvei_h(vtemp1, vreg_m, index);
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vtemp1);
+                la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
+                la_vsadd_w(vreg_d, vreg_d, vreg_d);
+                la_vssrani_h_w(vreg_d, vreg_d, 16);
+                break;
+            case 2:
+                vreg_d = alloc_fpr_src(rd);
+                la_vreplvei_w(vtemp1, vreg_m, index);
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vtemp1);
+                la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
+                la_vsadd_d(vreg_d, vreg_d, vreg_d);
+                la_vssrani_w_d(vreg_d, vreg_d, 32);
+                break;
+            default:
+                g_assert_not_reached();
+            }
             break;
         case 0x0d: /* SQRDMULH */
             assert(0);
@@ -14336,6 +14351,7 @@ do_gvec_end:
     free_alloc_fpr(vreg_m);
     free_alloc_fpr(vtemp);
     free_alloc_fpr(vtemp1);
+    free_alloc_fpr(vzero);
 }
 
 /* Crypto AES
