@@ -323,7 +323,7 @@ static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
         assert(0);
     }
 
-    la_vseteqz_v(fcc1_ir2_opnd, vtemp);
+    la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
     la_bcnez(fcc1_ir2_opnd, set_qc);
     
     li_d(temp, lower[size]);
@@ -350,7 +350,7 @@ static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
         assert(0);
     }
 
-    la_vseteqz_v(fcc1_ir2_opnd, vtemp);
+    la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
     la_bcnez(fcc1_ir2_opnd, set_qc);
 
     la_b(exit);
@@ -9711,6 +9711,7 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
 
+    // TODO : need fix saturate
     if (round) {
         if (is_u_shift) {
             switch (size) {
@@ -9964,19 +9965,42 @@ static void handle_3same_64(DisasContext *s, int opcode, bool u, int rd, int rn,
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
     IR2_OPND vreg_m = alloc_fpr_src(rm);
+    IR2_OPND vreg_temp = ra_alloc_ftemp();
+    IR2_OPND vreg_temp1 = ra_alloc_ftemp();
+    IR2_OPND temp = ra_alloc_itemp();
+
+    IR2_OPND set_qc = ir2_opnd_new_type(IR2_OPND_LABEL);
+    IR2_OPND exit = ir2_opnd_new_type(IR2_OPND_LABEL);
+
 
     switch (opcode) {
     case 0x1: /* SQADD */
         assert(0);
         break;
     case 0x5: /* SQSUB */
-        // TODO : need handle saturate
         if (u) {
-            la_vssub_d(vreg_d, vreg_n, vreg_m);
+            la_vssub_du(vreg_temp1, vreg_n, vreg_m);
         } else {
-            la_vssub_d(vreg_d, vreg_n, vreg_m);
+            la_vssub_d(vreg_temp1, vreg_n, vreg_m);
         }
-        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
+        la_vinsgr2vr_d(vreg_temp1, zero_ir2_opnd, 1);
+
+        la_vsub_d(vreg_temp, vreg_n, vreg_m);
+        la_vinsgr2vr_d(vreg_temp, zero_ir2_opnd, 1);
+
+        la_vseq_d(vreg_temp, vreg_temp1, vreg_temp);
+        la_vsetanyeqz_b(fcc1_ir2_opnd, vreg_temp);
+        la_bcnez(fcc1_ir2_opnd, set_qc);
+        la_b(exit);
+
+        la_label(set_qc);
+        li_d(temp, 1);
+        la_st_w(temp, env_ir2_opnd, env_offset_QC());
+
+        la_label(exit);
+
+        la_vori_b(vreg_d, vreg_temp1, 0);
+
         break;
     case 0x6: /* CMGT, CMHI */
         assert(0);
@@ -10015,6 +10039,10 @@ static void handle_3same_64(DisasContext *s, int opcode, bool u, int rd, int rn,
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
     free_alloc_fpr(vreg_m);
+
+    free_alloc_fpr(vreg_temp);
+    free_alloc_fpr(vreg_temp1);
+    free_alloc_gpr(temp);
 }
 
 static void handle_3same_float(DisasContext *s, int size, int elements,
@@ -12470,15 +12498,23 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
     }
     /* 分别执行左移和右移 */
     IR2_OPND vtemp, vleft, vright, vtemp1, vzero;
+    IR2_OPND set_qc, exit;
+    IR2_OPND temp;
     if (opcode == 0x08) {
         vtemp = ra_alloc_ftemp();
         vleft = ra_alloc_ftemp();
         vright = ra_alloc_ftemp();
-    } else if(opcode == 0x16){
+    } else if (opcode == 0x16) {
         vtemp = ra_alloc_ftemp();
         vtemp1 = ra_alloc_ftemp();
         vzero = ra_alloc_ftemp();
         la_vandi_b(vzero, vzero, 0);
+    } else if (opcode == 0x05) {
+        vtemp = ra_alloc_ftemp();
+        vtemp1 = ra_alloc_ftemp();
+        temp = ra_alloc_itemp();
+        set_qc = ir2_opnd_new_type(IR2_OPND_LABEL);
+        exit = ir2_opnd_new_type(IR2_OPND_LABEL);
     }
 
     switch (opcode) {
@@ -12490,43 +12526,62 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
         }
         return;
     case 0x05: /* SQSUB, UQSUB */
-          // TODO : need handle saturate
         if (u) {
-          switch(size){
-          case 0:
-              la_vssub_bu(vreg_d, vreg_n, vreg_m);              
-              break;
-          case 1:
-              la_vssub_hu(vreg_d, vreg_n, vreg_m);              
-              break;
-          case 2:
-              la_vssub_wu(vreg_d, vreg_n, vreg_m);              
-              break;
-          case 3:
-              la_vssub_du(vreg_d, vreg_n, vreg_m);
-              break;
-          default:
-              assert(0);
-          }
+            switch (size) {
+            case 0:
+                la_vssub_bu(vtemp1, vreg_n, vreg_m);
+                la_vsub_b(vtemp, vreg_n, vreg_m);
+                break;
+            case 1:
+                la_vssub_hu(vtemp1, vreg_n, vreg_m);
+                la_vsub_h(vtemp, vreg_n, vreg_m);
+                break;
+            case 2:
+                la_vssub_wu(vtemp1, vreg_n, vreg_m);
+                la_vsub_w(vtemp, vreg_n, vreg_m);
+                break;
+            case 3:
+                la_vssub_du(vtemp1, vreg_n, vreg_m);
+                la_vsub_d(vtemp, vreg_n, vreg_m);
+                break;
+            default:
+                assert(0);
+            }
         } else {
-          switch(size){
-          case 0:
-              la_vssub_b(vreg_d, vreg_n, vreg_m);              
-              break;
-          case 1:
-              la_vssub_h(vreg_d, vreg_n, vreg_m);              
-              break;
-          case 2:
-              la_vssub_w(vreg_d, vreg_n, vreg_m);              
-              break;
-          case 3:
-              la_vssub_d(vreg_d, vreg_n, vreg_m);              
-              break;
-          default:
-              assert(0);
-          }
+            switch (size) {
+            case 0:
+                la_vssub_b(vtemp1, vreg_n, vreg_m);
+                la_vsub_b(vtemp, vreg_n, vreg_m);
+                break;
+            case 1:
+                la_vssub_h(vtemp1, vreg_n, vreg_m);
+                la_vsub_h(vtemp, vreg_n, vreg_m);
+                break;
+            case 2:
+                la_vssub_w(vtemp1, vreg_n, vreg_m);
+                la_vsub_w(vtemp, vreg_n, vreg_m);
+                break;
+            case 3:
+                la_vssub_d(vtemp1, vreg_n, vreg_m);
+                la_vsub_d(vtemp, vreg_n, vreg_m);
+                break;
+            default:
+                assert(0);
+            }
         }
-        return;
+        la_vseq_d(vtemp, vtemp1, vtemp);
+        la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
+        la_bcnez(fcc1_ir2_opnd, set_qc);
+        la_b(exit);
+
+        la_label(set_qc);
+        li_d(temp, 1);
+        la_st_w(temp, env_ir2_opnd, env_offset_QC());
+
+        la_label(exit);
+
+        la_vori_b(vreg_d, vtemp1, 0);
+        goto do_gvec_end;
     case 0x08: /* SSHL, USHL */
         switch (size) {
         case 0:
@@ -13004,6 +13059,10 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
             free_alloc_fpr(vtemp);
             free_alloc_fpr(vtemp1);
             free_alloc_fpr(vzero);
+        } else if (opcode == 0x05) {
+            free_alloc_fpr(vtemp);
+            free_alloc_fpr(vtemp1);
+            free_alloc_gpr(temp);
         }
         return;
     }
