@@ -12894,18 +12894,21 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
         }
         goto do_gvec_end;
     case 0x16: /* SQDMULH, SQRDMULH */
+        // TODO : need handle saturate
         if (u) {
             switch (size) {
             case 1:
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
+                la_vsadd_w(vreg_d, vreg_d, vreg_d);
                 la_vssrarni_h_w(vreg_d, vreg_d, 16);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
+                la_vsadd_d(vreg_d, vreg_d, vreg_d);
                 la_vssrarni_w_d(vreg_d, vreg_d, 32);
                 break;
             default:
@@ -12917,12 +12920,14 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
+                la_vsadd_w(vreg_d, vreg_d, vreg_d);
                 la_vssrani_h_w(vreg_d, vreg_d, 16);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
+                la_vsadd_d(vreg_d, vreg_d, vreg_d);
                 la_vssrani_w_d(vreg_d, vreg_d, 32);
                 break;
             default:
