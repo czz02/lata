@@ -38,6 +38,8 @@
 #include "semihosting/semihost.h"
 #include "cpregs.h"
 
+uint32 curr_insn = -1;
+
 enum a64_shift_type {
     A64_SHIFT_TYPE_LSL = 0,
     A64_SHIFT_TYPE_LSR = 1,
@@ -10738,11 +10740,13 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
     IR2_OPND vreg_d = alloc_fpr_src(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
     IR2_OPND vtemp = ra_alloc_ftemp();
+    IR2_OPND vtemp1 = ra_alloc_ftemp();
     la_vandi_b(vtemp, vtemp, 0);
 
     switch (opcode) {
     case 0x12: /* XTN,XTN2, SQXTUN */
     {
+        assert(!u);
         if (!is_q) {
             switch (size) {
             case 0:
@@ -10786,7 +10790,43 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
     }
     case 0x14: /* SQXTN, UQXTN */
     {
-        assert(0);
+        if (u) {
+            switch (size) {
+            case 0:
+                la_vsat_hu(vtemp1, vreg_n, 7);
+                la_vpickev_b(vreg_d, vtemp, vtemp1);
+                break;
+            case 1:
+                la_vsat_wu(vtemp1, vreg_n, 15);
+                la_vpickev_h(vreg_d, vtemp, vtemp1);
+                break;
+            case 2:
+                la_vsat_du(vtemp1, vreg_n, 31);
+                la_vpickev_w(vreg_d, vtemp, vtemp1);
+                break;
+            default:
+                assert(0);
+            }
+        } else {
+            switch (size) {
+            case 0:
+                la_vsat_h(vtemp1, vreg_n, 7);
+                la_vpickev_b(vreg_d, vtemp, vtemp1);
+                break;
+            case 1:
+                la_vsat_w(vtemp1, vreg_n, 15);
+                la_vpickev_h(vreg_d, vtemp, vtemp1);
+                break;
+            case 2:
+                la_vsat_d(vtemp1, vreg_n, 31);
+                la_vpickev_w(vreg_d, vtemp, vtemp1);
+                break;
+            default:
+                assert(0);
+            }
+        }
+        if (is_q)
+            la_vpickev_d(vreg_d, vtemp, vreg_d);
         break;
     }
     case 0x16: /* FCVTN, FCVTN2 */
@@ -10827,6 +10867,7 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
 
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vtemp);
+    free_alloc_fpr(vtemp1);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
 }
@@ -14414,7 +14455,21 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
         }
     } else {
         /* long ops: 16x16->32 or 32x32->64 */
-        assert(0);
+        switch (opcode) {
+        case 0x2: /* SMLAL, SMLAL2, UMLAL, UMLAL2 */
+            assert(0);
+            break;
+        case 0x6: /* SMLSL, SMLSL2, UMLSL, UMLSL2 */
+            assert(0);
+            break;
+        case 0x7: /* SQDMLSL, SQDMLSL2 */
+            /* fall through */
+        case 0x3: /* SQDMLAL, SQDMLAL2 */
+            assert(0);
+            break;
+        default:
+            assert(0);
+        }
     }
 do_gvec_end:
     if (!is_q) {
@@ -15083,6 +15138,7 @@ bool tr_ir2_generate(struct TranslationBlock *tb)
             break;
         }
 #endif
+        curr_insn = pir1->insn;
         bool trans_success = translate_functions[pir1->insn_type](pir1);
         if (!trans_success) {
             lsassertm(0, "ir1_translate fail");

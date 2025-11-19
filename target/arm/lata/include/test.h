@@ -10,16 +10,16 @@
 
 #define android_assert assert
 
-// #define android_assert(condition)                                                 \
-//     do {                                                                          \
-//         if (!(condition)) {                                                       \
-//             __android_log_print(                                                  \
-//                 ANDROID_LOG_FATAL, LOG_TAG,                                       \
-//                 "Assertion failed: '%s', in file %s, line %d, function: %s",      \
-//                 #condition, __FILE__, __LINE__, __func__);                        \
-//             abort();                                                              \
-//         }                                                                         \
-//     } while (0)
+#define assert(condition)                                                 \
+    do {                                                                          \
+        if (!(condition)) {                                                       \
+            __android_log_print(                                                  \
+                ANDROID_LOG_FATAL, LOG_TAG,                                       \
+                "Assertion failed: '%s', in file %s, line %d, function: %s, insn: %x",      \
+                #condition, __FILE__, __LINE__, __func__, curr_insn);             \
+            abort();                                                              \
+        }                                                                         \
+    } while (0)
 
 #endif
 
