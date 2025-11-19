@@ -9968,10 +9968,11 @@ static void handle_3same_64(DisasContext *s, int opcode, bool u, int rd, int rn,
     IR2_OPND vreg_temp = ra_alloc_ftemp();
     IR2_OPND vreg_temp1 = ra_alloc_ftemp();
     IR2_OPND temp = ra_alloc_itemp();
+    IR2_OPND vleft = ra_alloc_ftemp();
+    IR2_OPND vright = ra_alloc_ftemp();
 
-    IR2_OPND set_qc = ir2_opnd_new_type(IR2_OPND_LABEL);
+    IR2_OPND label = ir2_opnd_new_type(IR2_OPND_LABEL);
     IR2_OPND exit = ir2_opnd_new_type(IR2_OPND_LABEL);
-
 
     switch (opcode) {
     case 0x1: /* SQADD */
@@ -9990,10 +9991,10 @@ static void handle_3same_64(DisasContext *s, int opcode, bool u, int rd, int rn,
 
         la_vseq_d(vreg_temp, vreg_temp1, vreg_temp);
         la_vsetanyeqz_b(fcc1_ir2_opnd, vreg_temp);
-        la_bcnez(fcc1_ir2_opnd, set_qc);
+        la_bcnez(fcc1_ir2_opnd, label);
         la_b(exit);
 
-        la_label(set_qc);
+        la_label(label);
         li_d(temp, 1);
         la_st_w(temp, env_ir2_opnd, env_offset_QC());
 
@@ -10012,7 +10013,46 @@ static void handle_3same_64(DisasContext *s, int opcode, bool u, int rd, int rn,
         assert(0);
         break;
     case 0x8: /* SSHL, USHL */
-        assert(0);
+        /* 取元素中shift */
+        la_vslli_d(vleft, vreg_m, 56);
+        la_vsrli_d(vleft, vleft, 56);
+
+        /* 正数放vleft左移，负数取反后放vright右移，vreg_temp存放符号位*/
+        la_vslti_b(vreg_temp, vleft, 0);
+        la_vand_v(vright, vreg_temp, vleft);
+        la_vsub_b(vleft, vleft, vright);
+        la_vsigncov_b(vright, vreg_temp, vright);
+
+        /* ARM
+         * 移位量不做模运算，这里需要特殊处理，左移大于等于元素长度对应清零，右移大于等于元素长度shift-1*/
+        /* vslti的立即数限制5位，进行特殊处理，右移缩小2倍与16比较 */
+        la_vsll_d(vreg_d, vreg_n, vleft);
+        if (!u) {
+            la_vsra_d(vreg_d, vreg_d, vright);
+        } else {
+            la_vsrl_d(vreg_d, vreg_d, vright);
+        }
+        la_vsrli_b(vreg_temp, vleft, 2);
+        la_vslti_du(vleft, vreg_temp, 16);
+        la_vsrli_b(vright, vright, 2);
+        la_vslti_du(vright, vright, 16);
+
+        // la_vsll_d(vreg_temp, vreg_n, vleft);
+        la_vand_v(vreg_temp, vreg_d, vleft);
+
+        /* 正常右移 */
+        la_vand_v(vreg_temp, vreg_temp, vright);
+        /* 满位右移 */
+        la_vnori_b(vright, vright, 0);
+        if (!u) {
+            la_vsrai_d(vleft, vreg_n, 63);
+        } else {
+            la_vandi_b(vleft, vreg_n, 0);
+        }
+        la_vand_v(vleft, vright, vleft);
+        la_vadd_d(vreg_d, vreg_temp, vleft);
+
+        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
         break;
     case 0x9: /* SQSHL, UQSHL */
         assert(0);
@@ -10042,6 +10082,8 @@ static void handle_3same_64(DisasContext *s, int opcode, bool u, int rd, int rn,
 
     free_alloc_fpr(vreg_temp);
     free_alloc_fpr(vreg_temp1);
+    free_alloc_fpr(vleft);
+    free_alloc_fpr(vright);
     free_alloc_gpr(temp);
 }
 
