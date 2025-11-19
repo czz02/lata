@@ -11426,9 +11426,6 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         vreg_d = alloc_fpr_dst(rd);
         if (!is_q) {
             switch (size) {
-            case 0:
-                assert(0);
-                break;
             case 1:
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
@@ -11443,23 +11440,17 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, -1);
                 lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero, rd);
                 break;
-            case 3:
-                assert(0);
-                break;
             default:
                 assert(0);
             }
 
         } else {
-            assert(0);
             switch (size) {
-            case 0:
-                break;
             case 1:
+                assert(0);
                 break;
             case 2:
-                break;
-            case 3:
+                assert(0);
                 break;
             default:
                 assert(0);
@@ -11470,9 +11461,6 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         vreg_d = alloc_fpr_dst(rd);
         if (!is_q) {
             switch (size) {
-            case 0:
-                assert(0);
-                break;
             case 1:
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
@@ -11497,23 +11485,17 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 // la_vsadd_d(vreg_d, vreg_d, vzero);
                 // gen_sat_q(vreg_d, 2, false);
                 break;
-            case 3:
-                assert(0);
-                break;
             default:
                 assert(0);
             }
 
         } else {
-            assert(0);
             switch (size) {
-            case 0:
-                break;
             case 1:
+                assert(0);
                 break;
             case 2:
-                break;
-            case 3:
+                assert(0);
                 break;
             default:
                 assert(0);
@@ -11521,7 +11503,37 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         }
         break;
     case 0xd: /* SQDMULL, SQDMULL2 */
-        assert(0);
+        vreg_d = alloc_fpr_dst(rd);
+        if (!is_q) {
+            switch (size) {
+            case 1:
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vreg_m);
+                la_vmulwev_w_h(vzero, vtemp, vtemp1);
+                lata_helper_addl_saturate_s32(s, vreg_d, vzero, vzero, rd);
+                break;
+            case 2:
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vreg_m);
+                la_vmulwev_d_w(vzero, vtemp, vtemp1);
+                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, rd);
+                break;
+            default:
+                assert(0);
+            }
+
+        } else {
+            switch (size) {
+            case 1:
+                assert(0);
+                break;
+            case 2:
+                assert(0);
+                break;
+            default:
+                assert(0);
+            }
+        }
         break;
     case 0x10: /* UADDL, UADDL2 */
     case 0x12: /* USUBL, USUBL2 */
