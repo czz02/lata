@@ -14315,8 +14315,6 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
             }
         }
         goto do_gvec_end;
-        break;
-
     case 0x10: /* MLA */
         if (!is_long && !is_scalar) {
             assert(0);
@@ -14358,6 +14356,10 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
             break;
         default:
             g_assert_not_reached();
+        }
+        if (!is_q) {
+            /* 高64位清零 */
+            la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
         }
     } else if (!is_long) {
         /* 32 bit floating point, or 16 or 32 bit integer.
@@ -14467,15 +14469,34 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
         case 0x3: /* SQDMLAL, SQDMLAL2 */
             assert(0);
             break;
+        case 0xa: /* SMULL, SMULL2 */
+            vreg_d = alloc_fpr_dst(rd);
+            assert(!is_q);
+            switch (size) {
+            case 1:
+                la_vreplvei_h(vtemp1, vreg_m, index);
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vtemp1);
+                la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
+                break;
+            case 2:
+                la_vreplvei_w(vtemp1, vreg_m, index);
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vtemp1);
+                la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
+                break;
+            default:
+                assert(0);
+            }
+            break;
+        case 0xb:
+            assert(0);
+            break;
         default:
             assert(0);
         }
     }
 do_gvec_end:
-    if (!is_q) {
-        /* 高64位清零 */
-        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
-    }
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
