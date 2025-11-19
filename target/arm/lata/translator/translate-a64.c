@@ -304,19 +304,19 @@ static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
 
     switch (size) {
     case 0:
-        la_vpickve2gr_b(vtemp, vtemp, 0);
+        la_vreplvei_b(vtemp, vtemp, 0);
         la_vseq_b(vtemp, vtemp, vreg);
         break;
     case 1:
-        la_vpickve2gr_h(vtemp, vtemp, 0);
+        la_vreplvei_h(vtemp, vtemp, 0);
         la_vseq_h(vtemp, vtemp, vreg);
         break;
     case 2:
-        la_vpickve2gr_w(vtemp, vtemp, 0);
+        la_vreplvei_w(vtemp, vtemp, 0);
         la_vseq_w(vtemp, vtemp, vreg);
         break;
     case 3:
-        la_vpickve2gr_d(vtemp, vtemp, 0);
+        la_vreplvei_d(vtemp, vtemp, 0);
         la_vseq_d(vtemp, vtemp, vreg);
         break;
     default:
@@ -331,19 +331,19 @@ static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
 
     switch (size) {
     case 0:
-        la_vpickve2gr_b(vtemp, vtemp, 0);
+        la_vreplvei_b(vtemp, vtemp, 0);
         la_vseq_b(vtemp, vtemp, vreg);
         break;
     case 1:
-        la_vpickve2gr_h(vtemp, vtemp, 0);
+        la_vreplvei_h(vtemp, vtemp, 0);
         la_vseq_h(vtemp, vtemp, vreg);
         break;
     case 2:
-        la_vpickve2gr_w(vtemp, vtemp, 0);
+        la_vreplvei_w(vtemp, vtemp, 0);
         la_vseq_w(vtemp, vtemp, vreg);
         break;
     case 3:
-        la_vpickve2gr_d(vtemp, vtemp, 0);
+        la_vreplvei_d(vtemp, vtemp, 0);
         la_vseq_d(vtemp, vtemp, vreg);
         break;
     default:
