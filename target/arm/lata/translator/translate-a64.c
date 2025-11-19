@@ -30,6 +30,7 @@
 #include "translate-a64.h"
 #include "tu.h"
 #include "clear-high.h"
+#include "test.h"
 #endif
 
 #include "qemu/log.h"
@@ -1105,7 +1106,7 @@ static bool trans_AUTIBSP(DisasContext *s)
 
 static bool trans_CLREX(DisasContext *s)
 {
-    assert(0);
+    return true;
 }
 
 static void lata_gen_mb(void)

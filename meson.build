@@ -223,6 +223,10 @@ qemu_common_flags = [
 qemu_cflags = []
 qemu_ldflags = []
 
+if have_android
+  qemu_ldflags += '-llog'
+endif 
+
 if targetos == 'darwin'
   # Disable attempts to use ObjectiveC features in os/object.h since they
   # won't work when we're compiling with gcc as a C compiler.

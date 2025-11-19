@@ -216,9 +216,9 @@ void start_exclusive(void)
     }
 
     qatomic_set(&pending_cpus, running_cpus + 1);
-    while (pending_cpus > 1) {
-        qemu_cond_wait(&exclusive_cond, &qemu_cpu_list_lock);
-    }
+    // while (pending_cpus > 1) {
+    //     qemu_cond_wait(&exclusive_cond, &qemu_cpu_list_lock);
+    // }
 
     /* Can release mutex, no one will enter another exclusive
      * section until end_exclusive resets pending_cpus to 0.
