@@ -13129,7 +13129,28 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
     if (size == 3) {
         assert(is_q);
     } else {
-        assert(0);
+        switch (opcode) {
+        case 0x0: /* SHADD, UHADD */
+            assert(0);
+            break;
+        case 0x2: /* SRHADD, URHADD */
+            assert(0);
+            break;
+        case 0x4: /* SHSUB, UHSUB */
+            assert(0);
+            break;
+        case 0x9: /* SQSHL, UQSHL */
+            assert(0);
+            break;
+        case 0xa: /* SRSHL, URSHL */
+            assert(0);
+            break;
+        case 0xb: /* SQRSHL, UQRSHL */
+            assert(0);
+            break;
+        default:
+            g_assert_not_reached();
+        }
     }
 }
 
