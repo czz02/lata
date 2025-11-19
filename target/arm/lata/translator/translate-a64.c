@@ -14459,7 +14459,27 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
         /* long ops: 16x16->32 or 32x32->64 */
         switch (opcode) {
         case 0x2: /* SMLAL, SMLAL2, UMLAL, UMLAL2 */
-            assert(0);
+            vreg_d = alloc_fpr_dst(rd);
+            assert(!is_q);
+            assert(!u);
+            switch (size) {
+            case 1:
+                la_vreplvei_h(vtemp1, vreg_m, index);
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vtemp1);
+                la_vmulwev_w_h(vzero, vtemp, vtemp1);
+                la_vadd_w(vreg_d, vzero, vreg_d);
+                break;
+            case 2:
+                la_vreplvei_w(vtemp1, vreg_m, index);
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vtemp1);
+                la_vmulwev_d_w(vzero, vtemp, vtemp1);
+                la_vadd_d(vreg_d, vzero, vreg_d);
+                break;
+            default:
+                assert(0);
+            }
             break;
         case 0x6: /* SMLSL, SMLSL2, UMLSL, UMLSL2 */
             assert(0);
@@ -14471,22 +14491,40 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
             break;
         case 0xa: /* SMULL, SMULL2 */
             vreg_d = alloc_fpr_dst(rd);
-            assert(!is_q);
-            switch (size) {
-            case 1:
-                la_vreplvei_h(vtemp1, vreg_m, index);
-                la_vilvl_h(vtemp, vzero, vreg_n);
-                la_vilvl_h(vtemp1, vzero, vtemp1);
-                la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
-                break;
-            case 2:
-                la_vreplvei_w(vtemp1, vreg_m, index);
-                la_vilvl_w(vtemp, vzero, vreg_n);
-                la_vilvl_w(vtemp1, vzero, vtemp1);
-                la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
-                break;
-            default:
-                assert(0);
+            if (!is_q) {
+                switch (size) {
+                case 1:
+                    la_vreplvei_h(vtemp1, vreg_m, index);
+                    la_vilvl_h(vtemp, vzero, vreg_n);
+                    la_vilvl_h(vtemp1, vzero, vtemp1);
+                    la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
+                    break;
+                case 2:
+                    la_vreplvei_w(vtemp1, vreg_m, index);
+                    la_vilvl_w(vtemp, vzero, vreg_n);
+                    la_vilvl_w(vtemp1, vzero, vtemp1);
+                    la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
+                    break;
+                default:
+                    assert(0);
+                }
+            } else {
+                switch (size) {
+                case 1:
+                    la_vreplvei_h(vtemp1, vreg_m, index);
+                    la_vilvh_h(vtemp, vzero, vreg_n);
+                    la_vilvh_h(vtemp1, vzero, vtemp1);
+                    la_vmulwev_w_h(vreg_d, vtemp, vtemp1);
+                    break;
+                case 2:
+                    la_vreplvei_w(vtemp1, vreg_m, index);
+                    la_vilvh_w(vtemp, vzero, vreg_n);
+                    la_vilvh_w(vtemp1, vzero, vtemp1);
+                    la_vmulwev_d_w(vreg_d, vtemp, vtemp1);
+                    break;
+                default:
+                    assert(0);
+                }
             }
             break;
         case 0xb:
