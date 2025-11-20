@@ -9708,7 +9708,6 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
         return;
     }
 
-
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
     IR2_OPND vtemp = ra_alloc_ftemp();
@@ -9749,6 +9748,7 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
                     assert(0);
                 }
             } else {
+                assert(0);
                 switch (size) {
                 case 0:
                     la_vssrarni_bu_h(vreg, vreg_n, shift);
@@ -9764,7 +9764,6 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
                 }
             }
         }
-
     } else {
         if (is_u_shift) {
             switch (size) {
@@ -9796,6 +9795,7 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
                     assert(0);
                 }
             } else {
+                assert(0);
                 switch (size) {
                 case 0:
                     la_vssrani_bu_h(vreg, vreg_n, shift);
@@ -10844,6 +10844,7 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
     }
     case 0x14: /* SQXTN, UQXTN */
     {
+        assert(!is_q);
         if (u) {
             switch (size) {
             case 0:
@@ -10919,6 +10920,10 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
         g_assert_not_reached();
     }
 
+    if (!is_q) {
+        /* 高64位清零 */
+        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
+    }
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vtemp);
     free_alloc_fpr(vtemp1);
@@ -11499,7 +11504,56 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         assert(0);
         break;
     case 0x8: /* SMLAL, SMLAL2 */
-        assert(0);
+        vreg_d = alloc_fpr_src(rd);
+        if (!is_q) {
+            /* 低位统一移至偶数位后做偶数位的相乘并拓2倍宽 */
+            switch (size) {
+            case 0:
+                la_vilvl_b(vtemp, vzero, vreg_n);
+                la_vilvl_b(vtemp1, vzero, vreg_m);
+                la_vmulwev_h_b(vzero, vtemp, vtemp1);
+                la_vadd_h(vreg_d, vzero, vreg_d);
+                break;
+            case 1:
+                la_vilvl_h(vtemp, vzero, vreg_n);
+                la_vilvl_h(vtemp1, vzero, vreg_m);
+                la_vmulwev_w_h(vzero, vtemp, vtemp1);
+                la_vadd_w(vreg_d, vzero, vreg_d);
+                break;
+            case 2:
+                la_vilvl_w(vtemp, vzero, vreg_n);
+                la_vilvl_w(vtemp1, vzero, vreg_m);
+                la_vmulwev_d_w(vzero, vtemp, vtemp1);
+                la_vadd_d(vreg_d, vzero, vreg_d);
+                break;
+            default:
+                assert(0);
+            }
+        } else {
+            /* 高位统一移至偶数位后做偶数位的相乘并拓2倍宽 */
+            switch (size) {
+            case 0:
+                la_vilvh_b(vtemp, vzero, vreg_n);
+                la_vilvh_b(vtemp1, vzero, vreg_m);
+                la_vmulwev_h_b(vzero, vtemp, vtemp1);
+                la_vadd_h(vreg_d, vzero, vreg_d);
+                break;
+            case 1:
+                la_vilvh_h(vtemp, vzero, vreg_n);
+                la_vilvh_h(vtemp1, vzero, vreg_m);
+                la_vmulwev_w_h(vzero, vtemp, vtemp1);
+                la_vadd_w(vreg_d, vzero, vreg_d);
+                break;
+            case 2:
+                la_vilvh_w(vtemp, vzero, vreg_n);
+                la_vilvh_w(vtemp1, vzero, vreg_m);
+                la_vmulwev_d_w(vzero, vtemp, vtemp1);
+                la_vadd_d(vreg_d, vzero, vreg_d);
+                break;
+            default:
+                assert(0);
+            }
+        }
         break;
     case 0xa: /* SMLSL, SMLSL2 */
         assert(0);
@@ -11561,7 +11615,7 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         }
         break;
     case 0x9: /* SQDMLAL, SQDMLAL2 */
-        vreg_d = alloc_fpr_dst(rd);
+        vreg_d = alloc_fpr_src(rd);
         if (!is_q) {
             switch (size) {
             case 1:
@@ -11596,7 +11650,7 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         }
         break;
     case 0xb: /* SQDMLSL, SQDMLSL2 */
-        vreg_d = alloc_fpr_dst(rd);
+        vreg_d = alloc_fpr_src(rd);
         if (!is_q) {
             switch (size) {
             case 1:
@@ -14469,9 +14523,9 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
             break;
         case 0x0c: /* SQDMULH */
             // TODO : need handle saturate
+            vreg_d = alloc_fpr_src(rd);
             switch (size) {
             case 1:
-                vreg_d = alloc_fpr_src(rd);
                 la_vreplvei_h(vtemp1, vreg_m, index);
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vtemp1);
@@ -14480,7 +14534,6 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
                 la_vssrani_h_w(vreg_d, vreg_d, 16);
                 break;
             case 2:
-                vreg_d = alloc_fpr_src(rd);
                 la_vreplvei_w(vtemp1, vreg_m, index);
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vtemp1);
@@ -14513,7 +14566,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
         /* long ops: 16x16->32 or 32x32->64 */
         switch (opcode) {
         case 0x2: /* SMLAL, SMLAL2, UMLAL, UMLAL2 */
-            vreg_d = alloc_fpr_dst(rd);
+            vreg_d = alloc_fpr_src(rd);
             assert(!u);
             if (!is_q) {
                 switch (size) {
