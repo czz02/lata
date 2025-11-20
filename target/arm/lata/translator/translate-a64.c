@@ -4350,6 +4350,7 @@ static bool trans_ST_single(DisasContext *s)
         default:
             break;
         }
+        free_alloc_fpr(vreg_d);
     }
 
     if (a->p) {
@@ -4421,6 +4422,7 @@ static bool trans_LD_single(DisasContext *s)
             break;
         }
         store_fpr_dst(rt, vreg_d);
+        free_alloc_fpr(vreg_d);
     }
 
     if (a->p) {
@@ -4449,7 +4451,7 @@ static bool trans_LD_single_repl(DisasContext *s)
 {
     arg_LD_single_repl *a = &(s->arg.f_decode_insn3232);
     IR2_OPND vreg_d, reg_n, reg_m;
-    int total; /* total bytes */
+    int xs, total, rt; /* total bytes */
     int esize;
 
     if (!a->p && a->rm != 0) {
@@ -4471,29 +4473,32 @@ static bool trans_LD_single_repl(DisasContext *s)
         clear_gpr_high(a->rn);
     }
 
-    vreg_d = alloc_fpr_dst(a->rt);
-    switch (esize) {
-    case 1:
-        la_vldrepl_b(vreg_d, reg_n, 0);
-        break;
-    case 2:
-        la_vldrepl_h(vreg_d, reg_n, 0);
-        break;
-    case 4:
-        la_vldrepl_w(vreg_d, reg_n, 0);
-        break;
-    case 8:
-        la_vldrepl_d(vreg_d, reg_n, 0);
-        break;
-    default:
-        break;
+    for (xs = 0, rt = a->rt; xs < a->selem; xs++, rt = (rt + 1) % 32) {
+        vreg_d = alloc_fpr_dst(rt);
+        switch (esize) {
+        case 1:
+            la_vldrepl_b(vreg_d, reg_n, xs);
+            break;
+        case 2:
+            la_vldrepl_h(vreg_d, reg_n, xs);
+            break;
+        case 4:
+            la_vldrepl_w(vreg_d, reg_n, xs);
+            break;
+        case 8:
+            la_vldrepl_d(vreg_d, reg_n, xs);
+            break;
+        default:
+            assert(0);
+        }
+        if (!a->q) {
+            /* 高64位清零 */
+            la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
+        }
+        store_fpr_dst(rt, vreg_d);
+        free_alloc_fpr(vreg_d);
     }
 
-    if (!a->q) {
-        /* 高64位清零 */
-        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
-    }
-    store_fpr_dst(a->rt, vreg_d);
 
     if (a->p) {
         if (a->rm == 31) {
