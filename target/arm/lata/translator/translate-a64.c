@@ -9749,7 +9749,19 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
                     assert(0);
                 }
             } else {
-                assert(0);
+                switch (size) {
+                case 0:
+                    la_vssrarni_bu_h(vreg, vreg_n, shift);
+                    break;
+                case 1:
+                    la_vssrarni_hu_w(vreg, vreg_n, shift);
+                    break;
+                case 2:
+                    la_vssrarni_wu_d(vreg, vreg_n, shift);
+                    break;
+                default:
+                    assert(0);
+                }
             }
         }
 
@@ -9784,7 +9796,19 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
                     assert(0);
                 }
             } else {
-                assert(0);
+                switch (size) {
+                case 0:
+                    la_vssrani_bu_h(vreg, vreg_n, shift);
+                    break;
+                case 1:
+                    la_vssrani_hu_w(vreg, vreg_n, shift);
+                    break;
+                case 2:
+                    la_vssrani_wu_d(vreg, vreg_n, shift);
+                    break;
+                default:
+                    assert(0);
+                }
             }
         }
     }
@@ -9794,6 +9818,7 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
     else
         la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
    
+    store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
     free_alloc_fpr(vtemp);
