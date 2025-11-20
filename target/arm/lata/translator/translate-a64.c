@@ -9699,8 +9699,6 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
 
     assert(size < 4);
 
-    assert(is_q == false);
-
     if (extract32(immh, 3, 1)) {
         lata_unallocated_encoding(s);
         return;
@@ -9713,25 +9711,24 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
 
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
+    IR2_OPND vtemp = ra_alloc_ftemp();
+    IR2_OPND vreg;
+
+    if(is_q) vreg = vtemp;
+    else vreg = vreg_d;
 
     // TODO : need fix saturate
     if (round) {
         if (is_u_shift) {
             switch (size) {
             case 0:
-                la_vssrlrni_bu_h(vreg_d, vreg_n, shift);
-                gen_sat_q(vreg_d, 0, true);
+                la_vssrlrni_bu_h(vreg, vreg_n, shift);
                 break;
             case 1:
-                la_vssrlrni_hu_w(vreg_d, vreg_n, shift);
-                gen_sat_q(vreg_d, 1, true);
+                la_vssrlrni_hu_w(vreg, vreg_n, shift);
                 break;
             case 2:
-                la_vssrlrni_wu_d(vreg_d, vreg_n, shift);
-                gen_sat_q(vreg_d, 2, true);
-                break;
-            case 3:
-                assert(0);
+                la_vssrlrni_wu_d(vreg, vreg_n, shift);
                 break;
             default:
                 assert(0);
@@ -9740,19 +9737,13 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
             if (!is_u_narrow) {
                 switch (size) {
                 case 0:
-                    la_vssrarni_b_h(vreg_d, vreg_n, shift);
-                    gen_sat_q(vreg_d, 0, false);
+                    la_vssrarni_b_h(vreg, vreg_n, shift);
                     break;
                 case 1:
-                    la_vssrarni_h_w(vreg_d, vreg_n, shift);
-                    gen_sat_q(vreg_d, 1, false);
+                    la_vssrarni_h_w(vreg, vreg_n, shift);
                     break;
                 case 2:
-                    la_vssrarni_w_d(vreg_d, vreg_n, shift);
-                    gen_sat_q(vreg_d, 2, false);
-                    break;
-                case 3:
-                    assert(0);
+                    la_vssrarni_w_d(vreg, vreg_n, shift);
                     break;
                 default:
                     assert(0);
@@ -9763,11 +9754,49 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
         }
 
     } else {
-        assert(0);
+        if (is_u_shift) {
+            switch (size) {
+            case 0:
+                la_vssrlni_bu_h(vreg, vreg_n, shift);
+                break;
+            case 1:
+                la_vssrlni_hu_w(vreg, vreg_n, shift);
+                break;
+            case 2:
+                la_vssrlni_wu_d(vreg, vreg_n, shift);
+                break;
+            default:
+                assert(0);
+            }
+        } else {
+            if (!is_u_narrow) {
+                switch (size) {
+                case 0:
+                    la_vssrani_b_h(vreg, vreg_n, shift);
+                    break;
+                case 1:
+                    la_vssrani_h_w(vreg, vreg_n, shift);
+                    break;
+                case 2:
+                    la_vssrani_w_d(vreg, vreg_n, shift);
+                    break;
+                default:
+                    assert(0);
+                }
+            } else {
+                assert(0);
+            }
+        }
     }
 
+    if (is_q)
+        la_vpickev_d(vreg_d, vtemp, vreg_d);
+    else
+        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
+   
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
+    free_alloc_fpr(vtemp);
 }
 
 /* SQSHLU, UQSHL, SQSHL: saturating left shifts */
