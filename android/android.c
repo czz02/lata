@@ -288,6 +288,22 @@ void android_add_state_kv(void *berberis_state, void *env){
     pthread_mutex_unlock(&b2q_mutex);
 }
 
+// static void init_queue(CircularQueue *q) {
+//     q->head = 0;
+//     q->count = 0;
+// }
+
+// void push_queue(CircularQueue *q, uint64_t val) {
+//     q->data[q->head] = val; // 写入数据
+
+//     q->head = (q->head + 1) % MX_QUEUE;
+//     if (q->count < MX_QUEUE) {
+//         q->count++;
+//     }
+
+// }
+
+// CircularQueue q4pc;
 
 extern void* android_init(BerberisCallbacks *cbs);
 struct AndroidRuntimeCallbacks {
@@ -324,6 +340,8 @@ AndroidConfig android_config;
 void *android_init(BerberisCallbacks *cbs)
 {
     assert(cbs);
+
+    // init_queue(&q4pc);
 
     berberis_cb = cbs;
 

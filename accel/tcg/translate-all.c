@@ -440,6 +440,8 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
 #endif
 #endif
 
+// push_queue(&q4pc, pc);
+
 #ifdef CONFIG_ANDROID
     gen_code_size = gen_func_wrap(tb, pc);
     if (gen_code_size) {

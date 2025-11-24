@@ -503,6 +503,61 @@ static void gen_goto_tb_indirect(DisasContext *s, uint32_t rn)
     free_alloc_gpr(reg_n);
 }
 
+static void gen_goto_tb_indirect_blr(DisasContext *s, IR2_OPND reg_n)
+{
+
+#ifdef CONFIG_LATA_INDIRECT_JMP
+    IR2_OPND guest_pc = ra_alloc_itemp();
+    IR2_OPND host_pc = ra_alloc_itemp();
+    IR2_OPND exit = ir2_opnd_new_type(IR2_OPND_LABEL);
+
+    if (option_fam_jmp_cache) {
+        li_d(host_pc, (uint64_t)(current_cpu->env_ptr->pc_map_cache));
+        la_alsl_d(host_pc, reg_n, host_pc, 2);
+        la_ld_d(host_pc, host_pc, 0);
+        la_beqz(host_pc, exit);
+        la_jirl(zero_ir2_opnd, host_pc, 0);
+        la_label(exit);
+        la_st_d(reg_n, env_ir2_opnd, env_offset_pc());
+        lata_gen_exit_tb_ret_0(s);
+        return;
+    }
+
+    if (indirect_jmp_opt_profile) {
+        la_ld_d(guest_pc, env_ir2_opnd, env_offset(jr_cnt));
+        la_addi_d(guest_pc, guest_pc, 1);
+        la_st_d(guest_pc, env_ir2_opnd, env_offset(jr_cnt));
+    }
+
+    la_bstrpick_d(guest_pc, reg_n, LATA_PC_LOW_BIT + TB_JMP_CACHE_BITS - 1,
+                  LATA_PC_LOW_BIT);
+    li_d(host_pc, (uint64_t)(current_cpu->env_ptr->pc_map_cache));
+    la_alsl_d(host_pc, guest_pc, host_pc, 3);
+    la_ld_d(guest_pc, host_pc, 0); // guest pc
+    la_ld_d(host_pc, host_pc, 8); // host pc
+    la_bne(reg_n, guest_pc, exit);
+
+    if (indirect_jmp_opt_profile) {
+        la_ld_d(guest_pc, env_ir2_opnd, env_offset(jr_hit));
+        la_addi_d(guest_pc, guest_pc, 1);
+        la_st_d(guest_pc, env_ir2_opnd, env_offset(jr_hit));
+    }
+
+    la_jirl(zero_ir2_opnd, host_pc, 0);
+    la_label(exit);
+
+    free_alloc_gpr(guest_pc);
+    free_alloc_gpr(host_pc);
+#endif
+
+    la_st_d(reg_n, env_ir2_opnd, env_offset_pc());
+
+    /* do not link, but context_switch_native_to_bt_ret_0 will do this */
+    lata_gen_exit_tb_ret_0(s);
+
+    free_alloc_gpr(reg_n);
+}
+
 static inline void li_arm_addr(IR2_OPND opnd2, int64_t value)
 {
     uint32_t /* hi32 ,*/ lo32;
@@ -928,6 +983,10 @@ static bool trans_BR(DisasContext *s)
 static bool trans_BLR(DisasContext *s)
 {
     arg_r *a = &(s->arg.f_r);
+
+    IR2_OPND reg_n;
+    IR2_OPND x30 = alloc_gpr_dst(30);
+
     if (clearGprHigh) {
         for (int i = 0; i < 32; ++i) {
             if (arm_la_map[i] >= 0) {
@@ -936,11 +995,17 @@ static bool trans_BLR(DisasContext *s)
         }
     }
 
-    IR2_OPND x30 = alloc_gpr_dst(30);
+    if (a->rn != 30){
+        reg_n = alloc_gpr_src(a->rn);
+    } else {
+        reg_n = ra_alloc_itemp();
+        la_ori(reg_n, x30, 0);
+    }
+
     li_d(x30, s->base->pc_next); /* BL setting X30 to PC+4 */
     store_gpr_dst(30, x30);
 
-    gen_goto_tb_indirect(s, a->rn);
+    gen_goto_tb_indirect_blr(s, reg_n);
     // s->base->is_jmp = DISAS_NORETURN;
 
     return true;
@@ -9713,7 +9778,9 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
         return;
     }
 
-    IR2_OPND vreg_d = alloc_fpr_dst(rd);
+    assert(!is_scalar);
+
+    IR2_OPND vreg_d = alloc_fpr_src(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
     IR2_OPND vtemp = ra_alloc_ftemp();
     IR2_OPND vreg;

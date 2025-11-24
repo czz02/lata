@@ -48,5 +48,14 @@ extern void handle_android_syscall(CPUARMState *env);
 #define MAP_BITS 12
 #define MAP_SIZE (1 << MAP_BITS)
 
+// #define MX_QUEUE 64
+// typedef struct {
+//     uint64_t data[MX_QUEUE];
+//     int head;  // 指向下一个将被写入的位置
+//     int count; // 当前队列中有效元素的数量
+// } CircularQueue;
+
+// void push_queue(CircularQueue *q, uint64_t val);
+// extern CircularQueue q4pc;
 
 #endif
