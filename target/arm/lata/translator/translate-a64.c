@@ -10867,49 +10867,78 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
     IR2_OPND vreg_n = alloc_fpr_src(rn);
     IR2_OPND vtemp = ra_alloc_ftemp();
     IR2_OPND vtemp1 = ra_alloc_ftemp();
+    IR2_OPND vmask = ra_alloc_ftemp();
     la_vandi_b(vtemp, vtemp, 0);
 
     switch (opcode) {
     case 0x12: /* XTN,XTN2, SQXTUN */
     {
-        assert(!u);
-        if (!is_q) {
+        if (u) {
+            assert(!is_q);
             switch (size) {
             case 0:
-                la_vpickev_b(vreg_d, vtemp, vreg_n);
+                la_vslei_h(vmask, vreg_n, 0);
+                la_vnor_v(vmask, vmask, vmask);
+                la_vand_v(vmask, vmask, vreg_n);
+                la_vsat_hu(vtemp1, vmask, 7);
+                la_vpickev_b(vreg_d, vtemp, vtemp1);
                 break;
             case 1:
-                la_vpickev_h(vreg_d, vtemp, vreg_n);
+                la_vslei_w(vmask, vreg_n, 0);
+                la_vnor_v(vmask, vmask, vmask);
+                la_vand_v(vmask, vmask, vreg_n);
+                la_vsat_wu(vtemp1, vmask, 15);
+                la_vpickev_h(vreg_d, vtemp, vtemp1);
                 break;
             case 2:
-                la_vpickev_w(vreg_d, vtemp, vreg_n);
-                break;
-            case 3:
-                la_vpickev_d(vreg_d, vtemp, vreg_n);
+                la_vslei_d(vmask, vreg_n, 0);
+                la_vnor_v(vmask, vmask, vmask);
+                la_vand_v(vmask, vmask, vreg_n);
+                la_vsat_du(vtemp1, vmask, 31);
+                la_vpickev_w(vreg_d, vtemp, vtemp1);
                 break;
             default:
                 assert(0);
             }
         } else {
-            switch (size) {
-            case 0:
-                la_vpickev_b(vtemp, vtemp, vreg_n);
-                la_vpickev_d(vreg_d, vtemp, vreg_d);
-                break;
-            case 1:
-                la_vpickev_h(vtemp, vtemp, vreg_n);
-                la_vpickev_d(vreg_d, vtemp, vreg_d);
-                break;
-            case 2:
-                la_vpickev_w(vtemp, vtemp, vreg_n);
-                la_vpickev_d(vreg_d, vtemp, vreg_d);
-                break;
-            case 3:
-                la_vpickev_d(vtemp, vtemp, vreg_n);
-                la_vpickev_d(vreg_d, vtemp, vreg_d);
-                break;
-            default:
-                assert(0);
+            if (!is_q) {
+                switch (size) {
+                case 0:
+                    la_vpickev_b(vreg_d, vtemp, vreg_n);
+                    break;
+                case 1:
+                    la_vpickev_h(vreg_d, vtemp, vreg_n);
+                    break;
+                case 2:
+                    la_vpickev_w(vreg_d, vtemp, vreg_n);
+                    break;
+                case 3:
+                    la_vpickev_d(vreg_d, vtemp, vreg_n);
+                    break;
+                default:
+                    assert(0);
+                }
+            } else {
+                switch (size) {
+                case 0:
+                    la_vpickev_b(vtemp, vtemp, vreg_n);
+                    la_vpickev_d(vreg_d, vtemp, vreg_d);
+                    break;
+                case 1:
+                    la_vpickev_h(vtemp, vtemp, vreg_n);
+                    la_vpickev_d(vreg_d, vtemp, vreg_d);
+                    break;
+                case 2:
+                    la_vpickev_w(vtemp, vtemp, vreg_n);
+                    la_vpickev_d(vreg_d, vtemp, vreg_d);
+                    break;
+                case 3:
+                    la_vpickev_d(vtemp, vtemp, vreg_n);
+                    la_vpickev_d(vreg_d, vtemp, vreg_d);
+                    break;
+                default:
+                    assert(0);
+                }
             }
         }
         break;
@@ -10952,8 +10981,6 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
                 assert(0);
             }
         }
-        if (is_q)
-            la_vpickev_d(vreg_d, vtemp, vreg_d);
         break;
     }
     case 0x16: /* FCVTN, FCVTN2 */
@@ -10999,6 +11026,7 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vtemp);
     free_alloc_fpr(vtemp1);
+    free_alloc_fpr(vmask);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
 }
