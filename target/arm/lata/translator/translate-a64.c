@@ -9696,6 +9696,20 @@ static void handle_scalar_simd_shri(DisasContext *s, bool is_u, int immh,
         break;
 
     case 0x04: /* SRSHR / URSHR (rounding) */
+        if (is_u) {
+            /* Shift count the same size as element size produces zero.  */
+            if (shift == 8 << size) {
+                la_vandi_b(vreg_d, vtemp, 0);
+                break;
+            }
+            la_vsrlri_d(vreg_d, vtemp, shift);
+        } else {
+            /* Shift count the same size as element size produces all sign.  */
+            if (shift == 8 << size) {
+                shift -= 1;
+            }
+            la_vsrari_d(vreg_d, vtemp, shift);
+        }
         assert(0);
         break;
 
@@ -11245,7 +11259,50 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
         break;
 
     case 0x04: /* SRSHR / URSHR (rounding) */
-        assert(0);
+        if (is_u) {
+            /* Shift count the same size as element size produces zero.  */
+            if (shift == 8 << size) {
+                la_vandi_b(vreg_d, vtemp, 0);
+                break;
+            }
+            switch (size) {
+            case 0:
+                la_vsrlri_b(vreg_d, vtemp, shift);
+                break;
+            case 1:
+                la_vsrlri_h(vreg_d, vtemp, shift);
+                break;
+            case 2:
+                la_vsrlri_w(vreg_d, vtemp, shift);
+                break;
+            case 3:
+                la_vsrlri_d(vreg_d, vtemp, shift);
+                break;
+            default:
+                assert(0);
+            }
+        } else {
+            /* Shift count the same size as element size produces all sign.  */
+            if (shift == 8 << size) {
+                shift -= 1;
+            }
+            switch (size) {
+            case 0:
+                la_vsrari_b(vreg_d, vtemp, shift);
+                break;
+            case 1:
+                la_vsrari_h(vreg_d, vtemp, shift);
+                break;
+            case 2:
+                la_vsrari_w(vreg_d, vtemp, shift);
+                break;
+            case 3:
+                la_vsrari_d(vreg_d, vtemp, shift);
+                break;
+            default:
+                assert(0);
+            }
+        }
         break;
 
     case 0x06: /* SRSRA / URSRA (accum + rounding) */
