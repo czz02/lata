@@ -11229,9 +11229,10 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
     int size = 32 - clz32(immh) - 1;
     int immhb = immh << 3 | immb;
     int shift = 2 * (8 << size) - immhb;
-    IR2_OPND vreg_d = alloc_fpr_dst(rd);
+    IR2_OPND vreg_d = alloc_fpr_src(rd);
     IR2_OPND vreg_n = alloc_fpr_src(rn);
     IR2_OPND vtemp = ra_alloc_ftemp();
+    IR2_OPND vtemp1 = ra_alloc_ftemp();
 
     if (extract32(immh, 3, 1) && !is_q) {
         lata_unallocated_encoding(s);
@@ -11250,7 +11251,57 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
 
     switch (opcode) {
     case 0x02: /* SSRA / USRA (accumulate) */
-        assert(0);
+        if (is_u) {
+            /* Shift count the same size as element size produces zero.  */
+            if (shift == 8 << size) {
+                break;
+            }
+            switch (size) {
+            case 0:
+                la_vsrli_b(vtemp1, vtemp, shift);
+                la_vadd_b(vreg_d, vtemp1, vreg_d);
+                break;
+            case 1:
+                la_vsrli_h(vtemp1, vtemp, shift);
+                la_vadd_h(vreg_d, vtemp1, vreg_d);
+                break;
+            case 2:
+                la_vsrli_w(vtemp1, vtemp, shift);
+                la_vadd_w(vreg_d, vtemp1, vreg_d);
+                break;
+            case 3:
+                la_vsrli_d(vtemp1, vtemp, shift);
+                la_vadd_d(vreg_d, vtemp1, vreg_d);
+                break;
+            default:
+                assert(0);
+            }
+        } else {
+            /* Shift count the same size as element size produces all sign.  */
+            if (shift == 8 << size) {
+                shift -= 1;
+            }
+            switch (size) {
+            case 0:
+                la_vsrai_b(vtemp1, vtemp, shift);
+                la_vadd_b(vreg_d, vtemp1, vreg_d);
+                break;
+            case 1:
+                la_vsrai_h(vtemp1, vtemp, shift);
+                la_vadd_h(vreg_d, vtemp1, vreg_d);
+                break;
+            case 2:
+                la_vsrai_w(vtemp1, vtemp, shift);
+                la_vadd_w(vreg_d, vtemp1, vreg_d);
+                break;
+            case 3:
+                la_vsrai_d(vtemp1, vtemp, shift);
+                la_vadd_d(vreg_d, vtemp1, vreg_d);
+                break;
+            default:
+                assert(0);
+            }
+        }
         break;
 
     case 0x08: /* SRI */
@@ -11363,6 +11414,7 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
     free_alloc_fpr(vtemp);
+    free_alloc_fpr(vtemp1);
 }
 
 /* SHL/SLI - Vector shift left */
