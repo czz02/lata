@@ -251,30 +251,9 @@ static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
 {
     if (tbi == 0) {
         /* Load unmodified address */
-        la_mov64(*dst, *src);
-    } else if (!regime_has_2_ranges(s->mmu_idx)) {
-        /* Force tag byte to all zero */
-        la_bstrpick_d(*dst, *src, 56, 0);
     } else {
-        /* Sign-extend from bit 55.  */
-        la_slli_d(*dst, *src, 8);
-        la_srai_d(*dst, *dst, 8);
-
-        switch (tbi) {
-        case 1:
-            /* tbi0 but !tbi1: only use the extension if positive */
-            la_and(*dst, *dst, *src);
-            break;
-        case 2:
-            /* !tbi0 but tbi1: only use the extension if negative */
-            la_or(*dst, *dst, *src);
-            break;
-        case 3:
-            /* tbi0 and tbi1: always use the extension */
-            break;
-        default:
-            g_assert_not_reached();
-        }
+        /* lata only support user-mode, we don't need Sign-extend */
+        la_bstrpick_d(*dst, *src, 56, 0);
     }
 }
 
