@@ -6546,8 +6546,15 @@ static void handle_div(DisasContext *s, bool is_signed, unsigned int sf,
             la_div_d(reg_d, temp_n, temp_m);
         }
     } else {
-        la_div_du(reg_d, reg_n, reg_m);
+        if (sf) {
+            la_div_du(reg_d, reg_n, reg_m);
+        } else {
+            la_div_wu(reg_d, reg_n, reg_m);
+        }
     }
+
+    // arm : x / 0 = 0
+    la_maskeqz(reg_d, reg_d, reg_m);
 
     if (rd != 31 && arm_la_map[rd] >= 0 && clearGprHigh) {
         set_w_write_flag(rd, sf);
