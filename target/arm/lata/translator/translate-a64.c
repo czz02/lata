@@ -13765,7 +13765,44 @@ static void handle_2misc_pairwise(DisasContext *s, int opcode, bool u,
 
 static void handle_shll(DisasContext *s, bool is_q, int size, int rn, int rd)
 {
-    assert(0);
+    IR2_OPND vreg_d = alloc_fpr_src(rd);
+    IR2_OPND vreg_n = alloc_fpr_src(rn);
+    IR2_OPND vtemp = ra_alloc_ftemp();
+    la_vandi_b(vtemp, vtemp, 0);
+
+    if (!is_q) {
+        switch (size) {
+        case 0:
+            la_vilvl_b(vreg_d, vreg_n, vtemp);
+            break;
+        case 1:
+            la_vilvl_h(vreg_d, vreg_n, vtemp);
+            break;
+        case 2:
+            la_vilvl_w(vreg_d, vreg_n, vtemp);
+            break;
+        default:
+            assert(0);
+        }
+    } else {
+        switch (size) {
+        case 0:
+            la_vilvh_b(vreg_d, vreg_n, vtemp);
+            break;
+        case 1:
+            la_vilvh_h(vreg_d, vreg_n, vtemp);
+            break;
+        case 2:
+            la_vilvh_w(vreg_d, vreg_n, vtemp);
+            break;
+        default:
+            assert(0);
+        }
+    }
+
+    free_alloc_fpr(vreg_d);
+    free_alloc_fpr(vreg_n);
+    free_alloc_fpr(vtemp);
 }
 
 /* AdvSIMD two reg misc
