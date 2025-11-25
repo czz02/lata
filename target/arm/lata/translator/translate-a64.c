@@ -2341,6 +2341,8 @@ static bool trans_LDP(DisasContext *s)
     IR2_OPND reg_t2 = alloc_gpr_dst(a->rt2);
     IR2_OPND temp = ra_alloc_itemp();
 
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
+
     if (clearGprHigh && arm_la_map[a->rn] >= 0) { /* all reg_n is 64-bit size*/
         clear_gpr_high(a->rn);
     }
@@ -2688,6 +2690,7 @@ static bool trans_STR_i(DisasContext *s)
     }
 
     lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
+
     if (!a->w && offset) { // postindex = false
         /* Unsigned offset立即数是uimm12位，
         la_addi_d立即数是imm12，需要将立即数加载到寄存器
@@ -2771,6 +2774,8 @@ static bool trans_LDR_i(DisasContext *s)
 
     IR2_OPND reg_n = alloc_gpr_src_sp(a->rn);
     IR2_OPND reg_t = alloc_gpr_dst(a->rt);
+
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
 
     /*  # LDR (immediate)
         ## Post-index                       ## Pre-index ## Unsigned offset
@@ -2979,6 +2984,8 @@ static bool trans_LDR_v_i(DisasContext *s)
     IR2_OPND reg_n = alloc_gpr_src_sp(a->rn);
     IR2_OPND vreg_t = alloc_fpr_dst(a->rt);
 
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
+
     if (clearGprHigh && arm_la_map[a->rn] >= 0) { /* all reg_n is 64-bit size*/
         clear_gpr_high(a->rn);
     }
@@ -3053,6 +3060,8 @@ static bool trans_LDR(DisasContext *s)
     if (extract32(a->opt, 1, 1) == 0) {
         return false;
     }
+
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
 
     int extsize = extract32(a->opt, 0, 2);
     bool is_signed = extract32(a->opt, 2, 1);
@@ -3217,6 +3226,8 @@ static bool trans_STR(DisasContext *s)
         return false;
     }
 
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
+
     if (is_signed) {
         switch (extsize) {
         case 0:
@@ -3324,6 +3335,8 @@ static bool trans_LDR_v(DisasContext *s)
     if (!fp_access_check(s)) {
         return true;
     }
+
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
 
     int extsize = extract32(a->opt, 0, 2);
     bool is_signed = extract32(a->opt, 2, 1);
@@ -3464,6 +3477,8 @@ static bool trans_STR_v(DisasContext *s)
         return true;
     }
 
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
+    
     if (is_signed) {
         switch (extsize) {
         case 0:
