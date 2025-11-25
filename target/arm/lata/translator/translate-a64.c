@@ -7497,6 +7497,7 @@ static void handle_fp_2src_single(DisasContext *s, int opcode, int rd, int rn,
     IR2_OPND vreg_n = alloc_fpr_src(rn);
     IR2_OPND vreg_m = alloc_fpr_src(rm);
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
+    IR2_OPND vtemp, vtemp1;
 
     switch (opcode) {
     case 0x0: /* FMUL */
@@ -7512,10 +7513,20 @@ static void handle_fp_2src_single(DisasContext *s, int opcode, int rd, int rn,
         la_fsub_s(vreg_d, vreg_n, vreg_m);
         break;
     case 0x4: /* FMAX */
-        assert(0);
-        break;
     case 0x5: /* FMIN */
-        assert(0);
+        vtemp = ra_alloc_ftemp();
+        vtemp1 = ra_alloc_ftemp();
+        if (opcode & 0x1) {
+            la_fmin_s(vtemp, vreg_n, vreg_m);
+        } else {
+            la_fmax_s(vtemp, vreg_n, vreg_m);
+        }
+        la_fcmp_cond_s(fcc0_ir2_opnd, vreg_n, vreg_m, FCMP_COND_CUN);
+        la_fcmp_cond_s(fcc1_ir2_opnd, vreg_n, vreg_n, FCMP_COND_CUN);
+        la_fsel(vtemp1, vreg_m, vreg_n, fcc1_ir2_opnd);
+        la_fsel(vreg_d, vtemp, vtemp1, fcc0_ir2_opnd);
+        free_alloc_fpr(vtemp);
+        free_alloc_fpr(vtemp1);
         break;
     case 0x6: /* FMAXNM */
         la_fmax_s(vreg_d, vreg_n, vreg_m);
@@ -7543,7 +7554,7 @@ static void handle_fp_2src_double(DisasContext *s, int opcode, int rd, int rn,
     IR2_OPND vreg_n = alloc_fpr_src(rn);
     IR2_OPND vreg_m = alloc_fpr_src(rm);
     IR2_OPND vreg_d = alloc_fpr_dst(rd);
-    // IR2_OPND vtemp;
+    IR2_OPND vtemp, vtemp1;
 
     switch (opcode) {
     case 0x0: /* FMUL */
@@ -7559,10 +7570,20 @@ static void handle_fp_2src_double(DisasContext *s, int opcode, int rd, int rn,
         la_fsub_d(vreg_d, vreg_n, vreg_m);
         break;
     case 0x4: /* FMAX */
-        assert(0);
-        break;
     case 0x5: /* FMIN */
-        assert(0);
+        vtemp = ra_alloc_ftemp();
+        vtemp1 = ra_alloc_ftemp();
+        if (opcode & 0x1) {
+            la_fmin_d(vtemp, vreg_n, vreg_m);
+        } else {
+            la_fmax_d(vtemp, vreg_n, vreg_m);
+        }
+        la_fcmp_cond_d(fcc0_ir2_opnd, vreg_n, vreg_m, FCMP_COND_CUN);
+        la_fcmp_cond_d(fcc1_ir2_opnd, vreg_n, vreg_n, FCMP_COND_CUN);
+        la_fsel(vtemp1, vreg_m, vreg_n, fcc1_ir2_opnd);
+        la_fsel(vreg_d, vtemp, vtemp1, fcc0_ir2_opnd);
+        free_alloc_fpr(vtemp);
+        free_alloc_fpr(vtemp1);
         break;
     case 0x6: /* FMAXNM */
         la_fmax_d(vreg_d, vreg_n, vreg_m);
@@ -10245,6 +10266,8 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
     IR2_OPND vreg_m = alloc_fpr_src(rm);
     IR2_OPND vtemp = ra_alloc_ftemp();
     IR2_OPND vtemp1 = ra_alloc_ftemp();
+    IR2_OPND vtemp2 = ra_alloc_ftemp();
+    IR2_OPND vtemp3 = ra_alloc_ftemp();
 
     IR2_OPND vreg_d;
     if (fpopcode == 0x39 || fpopcode == 0x19) {
@@ -10254,7 +10277,6 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
     }
     if (size) {
         /* Double */
-
         switch (fpopcode) {
         case 0x39: /* FMLS */
             la_vxor_v(vtemp, vtemp, vtemp);
@@ -10277,7 +10299,11 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
             la_vfcmp_cond_d(vreg_d, vreg_n, vreg_m, FCMP_COND_SEQ);
             break;
         case 0x1e: /* FMAX */
-            assert(0);
+            la_vfmax_d(vtemp, vreg_n, vreg_m);
+            la_vfcmp_cond_d(vtemp1, vreg_n, vreg_m, FCMP_COND_CUN);
+            la_vfcmp_cond_d(vtemp2, vreg_n, vreg_n, FCMP_COND_CUN);
+            la_vbitsel_v(vtemp3, vreg_m, vreg_n, vtemp2);
+            la_vbitsel_v(vreg_d, vtemp, vtemp3, vtemp1);
             break;
         case 0x1f: /* FRECPS */
             assert(0);
@@ -10289,7 +10315,11 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
             la_vfsub_d(vreg_d, vreg_n, vreg_m);
             break;
         case 0x3e: /* FMIN */
-            assert(0);
+            la_vfmin_d(vtemp, vreg_n, vreg_m);
+            la_vfcmp_cond_d(vtemp1, vreg_n, vreg_m, FCMP_COND_CUN);
+            la_vfcmp_cond_d(vtemp2, vreg_n, vreg_n, FCMP_COND_CUN);
+            la_vbitsel_v(vtemp3, vreg_m, vreg_n, vtemp2);
+            la_vbitsel_v(vreg_d, vtemp, vtemp3, vtemp1);
             break;
         case 0x3f: /* FRSQRTS */
             assert(0);
@@ -10324,7 +10354,6 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
         }
     } else {
         /* Single */
-
         switch (fpopcode) {
         case 0x39: /* FMLS */
             la_vxor_v(vtemp, vtemp, vtemp);
@@ -10344,7 +10373,11 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
             la_vfcmp_cond_s(vreg_d, vreg_n, vreg_m, FCMP_COND_SEQ);
             break;
         case 0x1e: /* FMAX */
-            assert(0);
+            la_vfmax_s(vtemp, vreg_n, vreg_m);
+            la_vfcmp_cond_s(vtemp1, vreg_n, vreg_m, FCMP_COND_CUN);
+            la_vfcmp_cond_s(vtemp2, vreg_n, vreg_n, FCMP_COND_CUN);
+            la_vbitsel_v(vtemp3, vreg_m, vreg_n, vtemp2);
+            la_vbitsel_v(vreg_d, vtemp, vtemp3, vtemp1);
             break;
         case 0x1f: /* FRECPS */
             assert(0);
@@ -10359,7 +10392,11 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
             la_vfsub_s(vreg_d, vreg_n, vreg_m);
             break;
         case 0x3e: /* FMIN */
-            assert(0);
+            la_vfmin_s(vtemp, vreg_n, vreg_m);
+            la_vfcmp_cond_s(vtemp1, vreg_n, vreg_m, FCMP_COND_CUN);
+            la_vfcmp_cond_s(vtemp2, vreg_n, vreg_n, FCMP_COND_CUN);
+            la_vbitsel_v(vtemp3, vreg_m, vreg_n, vtemp2);
+            la_vbitsel_v(vreg_d, vtemp, vtemp3, vtemp1);
             break;
         case 0x3f: /* FRSQRTS */
             assert(0);
@@ -10406,6 +10443,8 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
     free_alloc_fpr(vreg_m);
     free_alloc_fpr(vtemp);
     free_alloc_fpr(vtemp1);
+    free_alloc_fpr(vtemp2);
+    free_alloc_fpr(vtemp3);
 }
 
 static void handle_3same_float_scalar(DisasContext *s, int size, int fpopcode,
