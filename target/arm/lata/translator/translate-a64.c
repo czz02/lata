@@ -263,6 +263,7 @@ static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
 // check saturate
 static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
 {
+    assert(0);
     IR2_OPND vtemp = ra_alloc_ftemp();
     IR2_OPND temp = ra_alloc_itemp();
     IR2_OPND set_qc = ir2_opnd_new_type(IR2_OPND_LABEL);
@@ -355,6 +356,7 @@ static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
 static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
                                           IR2_OPND vreg2, int rd)
 {
+    assert(0);
     IR2_OPND temp = ra_alloc_itemp();
 
     // li_d(temp, ctx->base->pc_next);
@@ -387,6 +389,7 @@ static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR
 static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
                                           IR2_OPND vreg2, int rd)
 {
+    assert(0);
     IR2_OPND temp = ra_alloc_itemp();
 
     // li_d(temp, ctx->base->pc_next);
