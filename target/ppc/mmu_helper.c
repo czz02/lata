@@ -61,8 +61,8 @@ static inline void ppc6xx_tlb_invalidate_all(CPUPPCState *env)
 }
 
 static inline void ppc6xx_tlb_invalidate_virt2(CPUPPCState *env,
-                                               target_ulong eaddr,
-                                               int is_code, int match_epn)
+                                               target_ulong eaddr, int is_code,
+                                               int match_epn)
 {
 #if !defined(FLUSH_ALL_TLBS)
     CPUState *cs = env_cpu(env);
@@ -74,8 +74,9 @@ static inline void ppc6xx_tlb_invalidate_virt2(CPUPPCState *env,
         nr = ppc6xx_tlb_getnum(env, eaddr, way, is_code);
         tlb = &env->tlb.tlb6[nr];
         if (pte_is_valid(tlb->pte0) && (match_epn == 0 || eaddr == tlb->EPN)) {
-            qemu_log_mask(CPU_LOG_MMU, "TLB invalidate %d/%d "
-                          TARGET_FMT_lx "\n", nr, env->nb_tlb, eaddr);
+            qemu_log_mask(CPU_LOG_MMU,
+                          "TLB invalidate %d/%d " TARGET_FMT_lx "\n", nr,
+                          env->nb_tlb, eaddr);
             pte_invalidate(&tlb->pte0);
             tlb_flush_page(cs, tlb->EPN);
         }
@@ -100,9 +101,10 @@ static void ppc6xx_tlb_store(CPUPPCState *env, target_ulong EPN, int way,
 
     nr = ppc6xx_tlb_getnum(env, EPN, way, is_code);
     tlb = &env->tlb.tlb6[nr];
-    qemu_log_mask(CPU_LOG_MMU, "Set TLB %d/%d EPN " TARGET_FMT_lx " PTE0 "
-                  TARGET_FMT_lx " PTE1 " TARGET_FMT_lx "\n", nr, env->nb_tlb,
-                  EPN, pte0, pte1);
+    qemu_log_mask(CPU_LOG_MMU,
+                  "Set TLB %d/%d EPN " TARGET_FMT_lx " PTE0 " TARGET_FMT_lx
+                  " PTE1 " TARGET_FMT_lx "\n",
+                  nr, env->nb_tlb, EPN, pte0, pte1);
     /* Invalidate any pending reference in QEMU for this virtual address */
     ppc6xx_tlb_invalidate_virt2(env, EPN, is_code, 1);
     tlb->pte0 = pte0;
@@ -165,8 +167,9 @@ static inline void do_invalidate_BAT(CPUPPCState *env, target_ulong BATu,
         qemu_log_mask(CPU_LOG_MMU, "Flush done\n");
         return;
     }
-    qemu_log_mask(CPU_LOG_MMU, "Flush BAT from " TARGET_FMT_lx
-                  " to " TARGET_FMT_lx " (" TARGET_FMT_lx ")\n",
+    qemu_log_mask(CPU_LOG_MMU,
+                  "Flush BAT from " TARGET_FMT_lx " to " TARGET_FMT_lx
+                  " (" TARGET_FMT_lx ")\n",
                   base, end, mask);
     for (page = base; page != end; page += TARGET_PAGE_SIZE) {
         tlb_flush_page(cs, page);
@@ -178,9 +181,9 @@ static inline void do_invalidate_BAT(CPUPPCState *env, target_ulong BATu,
 static inline void dump_store_bat(CPUPPCState *env, char ID, int ul, int nr,
                                   target_ulong value)
 {
-    qemu_log_mask(CPU_LOG_MMU, "Set %cBAT%d%c to " TARGET_FMT_lx " ("
-                  TARGET_FMT_lx ")\n", ID, nr, ul == 0 ? 'u' : 'l',
-                  value, env->nip);
+    qemu_log_mask(CPU_LOG_MMU,
+                  "Set %cBAT%d%c to " TARGET_FMT_lx " (" TARGET_FMT_lx ")\n",
+                  ID, nr, ul == 0 ? 'u' : 'l', value, env->nip);
 }
 
 void helper_store_ibatu(CPUPPCState *env, uint32_t nr, target_ulong value)
@@ -198,10 +201,10 @@ void helper_store_ibatu(CPUPPCState *env, uint32_t nr, target_ulong value)
          * invalidate all TLBs covered by this BAT
          */
         mask = (value << 15) & 0x0FFE0000UL;
-        env->IBAT[0][nr] = (value & 0x00001FFFUL) |
-            (value & ~0x0001FFFFUL & ~mask);
+        env->IBAT[0][nr] =
+            (value & 0x00001FFFUL) | (value & ~0x0001FFFFUL & ~mask);
         env->IBAT[1][nr] = (env->IBAT[1][nr] & 0x0000007B) |
-            (env->IBAT[1][nr] & ~0x0001FFFF & ~mask);
+                           (env->IBAT[1][nr] & ~0x0001FFFF & ~mask);
 #if !defined(FLUSH_ALL_TLBS)
         do_invalidate_BAT(env, env->IBAT[0][nr], mask);
 #else
@@ -231,10 +234,10 @@ void helper_store_dbatu(CPUPPCState *env, uint32_t nr, target_ulong value)
         do_invalidate_BAT(env, env->DBAT[0][nr], mask);
 #endif
         mask = (value << 15) & 0x0FFE0000UL;
-        env->DBAT[0][nr] = (value & 0x00001FFFUL) |
-            (value & ~0x0001FFFFUL & ~mask);
+        env->DBAT[0][nr] =
+            (value & 0x00001FFFUL) | (value & ~0x0001FFFFUL & ~mask);
         env->DBAT[1][nr] = (env->DBAT[1][nr] & 0x0000007B) |
-            (env->DBAT[1][nr] & ~0x0001FFFF & ~mask);
+                           (env->DBAT[1][nr] & ~0x0001FFFF & ~mask);
 #if !defined(FLUSH_ALL_TLBS)
         do_invalidate_BAT(env, env->DBAT[0][nr], mask);
 #else
@@ -259,35 +262,35 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
         tlb_flush(env_cpu(env));
     } else
 #endif /* defined(TARGET_PPC64) */
-    switch (env->mmu_model) {
-    case POWERPC_MMU_SOFT_6xx:
-        ppc6xx_tlb_invalidate_all(env);
-        break;
-    case POWERPC_MMU_SOFT_4xx:
-        ppc4xx_tlb_invalidate_all(env);
-        break;
-    case POWERPC_MMU_REAL:
-        cpu_abort(env_cpu(env), "No TLB for PowerPC 4xx in real mode\n");
-        break;
-    case POWERPC_MMU_MPC8xx:
-        /* XXX: TODO */
-        cpu_abort(env_cpu(env), "MPC8xx MMU model is not implemented\n");
-        break;
-    case POWERPC_MMU_BOOKE:
-        tlb_flush(env_cpu(env));
-        break;
-    case POWERPC_MMU_BOOKE206:
-        booke206_flush_tlb(env, -1, 0);
-        break;
-    case POWERPC_MMU_32B:
-        env->tlb_need_flush = 0;
-        tlb_flush(env_cpu(env));
-        break;
-    default:
-        /* XXX: TODO */
-        cpu_abort(env_cpu(env), "Unknown MMU model %x\n", env->mmu_model);
-        break;
-    }
+        switch (env->mmu_model) {
+        case POWERPC_MMU_SOFT_6xx:
+            ppc6xx_tlb_invalidate_all(env);
+            break;
+        case POWERPC_MMU_SOFT_4xx:
+            ppc4xx_tlb_invalidate_all(env);
+            break;
+        case POWERPC_MMU_REAL:
+            cpu_abort(env_cpu(env), "No TLB for PowerPC 4xx in real mode\n");
+            break;
+        case POWERPC_MMU_MPC8xx:
+            /* XXX: TODO */
+            cpu_abort(env_cpu(env), "MPC8xx MMU model is not implemented\n");
+            break;
+        case POWERPC_MMU_BOOKE:
+            tlb_flush(env_cpu(env));
+            break;
+        case POWERPC_MMU_BOOKE206:
+            booke206_flush_tlb(env, -1, 0);
+            break;
+        case POWERPC_MMU_32B:
+            env->tlb_need_flush = 0;
+            tlb_flush(env_cpu(env));
+            break;
+        default:
+            /* XXX: TODO */
+            cpu_abort(env_cpu(env), "Unknown MMU model %x\n", env->mmu_model);
+            break;
+        }
 }
 
 void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
@@ -305,26 +308,26 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
         env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
     } else
 #endif /* defined(TARGET_PPC64) */
-    switch (env->mmu_model) {
-    case POWERPC_MMU_SOFT_6xx:
-        ppc6xx_tlb_invalidate_virt(env, addr, 0);
-        if (env->id_tlbs == 1) {
-            ppc6xx_tlb_invalidate_virt(env, addr, 1);
+        switch (env->mmu_model) {
+        case POWERPC_MMU_SOFT_6xx:
+            ppc6xx_tlb_invalidate_virt(env, addr, 0);
+            if (env->id_tlbs == 1) {
+                ppc6xx_tlb_invalidate_virt(env, addr, 1);
+            }
+            break;
+        case POWERPC_MMU_32B:
+            /*
+             * Actual CPUs invalidate entire congruence classes based on
+             * the geometry of their TLBs and some OSes take that into
+             * account, we just mark the TLB to be flushed later (context
+             * synchronizing event or sync instruction on 32-bit).
+             */
+            env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
+            break;
+        default:
+            /* Should never reach here with other MMU models */
+            assert(0);
         }
-        break;
-    case POWERPC_MMU_32B:
-        /*
-         * Actual CPUs invalidate entire congruence classes based on
-         * the geometry of their TLBs and some OSes take that into
-         * account, we just mark the TLB to be flushed later (context
-         * synchronizing event or sync instruction on 32-bit).
-         */
-        env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
-        break;
-    default:
-        /* Should never reach here with other MMU models */
-        assert(0);
-    }
 #else
     ppc_tlb_invalidate_all(env);
 #endif
@@ -348,8 +351,8 @@ target_ulong helper_load_sr(CPUPPCState *env, target_ulong sr_num)
 void helper_store_sr(CPUPPCState *env, target_ulong srnum, target_ulong value)
 {
     qemu_log_mask(CPU_LOG_MMU,
-            "%s: reg=%d " TARGET_FMT_lx " " TARGET_FMT_lx "\n", __func__,
-            (int)srnum, value, env->sr[srnum]);
+                  "%s: reg=%d " TARGET_FMT_lx " " TARGET_FMT_lx "\n", __func__,
+                  (int)srnum, value, env->sr[srnum]);
 #if defined(TARGET_PPC64)
     if (mmu_is_64bit(env->mmu_model)) {
         PowerPCCPU *cpu = env_archcpu(env);
@@ -366,7 +369,7 @@ void helper_store_sr(CPUPPCState *env, target_ulong srnum, target_ulong value)
         ppc_store_slb(cpu, srnum, esid, vsid);
     } else
 #endif
-    if (env->sr[srnum] != value) {
+        if (env->sr[srnum] != value) {
         env->sr[srnum] = value;
         /*
          * Invalidating 256MB of virtual memory in 4kB pages is way
@@ -402,27 +405,27 @@ void helper_tlbie(CPUPPCState *env, target_ulong addr)
 #if defined(TARGET_PPC64)
 
 /* Invalidation Selector */
-#define TLBIE_IS_VA         0
-#define TLBIE_IS_PID        1
-#define TLBIE_IS_LPID       2
-#define TLBIE_IS_ALL        3
+#define TLBIE_IS_VA 0
+#define TLBIE_IS_PID 1
+#define TLBIE_IS_LPID 2
+#define TLBIE_IS_ALL 3
 
 /* Radix Invalidation Control */
-#define TLBIE_RIC_TLB       0
-#define TLBIE_RIC_PWC       1
-#define TLBIE_RIC_ALL       2
-#define TLBIE_RIC_GRP       3
+#define TLBIE_RIC_TLB 0
+#define TLBIE_RIC_PWC 1
+#define TLBIE_RIC_ALL 2
+#define TLBIE_RIC_GRP 3
 
 /* Radix Actual Page sizes */
-#define TLBIE_R_AP_4K       0
-#define TLBIE_R_AP_64K      5
-#define TLBIE_R_AP_2M       1
-#define TLBIE_R_AP_1G       2
+#define TLBIE_R_AP_4K 0
+#define TLBIE_R_AP_64K 5
+#define TLBIE_R_AP_2M 1
+#define TLBIE_R_AP_1G 2
 
 /* RB field masks */
-#define TLBIE_RB_EPN_MASK   PPC_BITMASK(0, 51)
-#define TLBIE_RB_IS_MASK    PPC_BITMASK(52, 53)
-#define TLBIE_RB_AP_MASK    PPC_BITMASK(56, 58)
+#define TLBIE_RB_EPN_MASK PPC_BITMASK(0, 51)
+#define TLBIE_RB_IS_MASK PPC_BITMASK(52, 53)
+#define TLBIE_RB_AP_MASK PPC_BITMASK(56, 58)
 
 void helper_tlbie_isa300(CPUPPCState *env, target_ulong rb, target_ulong rs,
                          uint32_t flags)
@@ -438,12 +441,13 @@ void helper_tlbie_isa300(CPUPPCState *env, target_ulong rb, target_ulong rs,
     bool local = flags & TLBIE_F_LOCAL;
     bool effR;
     unsigned is = extract64(rb, PPC_BIT_NR(53), 2);
-    unsigned ap;        /* actual page size */
+    unsigned ap; /* actual page size */
     target_ulong addr, pgoffs_mask;
 
     qemu_log_mask(CPU_LOG_MMU,
-        "%s: local=%d addr=" TARGET_FMT_lx " ric=%u prs=%d r=%d is=%u\n",
-        __func__, local, rb & TARGET_PAGE_MASK, ric, prs, r, is);
+                  "%s: local=%d addr=" TARGET_FMT_lx
+                  " ric=%u prs=%d r=%d is=%u\n",
+                  __func__, local, rb & TARGET_PAGE_MASK, ric, prs, r, is);
 
     effR = FIELD_EX64(env->msr, MSR, HV) ? r : env->spr[SPR_LPCR] & LPCR_HR;
 
@@ -455,9 +459,10 @@ void helper_tlbie_isa300(CPUPPCState *env, target_ulong rb, target_ulong rs,
     /* Check for invalid instruction forms (effR=1). */
     if (unlikely(ric == TLBIE_RIC_GRP ||
                  ((ric == TLBIE_RIC_PWC || ric == TLBIE_RIC_ALL) &&
-                                           is == TLBIE_IS_VA) ||
+                  is == TLBIE_IS_VA) ||
                  (!prs && is == TLBIE_IS_PID))) {
-        qemu_log_mask(LOG_GUEST_ERROR,
+        qemu_log_mask(
+            LOG_GUEST_ERROR,
             "%s: invalid instruction form: ric=%u prs=%d r=%d is=%u\n",
             __func__, ric, prs, r, is);
         goto invalid;
@@ -491,7 +496,8 @@ void helper_tlbie_isa300(CPUPPCState *env, target_ulong rb, target_ulong rs,
      */
     if (unlikely(ric == TLBIE_RIC_TLB && prs && is == TLBIE_IS_VA &&
                  (rb & R_EADDR_QUADRANT) != R_EADDR_QUADRANT0)) {
-        qemu_log_mask(LOG_GUEST_ERROR,
+        qemu_log_mask(
+            LOG_GUEST_ERROR,
             "%s: attempt to invalidate a translation outside of quadrant 0\n",
             __func__);
         goto inval_all;
@@ -547,8 +553,8 @@ inval_all:
 
 invalid:
     raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                           POWERPC_EXCP_INVAL |
-                           POWERPC_EXCP_INVAL_INVAL, GETPC());
+                           POWERPC_EXCP_INVAL | POWERPC_EXCP_INVAL_INVAL,
+                           GETPC());
 }
 
 #endif
@@ -578,12 +584,13 @@ static void do_6xx_tlb(CPUPPCState *env, target_ulong new_EPN, int is_code)
     }
     way = (env->spr[SPR_SRR1] >> 17) & 1;
     (void)EPN; /* avoid a compiler warning */
-    qemu_log_mask(CPU_LOG_MMU, "%s: EPN " TARGET_FMT_lx " " TARGET_FMT_lx
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s: EPN " TARGET_FMT_lx " " TARGET_FMT_lx
                   " PTE0 " TARGET_FMT_lx " PTE1 " TARGET_FMT_lx " way %d\n",
                   __func__, new_EPN, EPN, CMP, RPN, way);
     /* Store this TLB */
-    ppc6xx_tlb_store(env, (uint32_t)(new_EPN & TARGET_PAGE_MASK),
-                     way, is_code, CMP, RPN);
+    ppc6xx_tlb_store(env, (uint32_t)(new_EPN & TARGET_PAGE_MASK), way, is_code,
+                     CMP, RPN);
 }
 
 void helper_6xx_tlbd(CPUPPCState *env, target_ulong EPN)
@@ -689,20 +696,20 @@ static inline int booke_page_size_to_tlb(target_ulong page_size)
 }
 
 /* Helpers for 4xx TLB management */
-#define PPC4XX_TLB_ENTRY_MASK       0x0000003f  /* Mask for 64 TLB entries */
+#define PPC4XX_TLB_ENTRY_MASK 0x0000003f /* Mask for 64 TLB entries */
 
-#define PPC4XX_TLBHI_V              0x00000040
-#define PPC4XX_TLBHI_E              0x00000020
-#define PPC4XX_TLBHI_SIZE_MIN       0
-#define PPC4XX_TLBHI_SIZE_MAX       7
-#define PPC4XX_TLBHI_SIZE_DEFAULT   1
-#define PPC4XX_TLBHI_SIZE_SHIFT     7
-#define PPC4XX_TLBHI_SIZE_MASK      0x00000007
+#define PPC4XX_TLBHI_V 0x00000040
+#define PPC4XX_TLBHI_E 0x00000020
+#define PPC4XX_TLBHI_SIZE_MIN 0
+#define PPC4XX_TLBHI_SIZE_MAX 7
+#define PPC4XX_TLBHI_SIZE_DEFAULT 1
+#define PPC4XX_TLBHI_SIZE_SHIFT 7
+#define PPC4XX_TLBHI_SIZE_MASK 0x00000007
 
-#define PPC4XX_TLBLO_EX             0x00000200
-#define PPC4XX_TLBLO_WR             0x00000100
-#define PPC4XX_TLBLO_ATTR_MASK      0x000000FF
-#define PPC4XX_TLBLO_RPN_MASK       0xFFFFFC00
+#define PPC4XX_TLBLO_EX 0x00000200
+#define PPC4XX_TLBLO_WR 0x00000100
+#define PPC4XX_TLBLO_ATTR_MASK 0x000000FF
+#define PPC4XX_TLBLO_RPN_MASK 0xFFFFFC00
 
 void helper_store_40x_pid(CPUPPCState *env, target_ulong val)
 {
@@ -750,36 +757,36 @@ target_ulong helper_4xx_tlbre_lo(CPUPPCState *env, target_ulong entry)
     return ret;
 }
 
-void helper_4xx_tlbwe_hi(CPUPPCState *env, target_ulong entry,
-                         target_ulong val)
+void helper_4xx_tlbwe_hi(CPUPPCState *env, target_ulong entry, target_ulong val)
 {
     CPUState *cs = env_cpu(env);
     ppcemb_tlb_t *tlb;
     target_ulong page, end;
 
-    qemu_log_mask(CPU_LOG_MMU, "%s entry %d val " TARGET_FMT_lx "\n",
-                  __func__, (int)entry,
-              val);
+    qemu_log_mask(CPU_LOG_MMU, "%s entry %d val " TARGET_FMT_lx "\n", __func__,
+                  (int)entry, val);
     entry &= PPC4XX_TLB_ENTRY_MASK;
     tlb = &env->tlb.tlbe[entry];
     /* Invalidate previous TLB (if it's valid) */
     if (tlb->prot & PAGE_VALID) {
         end = tlb->EPN + tlb->size;
-        qemu_log_mask(CPU_LOG_MMU, "%s: invalidate old TLB %d start "
-                      TARGET_FMT_lx " end " TARGET_FMT_lx "\n", __func__,
-                      (int)entry, tlb->EPN, end);
+        qemu_log_mask(CPU_LOG_MMU,
+                      "%s: invalidate old TLB %d start " TARGET_FMT_lx
+                      " end " TARGET_FMT_lx "\n",
+                      __func__, (int)entry, tlb->EPN, end);
         for (page = tlb->EPN; page < end; page += TARGET_PAGE_SIZE) {
             tlb_flush_page(cs, page);
         }
     }
-    tlb->size = booke_tlb_to_page_size((val >> PPC4XX_TLBHI_SIZE_SHIFT)
-                                       & PPC4XX_TLBHI_SIZE_MASK);
+    tlb->size = booke_tlb_to_page_size((val >> PPC4XX_TLBHI_SIZE_SHIFT) &
+                                       PPC4XX_TLBHI_SIZE_MASK);
     /*
      * We cannot handle TLB size < TARGET_PAGE_SIZE.
      * If this ever occurs, we should implement TARGET_PAGE_BITS_VARY
      */
     if ((val & PPC4XX_TLBHI_V) && tlb->size < TARGET_PAGE_SIZE) {
-        cpu_abort(cs, "TLB size " TARGET_FMT_lu " < %u "
+        cpu_abort(cs,
+                  "TLB size " TARGET_FMT_lu " < %u "
                   "are not supported (%d)\n"
                   "Please implement TARGET_PAGE_BITS_VARY\n",
                   tlb->size, TARGET_PAGE_SIZE, (int)((val >> 7) & 0x7));
@@ -796,10 +803,10 @@ void helper_4xx_tlbwe_hi(CPUPPCState *env, target_ulong entry,
         tlb->prot &= ~PAGE_VALID;
     }
     tlb->PID = env->spr[SPR_40x_PID]; /* PID */
-    qemu_log_mask(CPU_LOG_MMU, "%s: set up TLB %d RPN " HWADDR_FMT_plx
-                  " EPN " TARGET_FMT_lx " size " TARGET_FMT_lx
-                  " prot %c%c%c%c PID %d\n", __func__,
-                  (int)entry, tlb->RPN, tlb->EPN, tlb->size,
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s: set up TLB %d RPN " HWADDR_FMT_plx " EPN " TARGET_FMT_lx
+                  " size " TARGET_FMT_lx " prot %c%c%c%c PID %d\n",
+                  __func__, (int)entry, tlb->RPN, tlb->EPN, tlb->size,
                   tlb->prot & PAGE_READ ? 'r' : '-',
                   tlb->prot & PAGE_WRITE ? 'w' : '-',
                   tlb->prot & PAGE_EXEC ? 'x' : '-',
@@ -807,22 +814,22 @@ void helper_4xx_tlbwe_hi(CPUPPCState *env, target_ulong entry,
     /* Invalidate new TLB (if valid) */
     if (tlb->prot & PAGE_VALID) {
         end = tlb->EPN + tlb->size;
-        qemu_log_mask(CPU_LOG_MMU, "%s: invalidate TLB %d start "
-                      TARGET_FMT_lx " end " TARGET_FMT_lx "\n", __func__,
-                      (int)entry, tlb->EPN, end);
+        qemu_log_mask(CPU_LOG_MMU,
+                      "%s: invalidate TLB %d start " TARGET_FMT_lx
+                      " end " TARGET_FMT_lx "\n",
+                      __func__, (int)entry, tlb->EPN, end);
         for (page = tlb->EPN; page < end; page += TARGET_PAGE_SIZE) {
             tlb_flush_page(cs, page);
         }
     }
 }
 
-void helper_4xx_tlbwe_lo(CPUPPCState *env, target_ulong entry,
-                         target_ulong val)
+void helper_4xx_tlbwe_lo(CPUPPCState *env, target_ulong entry, target_ulong val)
 {
     ppcemb_tlb_t *tlb;
 
-    qemu_log_mask(CPU_LOG_MMU, "%s entry %i val " TARGET_FMT_lx "\n",
-                  __func__, (int)entry, val);
+    qemu_log_mask(CPU_LOG_MMU, "%s entry %i val " TARGET_FMT_lx "\n", __func__,
+                  (int)entry, val);
     entry &= PPC4XX_TLB_ENTRY_MASK;
     tlb = &env->tlb.tlbe[entry];
     tlb->attr = val & PPC4XX_TLBLO_ATTR_MASK;
@@ -834,10 +841,10 @@ void helper_4xx_tlbwe_lo(CPUPPCState *env, target_ulong entry,
     if (val & PPC4XX_TLBLO_WR) {
         tlb->prot |= PAGE_WRITE;
     }
-    qemu_log_mask(CPU_LOG_MMU, "%s: set up TLB %d RPN " HWADDR_FMT_plx
-                  " EPN " TARGET_FMT_lx
-                  " size " TARGET_FMT_lx " prot %c%c%c%c PID %d\n", __func__,
-                  (int)entry, tlb->RPN, tlb->EPN, tlb->size,
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s: set up TLB %d RPN " HWADDR_FMT_plx " EPN " TARGET_FMT_lx
+                  " size " TARGET_FMT_lx " prot %c%c%c%c PID %d\n",
+                  __func__, (int)entry, tlb->RPN, tlb->EPN, tlb->size,
                   tlb->prot & PAGE_READ ? 'r' : '-',
                   tlb->prot & PAGE_WRITE ? 'w' : '-',
                   tlb->prot & PAGE_EXEC ? 'x' : '-',
@@ -1072,8 +1079,8 @@ void helper_booke206_tlbwe(CPUPPCState *env)
 
     if (!tlb) {
         raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_INVAL |
-                               POWERPC_EXCP_INVAL_INVAL, GETPC());
+                               POWERPC_EXCP_INVAL | POWERPC_EXCP_INVAL_INVAL,
+                               GETPC());
     }
 
     /* check that we support the targeted size */
@@ -1082,8 +1089,8 @@ void helper_booke206_tlbwe(CPUPPCState *env)
     if ((env->spr[SPR_BOOKE_MAS1] & MAS1_VALID) && (tlbncfg & TLBnCFG_AVAIL) &&
         !(size_ps & (1 << size_tlb))) {
         raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_INVAL |
-                               POWERPC_EXCP_INVAL_INVAL, GETPC());
+                               POWERPC_EXCP_INVAL | POWERPC_EXCP_INVAL_INVAL,
+                               GETPC());
     }
 
     if (FIELD_EX64(env->msr, MSR, GS)) {
@@ -1106,8 +1113,8 @@ void helper_booke206_tlbwe(CPUPPCState *env)
         flush_page(env, tlb);
     }
 
-    tlb->mas7_3 = ((uint64_t)env->spr[SPR_BOOKE_MAS7] << 32) |
-        env->spr[SPR_BOOKE_MAS3];
+    tlb->mas7_3 =
+        ((uint64_t)env->spr[SPR_BOOKE_MAS7] << 32) | env->spr[SPR_BOOKE_MAS3];
     tlb->mas1 = env->spr[SPR_BOOKE_MAS1];
 
     if ((env->spr[SPR_MMUCFG] & MMUCFG_MAVN) == MMUCFG_MAVN_V2) {
@@ -1217,7 +1224,7 @@ void helper_booke206_tlbsx(CPUPPCState *env, target_ulong address)
     }
 
     env->spr[SPR_BOOKE_MAS1] |= (env->spr[SPR_BOOKE_MAS6] >> 16)
-        << MAS1_TID_SHIFT;
+                                << MAS1_TID_SHIFT;
 
     /* next victim logic */
     env->spr[SPR_BOOKE_MAS0] |= env->last_way << MAS0_ESEL_SHIFT;
@@ -1265,13 +1272,13 @@ void helper_booke206_tlbivax(CPUPPCState *env, target_ulong address)
     if (address & 0x8) {
         /* flush TLB1 entries */
         booke206_invalidate_ea_tlb(env, 1, address);
-        CPU_FOREACH(cs) {
+        CPU_FOREACH (cs) {
             tlb_flush(cs);
         }
     } else {
         /* flush TLB0 entries */
         booke206_invalidate_ea_tlb(env, 0, address);
-        CPU_FOREACH(cs) {
+        CPU_FOREACH (cs) {
             tlb_flush_page(cs, address & MAS2_EPN_MASK);
         }
     }
@@ -1328,8 +1335,7 @@ void helper_booke206_tlbilx3(CPUPPCState *env, target_ulong address)
                 continue;
             }
             if ((ppcmas_tlb_check(env, tlb, NULL, address, pid) != 0) ||
-                (tlb->mas1 & MAS1_IPROT) ||
-                ((tlb->mas1 & MAS1_IND) != ind) ||
+                (tlb->mas1 & MAS1_IPROT) || ((tlb->mas1 & MAS1_IND) != ind) ||
                 ((tlb->mas8 & MAS8_TGS) != sgs)) {
                 continue;
             }
@@ -1372,15 +1378,15 @@ void helper_check_tlb_flush_global(CPUPPCState *env)
 
 
 bool ppc_cpu_tlb_fill(CPUState *cs, vaddr eaddr, int size,
-                      MMUAccessType access_type, int mmu_idx,
-                      bool probe, uintptr_t retaddr)
+                      MMUAccessType access_type, int mmu_idx, bool probe,
+                      uintptr_t retaddr)
 {
     PowerPCCPU *cpu = POWERPC_CPU(cs);
     hwaddr raddr;
     int page_size, prot;
 
-    if (ppc_xlate(cpu, eaddr, access_type, &raddr,
-                  &page_size, &prot, mmu_idx, !probe)) {
+    if (ppc_xlate(cpu, eaddr, access_type, &raddr, &page_size, &prot, mmu_idx,
+                  !probe)) {
         tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_MASK,
                      prot, mmu_idx, 1UL << page_size);
         return true;
@@ -1388,6 +1394,6 @@ bool ppc_cpu_tlb_fill(CPUState *cs, vaddr eaddr, int size,
     if (probe) {
         return false;
     }
-    raise_exception_err_ra(&cpu->env, cs->exception_index,
-                           cpu->env.error_code, retaddr);
+    raise_exception_err_ra(&cpu->env, cs->exception_index, cpu->env.error_code,
+                           retaddr);
 }

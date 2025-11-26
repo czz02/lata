@@ -18,11 +18,11 @@
 
 #define DEBUG_HAX_MEM 0
 
-#define DPRINTF(fmt, ...) \
-    do { \
-        if (DEBUG_HAX_MEM) { \
-            fprintf(stdout, fmt, ## __VA_ARGS__); \
-        } \
+#define DPRINTF(fmt, ...)                        \
+    do {                                         \
+        if (DEBUG_HAX_MEM) {                     \
+            fprintf(stdout, fmt, ##__VA_ARGS__); \
+        }                                        \
     } while (0)
 
 /**
@@ -56,8 +56,7 @@ typedef struct HAXMapping {
  * send to the kernel only the removal of the pages from the MMIO hole after
  * having computed locally the result of the deletion and additions.
  */
-static QTAILQ_HEAD(, HAXMapping) mappings =
-    QTAILQ_HEAD_INITIALIZER(mappings);
+static QTAILQ_HEAD(, HAXMapping) mappings = QTAILQ_HEAD_INITIALIZER(mappings);
 
 /**
  * hax_mapping_dump_list: dumps @mappings to stdout (for debugging)
@@ -67,9 +66,10 @@ static void hax_mapping_dump_list(void)
     HAXMapping *entry;
 
     DPRINTF("%s updates:\n", __func__);
-    QTAILQ_FOREACH(entry, &mappings, entry) {
+    QTAILQ_FOREACH (entry, &mappings, entry) {
         DPRINTF("\t%c 0x%016" PRIx64 "->0x%016" PRIx64 " VA 0x%016" PRIx64
-                "%s\n", entry->flags & HAX_RAM_INFO_INVALID ? '-' : '+',
+                "%s\n",
+                entry->flags & HAX_RAM_INFO_INVALID ? '-' : '+',
                 entry->start_pa, entry->start_pa + entry->size, entry->host_va,
                 entry->flags & HAX_RAM_INFO_ROM ? " ROM" : "");
     }
@@ -108,16 +108,16 @@ static void hax_update_mapping(uint64_t start_pa, uint32_t size,
     uint64_t end_pa = start_pa + size;
     HAXMapping *entry, *next;
 
-    QTAILQ_FOREACH_SAFE(entry, &mappings, entry, next) {
+    QTAILQ_FOREACH_SAFE (entry, &mappings, entry, next) {
         uint32_t chunk_sz;
         if (start_pa >= entry->start_pa + entry->size) {
             continue;
         }
         if (start_pa < entry->start_pa) {
-            chunk_sz = end_pa <= entry->start_pa ? size
-                                                 : entry->start_pa - start_pa;
-            hax_insert_mapping_before(entry, start_pa, chunk_sz,
-                                      host_va, flags);
+            chunk_sz =
+                end_pa <= entry->start_pa ? size : entry->start_pa - start_pa;
+            hax_insert_mapping_before(entry, start_pa, chunk_sz, host_va,
+                                      flags);
             start_pa += chunk_sz;
             host_va += chunk_sz;
             size -= chunk_sz;
@@ -188,7 +188,8 @@ static void hax_process_section(MemoryRegionSection *section, uint8_t flags)
     /* Adjust start_pa and size so that they are page-aligned. (Cf
      * kvm_set_phys_mem() in kvm-all.c).
      */
-    delta = qemu_real_host_page_size() - (start_pa & ~qemu_real_host_page_mask());
+    delta =
+        qemu_real_host_page_size() - (start_pa & ~qemu_real_host_page_mask());
     delta &= ~qemu_real_host_page_mask();
     if (delta > size) {
         return;
@@ -200,8 +201,8 @@ static void hax_process_section(MemoryRegionSection *section, uint8_t flags)
         return;
     }
 
-    host_va = (uintptr_t)memory_region_get_ram_ptr(mr)
-            + section->offset_within_region + delta;
+    host_va = (uintptr_t)memory_region_get_ram_ptr(mr) +
+              section->offset_within_region + delta;
     if (memory_region_is_rom(section->mr)) {
         flags |= HAX_RAM_INFO_ROM;
     }
@@ -252,17 +253,18 @@ static void hax_transaction_commit(MemoryListener *listener)
         if (DEBUG_HAX_MEM) {
             hax_mapping_dump_list();
         }
-        QTAILQ_FOREACH_SAFE(entry, &mappings, entry, next) {
+        QTAILQ_FOREACH_SAFE (entry, &mappings, entry, next) {
             if (entry->flags & HAX_RAM_INFO_INVALID) {
                 /* for unmapping, put the values expected by the kernel */
                 entry->flags = HAX_RAM_INFO_INVALID;
                 entry->host_va = 0;
             }
-            if (hax_set_ram(entry->start_pa, entry->size,
-                            entry->host_va, entry->flags)) {
-                fprintf(stderr, "%s: Failed mapping @0x%016" PRIx64 "+0x%"
-                        PRIx32 " flags %02x\n", __func__, entry->start_pa,
-                        entry->size, entry->flags);
+            if (hax_set_ram(entry->start_pa, entry->size, entry->host_va,
+                            entry->flags)) {
+                fprintf(stderr,
+                        "%s: Failed mapping @0x%016" PRIx64 "+0x%" PRIx32
+                        " flags %02x\n",
+                        __func__, entry->start_pa, entry->size, entry->flags);
             }
             QTAILQ_REMOVE(&mappings, entry, entry);
             g_free(entry);
@@ -271,8 +273,7 @@ static void hax_transaction_commit(MemoryListener *listener)
 }
 
 /* currently we fake the dirty bitmap sync, always dirty */
-static void hax_log_sync(MemoryListener *listener,
-                         MemoryRegionSection *section)
+static void hax_log_sync(MemoryListener *listener, MemoryRegionSection *section)
 {
     MemoryRegion *mr = section->mr;
 

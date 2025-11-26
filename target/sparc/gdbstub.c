@@ -89,10 +89,9 @@ int sparc_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
     case 81:
         return gdb_get_regl(mem_buf, env->npc);
     case 82:
-        return gdb_get_regl(mem_buf, (cpu_get_ccr(env) << 32) |
-                                     ((env->asi & 0xff) << 24) |
-                                     ((env->pstate & 0xfff) << 8) |
-                                     cpu_get_cwp64(env));
+        return gdb_get_regl(
+            mem_buf, (cpu_get_ccr(env) << 32) | ((env->asi & 0xff) << 24) |
+                         ((env->pstate & 0xfff) << 8) | cpu_get_cwp64(env));
     case 83:
         return gdb_get_regl(mem_buf, env->fsr);
     case 84:

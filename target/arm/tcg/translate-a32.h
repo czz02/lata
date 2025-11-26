@@ -60,27 +60,27 @@ static inline TCGv_i32 load_cpu_offset(int offset)
 }
 
 /* Load from a 32-bit field to a TCGv_i32 */
-#define load_cpu_field(name)                                            \
-    ({                                                                  \
-        QEMU_BUILD_BUG_ON(sizeof_field(CPUARMState, name) != 4);        \
-        load_cpu_offset(offsetof(CPUARMState, name));                   \
+#define load_cpu_field(name)                                     \
+    ({                                                           \
+        QEMU_BUILD_BUG_ON(sizeof_field(CPUARMState, name) != 4); \
+        load_cpu_offset(offsetof(CPUARMState, name));            \
     })
 
 /* Load from the low half of a 64-bit field to a TCGv_i32 */
-#define load_cpu_field_low32(name)                                      \
-    ({                                                                  \
-        QEMU_BUILD_BUG_ON(sizeof_field(CPUARMState, name) != 8);        \
-        load_cpu_offset(offsetoflow32(CPUARMState, name));              \
+#define load_cpu_field_low32(name)                               \
+    ({                                                           \
+        QEMU_BUILD_BUG_ON(sizeof_field(CPUARMState, name) != 8); \
+        load_cpu_offset(offsetoflow32(CPUARMState, name));       \
     })
 
 void store_cpu_offset(TCGv_i32 var, int offset, int size);
 
-#define store_cpu_field(val, name)                                      \
-    ({                                                                  \
-        QEMU_BUILD_BUG_ON(sizeof_field(CPUARMState, name) != 4          \
-                          && sizeof_field(CPUARMState, name) != 1);     \
-        store_cpu_offset(val, offsetof(CPUARMState, name),              \
-                         sizeof_field(CPUARMState, name));              \
+#define store_cpu_field(val, name)                                \
+    ({                                                            \
+        QEMU_BUILD_BUG_ON(sizeof_field(CPUARMState, name) != 4 && \
+                          sizeof_field(CPUARMState, name) != 1);  \
+        store_cpu_offset(val, offsetof(CPUARMState, name),        \
+                         sizeof_field(CPUARMState, name));        \
     })
 
 #define store_cpu_field_constant(val, name) \
@@ -96,22 +96,22 @@ static inline TCGv_i32 load_reg(DisasContext *s, int reg)
 
 void store_reg(DisasContext *s, int reg, TCGv_i32 var);
 
-void gen_aa32_ld_internal_i32(DisasContext *s, TCGv_i32 val,
-                              TCGv_i32 a32, int index, MemOp opc);
-void gen_aa32_st_internal_i32(DisasContext *s, TCGv_i32 val,
-                              TCGv_i32 a32, int index, MemOp opc);
-void gen_aa32_ld_internal_i64(DisasContext *s, TCGv_i64 val,
-                              TCGv_i32 a32, int index, MemOp opc);
-void gen_aa32_st_internal_i64(DisasContext *s, TCGv_i64 val,
-                              TCGv_i32 a32, int index, MemOp opc);
-void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
-                     int index, MemOp opc);
-void gen_aa32_st_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
-                     int index, MemOp opc);
-void gen_aa32_ld_i64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32,
-                     int index, MemOp opc);
-void gen_aa32_st_i64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32,
-                     int index, MemOp opc);
+void gen_aa32_ld_internal_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
+                              int index, MemOp opc);
+void gen_aa32_st_internal_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
+                              int index, MemOp opc);
+void gen_aa32_ld_internal_i64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32,
+                              int index, MemOp opc);
+void gen_aa32_st_internal_i64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32,
+                              int index, MemOp opc);
+void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32, int index,
+                     MemOp opc);
+void gen_aa32_st_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32, int index,
+                     MemOp opc);
+void gen_aa32_ld_i64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32, int index,
+                     MemOp opc);
+void gen_aa32_st_i64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32, int index,
+                     MemOp opc);
 
 #define DO_GEN_LD(SUFF, OPC)                                            \
     static inline void gen_aa32_ld##SUFF(DisasContext *s, TCGv_i32 val, \
@@ -127,14 +127,14 @@ void gen_aa32_st_i64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32,
         gen_aa32_st_i32(s, val, a32, index, OPC);                       \
     }
 
-static inline void gen_aa32_ld64(DisasContext *s, TCGv_i64 val,
-                                 TCGv_i32 a32, int index)
+static inline void gen_aa32_ld64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32,
+                                 int index)
 {
     gen_aa32_ld_i64(s, val, a32, index, MO_UQ);
 }
 
-static inline void gen_aa32_st64(DisasContext *s, TCGv_i64 val,
-                                 TCGv_i32 a32, int index)
+static inline void gen_aa32_st64(DisasContext *s, TCGv_i64 val, TCGv_i32 a32,
+                                 int index)
 {
     gen_aa32_st_i64(s, val, a32, index, MO_UQ);
 }

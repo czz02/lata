@@ -56,7 +56,7 @@ struct PPCElfPrstatus {
 struct PPCElfFpregset {
     uint64_t fpr[32];
     reg_t fpscr;
-}  QEMU_PACKED;
+} QEMU_PACKED;
 
 
 struct PPCElfVmxregset {
@@ -66,25 +66,25 @@ struct PPCElfVmxregset {
         ppc_avr_t unused;
         uint32_t value;
     } vrsave;
-}  QEMU_PACKED;
+} QEMU_PACKED;
 
 struct PPCElfVsxregset {
     uint64_t vsr[32];
-}  QEMU_PACKED;
+} QEMU_PACKED;
 
 struct PPCElfSperegset {
     uint32_t evr[32];
     uint64_t spe_acc;
     uint32_t spe_fscr;
-}  QEMU_PACKED;
+} QEMU_PACKED;
 
 typedef struct noteStruct {
     Elf_Nhdr hdr;
     char name[5];
     char pad3[3];
     union {
-        struct PPCElfPrstatus  prstatus;
-        struct PPCElfFpregset  fpregset;
+        struct PPCElfPrstatus prstatus;
+        struct PPCElfFpregset fpregset;
         struct PPCElfVmxregset vmxregset;
         struct PPCElfVsxregset vsxregset;
         struct PPCElfSperegset speregset;
@@ -130,7 +130,7 @@ static void ppc_write_elf_prstatus(NoteFuncArg *arg, PowerPCCPU *cpu)
 static void ppc_write_elf_fpregset(NoteFuncArg *arg, PowerPCCPU *cpu)
 {
     int i;
-    struct PPCElfFpregset  *fpregset;
+    struct PPCElfFpregset *fpregset;
     Note *note = &arg->note;
     DumpState *s = arg->state;
 
@@ -213,12 +213,12 @@ static const struct NoteFuncDescStruct {
     int contents_size;
     void (*note_contents_func)(NoteFuncArg *arg, PowerPCCPU *cpu);
 } note_func[] = {
-    {sizeof_field(Note, contents.prstatus),  ppc_write_elf_prstatus},
-    {sizeof_field(Note, contents.fpregset),  ppc_write_elf_fpregset},
-    {sizeof_field(Note, contents.vmxregset), ppc_write_elf_vmxregset},
-    {sizeof_field(Note, contents.vsxregset), ppc_write_elf_vsxregset},
-    {sizeof_field(Note, contents.speregset), ppc_write_elf_speregset},
-    { 0, NULL}
+    { sizeof_field(Note, contents.prstatus), ppc_write_elf_prstatus },
+    { sizeof_field(Note, contents.fpregset), ppc_write_elf_fpregset },
+    { sizeof_field(Note, contents.vmxregset), ppc_write_elf_vmxregset },
+    { sizeof_field(Note, contents.vsxregset), ppc_write_elf_vsxregset },
+    { sizeof_field(Note, contents.speregset), ppc_write_elf_speregset },
+    { 0, NULL }
 };
 
 typedef struct NoteFuncDescStruct NoteFuncDesc;
@@ -243,8 +243,7 @@ int cpu_get_dump_info(ArchDumpInfo *info,
         info->d_endian = ELFDATA2MSB;
     }
     /* 64KB is the max page size for pseries kernel */
-    if (strncmp(object_get_typename(qdev_get_machine()),
-                "pseries-", 8) == 0) {
+    if (strncmp(object_get_typename(qdev_get_machine()), "pseries-", 8) == 0) {
         info->page_size = (1U << 16);
     }
 
@@ -260,17 +259,16 @@ ssize_t cpu_get_note_size(int class, int machine, int nr_cpus)
 
     note_head_size = sizeof(Elf_Nhdr);
     for (nf = note_func; nf->note_contents_func; nf++) {
-        elf_note_size = elf_note_size + note_head_size + name_size +
-            nf->contents_size;
+        elf_note_size =
+            elf_note_size + note_head_size + name_size + nf->contents_size;
     }
 
-    return (elf_note_size) * nr_cpus;
+    return (elf_note_size)*nr_cpus;
 }
 
 static int ppc_write_all_elf_notes(const char *note_name,
-                                   WriteCoreDumpFunction f,
-                                   PowerPCCPU *cpu, int id,
-                                   DumpState *s)
+                                   WriteCoreDumpFunction f, PowerPCCPU *cpu,
+                                   int id, DumpState *s)
 {
     NoteFuncArg arg = { .state = s };
     int ret = -1;
@@ -294,15 +292,15 @@ static int ppc_write_all_elf_notes(const char *note_name,
     return 0;
 }
 
-int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                               int cpuid, DumpState *s)
+int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                               DumpState *s)
 {
     PowerPCCPU *cpu = POWERPC_CPU(cs);
     return ppc_write_all_elf_notes("CORE", f, cpu, cpuid, s);
 }
 
-int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-                               int cpuid, DumpState *s)
+int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                               DumpState *s)
 {
     PowerPCCPU *cpu = POWERPC_CPU(cs);
     return ppc_write_all_elf_notes("CORE", f, cpu, cpuid, s);

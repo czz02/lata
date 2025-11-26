@@ -205,8 +205,8 @@ static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
         if (d->level == cache->level && d->type == cache->type &&
             d->size == cache->size && d->line_size == cache->line_size &&
             d->associativity == cache->associativity) {
-                return i;
-            }
+            return i;
+        }
     }
 
     return CACHE_DESCRIPTOR_UNAVAILABLE;
@@ -215,49 +215,46 @@ static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
 /* CPUID Leaf 4 constants: */
 
 /* EAX: */
-#define CACHE_TYPE_D    1
-#define CACHE_TYPE_I    2
-#define CACHE_TYPE_UNIFIED   3
+#define CACHE_TYPE_D 1
+#define CACHE_TYPE_I 2
+#define CACHE_TYPE_UNIFIED 3
 
-#define CACHE_LEVEL(l)        (l << 5)
+#define CACHE_LEVEL(l) (l << 5)
 
 #define CACHE_SELF_INIT_LEVEL (1 << 8)
 
 /* EDX: */
-#define CACHE_NO_INVD_SHARING   (1 << 0)
-#define CACHE_INCLUSIVE       (1 << 1)
-#define CACHE_COMPLEX_IDX     (1 << 2)
+#define CACHE_NO_INVD_SHARING (1 << 0)
+#define CACHE_INCLUSIVE (1 << 1)
+#define CACHE_COMPLEX_IDX (1 << 2)
 
 /* Encode CacheType for CPUID[4].EAX */
-#define CACHE_TYPE(t) (((t) == DATA_CACHE) ? CACHE_TYPE_D : \
-                       ((t) == INSTRUCTION_CACHE) ? CACHE_TYPE_I : \
-                       ((t) == UNIFIED_CACHE) ? CACHE_TYPE_UNIFIED : \
-                       0 /* Invalid value */)
+#define CACHE_TYPE(t)                                  \
+    (((t) == DATA_CACHE)        ? CACHE_TYPE_D :       \
+     ((t) == INSTRUCTION_CACHE) ? CACHE_TYPE_I :       \
+     ((t) == UNIFIED_CACHE)     ? CACHE_TYPE_UNIFIED : \
+                                  0 /* Invalid value */)
 
 
 /* Encode cache info for CPUID[4] */
-static void encode_cache_cpuid4(CPUCacheInfo *cache,
-                                int num_apic_ids, int num_cores,
-                                uint32_t *eax, uint32_t *ebx,
+static void encode_cache_cpuid4(CPUCacheInfo *cache, int num_apic_ids,
+                                int num_cores, uint32_t *eax, uint32_t *ebx,
                                 uint32_t *ecx, uint32_t *edx)
 {
     assert(cache->size == cache->line_size * cache->associativity *
-                          cache->partitions * cache->sets);
+                              cache->partitions * cache->sets);
 
     assert(num_apic_ids > 0);
-    *eax = CACHE_TYPE(cache->type) |
-           CACHE_LEVEL(cache->level) |
+    *eax = CACHE_TYPE(cache->type) | CACHE_LEVEL(cache->level) |
            (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0) |
-           ((num_cores - 1) << 26) |
-           ((num_apic_ids - 1) << 14);
+           ((num_cores - 1) << 26) | ((num_apic_ids - 1) << 14);
 
     assert(cache->line_size > 0);
     assert(cache->partitions > 0);
     assert(cache->associativity > 0);
     /* We don't implement fully-associative caches */
     assert(cache->associativity < cache->sets);
-    *ebx = (cache->line_size - 1) |
-           ((cache->partitions - 1) << 12) |
+    *ebx = (cache->line_size - 1) | ((cache->partitions - 1) << 12) |
            ((cache->associativity - 1) << 22);
 
     assert(cache->sets > 0);
@@ -282,25 +279,25 @@ static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
 #define ASSOC_FULL 0xFF
 
 /* AMD associativity encoding used on CPUID Leaf 0x80000006: */
-#define AMD_ENC_ASSOC(a) (a <=   1 ? a   : \
-                          a ==   2 ? 0x2 : \
-                          a ==   4 ? 0x4 : \
-                          a ==   8 ? 0x6 : \
-                          a ==  16 ? 0x8 : \
-                          a ==  32 ? 0xA : \
-                          a ==  48 ? 0xB : \
-                          a ==  64 ? 0xC : \
-                          a ==  96 ? 0xD : \
-                          a == 128 ? 0xE : \
-                          a == ASSOC_FULL ? 0xF : \
-                          0 /* invalid value */)
+#define AMD_ENC_ASSOC(a)     \
+    (a <= 1          ? a :   \
+     a == 2          ? 0x2 : \
+     a == 4          ? 0x4 : \
+     a == 8          ? 0x6 : \
+     a == 16         ? 0x8 : \
+     a == 32         ? 0xA : \
+     a == 48         ? 0xB : \
+     a == 64         ? 0xC : \
+     a == 96         ? 0xD : \
+     a == 128        ? 0xE : \
+     a == ASSOC_FULL ? 0xF : \
+                       0 /* invalid value */)
 
 /*
  * Encode cache info for CPUID[0x80000006].ECX and CPUID[0x80000006].EDX
  * @l3 can be NULL.
  */
-static void encode_cache_cpuid80000006(CPUCacheInfo *l2,
-                                       CPUCacheInfo *l3,
+static void encode_cache_cpuid80000006(CPUCacheInfo *l2, CPUCacheInfo *l3,
                                        uint32_t *ecx, uint32_t *edx)
 {
     assert(l2->size % 1024 == 0);
@@ -308,8 +305,8 @@ static void encode_cache_cpuid80000006(CPUCacheInfo *l2,
     assert(l2->lines_per_tag > 0);
     assert(l2->line_size > 0);
     *ecx = ((l2->size / 1024) << 16) |
-           (AMD_ENC_ASSOC(l2->associativity) << 12) |
-           (l2->lines_per_tag << 8) | (l2->line_size);
+           (AMD_ENC_ASSOC(l2->associativity) << 12) | (l2->lines_per_tag << 8) |
+           (l2->line_size);
 
     if (l3) {
         assert(l3->size % (512 * 1024) == 0);
@@ -326,16 +323,16 @@ static void encode_cache_cpuid80000006(CPUCacheInfo *l2,
 
 /* Encode cache info for CPUID[8000001D] */
 static void encode_cache_cpuid8000001d(CPUCacheInfo *cache,
-                                       X86CPUTopoInfo *topo_info,
-                                       uint32_t *eax, uint32_t *ebx,
-                                       uint32_t *ecx, uint32_t *edx)
+                                       X86CPUTopoInfo *topo_info, uint32_t *eax,
+                                       uint32_t *ebx, uint32_t *ecx,
+                                       uint32_t *edx)
 {
     uint32_t l3_threads;
     assert(cache->size == cache->line_size * cache->associativity *
-                          cache->partitions * cache->sets);
+                              cache->partitions * cache->sets);
 
     *eax = CACHE_TYPE(cache->type) | CACHE_LEVEL(cache->level) |
-               (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0);
+           (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0);
 
     /* L3 is shared among multiple cores */
     if (cache->level == 3) {
@@ -350,8 +347,7 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo *cache,
     assert(cache->associativity > 0);
     /* We don't implement fully-associative caches */
     assert(cache->associativity < cache->sets);
-    *ebx = (cache->line_size - 1) |
-           ((cache->partitions - 1) << 12) |
+    *ebx = (cache->line_size - 1) | ((cache->partitions - 1) << 12) |
            ((cache->associativity - 1) << 22);
 
     assert(cache->sets > 0);
@@ -529,28 +525,28 @@ static CPUCacheInfo legacy_l3_cache = {
 
 /* TLB definitions: */
 
-#define L1_DTLB_2M_ASSOC       1
-#define L1_DTLB_2M_ENTRIES   255
-#define L1_DTLB_4K_ASSOC       1
-#define L1_DTLB_4K_ENTRIES   255
+#define L1_DTLB_2M_ASSOC 1
+#define L1_DTLB_2M_ENTRIES 255
+#define L1_DTLB_4K_ASSOC 1
+#define L1_DTLB_4K_ENTRIES 255
 
-#define L1_ITLB_2M_ASSOC       1
-#define L1_ITLB_2M_ENTRIES   255
-#define L1_ITLB_4K_ASSOC       1
-#define L1_ITLB_4K_ENTRIES   255
+#define L1_ITLB_2M_ASSOC 1
+#define L1_ITLB_2M_ENTRIES 255
+#define L1_ITLB_4K_ASSOC 1
+#define L1_ITLB_4K_ENTRIES 255
 
-#define L2_DTLB_2M_ASSOC       0 /* disabled */
-#define L2_DTLB_2M_ENTRIES     0 /* disabled */
-#define L2_DTLB_4K_ASSOC       4
-#define L2_DTLB_4K_ENTRIES   512
+#define L2_DTLB_2M_ASSOC 0 /* disabled */
+#define L2_DTLB_2M_ENTRIES 0 /* disabled */
+#define L2_DTLB_4K_ASSOC 4
+#define L2_DTLB_4K_ENTRIES 512
 
-#define L2_ITLB_2M_ASSOC       0 /* disabled */
-#define L2_ITLB_2M_ENTRIES     0 /* disabled */
-#define L2_ITLB_4K_ASSOC       4
-#define L2_ITLB_4K_ENTRIES   512
+#define L2_ITLB_2M_ASSOC 0 /* disabled */
+#define L2_ITLB_2M_ENTRIES 0 /* disabled */
+#define L2_ITLB_4K_ASSOC 4
+#define L2_ITLB_4K_ENTRIES 512
 
 /* CPUID Leaf 0x14 constants: */
-#define INTEL_PT_MAX_SUBLEAF     0x1
+#define INTEL_PT_MAX_SUBLEAF 0x1
 /*
  * bit[00]: IA32_RTIT_CTL.CR3 filter can be set to 1 and IA32_RTIT_CR3_MATCH
  *          MSR can be accessed;
@@ -559,7 +555,7 @@ static CPUCacheInfo legacy_l3_cache = {
  *          of Intel PT MSRs across warm reset;
  * bit[03]: Support MTC timing packet and suppression of COFI-based packets;
  */
-#define INTEL_PT_MINIMAL_EBX     0xf
+#define INTEL_PT_MINIMAL_EBX 0xf
 /*
  * bit[00]: Tracing can be enabled with IA32_RTIT_CTL.ToPA = 1 and
  *          IA32_RTIT_OUTPUT_BASE and IA32_RTIT_OUTPUT_MASK_PTRS MSRs can be
@@ -569,29 +565,30 @@ static CPUCacheInfo legacy_l3_cache = {
  *          IA32_RTIT_OUTPUT_MASK_PTRS;
  * bit[02]: Support Single-Range Output scheme;
  */
-#define INTEL_PT_MINIMAL_ECX     0x7
+#define INTEL_PT_MINIMAL_ECX 0x7
 /* generated packets which contain IP payloads have LIP values */
-#define INTEL_PT_IP_LIP          (1 << 31)
-#define INTEL_PT_ADDR_RANGES_NUM 0x2 /* Number of configurable address ranges */
+#define INTEL_PT_IP_LIP (1 << 31)
+#define INTEL_PT_ADDR_RANGES_NUM 0x2 /* Number of configurable address ranges \
+                                      */
 #define INTEL_PT_ADDR_RANGES_NUM_MASK 0x3
-#define INTEL_PT_MTC_BITMAP      (0x0249 << 16) /* Support ART(0,3,6,9) */
-#define INTEL_PT_CYCLE_BITMAP    0x1fff         /* Support 0,2^(0~11) */
-#define INTEL_PT_PSB_BITMAP      (0x003f << 16) /* Support 2K,4K,8K,16K,32K,64K */
+#define INTEL_PT_MTC_BITMAP (0x0249 << 16) /* Support ART(0,3,6,9) */
+#define INTEL_PT_CYCLE_BITMAP 0x1fff /* Support 0,2^(0~11) */
+#define INTEL_PT_PSB_BITMAP (0x003f << 16) /* Support 2K,4K,8K,16K,32K,64K */
 
 /* CPUID Leaf 0x1D constants: */
-#define INTEL_AMX_TILE_MAX_SUBLEAF     0x1
-#define INTEL_AMX_TOTAL_TILE_BYTES     0x2000
-#define INTEL_AMX_BYTES_PER_TILE       0x400
-#define INTEL_AMX_BYTES_PER_ROW        0x40
-#define INTEL_AMX_TILE_MAX_NAMES       0x8
-#define INTEL_AMX_TILE_MAX_ROWS        0x10
+#define INTEL_AMX_TILE_MAX_SUBLEAF 0x1
+#define INTEL_AMX_TOTAL_TILE_BYTES 0x2000
+#define INTEL_AMX_BYTES_PER_TILE 0x400
+#define INTEL_AMX_BYTES_PER_ROW 0x40
+#define INTEL_AMX_TILE_MAX_NAMES 0x8
+#define INTEL_AMX_TILE_MAX_ROWS 0x10
 
 /* CPUID Leaf 0x1E constants: */
-#define INTEL_AMX_TMUL_MAX_K           0x10
-#define INTEL_AMX_TMUL_MAX_N           0x40
+#define INTEL_AMX_TMUL_MAX_K 0x10
+#define INTEL_AMX_TMUL_MAX_N 0x40
 
-void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
-                              uint32_t vendor2, uint32_t vendor3)
+void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1, uint32_t vendor2,
+                              uint32_t vendor3)
 {
     int i;
     for (i = 0; i < 4; i++) {
@@ -603,26 +600,27 @@ void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
 }
 
 #define I486_FEATURES (CPUID_FP87 | CPUID_VME | CPUID_PSE)
-#define PENTIUM_FEATURES (I486_FEATURES | CPUID_DE | CPUID_TSC | \
-          CPUID_MSR | CPUID_MCE | CPUID_CX8 | CPUID_MMX | CPUID_APIC)
-#define PENTIUM2_FEATURES (PENTIUM_FEATURES | CPUID_PAE | CPUID_SEP | \
-          CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
-          CPUID_PSE36 | CPUID_FXSR)
+#define PENTIUM_FEATURES                                            \
+    (I486_FEATURES | CPUID_DE | CPUID_TSC | CPUID_MSR | CPUID_MCE | \
+     CPUID_CX8 | CPUID_MMX | CPUID_APIC)
+#define PENTIUM2_FEATURES                                                \
+    (PENTIUM_FEATURES | CPUID_PAE | CPUID_SEP | CPUID_MTRR | CPUID_PGE | \
+     CPUID_MCA | CPUID_CMOV | CPUID_PAT | CPUID_PSE36 | CPUID_FXSR)
 #define PENTIUM3_FEATURES (PENTIUM2_FEATURES | CPUID_SSE)
-#define PPRO_FEATURES (CPUID_FP87 | CPUID_DE | CPUID_PSE | CPUID_TSC | \
-          CPUID_MSR | CPUID_MCE | CPUID_CX8 | CPUID_PGE | CPUID_CMOV | \
-          CPUID_PAT | CPUID_FXSR | CPUID_MMX | CPUID_SSE | CPUID_SSE2 | \
-          CPUID_PAE | CPUID_SEP | CPUID_APIC)
+#define PPRO_FEATURES                                                          \
+    (CPUID_FP87 | CPUID_DE | CPUID_PSE | CPUID_TSC | CPUID_MSR | CPUID_MCE |   \
+     CPUID_CX8 | CPUID_PGE | CPUID_CMOV | CPUID_PAT | CPUID_FXSR | CPUID_MMX | \
+     CPUID_SSE | CPUID_SSE2 | CPUID_PAE | CPUID_SEP | CPUID_APIC)
 
-#define TCG_FEATURES (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | \
-          CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP | \
-          CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
-          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | \
-          CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
-          /* partly implemented:
-          CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
-          /* missing:
-          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
+#define TCG_FEATURES                                                           \
+    (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |  \
+     CPUID_CX8 | CPUID_APIC | CPUID_SEP | CPUID_MTRR | CPUID_PGE | CPUID_MCA | \
+     CPUID_CMOV | CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI |       \
+     CPUID_MMX | CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
+/* partly implemented:
+CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
+/* missing:
+CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
 
 /*
  * Kernel-only features that can be shown to usermode programs even if
@@ -630,23 +628,23 @@ void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
  * in CPL=3; remove them if they are ever implemented for system emulation.
  */
 #if defined CONFIG_USER_ONLY
-#define CPUID_EXT_KERNEL_FEATURES (CPUID_EXT_PCID | CPUID_EXT_TSC_DEADLINE_TIMER | \
-                                 CPUID_EXT_X2APIC)
+#define CPUID_EXT_KERNEL_FEATURES \
+    (CPUID_EXT_PCID | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_X2APIC)
 #else
 #define CPUID_EXT_KERNEL_FEATURES 0
 #endif
-#define TCG_EXT_FEATURES (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | \
-          CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | \
-          CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_POPCNT | \
-          CPUID_EXT_XSAVE | /* CPUID_EXT_OSXSAVE is dynamic */   \
-          CPUID_EXT_MOVBE | CPUID_EXT_AES | CPUID_EXT_HYPERVISOR | \
-          CPUID_EXT_RDRAND | CPUID_EXT_AVX | CPUID_EXT_F16C | \
-          CPUID_EXT_FMA | CPUID_EXT_KERNEL_FEATURES)
-          /* missing:
-          CPUID_EXT_DTES64, CPUID_EXT_DSCPL, CPUID_EXT_VMX, CPUID_EXT_SMX,
-          CPUID_EXT_EST, CPUID_EXT_TM2, CPUID_EXT_CID,
-          CPUID_EXT_XTPR, CPUID_EXT_PDCM, CPUID_EXT_PCID, CPUID_EXT_DCA,
-          CPUID_EXT_X2APIC, CPUID_EXT_TSC_DEADLINE_TIMER */
+#define TCG_EXT_FEATURES                                                     \
+    (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |              \
+     CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | CPUID_EXT_SSE41 | CPUID_EXT_SSE42 |  \
+     CPUID_EXT_POPCNT | CPUID_EXT_XSAVE | /* CPUID_EXT_OSXSAVE is dynamic */ \
+     CPUID_EXT_MOVBE | CPUID_EXT_AES | CPUID_EXT_HYPERVISOR |                \
+     CPUID_EXT_RDRAND | CPUID_EXT_AVX | CPUID_EXT_F16C | CPUID_EXT_FMA |     \
+     CPUID_EXT_KERNEL_FEATURES)
+/* missing:
+CPUID_EXT_DTES64, CPUID_EXT_DSCPL, CPUID_EXT_VMX, CPUID_EXT_SMX,
+CPUID_EXT_EST, CPUID_EXT_TM2, CPUID_EXT_CID,
+CPUID_EXT_XTPR, CPUID_EXT_PDCM, CPUID_EXT_PCID, CPUID_EXT_DCA,
+CPUID_EXT_X2APIC, CPUID_EXT_TSC_DEADLINE_TIMER */
 
 #ifdef TARGET_X86_64
 #define TCG_EXT2_X86_64_FEATURES CPUID_EXT2_LM
@@ -675,11 +673,11 @@ void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
 #define CPUID_EXT2_KERNEL_FEATURES 0
 #endif
 
-#define TCG_EXT2_FEATURES ((TCG_FEATURES & CPUID_EXT2_AMD_ALIASES) | \
-          CPUID_EXT2_NX | CPUID_EXT2_MMXEXT | CPUID_EXT2_RDTSCP | \
-          CPUID_EXT2_3DNOW | CPUID_EXT2_3DNOWEXT | CPUID_EXT2_PDPE1GB | \
-          CPUID_EXT2_SYSCALL | TCG_EXT2_X86_64_FEATURES | \
-          CPUID_EXT2_KERNEL_FEATURES)
+#define TCG_EXT2_FEATURES                                            \
+    ((TCG_FEATURES & CPUID_EXT2_AMD_ALIASES) | CPUID_EXT2_NX |       \
+     CPUID_EXT2_MMXEXT | CPUID_EXT2_RDTSCP | CPUID_EXT2_3DNOW |      \
+     CPUID_EXT2_3DNOWEXT | CPUID_EXT2_PDPE1GB | CPUID_EXT2_SYSCALL | \
+     TCG_EXT2_X86_64_FEATURES | CPUID_EXT2_KERNEL_FEATURES)
 
 #if defined CONFIG_USER_ONLY
 #define CPUID_EXT3_KERNEL_FEATURES CPUID_EXT3_OSVW
@@ -687,9 +685,10 @@ void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
 #define CPUID_EXT3_KERNEL_FEATURES 0
 #endif
 
-#define TCG_EXT3_FEATURES (CPUID_EXT3_LAHF_LM | CPUID_EXT3_SVM | \
-          CPUID_EXT3_CR8LEG | CPUID_EXT3_ABM | CPUID_EXT3_SSE4A | \
-          CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_KERNEL_FEATURES)
+#define TCG_EXT3_FEATURES                                           \
+    (CPUID_EXT3_LAHF_LM | CPUID_EXT3_SVM | CPUID_EXT3_CR8LEG |      \
+     CPUID_EXT3_ABM | CPUID_EXT3_SSE4A | CPUID_EXT3_3DNOWPREFETCH | \
+     CPUID_EXT3_KERNEL_FEATURES)
 
 #define TCG_EXT4_FEATURES 0
 
@@ -698,8 +697,9 @@ void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
 #else
 #define CPUID_SVM_KERNEL_FEATURES 0
 #endif
-#define TCG_SVM_FEATURES (CPUID_SVM_NPT | CPUID_SVM_VGIF | \
-          CPUID_SVM_SVME_ADDR_CHK | CPUID_SVM_KERNEL_FEATURES)
+#define TCG_SVM_FEATURES                                        \
+    (CPUID_SVM_NPT | CPUID_SVM_VGIF | CPUID_SVM_SVME_ADDR_CHK | \
+     CPUID_SVM_KERNEL_FEATURES)
 
 #define TCG_KVM_FEATURES 0
 
@@ -708,59 +708,63 @@ void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
 #else
 #define CPUID_7_0_EBX_KERNEL_FEATURES 0
 #endif
-#define TCG_7_0_EBX_FEATURES (CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_SMAP | \
-          CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ADX | \
-          CPUID_7_0_EBX_PCOMMIT | CPUID_7_0_EBX_CLFLUSHOPT |            \
-          CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_FSGSBASE | \
-          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_RDSEED | \
-          CPUID_7_0_EBX_KERNEL_FEATURES)
-          /* missing:
-          CPUID_7_0_EBX_HLE
-          CPUID_7_0_EBX_INVPCID, CPUID_7_0_EBX_RTM */
+#define TCG_7_0_EBX_FEATURES                                             \
+    (CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_BMI1 |      \
+     CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_PCOMMIT |    \
+     CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_MPX | \
+     CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_AVX2 |  \
+     CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_KERNEL_FEATURES)
+/* missing:
+CPUID_7_0_EBX_HLE
+CPUID_7_0_EBX_INVPCID, CPUID_7_0_EBX_RTM */
 
 #if defined CONFIG_SOFTMMU || defined CONFIG_LINUX
 #define TCG_7_0_ECX_RDPID CPUID_7_0_ECX_RDPID
 #else
 #define TCG_7_0_ECX_RDPID 0
 #endif
-#define TCG_7_0_ECX_FEATURES (CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU | \
-          /* CPUID_7_0_ECX_OSPKE is dynamic */ \
-          CPUID_7_0_ECX_LA57 | CPUID_7_0_ECX_PKS | CPUID_7_0_ECX_VAES | \
-          TCG_7_0_ECX_RDPID)
+#define TCG_7_0_ECX_FEATURES                                       \
+    (CPUID_7_0_ECX_UMIP |                                          \
+     CPUID_7_0_ECX_PKU | /* CPUID_7_0_ECX_OSPKE is dynamic */      \
+     CPUID_7_0_ECX_LA57 | CPUID_7_0_ECX_PKS | CPUID_7_0_ECX_VAES | \
+     TCG_7_0_ECX_RDPID)
 
 #if defined CONFIG_USER_ONLY
-#define CPUID_7_0_EDX_KERNEL_FEATURES (CPUID_7_0_EDX_SPEC_CTRL | \
-          CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD)
+#define CPUID_7_0_EDX_KERNEL_FEATURES                            \
+    (CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_ARCH_CAPABILITIES | \
+     CPUID_7_0_EDX_SPEC_CTRL_SSBD)
 #else
 #define CPUID_7_0_EDX_KERNEL_FEATURES 0
 #endif
-#define TCG_7_0_EDX_FEATURES (CPUID_7_0_EDX_FSRM | CPUID_7_0_EDX_KERNEL_FEATURES)
+#define TCG_7_0_EDX_FEATURES \
+    (CPUID_7_0_EDX_FSRM | CPUID_7_0_EDX_KERNEL_FEATURES)
 
-#define TCG_7_1_EAX_FEATURES (CPUID_7_1_EAX_FZRM | CPUID_7_1_EAX_FSRS | \
-          CPUID_7_1_EAX_FSRC)
+#define TCG_7_1_EAX_FEATURES \
+    (CPUID_7_1_EAX_FZRM | CPUID_7_1_EAX_FSRS | CPUID_7_1_EAX_FSRC)
 #define TCG_7_1_EDX_FEATURES 0
 #define TCG_7_2_EDX_FEATURES 0
 #define TCG_APM_FEATURES 0
 #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
 #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
-          /* missing:
-          CPUID_XSAVE_XSAVEC, CPUID_XSAVE_XSAVES */
+/* missing:
+CPUID_XSAVE_XSAVEC, CPUID_XSAVE_XSAVES */
 #define TCG_14_0_ECX_FEATURES 0
 #define TCG_SGX_12_0_EAX_FEATURES 0
 #define TCG_SGX_12_0_EBX_FEATURES 0
 #define TCG_SGX_12_1_EAX_FEATURES 0
 
 #if defined CONFIG_USER_ONLY
-#define CPUID_8000_0008_EBX_KERNEL_FEATURES (CPUID_8000_0008_EBX_IBPB | \
-          CPUID_8000_0008_EBX_IBRS | CPUID_8000_0008_EBX_STIBP | \
-          CPUID_8000_0008_EBX_STIBP_ALWAYS_ON | CPUID_8000_0008_EBX_AMD_SSBD | \
-          CPUID_8000_0008_EBX_AMD_PSFD)
+#define CPUID_8000_0008_EBX_KERNEL_FEATURES                            \
+    (CPUID_8000_0008_EBX_IBPB | CPUID_8000_0008_EBX_IBRS |             \
+     CPUID_8000_0008_EBX_STIBP | CPUID_8000_0008_EBX_STIBP_ALWAYS_ON | \
+     CPUID_8000_0008_EBX_AMD_SSBD | CPUID_8000_0008_EBX_AMD_PSFD)
 #else
 #define CPUID_8000_0008_EBX_KERNEL_FEATURES 0
 #endif
 
-#define TCG_8000_0008_EBX  (CPUID_8000_0008_EBX_XSAVEERPTR | \
-          CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_KERNEL_FEATURES)
+#define TCG_8000_0008_EBX                                            \
+    (CPUID_8000_0008_EBX_XSAVEERPTR | CPUID_8000_0008_EBX_WBNOINVD | \
+     CPUID_8000_0008_EBX_KERNEL_FEATURES)
 
 FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
     [FEAT_1_EDX] = {
@@ -1450,100 +1454,102 @@ typedef struct FeatureDep {
 
 static FeatureDep feature_dependencies[] = {
     {
-        .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_ARCH_CAPABILITIES },
-        .to = { FEAT_ARCH_CAPABILITIES,     ~0ull },
+        .from = { FEAT_7_0_EDX, CPUID_7_0_EDX_ARCH_CAPABILITIES },
+        .to = { FEAT_ARCH_CAPABILITIES, ~0ull },
     },
     {
-        .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_CORE_CAPABILITY },
-        .to = { FEAT_CORE_CAPABILITY,       ~0ull },
+        .from = { FEAT_7_0_EDX, CPUID_7_0_EDX_CORE_CAPABILITY },
+        .to = { FEAT_CORE_CAPABILITY, ~0ull },
     },
     {
-        .from = { FEAT_1_ECX,             CPUID_EXT_PDCM },
-        .to = { FEAT_PERF_CAPABILITIES,       ~0ull },
+        .from = { FEAT_1_ECX, CPUID_EXT_PDCM },
+        .to = { FEAT_PERF_CAPABILITIES, ~0ull },
     },
     {
-        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
-        .to = { FEAT_VMX_PROCBASED_CTLS,    ~0ull },
+        .from = { FEAT_1_ECX, CPUID_EXT_VMX },
+        .to = { FEAT_VMX_PROCBASED_CTLS, ~0ull },
     },
     {
-        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
-        .to = { FEAT_VMX_PINBASED_CTLS,     ~0ull },
+        .from = { FEAT_1_ECX, CPUID_EXT_VMX },
+        .to = { FEAT_VMX_PINBASED_CTLS, ~0ull },
     },
     {
-        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
-        .to = { FEAT_VMX_EXIT_CTLS,         ~0ull },
+        .from = { FEAT_1_ECX, CPUID_EXT_VMX },
+        .to = { FEAT_VMX_EXIT_CTLS, ~0ull },
     },
     {
-        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
-        .to = { FEAT_VMX_ENTRY_CTLS,        ~0ull },
+        .from = { FEAT_1_ECX, CPUID_EXT_VMX },
+        .to = { FEAT_VMX_ENTRY_CTLS, ~0ull },
     },
     {
-        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
-        .to = { FEAT_VMX_MISC,              ~0ull },
+        .from = { FEAT_1_ECX, CPUID_EXT_VMX },
+        .to = { FEAT_VMX_MISC, ~0ull },
     },
     {
-        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
-        .to = { FEAT_VMX_BASIC,             ~0ull },
+        .from = { FEAT_1_ECX, CPUID_EXT_VMX },
+        .to = { FEAT_VMX_BASIC, ~0ull },
     },
     {
-        .from = { FEAT_8000_0001_EDX,       CPUID_EXT2_LM },
-        .to = { FEAT_VMX_ENTRY_CTLS,        VMX_VM_ENTRY_IA32E_MODE },
+        .from = { FEAT_8000_0001_EDX, CPUID_EXT2_LM },
+        .to = { FEAT_VMX_ENTRY_CTLS, VMX_VM_ENTRY_IA32E_MODE },
     },
     {
-        .from = { FEAT_VMX_PROCBASED_CTLS,  VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS },
-        .to = { FEAT_VMX_SECONDARY_CTLS,    ~0ull },
+        .from = { FEAT_VMX_PROCBASED_CTLS,
+                  VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS },
+        .to = { FEAT_VMX_SECONDARY_CTLS, ~0ull },
     },
     {
-        .from = { FEAT_XSAVE,               CPUID_XSAVE_XSAVES },
-        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_XSAVES },
+        .from = { FEAT_XSAVE, CPUID_XSAVE_XSAVES },
+        .to = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_XSAVES },
     },
     {
-        .from = { FEAT_1_ECX,               CPUID_EXT_RDRAND },
-        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_RDRAND_EXITING },
+        .from = { FEAT_1_ECX, CPUID_EXT_RDRAND },
+        .to = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_RDRAND_EXITING },
     },
     {
-        .from = { FEAT_7_0_EBX,             CPUID_7_0_EBX_INVPCID },
-        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_ENABLE_INVPCID },
+        .from = { FEAT_7_0_EBX, CPUID_7_0_EBX_INVPCID },
+        .to = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_ENABLE_INVPCID },
     },
     {
-        .from = { FEAT_7_0_EBX,             CPUID_7_0_EBX_MPX },
-        .to = { FEAT_VMX_EXIT_CTLS,         VMX_VM_EXIT_CLEAR_BNDCFGS },
+        .from = { FEAT_7_0_EBX, CPUID_7_0_EBX_MPX },
+        .to = { FEAT_VMX_EXIT_CTLS, VMX_VM_EXIT_CLEAR_BNDCFGS },
     },
     {
-        .from = { FEAT_7_0_EBX,             CPUID_7_0_EBX_MPX },
-        .to = { FEAT_VMX_ENTRY_CTLS,        VMX_VM_ENTRY_LOAD_BNDCFGS },
+        .from = { FEAT_7_0_EBX, CPUID_7_0_EBX_MPX },
+        .to = { FEAT_VMX_ENTRY_CTLS, VMX_VM_ENTRY_LOAD_BNDCFGS },
     },
     {
-        .from = { FEAT_7_0_EBX,             CPUID_7_0_EBX_RDSEED },
-        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_RDSEED_EXITING },
+        .from = { FEAT_7_0_EBX, CPUID_7_0_EBX_RDSEED },
+        .to = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_RDSEED_EXITING },
     },
     {
-        .from = { FEAT_7_0_EBX,             CPUID_7_0_EBX_INTEL_PT },
-        .to = { FEAT_14_0_ECX,              ~0ull },
+        .from = { FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT },
+        .to = { FEAT_14_0_ECX, ~0ull },
     },
     {
-        .from = { FEAT_8000_0001_EDX,       CPUID_EXT2_RDTSCP },
-        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_RDTSCP },
+        .from = { FEAT_8000_0001_EDX, CPUID_EXT2_RDTSCP },
+        .to = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_RDTSCP },
     },
     {
-        .from = { FEAT_VMX_SECONDARY_CTLS,  VMX_SECONDARY_EXEC_ENABLE_EPT },
-        .to = { FEAT_VMX_EPT_VPID_CAPS,     0xffffffffull },
+        .from = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_ENABLE_EPT },
+        .to = { FEAT_VMX_EPT_VPID_CAPS, 0xffffffffull },
     },
     {
-        .from = { FEAT_VMX_SECONDARY_CTLS,  VMX_SECONDARY_EXEC_ENABLE_EPT },
-        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST },
+        .from = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_ENABLE_EPT },
+        .to = { FEAT_VMX_SECONDARY_CTLS,
+                VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST },
     },
     {
-        .from = { FEAT_VMX_SECONDARY_CTLS,  VMX_SECONDARY_EXEC_ENABLE_VPID },
-        .to = { FEAT_VMX_EPT_VPID_CAPS,     0xffffffffull << 32 },
+        .from = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_ENABLE_VPID },
+        .to = { FEAT_VMX_EPT_VPID_CAPS, 0xffffffffull << 32 },
     },
     {
-        .from = { FEAT_VMX_SECONDARY_CTLS,  VMX_SECONDARY_EXEC_ENABLE_VMFUNC },
-        .to = { FEAT_VMX_VMFUNC,            ~0ull },
+        .from = { FEAT_VMX_SECONDARY_CTLS, VMX_SECONDARY_EXEC_ENABLE_VMFUNC },
+        .to = { FEAT_VMX_VMFUNC, ~0ull },
     },
     {
-        .from = { FEAT_8000_0001_ECX,       CPUID_EXT3_SVM },
-        .to = { FEAT_SVM,                   ~0ull },
+        .from = { FEAT_8000_0001_ECX, CPUID_EXT3_SVM },
+        .to = { FEAT_SVM, ~0ull },
     },
 };
 
@@ -1557,19 +1563,13 @@ typedef struct X86RegisterInfo32 {
 #define REGISTER(reg) \
     [R_##reg] = { .name = #reg, .qapi_enum = X86_CPU_REGISTER32_##reg }
 static const X86RegisterInfo32 x86_reg_info_32[CPU_NB_REGS32] = {
-    REGISTER(EAX),
-    REGISTER(ECX),
-    REGISTER(EDX),
-    REGISTER(EBX),
-    REGISTER(ESP),
-    REGISTER(EBP),
-    REGISTER(ESI),
-    REGISTER(EDI),
+    REGISTER(EAX), REGISTER(ECX), REGISTER(EDX), REGISTER(EBX),
+    REGISTER(ESP), REGISTER(EBP), REGISTER(ESI), REGISTER(EDI),
 };
 #undef REGISTER
 
 /* CPUID feature bits available in XSS */
-#define CPUID_XSTATE_XSS_MASK    (XSTATE_ARCH_LBR_MASK)
+#define CPUID_XSTATE_XSS_MASK (XSTATE_ARCH_LBR_MASK)
 
 ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
     [XSTATE_FP_BIT] = {
@@ -1683,16 +1683,16 @@ static uint64_t x86_cpu_get_migratable_flags(FeatureWord w)
     return r;
 }
 
-void host_cpuid(uint32_t function, uint32_t count,
-                uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
+void host_cpuid(uint32_t function, uint32_t count, uint32_t *eax, uint32_t *ebx,
+                uint32_t *ecx, uint32_t *edx)
 {
     uint32_t vec[4];
 
 #ifdef __x86_64__
     asm volatile("cpuid"
-                 : "=a"(vec[0]), "=b"(vec[1]),
-                   "=c"(vec[2]), "=d"(vec[3])
-                 : "0"(function), "c"(count) : "cc");
+                 : "=a"(vec[0]), "=b"(vec[1]), "=c"(vec[2]), "=d"(vec[3])
+                 : "0"(function), "c"(count)
+                 : "cc");
 #elif defined(__i386__)
     asm volatile("pusha \n\t"
                  "cpuid \n\t"
@@ -1701,7 +1701,8 @@ void host_cpuid(uint32_t function, uint32_t count,
                  "mov %%ecx, 8(%2) \n\t"
                  "mov %%edx, 12(%2) \n\t"
                  "popa"
-                 : : "a"(function), "c"(count), "S"(vec)
+                 :
+                 : "a"(function), "c"(count), "S"(vec)
                  : "memory", "cc");
 #else
     abort();
@@ -1798,361 +1799,388 @@ x86_cpu_def_get_versions(const X86CPUDefinition *def)
 {
     /* When X86CPUDefinition::versions is NULL, we register only v1 */
     static const X86CPUVersionDefinition default_version_list[] = {
-        { 1 },
-        { /* end of list */ }
+        { 1 }, { /* end of list */ }
     };
 
     return def->versions ?: default_version_list;
 }
 
 static const CPUCaches epyc_cache_info = {
-    .l1d_cache = &(CPUCacheInfo) {
-        .type = DATA_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l1i_cache = &(CPUCacheInfo) {
-        .type = INSTRUCTION_CACHE,
-        .level = 1,
-        .size = 64 * KiB,
-        .line_size = 64,
-        .associativity = 4,
-        .partitions = 1,
-        .sets = 256,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l2_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 2,
-        .size = 512 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 1024,
-        .lines_per_tag = 1,
-    },
-    .l3_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 3,
-        .size = 8 * MiB,
-        .line_size = 64,
-        .associativity = 16,
-        .partitions = 1,
-        .sets = 8192,
-        .lines_per_tag = 1,
-        .self_init = true,
-        .inclusive = true,
-        .complex_indexing = true,
-    },
+    .l1d_cache =
+        &(CPUCacheInfo){
+            .type = DATA_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l1i_cache =
+        &(CPUCacheInfo){
+            .type = INSTRUCTION_CACHE,
+            .level = 1,
+            .size = 64 * KiB,
+            .line_size = 64,
+            .associativity = 4,
+            .partitions = 1,
+            .sets = 256,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l2_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 2,
+            .size = 512 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 1024,
+            .lines_per_tag = 1,
+        },
+    .l3_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 3,
+            .size = 8 * MiB,
+            .line_size = 64,
+            .associativity = 16,
+            .partitions = 1,
+            .sets = 8192,
+            .lines_per_tag = 1,
+            .self_init = true,
+            .inclusive = true,
+            .complex_indexing = true,
+        },
 };
 
 static CPUCaches epyc_v4_cache_info = {
-    .l1d_cache = &(CPUCacheInfo) {
-        .type = DATA_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l1i_cache = &(CPUCacheInfo) {
-        .type = INSTRUCTION_CACHE,
-        .level = 1,
-        .size = 64 * KiB,
-        .line_size = 64,
-        .associativity = 4,
-        .partitions = 1,
-        .sets = 256,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l2_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 2,
-        .size = 512 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 1024,
-        .lines_per_tag = 1,
-    },
-    .l3_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 3,
-        .size = 8 * MiB,
-        .line_size = 64,
-        .associativity = 16,
-        .partitions = 1,
-        .sets = 8192,
-        .lines_per_tag = 1,
-        .self_init = true,
-        .inclusive = true,
-        .complex_indexing = false,
-    },
+    .l1d_cache =
+        &(CPUCacheInfo){
+            .type = DATA_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l1i_cache =
+        &(CPUCacheInfo){
+            .type = INSTRUCTION_CACHE,
+            .level = 1,
+            .size = 64 * KiB,
+            .line_size = 64,
+            .associativity = 4,
+            .partitions = 1,
+            .sets = 256,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l2_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 2,
+            .size = 512 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 1024,
+            .lines_per_tag = 1,
+        },
+    .l3_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 3,
+            .size = 8 * MiB,
+            .line_size = 64,
+            .associativity = 16,
+            .partitions = 1,
+            .sets = 8192,
+            .lines_per_tag = 1,
+            .self_init = true,
+            .inclusive = true,
+            .complex_indexing = false,
+        },
 };
 
 static const CPUCaches epyc_rome_cache_info = {
-    .l1d_cache = &(CPUCacheInfo) {
-        .type = DATA_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l1i_cache = &(CPUCacheInfo) {
-        .type = INSTRUCTION_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l2_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 2,
-        .size = 512 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 1024,
-        .lines_per_tag = 1,
-    },
-    .l3_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 3,
-        .size = 16 * MiB,
-        .line_size = 64,
-        .associativity = 16,
-        .partitions = 1,
-        .sets = 16384,
-        .lines_per_tag = 1,
-        .self_init = true,
-        .inclusive = true,
-        .complex_indexing = true,
-    },
+    .l1d_cache =
+        &(CPUCacheInfo){
+            .type = DATA_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l1i_cache =
+        &(CPUCacheInfo){
+            .type = INSTRUCTION_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l2_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 2,
+            .size = 512 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 1024,
+            .lines_per_tag = 1,
+        },
+    .l3_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 3,
+            .size = 16 * MiB,
+            .line_size = 64,
+            .associativity = 16,
+            .partitions = 1,
+            .sets = 16384,
+            .lines_per_tag = 1,
+            .self_init = true,
+            .inclusive = true,
+            .complex_indexing = true,
+        },
 };
 
 static const CPUCaches epyc_rome_v3_cache_info = {
-    .l1d_cache = &(CPUCacheInfo) {
-        .type = DATA_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l1i_cache = &(CPUCacheInfo) {
-        .type = INSTRUCTION_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l2_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 2,
-        .size = 512 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 1024,
-        .lines_per_tag = 1,
-    },
-    .l3_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 3,
-        .size = 16 * MiB,
-        .line_size = 64,
-        .associativity = 16,
-        .partitions = 1,
-        .sets = 16384,
-        .lines_per_tag = 1,
-        .self_init = true,
-        .inclusive = true,
-        .complex_indexing = false,
-    },
+    .l1d_cache =
+        &(CPUCacheInfo){
+            .type = DATA_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l1i_cache =
+        &(CPUCacheInfo){
+            .type = INSTRUCTION_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l2_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 2,
+            .size = 512 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 1024,
+            .lines_per_tag = 1,
+        },
+    .l3_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 3,
+            .size = 16 * MiB,
+            .line_size = 64,
+            .associativity = 16,
+            .partitions = 1,
+            .sets = 16384,
+            .lines_per_tag = 1,
+            .self_init = true,
+            .inclusive = true,
+            .complex_indexing = false,
+        },
 };
 
 static const CPUCaches epyc_milan_cache_info = {
-    .l1d_cache = &(CPUCacheInfo) {
-        .type = DATA_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l1i_cache = &(CPUCacheInfo) {
-        .type = INSTRUCTION_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l2_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 2,
-        .size = 512 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 1024,
-        .lines_per_tag = 1,
-    },
-    .l3_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 3,
-        .size = 32 * MiB,
-        .line_size = 64,
-        .associativity = 16,
-        .partitions = 1,
-        .sets = 32768,
-        .lines_per_tag = 1,
-        .self_init = true,
-        .inclusive = true,
-        .complex_indexing = true,
-    },
+    .l1d_cache =
+        &(CPUCacheInfo){
+            .type = DATA_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l1i_cache =
+        &(CPUCacheInfo){
+            .type = INSTRUCTION_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l2_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 2,
+            .size = 512 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 1024,
+            .lines_per_tag = 1,
+        },
+    .l3_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 3,
+            .size = 32 * MiB,
+            .line_size = 64,
+            .associativity = 16,
+            .partitions = 1,
+            .sets = 32768,
+            .lines_per_tag = 1,
+            .self_init = true,
+            .inclusive = true,
+            .complex_indexing = true,
+        },
 };
 
 static const CPUCaches epyc_milan_v2_cache_info = {
-    .l1d_cache = &(CPUCacheInfo) {
-        .type = DATA_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l1i_cache = &(CPUCacheInfo) {
-        .type = INSTRUCTION_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l2_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 2,
-        .size = 512 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 1024,
-        .lines_per_tag = 1,
-    },
-    .l3_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 3,
-        .size = 32 * MiB,
-        .line_size = 64,
-        .associativity = 16,
-        .partitions = 1,
-        .sets = 32768,
-        .lines_per_tag = 1,
-        .self_init = true,
-        .inclusive = true,
-        .complex_indexing = false,
-    },
+    .l1d_cache =
+        &(CPUCacheInfo){
+            .type = DATA_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l1i_cache =
+        &(CPUCacheInfo){
+            .type = INSTRUCTION_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l2_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 2,
+            .size = 512 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 1024,
+            .lines_per_tag = 1,
+        },
+    .l3_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 3,
+            .size = 32 * MiB,
+            .line_size = 64,
+            .associativity = 16,
+            .partitions = 1,
+            .sets = 32768,
+            .lines_per_tag = 1,
+            .self_init = true,
+            .inclusive = true,
+            .complex_indexing = false,
+        },
 };
 
 static const CPUCaches epyc_genoa_cache_info = {
-    .l1d_cache = &(CPUCacheInfo) {
-        .type = DATA_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l1i_cache = &(CPUCacheInfo) {
-        .type = INSTRUCTION_CACHE,
-        .level = 1,
-        .size = 32 * KiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 64,
-        .lines_per_tag = 1,
-        .self_init = 1,
-        .no_invd_sharing = true,
-    },
-    .l2_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 2,
-        .size = 1 * MiB,
-        .line_size = 64,
-        .associativity = 8,
-        .partitions = 1,
-        .sets = 2048,
-        .lines_per_tag = 1,
-    },
-    .l3_cache = &(CPUCacheInfo) {
-        .type = UNIFIED_CACHE,
-        .level = 3,
-        .size = 32 * MiB,
-        .line_size = 64,
-        .associativity = 16,
-        .partitions = 1,
-        .sets = 32768,
-        .lines_per_tag = 1,
-        .self_init = true,
-        .inclusive = true,
-        .complex_indexing = false,
-    },
+    .l1d_cache =
+        &(CPUCacheInfo){
+            .type = DATA_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l1i_cache =
+        &(CPUCacheInfo){
+            .type = INSTRUCTION_CACHE,
+            .level = 1,
+            .size = 32 * KiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 64,
+            .lines_per_tag = 1,
+            .self_init = 1,
+            .no_invd_sharing = true,
+        },
+    .l2_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 2,
+            .size = 1 * MiB,
+            .line_size = 64,
+            .associativity = 8,
+            .partitions = 1,
+            .sets = 2048,
+            .lines_per_tag = 1,
+        },
+    .l3_cache =
+        &(CPUCacheInfo){
+            .type = UNIFIED_CACHE,
+            .level = 3,
+            .size = 32 * MiB,
+            .line_size = 64,
+            .associativity = 16,
+            .partitions = 1,
+            .sets = 32768,
+            .lines_per_tag = 1,
+            .self_init = true,
+            .inclusive = true,
+            .complex_indexing = false,
+        },
 };
 
 /* The following VMX features are not supported by KVM and are left out in the
@@ -2191,51 +2219,40 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .family = 15,
         .model = 107,
         .stepping = 1,
-        .features[FEAT_1_EDX] =
-            PPRO_FEATURES |
-            CPUID_MTRR | CPUID_CLFLUSH | CPUID_MCA |
-            CPUID_PSE36,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3 | CPUID_EXT_CX16,
+        .features[FEAT_1_EDX] = PPRO_FEATURES | CPUID_MTRR | CPUID_CLFLUSH |
+                                CPUID_MCA | CPUID_PSE36,
+        .features[FEAT_1_ECX] = CPUID_EXT_SSE3 | CPUID_EXT_CX16,
         .features[FEAT_8000_0001_EDX] =
             CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM | CPUID_EXT3_SVM,
+        .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM | CPUID_EXT3_SVM,
         .xlevel = 0x8000000A,
         .model_id = "QEMU Virtual CPU version " QEMU_HW_VERSION,
     },
-    {
-        .name = "phenom",
-        .level = 5,
-        .vendor = CPUID_VENDOR_AMD,
-        .family = 16,
-        .model = 2,
-        .stepping = 3,
-        /* Missing: CPUID_HT */
-        .features[FEAT_1_EDX] =
-            PPRO_FEATURES |
-            CPUID_MTRR | CPUID_CLFLUSH | CPUID_MCA |
-            CPUID_PSE36 | CPUID_VME,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3 | CPUID_EXT_MONITOR | CPUID_EXT_CX16 |
-            CPUID_EXT_POPCNT,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX |
-            CPUID_EXT2_3DNOW | CPUID_EXT2_3DNOWEXT | CPUID_EXT2_MMXEXT |
-            CPUID_EXT2_FFXSR | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP,
-        /* Missing: CPUID_EXT3_CMP_LEG, CPUID_EXT3_EXTAPIC,
-                    CPUID_EXT3_CR8LEG,
-                    CPUID_EXT3_MISALIGNSSE, CPUID_EXT3_3DNOWPREFETCH,
-                    CPUID_EXT3_OSVW, CPUID_EXT3_IBS */
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM | CPUID_EXT3_SVM |
-            CPUID_EXT3_ABM | CPUID_EXT3_SSE4A,
-        /* Missing: CPUID_SVM_LBRV */
-        .features[FEAT_SVM] =
-            CPUID_SVM_NPT,
-        .xlevel = 0x8000001A,
-        .model_id = "AMD Phenom(tm) 9550 Quad-Core Processor"
-    },
+    { .name = "phenom",
+      .level = 5,
+      .vendor = CPUID_VENDOR_AMD,
+      .family = 16,
+      .model = 2,
+      .stepping = 3,
+      /* Missing: CPUID_HT */
+      .features[FEAT_1_EDX] = PPRO_FEATURES | CPUID_MTRR | CPUID_CLFLUSH |
+                              CPUID_MCA | CPUID_PSE36 | CPUID_VME,
+      .features[FEAT_1_ECX] = CPUID_EXT_SSE3 | CPUID_EXT_MONITOR |
+                              CPUID_EXT_CX16 | CPUID_EXT_POPCNT,
+      .features[FEAT_8000_0001_EDX] =
+          CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX |
+          CPUID_EXT2_3DNOW | CPUID_EXT2_3DNOWEXT | CPUID_EXT2_MMXEXT |
+          CPUID_EXT2_FFXSR | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP,
+      /* Missing: CPUID_EXT3_CMP_LEG, CPUID_EXT3_EXTAPIC,
+                  CPUID_EXT3_CR8LEG,
+                  CPUID_EXT3_MISALIGNSSE, CPUID_EXT3_3DNOWPREFETCH,
+                  CPUID_EXT3_OSVW, CPUID_EXT3_IBS */
+      .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM | CPUID_EXT3_SVM |
+                                      CPUID_EXT3_ABM | CPUID_EXT3_SSE4A,
+      /* Missing: CPUID_SVM_LBRV */
+      .features[FEAT_SVM] = CPUID_SVM_NPT,
+      .xlevel = 0x8000001A,
+      .model_id = "AMD Phenom(tm) 9550 Quad-Core Processor" },
     {
         .name = "core2duo",
         .level = 10,
@@ -2244,81 +2261,75 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .model = 15,
         .stepping = 11,
         /* Missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
-        .features[FEAT_1_EDX] =
-            PPRO_FEATURES |
-            CPUID_MTRR | CPUID_CLFLUSH | CPUID_MCA |
-            CPUID_PSE36 | CPUID_VME | CPUID_ACPI | CPUID_SS,
+        .features[FEAT_1_EDX] = PPRO_FEATURES | CPUID_MTRR | CPUID_CLFLUSH |
+                                CPUID_MCA | CPUID_PSE36 | CPUID_VME |
+                                CPUID_ACPI | CPUID_SS,
         /* Missing: CPUID_EXT_DTES64, CPUID_EXT_DSCPL, CPUID_EXT_EST,
          * CPUID_EXT_TM2, CPUID_EXT_XTPR, CPUID_EXT_PDCM, CPUID_EXT_VMX */
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3 | CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 |
-            CPUID_EXT_CX16,
+        .features[FEAT_1_ECX] = CPUID_EXT_SSE3 | CPUID_EXT_MONITOR |
+                                CPUID_EXT_SSSE3 | CPUID_EXT_CX16,
         .features[FEAT_8000_0001_EDX] =
             CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM,
+        .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM,
         .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS,
         .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE,
         .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT,
         .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
         .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+                                            VMX_PIN_BASED_NMI_EXITING |
+                                            VMX_PIN_BASED_VIRTUAL_NMIS,
+        .features[FEAT_VMX_PROCBASED_CTLS] =
+            VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
+            VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
+            VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
+            VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
+            VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
+            VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
+            VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
+            VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
+            VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
+            VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
         .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES,
+            VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES,
         .xlevel = 0x80000008,
         .model_id = "Intel(R) Core(TM)2 Duo CPU     T7700  @ 2.40GHz",
     },
-    {
-        .name = "kvm64",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 15,
-        .model = 6,
-        .stepping = 1,
-        /* Missing: CPUID_HT */
-        .features[FEAT_1_EDX] =
-            PPRO_FEATURES | CPUID_VME |
-            CPUID_MTRR | CPUID_CLFLUSH | CPUID_MCA |
-            CPUID_PSE36,
-        /* Missing: CPUID_EXT_POPCNT, CPUID_EXT_MONITOR */
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3 | CPUID_EXT_CX16,
-        /* Missing: CPUID_EXT2_PDPE1GB, CPUID_EXT2_RDTSCP */
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
-        /* Missing: CPUID_EXT3_LAHF_LM, CPUID_EXT3_CMP_LEG, CPUID_EXT3_EXTAPIC,
-                    CPUID_EXT3_CR8LEG, CPUID_EXT3_ABM, CPUID_EXT3_SSE4A,
-                    CPUID_EXT3_MISALIGNSSE, CPUID_EXT3_3DNOWPREFETCH,
-                    CPUID_EXT3_OSVW, CPUID_EXT3_IBS, CPUID_EXT3_SVM */
-        .features[FEAT_8000_0001_ECX] =
-            0,
-        /* VMX features from Cedar Mill/Prescott */
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE,
-        .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING,
-        .xlevel = 0x80000008,
-        .model_id = "Common KVM processor"
-    },
+    { .name = "kvm64",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 15,
+      .model = 6,
+      .stepping = 1,
+      /* Missing: CPUID_HT */
+      .features[FEAT_1_EDX] = PPRO_FEATURES | CPUID_VME | CPUID_MTRR |
+                              CPUID_CLFLUSH | CPUID_MCA | CPUID_PSE36,
+      /* Missing: CPUID_EXT_POPCNT, CPUID_EXT_MONITOR */
+      .features[FEAT_1_ECX] = CPUID_EXT_SSE3 | CPUID_EXT_CX16,
+      /* Missing: CPUID_EXT2_PDPE1GB, CPUID_EXT2_RDTSCP */
+      .features[FEAT_8000_0001_EDX] =
+          CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
+      /* Missing: CPUID_EXT3_LAHF_LM, CPUID_EXT3_CMP_LEG, CPUID_EXT3_EXTAPIC,
+                  CPUID_EXT3_CR8LEG, CPUID_EXT3_ABM, CPUID_EXT3_SSE4A,
+                  CPUID_EXT3_MISALIGNSSE, CPUID_EXT3_3DNOWPREFETCH,
+                  CPUID_EXT3_OSVW, CPUID_EXT3_IBS, CPUID_EXT3_SVM */
+      .features[FEAT_8000_0001_ECX] = 0,
+      /* VMX features from Cedar Mill/Prescott */
+      .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE,
+      .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING,
+      .xlevel = 0x80000008,
+      .model_id = "Common KVM processor" },
     {
         .name = "qemu32",
         .level = 4,
@@ -2326,43 +2337,37 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .family = 6,
         .model = 6,
         .stepping = 3,
-        .features[FEAT_1_EDX] =
-            PPRO_FEATURES,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3,
+        .features[FEAT_1_EDX] = PPRO_FEATURES,
+        .features[FEAT_1_ECX] = CPUID_EXT_SSE3,
         .xlevel = 0x80000004,
         .model_id = "QEMU Virtual CPU version " QEMU_HW_VERSION,
     },
-    {
-        .name = "kvm32",
-        .level = 5,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 15,
-        .model = 6,
-        .stepping = 1,
-        .features[FEAT_1_EDX] =
-            PPRO_FEATURES | CPUID_VME |
-            CPUID_MTRR | CPUID_CLFLUSH | CPUID_MCA | CPUID_PSE36,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_ECX] =
-            0,
-        /* VMX features from Yonah */
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE,
-        .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
-             VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
-             VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_USE_MSR_BITMAPS,
-        .xlevel = 0x80000008,
-        .model_id = "Common 32-bit KVM processor"
-    },
+    { .name = "kvm32",
+      .level = 5,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 15,
+      .model = 6,
+      .stepping = 1,
+      .features[FEAT_1_EDX] = PPRO_FEATURES | CPUID_VME | CPUID_MTRR |
+                              CPUID_CLFLUSH | CPUID_MCA | CPUID_PSE36,
+      .features[FEAT_1_ECX] = CPUID_EXT_SSE3,
+      .features[FEAT_8000_0001_ECX] = 0,
+      /* VMX features from Yonah */
+      .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE,
+      .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_MOV_DR_EXITING |
+          VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
+          VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS,
+      .xlevel = 0x80000008,
+      .model_id = "Common 32-bit KVM processor" },
     {
         .name = "coreduo",
         .level = 10,
@@ -2371,28 +2376,26 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .model = 14,
         .stepping = 8,
         /* Missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
-        .features[FEAT_1_EDX] =
-            PPRO_FEATURES | CPUID_VME |
-            CPUID_MTRR | CPUID_CLFLUSH | CPUID_MCA | CPUID_ACPI |
-            CPUID_SS,
+        .features[FEAT_1_EDX] = PPRO_FEATURES | CPUID_VME | CPUID_MTRR |
+                                CPUID_CLFLUSH | CPUID_MCA | CPUID_ACPI |
+                                CPUID_SS,
         /* Missing: CPUID_EXT_EST, CPUID_EXT_TM2 , CPUID_EXT_XTPR,
          * CPUID_EXT_PDCM, CPUID_EXT_VMX */
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3 | CPUID_EXT_MONITOR,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_NX,
+        .features[FEAT_1_ECX] = CPUID_EXT_SSE3 | CPUID_EXT_MONITOR,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_NX,
         .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE,
         .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT,
         .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
-             VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
-             VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_USE_MSR_BITMAPS,
+        .features[FEAT_VMX_PINBASED_CTLS] =
+            VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING,
+        .features[FEAT_VMX_PROCBASED_CTLS] =
+            VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
+            VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
+            VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
+            VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
+            VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+            VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+            VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_USE_MSR_BITMAPS,
         .xlevel = 0x80000008,
         .model_id = "Genuine Intel(R) CPU           T2600  @ 2.16GHz",
     },
@@ -2403,8 +2406,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .family = 4,
         .model = 8,
         .stepping = 0,
-        .features[FEAT_1_EDX] =
-            I486_FEATURES,
+        .features[FEAT_1_EDX] = I486_FEATURES,
         .xlevel = 0,
         .model_id = "",
     },
@@ -2415,8 +2417,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .family = 5,
         .model = 4,
         .stepping = 3,
-        .features[FEAT_1_EDX] =
-            PENTIUM_FEATURES,
+        .features[FEAT_1_EDX] = PENTIUM_FEATURES,
         .xlevel = 0,
         .model_id = "",
     },
@@ -2427,8 +2428,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .family = 6,
         .model = 5,
         .stepping = 2,
-        .features[FEAT_1_EDX] =
-            PENTIUM2_FEATURES,
+        .features[FEAT_1_EDX] = PENTIUM2_FEATURES,
         .xlevel = 0,
         .model_id = "",
     },
@@ -2439,8 +2439,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .family = 6,
         .model = 7,
         .stepping = 3,
-        .features[FEAT_1_EDX] =
-            PENTIUM3_FEATURES,
+        .features[FEAT_1_EDX] = PENTIUM3_FEATURES,
         .xlevel = 0,
         .model_id = "",
     },
@@ -2452,8 +2451,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .model = 2,
         .stepping = 3,
         .features[FEAT_1_EDX] =
-            PPRO_FEATURES | CPUID_PSE36 | CPUID_VME | CPUID_MTRR |
-            CPUID_MCA,
+            PPRO_FEATURES | CPUID_PSE36 | CPUID_VME | CPUID_MTRR | CPUID_MCA,
         .features[FEAT_8000_0001_EDX] =
             CPUID_EXT2_MMXEXT | CPUID_EXT2_3DNOW | CPUID_EXT2_3DNOWEXT,
         .xlevel = 0x80000008,
@@ -2467,20 +2465,15 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .model = 28,
         .stepping = 2,
         /* Missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
-        .features[FEAT_1_EDX] =
-            PPRO_FEATURES |
-            CPUID_MTRR | CPUID_CLFLUSH | CPUID_MCA | CPUID_VME |
-            CPUID_ACPI | CPUID_SS,
-            /* Some CPUs got no CPUID_SEP */
+        .features[FEAT_1_EDX] = PPRO_FEATURES | CPUID_MTRR | CPUID_CLFLUSH |
+                                CPUID_MCA | CPUID_VME | CPUID_ACPI | CPUID_SS,
+        /* Some CPUs got no CPUID_SEP */
         /* Missing: CPUID_EXT_DSCPL, CPUID_EXT_EST, CPUID_EXT_TM2,
          * CPUID_EXT_XTPR */
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3 | CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 |
-            CPUID_EXT_MOVBE,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_NX,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM,
+        .features[FEAT_1_ECX] = CPUID_EXT_SSE3 | CPUID_EXT_MONITOR |
+                                CPUID_EXT_SSSE3 | CPUID_EXT_MOVBE,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_NX,
+        .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM,
         .xlevel = 0x80000008,
         .model_id = "Intel(R) Atom(TM) CPU N270   @ 1.60GHz",
     },
@@ -2497,30 +2490,30 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
             CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSSE3 | CPUID_EXT_SSE3,
+        .features[FEAT_1_ECX] = CPUID_EXT_SSSE3 | CPUID_EXT_SSE3,
         .features[FEAT_8000_0001_EDX] =
             CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM,
+        .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM,
         .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS,
         .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE,
         .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT,
         .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
         .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+                                            VMX_PIN_BASED_NMI_EXITING |
+                                            VMX_PIN_BASED_VIRTUAL_NMIS,
+        .features[FEAT_VMX_PROCBASED_CTLS] =
+            VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
+            VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
+            VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
+            VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
+            VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
+            VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
+            VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
+            VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
+            VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
+            VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
         .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES,
+            VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES,
         .xlevel = 0x80000008,
         .model_id = "Intel Celeron_4x0 (Conroe/Merom Class Core 2)",
     },
@@ -2538,1424 +2531,1337 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
             CPUID_DE | CPUID_FP87,
         .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_SSE3,
+            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_SSE3,
         .features[FEAT_8000_0001_EDX] =
             CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM,
+        .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM,
         .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
-        .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Core 2 Duo P9xxx (Penryn Class Core 2)",
-    },
-    {
-        .name = "Nehalem",
-        .level = 11,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 26,
-        .stepping = 3,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_POPCNT | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM,
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Core i7 9xx (Nehalem Class Core i7)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .alias = "Nehalem-IBRS",
-                .props = (PropValue[]) {
-                    { "spec-ctrl", "on" },
-                    { "model-id",
-                      "Intel Core i7 9xx (Nehalem Core i7, IBRS update)" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Westmere",
-        .level = 11,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 44,
-        .stepping = 1,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST,
-        .xlevel = 0x80000008,
-        .model_id = "Westmere E56xx/L56xx/X56xx (Nehalem-C)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .alias = "Westmere-IBRS",
-                .props = (PropValue[]) {
-                    { "spec-ctrl", "on" },
-                    { "model-id",
-                      "Westmere E56xx/L56xx/X56xx (IBRS update)" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "SandyBridge",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 42,
-        .stepping = 1,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
-            CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
-            CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Xeon E312xx (Sandy Bridge)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .alias = "SandyBridge-IBRS",
-                .props = (PropValue[]) {
-                    { "spec-ctrl", "on" },
-                    { "model-id",
-                      "Intel Xeon E312xx (Sandy Bridge, IBRS update)" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "IvyBridge",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 58,
-        .stepping = 9,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
-            CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
-            CPUID_EXT_SSE3 | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_ERMS,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Xeon E3-12xx v2 (Ivy Bridge)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .alias = "IvyBridge-IBRS",
-                .props = (PropValue[]) {
-                    { "spec-ctrl", "on" },
-                    { "model-id",
-                      "Intel Xeon E3-12xx v2 (Ivy Bridge, IBRS)" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Haswell",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 60,
-        .stepping = 4,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-            CPUID_7_0_EBX_RTM,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS,
-        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Core Processor (Haswell)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .alias = "Haswell-noTSX",
-                .props = (PropValue[]) {
-                    { "hle", "off" },
-                    { "rtm", "off" },
-                    { "stepping", "1" },
-                    { "model-id", "Intel Core Processor (Haswell, no TSX)", },
-                    { /* end of list */ }
-                },
-            },
-            {
-                .version = 3,
-                .alias = "Haswell-IBRS",
-                .props = (PropValue[]) {
-                    /* Restore TSX features removed by -v2 above */
-                    { "hle", "on" },
-                    { "rtm", "on" },
-                    /*
-                     * Haswell and Haswell-IBRS had stepping=4 in
-                     * QEMU 4.0 and older
-                     */
-                    { "stepping", "4" },
-                    { "spec-ctrl", "on" },
-                    { "model-id",
-                      "Intel Core Processor (Haswell, IBRS)" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 4,
-                .alias = "Haswell-noTSX-IBRS",
-                .props = (PropValue[]) {
-                    { "hle", "off" },
-                    { "rtm", "off" },
-                    /* spec-ctrl was already enabled by -v3 above */
-                    { "stepping", "1" },
-                    { "model-id",
-                      "Intel Core Processor (Haswell, no TSX, IBRS)" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Broadwell",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 61,
-        .stepping = 2,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-            CPUID_7_0_EBX_SMAP,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
-        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Core Processor (Broadwell)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .alias = "Broadwell-noTSX",
-                .props = (PropValue[]) {
-                    { "hle", "off" },
-                    { "rtm", "off" },
-                    { "model-id", "Intel Core Processor (Broadwell, no TSX)", },
-                    { /* end of list */ }
-                },
-            },
-            {
-                .version = 3,
-                .alias = "Broadwell-IBRS",
-                .props = (PropValue[]) {
-                    /* Restore TSX features removed by -v2 above */
-                    { "hle", "on" },
-                    { "rtm", "on" },
-                    { "spec-ctrl", "on" },
-                    { "model-id",
-                      "Intel Core Processor (Broadwell, IBRS)" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 4,
-                .alias = "Broadwell-noTSX-IBRS",
-                .props = (PropValue[]) {
-                    { "hle", "off" },
-                    { "rtm", "off" },
-                    /* spec-ctrl was already enabled by -v3 above */
-                    { "model-id",
-                      "Intel Core Processor (Broadwell, no TSX, IBRS)" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Skylake-Client",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 94,
-        .stepping = 3,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-            CPUID_7_0_EBX_SMAP,
-        /* XSAVES is added in version 4 */
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC scaling */
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
-        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Core Processor (Skylake)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .alias = "Skylake-Client-IBRS",
-                .props = (PropValue[]) {
-                    { "spec-ctrl", "on" },
-                    { "model-id",
-                      "Intel Core Processor (Skylake, IBRS)" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 3,
-                .alias = "Skylake-Client-noTSX-IBRS",
-                .props = (PropValue[]) {
-                    { "hle", "off" },
-                    { "rtm", "off" },
-                    { "model-id",
-                      "Intel Core Processor (Skylake, IBRS, no TSX)" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 4,
-                .note = "IBRS, XSAVES, no TSX",
-                .props = (PropValue[]) {
-                    { "xsaves", "on" },
-                    { "vmx-xsaves", "on" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Skylake-Server",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 85,
-        .stepping = 4,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_PKU,
-        /* XSAVES is added in version 5 */
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC scaling */
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Xeon Processor (Skylake)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .alias = "Skylake-Server-IBRS",
-                .props = (PropValue[]) {
-                    /* clflushopt was not added to Skylake-Server-IBRS */
-                    /* TODO: add -v3 including clflushopt */
-                    { "clflushopt", "off" },
-                    { "spec-ctrl", "on" },
-                    { "model-id",
-                      "Intel Xeon Processor (Skylake, IBRS)" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 3,
-                .alias = "Skylake-Server-noTSX-IBRS",
-                .props = (PropValue[]) {
-                    { "hle", "off" },
-                    { "rtm", "off" },
-                    { "model-id",
-                      "Intel Xeon Processor (Skylake, IBRS, no TSX)" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 4,
-                .props = (PropValue[]) {
-                    { "vmx-eptp-switching", "on" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 5,
-                .note = "IBRS, XSAVES, EPT switching, no TSX",
-                .props = (PropValue[]) {
-                    { "xsaves", "on" },
-                    { "vmx-xsaves", "on" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Cascadelake-Server",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 85,
-        .stepping = 6,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_PKU |
-            CPUID_7_0_ECX_AVX512VNNI,
-        .features[FEAT_7_0_EDX] =
-            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-        /* XSAVES is added in version 5 */
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC scaling */
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Xeon Processor (Cascadelake)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            { .version = 2,
-              .note = "ARCH_CAPABILITIES",
-              .props = (PropValue[]) {
-                  { "arch-capabilities", "on" },
-                  { "rdctl-no", "on" },
-                  { "ibrs-all", "on" },
-                  { "skip-l1dfl-vmentry", "on" },
-                  { "mds-no", "on" },
-                  { /* end of list */ }
-              },
-            },
-            { .version = 3,
-              .alias = "Cascadelake-Server-noTSX",
-              .note = "ARCH_CAPABILITIES, no TSX",
-              .props = (PropValue[]) {
-                  { "hle", "off" },
-                  { "rtm", "off" },
-                  { /* end of list */ }
-              },
-            },
-            { .version = 4,
-              .note = "ARCH_CAPABILITIES, no TSX",
-              .props = (PropValue[]) {
-                  { "vmx-eptp-switching", "on" },
-                  { /* end of list */ }
-              },
-            },
-            { .version = 5,
-              .note = "ARCH_CAPABILITIES, EPT switching, XSAVES, no TSX",
-              .props = (PropValue[]) {
-                  { "xsaves", "on" },
-                  { "vmx-xsaves", "on" },
-                  { /* end of list */ }
-              },
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Cooperlake",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 85,
-        .stepping = 10,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_PKU |
-            CPUID_7_0_ECX_AVX512VNNI,
-        .features[FEAT_7_0_EDX] =
-            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_STIBP |
-            CPUID_7_0_EDX_SPEC_CTRL_SSBD | CPUID_7_0_EDX_ARCH_CAPABILITIES,
-        .features[FEAT_ARCH_CAPABILITIES] =
-            MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_IBRS_ALL |
-            MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY | MSR_ARCH_CAP_MDS_NO |
-            MSR_ARCH_CAP_PSCHANGE_MC_NO | MSR_ARCH_CAP_TAA_NO,
-        .features[FEAT_7_1_EAX] =
-            CPUID_7_1_EAX_AVX512_BF16,
-        /* XSAVES is added in version 2 */
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC scaling */
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
-        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Xeon Processor (Cooperlake)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            { .version = 2,
-              .note = "XSAVES",
-              .props = (PropValue[]) {
-                  { "xsaves", "on" },
-                  { "vmx-xsaves", "on" },
-                  { /* end of list */ }
-              },
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Icelake-Server",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 134,
-        .stepping = 0,
-        .features[FEAT_1_EDX] =
-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-            CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_8000_0008_EBX] =
-            CPUID_8000_0008_EBX_WBNOINVD,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-            CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI |
-            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
-            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-            CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57,
-        .features[FEAT_7_0_EDX] =
-            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-        /* XSAVES is added in version 5 */
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC scaling */
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
-        .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS,
-        .xlevel = 0x80000008,
-        .model_id = "Intel Xeon Processor (Icelake)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .note = "no TSX",
-                .alias = "Icelake-Server-noTSX",
-                .props = (PropValue[]) {
-                    { "hle", "off" },
-                    { "rtm", "off" },
-                    { /* end of list */ }
-                },
-            },
-            {
-                .version = 3,
-                .props = (PropValue[]) {
-                    { "arch-capabilities", "on" },
-                    { "rdctl-no", "on" },
-                    { "ibrs-all", "on" },
-                    { "skip-l1dfl-vmentry", "on" },
-                    { "mds-no", "on" },
-                    { "pschange-mc-no", "on" },
-                    { "taa-no", "on" },
-                    { /* end of list */ }
-                },
-            },
-            {
-                .version = 4,
-                .props = (PropValue[]) {
-                    { "sha-ni", "on" },
-                    { "avx512ifma", "on" },
-                    { "rdpid", "on" },
-                    { "fsrm", "on" },
-                    { "vmx-rdseed-exit", "on" },
-                    { "vmx-pml", "on" },
-                    { "vmx-eptp-switching", "on" },
-                    { "model", "106" },
-                    { /* end of list */ }
-                },
-            },
-            {
-                .version = 5,
-                .note = "XSAVES",
-                .props = (PropValue[]) {
-                    { "xsaves", "on" },
-                    { "vmx-xsaves", "on" },
-                    { /* end of list */ }
-                },
-            },
-            {
-                .version = 6,
-                .note = "5-level EPT",
-                .props = (PropValue[]) {
-                    { "vmx-page-walk-5", "on" },
-                    { /* end of list */ }
-                },
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "SapphireRapids",
-        .level = 0x20,
-        .vendor = CPUID_VENDOR_INTEL,
-        .family = 6,
-        .model = 143,
-        .stepping = 4,
-        /*
-         * please keep the ascending order so that we can have a clear view of
-         * bit position of each feature.
-         */
-        .features[FEAT_1_EDX] =
-            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC |
-            CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC |
-            CPUID_SEP | CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
-            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH | CPUID_MMX | CPUID_FXSR |
-            CPUID_SSE | CPUID_SSE2,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSSE3 |
-            CPUID_EXT_FMA | CPUID_EXT_CX16 | CPUID_EXT_PCID | CPUID_EXT_SSE41 |
-            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
-            CPUID_EXT_POPCNT | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES |
-            CPUID_EXT_XSAVE | CPUID_EXT_AVX | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_SYSCALL | CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB |
-            CPUID_EXT2_RDTSCP | CPUID_EXT2_LM,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM | CPUID_EXT3_ABM | CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_8000_0008_EBX] =
-            CPUID_8000_0008_EBX_WBNOINVD,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
-            CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
-            CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM |
-            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP |
-            CPUID_7_0_EBX_AVX512IFMA | CPUID_7_0_EBX_CLFLUSHOPT |
-            CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_SHA_NI |
-            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-            CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI |
-            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
-            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-            CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57 |
-            CPUID_7_0_ECX_RDPID | CPUID_7_0_ECX_BUS_LOCK_DETECT,
-        .features[FEAT_7_0_EDX] =
-            CPUID_7_0_EDX_FSRM | CPUID_7_0_EDX_SERIALIZE |
-            CPUID_7_0_EDX_TSX_LDTRK | CPUID_7_0_EDX_AMX_BF16 |
-            CPUID_7_0_EDX_AVX512_FP16 | CPUID_7_0_EDX_AMX_TILE |
-            CPUID_7_0_EDX_AMX_INT8 | CPUID_7_0_EDX_SPEC_CTRL |
-            CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-        .features[FEAT_ARCH_CAPABILITIES] =
-            MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_IBRS_ALL |
-            MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY | MSR_ARCH_CAP_MDS_NO |
-            MSR_ARCH_CAP_PSCHANGE_MC_NO | MSR_ARCH_CAP_TAA_NO,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES | CPUID_D_1_EAX_XFD,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_7_1_EAX] =
-            CPUID_7_1_EAX_AVX_VNNI | CPUID_7_1_EAX_AVX512_BF16 |
-            CPUID_7_1_EAX_FZRM | CPUID_7_1_EAX_FSRS | CPUID_7_1_EAX_FSRC,
-        .features[FEAT_VMX_BASIC] =
-            MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
         .features[FEAT_VMX_ENTRY_CTLS] =
-            VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_IA32E_MODE |
-            VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-            VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] =
-            MSR_VMX_EPT_EXECONLY |
-            MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_PAGE_WALK_LENGTH_5 |
-            MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
-            MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_AD_BITS |
-            MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-            MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-            MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
-            MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-            MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-        .features[FEAT_VMX_EXIT_CTLS] =
-            VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-            VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-            VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_IA32_PAT |
-            VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] =
-            MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_ACTIVITY_HLT |
-            MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] =
-            VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
-            VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
-            VMX_PIN_BASED_POSTED_INTR,
+            VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
+        .features[FEAT_VMX_EXIT_CTLS] = VMX_VM_EXIT_ACK_INTR_ON_EXIT |
+                                        VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL,
+        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
+        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
+                                            VMX_PIN_BASED_NMI_EXITING |
+                                            VMX_PIN_BASED_VIRTUAL_NMIS,
         .features[FEAT_VMX_PROCBASED_CTLS] =
             VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-            VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-            VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
-            VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
-            VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-            VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
-            VMX_CPU_BASED_PAUSE_EXITING |
+            VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
+            VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
+            VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
+            VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
         .features[FEAT_VMX_SECONDARY_CTLS] =
             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-            VMX_SECONDARY_EXEC_ENABLE_EPT | VMX_SECONDARY_EXEC_DESC |
-            VMX_SECONDARY_EXEC_RDTSCP |
-            VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-            VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_WBINVD_EXITING |
-            VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-            VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-            VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-            VMX_SECONDARY_EXEC_RDRAND_EXITING |
-            VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-            VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-            VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML |
-            VMX_SECONDARY_EXEC_XSAVES,
-        .features[FEAT_VMX_VMFUNC] =
-            MSR_VMX_VMFUNC_EPT_SWITCHING,
+            VMX_SECONDARY_EXEC_WBINVD_EXITING,
         .xlevel = 0x80000008,
-        .model_id = "Intel Xeon Processor (SapphireRapids)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .props = (PropValue[]) {
-                    { "sbdr-ssdp-no", "on" },
-                    { "fbsdp-no", "on" },
-                    { "psdp-no", "on" },
-                    { /* end of list */ }
-                }
-            },
-            { /* end of list */ }
-        }
+        .model_id = "Intel Core 2 Duo P9xxx (Penryn Class Core 2)",
     },
+    { .name = "Nehalem",
+      .level = 11,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 26,
+      .stepping = 3,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] = CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
+                              CPUID_EXT_SSE41 | CPUID_EXT_CX16 |
+                              CPUID_EXT_SSSE3 | CPUID_EXT_SSE3,
+      .features[FEAT_8000_0001_EDX] =
+          CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
+      .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM,
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Core i7 9xx (Nehalem Class Core i7)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .alias = "Nehalem-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "spec-ctrl", "on" },
+                        { "model-id",
+                          "Intel Core i7 9xx (Nehalem Core i7, IBRS update)" },
+                        { /* end of list */ } } },
+              { /* end of list */ } } },
+    { .name = "Westmere",
+      .level = 11,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 44,
+      .stepping = 1,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] = CPUID_EXT_AES | CPUID_EXT_POPCNT |
+                              CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+                              CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+                              CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+      .features[FEAT_8000_0001_EDX] =
+          CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
+      .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] =
+          MSR_VMX_MISC_ACTIVITY_HLT | MSR_VMX_MISC_STORE_LMA,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST,
+      .xlevel = 0x80000008,
+      .model_id = "Westmere E56xx/L56xx/X56xx (Nehalem-C)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .alias = "Westmere-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "spec-ctrl", "on" },
+                        { "model-id",
+                          "Westmere E56xx/L56xx/X56xx (IBRS update)" },
+                        { /* end of list */ } } },
+              { /* end of list */ } } },
+    { .name = "SandyBridge",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 42,
+      .stepping = 1,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+          CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT | CPUID_EXT_X2APIC |
+          CPUID_EXT_SSE42 | CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+          CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM,
+      .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] =
+          MSR_VMX_MISC_ACTIVITY_HLT | MSR_VMX_MISC_STORE_LMA,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Xeon E312xx (Sandy Bridge)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .alias = "SandyBridge-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "spec-ctrl", "on" },
+                        { "model-id",
+                          "Intel Xeon E312xx (Sandy Bridge, IBRS update)" },
+                        { /* end of list */ } } },
+              { /* end of list */ } } },
+    { .name = "IvyBridge",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 58,
+      .stepping = 9,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+          CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT | CPUID_EXT_X2APIC |
+          CPUID_EXT_SSE42 | CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+          CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 | CPUID_EXT_F16C |
+          CPUID_EXT_RDRAND,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_ERMS,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] = CPUID_EXT3_LAHF_LM,
+      .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] =
+          MSR_VMX_MISC_ACTIVITY_HLT | MSR_VMX_MISC_STORE_LMA,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+          VMX_PIN_BASED_POSTED_INTR,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+          VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Xeon E3-12xx v2 (Ivy Bridge)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .alias = "IvyBridge-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "spec-ctrl", "on" },
+                        { "model-id",
+                          "Intel Xeon E3-12xx v2 (Ivy Bridge, IBRS)" },
+                        { /* end of list */ } } },
+              { /* end of list */ } } },
+    { .name = "Haswell",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 60,
+      .stepping = 4,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+          CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+          CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+          CPUID_EXT_SSE3 | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+          CPUID_EXT_MOVBE | CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] = CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
+          CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM,
+      .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
+                                 MSR_VMX_MISC_STORE_LMA |
+                                 MSR_VMX_MISC_VMWRITE_VMEXIT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+          VMX_PIN_BASED_POSTED_INTR,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+          VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_INVPCID | VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
+          VMX_SECONDARY_EXEC_SHADOW_VMCS,
+      .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Core Processor (Haswell)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              {
+                  .version = 2,
+                  .alias = "Haswell-noTSX",
+                  .props =
+                      (PropValue[]){
+                          { "hle", "off" },
+                          { "rtm", "off" },
+                          { "stepping", "1" },
+                          {
+                              "model-id",
+                              "Intel Core Processor (Haswell, no TSX)",
+                          },
+                          { /* end of list */ } },
+              },
+              { .version = 3,
+                .alias = "Haswell-IBRS",
+                .props =
+                    (PropValue[]){
+                        /* Restore TSX features removed by -v2 above */
+                        { "hle", "on" },
+                        { "rtm", "on" },
+                        /*
+                         * Haswell and Haswell-IBRS had stepping=4 in
+                         * QEMU 4.0 and older
+                         */
+                        { "stepping", "4" },
+                        { "spec-ctrl", "on" },
+                        { "model-id", "Intel Core Processor (Haswell, IBRS)" },
+                        { /* end of list */ } } },
+              { .version = 4,
+                .alias = "Haswell-noTSX-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "hle", "off" },
+                        { "rtm", "off" },
+                        /* spec-ctrl was already enabled by -v3 above */
+                        { "stepping", "1" },
+                        { "model-id",
+                          "Intel Core Processor (Haswell, no TSX, IBRS)" },
+                        { /* end of list */ } } },
+              { /* end of list */ } } },
+    { .name = "Broadwell",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 61,
+      .stepping = 2,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+          CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+          CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+          CPUID_EXT_SSE3 | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+          CPUID_EXT_MOVBE | CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
+          CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM |
+          CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP,
+      .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
+                                 MSR_VMX_MISC_STORE_LMA |
+                                 MSR_VMX_MISC_VMWRITE_VMEXIT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+          VMX_PIN_BASED_POSTED_INTR,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+          VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_INVPCID | VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
+          VMX_SECONDARY_EXEC_SHADOW_VMCS | VMX_SECONDARY_EXEC_RDSEED_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_PML,
+      .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Core Processor (Broadwell)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              {
+                  .version = 2,
+                  .alias = "Broadwell-noTSX",
+                  .props =
+                      (PropValue[]){
+                          { "hle", "off" },
+                          { "rtm", "off" },
+                          {
+                              "model-id",
+                              "Intel Core Processor (Broadwell, no TSX)",
+                          },
+                          { /* end of list */ } },
+              },
+              { .version = 3,
+                .alias = "Broadwell-IBRS",
+                .props =
+                    (PropValue[]){
+                        /* Restore TSX features removed by -v2 above */
+                        { "hle", "on" },
+                        { "rtm", "on" },
+                        { "spec-ctrl", "on" },
+                        { "model-id",
+                          "Intel Core Processor (Broadwell, IBRS)" },
+                        { /* end of list */ } } },
+              { .version = 4,
+                .alias = "Broadwell-noTSX-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "hle", "off" },
+                        { "rtm", "off" },
+                        /* spec-ctrl was already enabled by -v3 above */
+                        { "model-id",
+                          "Intel Core Processor (Broadwell, no TSX, IBRS)" },
+                        { /* end of list */ } } },
+              { /* end of list */ } } },
+    { .name = "Skylake-Client",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 94,
+      .stepping = 3,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+          CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+          CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+          CPUID_EXT_SSE3 | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+          CPUID_EXT_MOVBE | CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
+          CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM |
+          CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP,
+      /* XSAVES is added in version 4 */
+      .features[FEAT_XSAVE] =
+          CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC
+         scaling */
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
+                                 MSR_VMX_MISC_STORE_LMA |
+                                 MSR_VMX_MISC_VMWRITE_VMEXIT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_INVPCID | VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
+          VMX_SECONDARY_EXEC_SHADOW_VMCS | VMX_SECONDARY_EXEC_RDSEED_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_PML,
+      .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Core Processor (Skylake)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .alias = "Skylake-Client-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "spec-ctrl", "on" },
+                        { "model-id", "Intel Core Processor (Skylake, IBRS)" },
+                        { /* end of list */ } } },
+              { .version = 3,
+                .alias = "Skylake-Client-noTSX-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "hle", "off" },
+                        { "rtm", "off" },
+                        { "model-id",
+                          "Intel Core Processor (Skylake, IBRS, no TSX)" },
+                        { /* end of list */ } } },
+              { .version = 4,
+                .note = "IBRS, XSAVES, no TSX",
+                .props =
+                    (PropValue[]){ { "xsaves", "on" },
+                                   { "vmx-xsaves", "on" },
+                                   { /* end of list */ } } },
+              { /* end of list */ } } },
+    { .name = "Skylake-Server",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 85,
+      .stepping = 4,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+          CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+          CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+          CPUID_EXT_SSE3 | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+          CPUID_EXT_MOVBE | CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB |
+                                      CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+                                      CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
+          CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM |
+          CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP |
+          CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+          CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+          CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+      .features[FEAT_7_0_ECX] = CPUID_7_0_ECX_PKU,
+      /* XSAVES is added in version 5 */
+      .features[FEAT_XSAVE] =
+          CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC
+         scaling */
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
+                                 MSR_VMX_MISC_STORE_LMA |
+                                 MSR_VMX_MISC_VMWRITE_VMEXIT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+          VMX_PIN_BASED_POSTED_INTR,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+          VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_INVPCID | VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
+          VMX_SECONDARY_EXEC_SHADOW_VMCS | VMX_SECONDARY_EXEC_RDSEED_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_PML,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Xeon Processor (Skylake)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .alias = "Skylake-Server-IBRS",
+                .props =
+                    (PropValue[]){
+                        /* clflushopt was not added to Skylake-Server-IBRS */
+                        /* TODO: add -v3 including clflushopt */
+                        { "clflushopt", "off" },
+                        { "spec-ctrl", "on" },
+                        { "model-id", "Intel Xeon Processor (Skylake, IBRS)" },
+                        { /* end of list */ } } },
+              { .version = 3,
+                .alias = "Skylake-Server-noTSX-IBRS",
+                .props =
+                    (PropValue[]){
+                        { "hle", "off" },
+                        { "rtm", "off" },
+                        { "model-id",
+                          "Intel Xeon Processor (Skylake, IBRS, no TSX)" },
+                        { /* end of list */ } } },
+              { .version = 4,
+                .props = (PropValue[]){ { "vmx-eptp-switching", "on" },
+                                        { /* end of list */ } } },
+              { .version = 5,
+                .note = "IBRS, XSAVES, EPT switching, no TSX",
+                .props = (PropValue[]){ { "xsaves", "on" },
+                                        { "vmx-xsaves", "on" },
+                                        { /* end of list */ } } },
+              { /* end of list */ } } },
+    { .name = "Cascadelake-Server",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 85,
+      .stepping = 6,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+          CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+          CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+          CPUID_EXT_SSE3 | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+          CPUID_EXT_MOVBE | CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB |
+                                      CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+                                      CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
+          CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM |
+          CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP |
+          CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+          CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+          CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+      .features[FEAT_7_0_ECX] = CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_AVX512VNNI,
+      .features[FEAT_7_0_EDX] =
+          CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+      /* XSAVES is added in version 5 */
+      .features[FEAT_XSAVE] =
+          CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC
+         scaling */
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
+                                 MSR_VMX_MISC_STORE_LMA |
+                                 MSR_VMX_MISC_VMWRITE_VMEXIT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+          VMX_PIN_BASED_POSTED_INTR,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+          VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_INVPCID | VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
+          VMX_SECONDARY_EXEC_SHADOW_VMCS | VMX_SECONDARY_EXEC_RDSEED_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_PML,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Xeon Processor (Cascadelake)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              {
+                  .version = 2,
+                  .note = "ARCH_CAPABILITIES",
+                  .props = (PropValue[]){ { "arch-capabilities", "on" },
+                                          { "rdctl-no", "on" },
+                                          { "ibrs-all", "on" },
+                                          { "skip-l1dfl-vmentry", "on" },
+                                          { "mds-no", "on" },
+                                          { /* end of list */ } },
+              },
+              {
+                  .version = 3,
+                  .alias = "Cascadelake-Server-noTSX",
+                  .note = "ARCH_CAPABILITIES, no TSX",
+                  .props = (PropValue[]){ { "hle", "off" },
+                                          { "rtm", "off" },
+                                          { /* end of list */ } },
+              },
+              {
+                  .version = 4,
+                  .note = "ARCH_CAPABILITIES, no TSX",
+                  .props = (PropValue[]){ { "vmx-eptp-switching", "on" },
+                                          { /* end of list */ } },
+              },
+              {
+                  .version = 5,
+                  .note = "ARCH_CAPABILITIES, EPT switching, XSAVES, no TSX",
+                  .props = (PropValue[]){ { "xsaves", "on" },
+                                          { "vmx-xsaves", "on" },
+                                          { /* end of list */ } },
+              },
+              { /* end of list */ } } },
+    { .name = "Cooperlake",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 85,
+      .stepping = 10,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+          CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+          CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+          CPUID_EXT_SSE3 | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+          CPUID_EXT_MOVBE | CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB |
+                                      CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+                                      CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
+          CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM |
+          CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP |
+          CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+          CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+          CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+      .features[FEAT_7_0_ECX] = CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_AVX512VNNI,
+      .features[FEAT_7_0_EDX] = CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_STIBP |
+                                CPUID_7_0_EDX_SPEC_CTRL_SSBD |
+                                CPUID_7_0_EDX_ARCH_CAPABILITIES,
+      .features[FEAT_ARCH_CAPABILITIES] =
+          MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_IBRS_ALL |
+          MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY | MSR_ARCH_CAP_MDS_NO |
+          MSR_ARCH_CAP_PSCHANGE_MC_NO | MSR_ARCH_CAP_TAA_NO,
+      .features[FEAT_7_1_EAX] = CPUID_7_1_EAX_AVX512_BF16,
+      /* XSAVES is added in version 2 */
+      .features[FEAT_XSAVE] =
+          CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC
+         scaling */
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
+                                 MSR_VMX_MISC_STORE_LMA |
+                                 MSR_VMX_MISC_VMWRITE_VMEXIT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+          VMX_PIN_BASED_POSTED_INTR,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+          VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_INVPCID | VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
+          VMX_SECONDARY_EXEC_SHADOW_VMCS | VMX_SECONDARY_EXEC_RDSEED_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_PML,
+      .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Xeon Processor (Cooperlake)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              {
+                  .version = 2,
+                  .note = "XSAVES",
+                  .props = (PropValue[]){ { "xsaves", "on" },
+                                          { "vmx-xsaves", "on" },
+                                          { /* end of list */ } },
+              },
+              { /* end of list */ } } },
+    { .name = "Icelake-Server",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 134,
+      .stepping = 0,
+      .features[FEAT_1_EDX] = CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+                              CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 |
+                              CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+                              CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+                              CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+                              CPUID_PSE | CPUID_DE | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+          CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+          CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+          CPUID_EXT_SSE3 | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+          CPUID_EXT_MOVBE | CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB |
+                                      CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+                                      CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+      .features[FEAT_8000_0008_EBX] = CPUID_8000_0008_EBX_WBNOINVD,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
+          CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM |
+          CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP |
+          CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+          CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+          CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+      .features[FEAT_7_0_ECX] =
+          CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
+          CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI | CPUID_7_0_ECX_VAES |
+          CPUID_7_0_ECX_VPCLMULQDQ | CPUID_7_0_ECX_AVX512VNNI |
+          CPUID_7_0_ECX_AVX512BITALG | CPUID_7_0_ECX_AVX512_VPOPCNTDQ |
+          CPUID_7_0_ECX_LA57,
+      .features[FEAT_7_0_EDX] =
+          CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+      /* XSAVES is added in version 5 */
+      .features[FEAT_XSAVE] =
+          CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      /* Missing: Mode-based execute control (XS/XU), processor tracing, TSC
+         scaling */
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+          MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+          MSR_VMX_EPT_INVVPID_SINGLE_ADDR | MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+          MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
+                                 MSR_VMX_MISC_STORE_LMA |
+                                 MSR_VMX_MISC_VMWRITE_VMEXIT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+          VMX_PIN_BASED_POSTED_INTR,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXITING |
+          VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITING |
+          VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_VIRTUAL_NMI_PENDING |
+          VMX_CPU_BASED_USE_MSR_BITMAPS | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+          VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+          VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_INVPCID | VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
+          VMX_SECONDARY_EXEC_SHADOW_VMCS,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Xeon Processor (Icelake)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              {
+                  .version = 2,
+                  .note = "no TSX",
+                  .alias = "Icelake-Server-noTSX",
+                  .props = (PropValue[]){ { "hle", "off" },
+                                          { "rtm", "off" },
+                                          { /* end of list */ } },
+              },
+              {
+                  .version = 3,
+                  .props = (PropValue[]){ { "arch-capabilities", "on" },
+                                          { "rdctl-no", "on" },
+                                          { "ibrs-all", "on" },
+                                          { "skip-l1dfl-vmentry", "on" },
+                                          { "mds-no", "on" },
+                                          { "pschange-mc-no", "on" },
+                                          { "taa-no", "on" },
+                                          { /* end of list */ } },
+              },
+              {
+                  .version = 4,
+                  .props = (PropValue[]){ { "sha-ni", "on" },
+                                          { "avx512ifma", "on" },
+                                          { "rdpid", "on" },
+                                          { "fsrm", "on" },
+                                          { "vmx-rdseed-exit", "on" },
+                                          { "vmx-pml", "on" },
+                                          { "vmx-eptp-switching", "on" },
+                                          { "model", "106" },
+                                          { /* end of list */ } },
+              },
+              {
+                  .version = 5,
+                  .note = "XSAVES",
+                  .props = (PropValue[]){ { "xsaves", "on" },
+                                          { "vmx-xsaves", "on" },
+                                          { /* end of list */ } },
+              },
+              {
+                  .version = 6,
+                  .note = "5-level EPT",
+                  .props = (PropValue[]){ { "vmx-page-walk-5", "on" },
+                                          { /* end of list */ } },
+              },
+              { /* end of list */ } } },
+    { .name = "SapphireRapids",
+      .level = 0x20,
+      .vendor = CPUID_VENDOR_INTEL,
+      .family = 6,
+      .model = 143,
+      .stepping = 4,
+      /*
+       * please keep the ascending order so that we can have a clear view of
+       * bit position of each feature.
+       */
+      .features[FEAT_1_EDX] = CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE |
+                              CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |
+                              CPUID_CX8 | CPUID_APIC | CPUID_SEP | CPUID_MTRR |
+                              CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT |
+                              CPUID_PSE36 | CPUID_CLFLUSH | CPUID_MMX |
+                              CPUID_FXSR | CPUID_SSE | CPUID_SSE2,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSSE3 |
+          CPUID_EXT_FMA | CPUID_EXT_CX16 | CPUID_EXT_PCID | CPUID_EXT_SSE41 |
+          CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
+          CPUID_EXT_POPCNT | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES |
+          CPUID_EXT_XSAVE | CPUID_EXT_AVX | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_SYSCALL | CPUID_EXT2_NX |
+                                      CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_LM,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_LAHF_LM | CPUID_EXT3_ABM | CPUID_EXT3_3DNOWPREFETCH,
+      .features[FEAT_8000_0008_EBX] = CPUID_8000_0008_EBX_WBNOINVD,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
+          CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+          CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_RTM |
+          CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+          CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP |
+          CPUID_7_0_EBX_AVX512IFMA | CPUID_7_0_EBX_CLFLUSHOPT |
+          CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_SHA_NI |
+          CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL,
+      .features[FEAT_7_0_ECX] =
+          CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
+          CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI | CPUID_7_0_ECX_VAES |
+          CPUID_7_0_ECX_VPCLMULQDQ | CPUID_7_0_ECX_AVX512VNNI |
+          CPUID_7_0_ECX_AVX512BITALG | CPUID_7_0_ECX_AVX512_VPOPCNTDQ |
+          CPUID_7_0_ECX_LA57 | CPUID_7_0_ECX_RDPID |
+          CPUID_7_0_ECX_BUS_LOCK_DETECT,
+      .features[FEAT_7_0_EDX] =
+          CPUID_7_0_EDX_FSRM | CPUID_7_0_EDX_SERIALIZE |
+          CPUID_7_0_EDX_TSX_LDTRK | CPUID_7_0_EDX_AMX_BF16 |
+          CPUID_7_0_EDX_AVX512_FP16 | CPUID_7_0_EDX_AMX_TILE |
+          CPUID_7_0_EDX_AMX_INT8 | CPUID_7_0_EDX_SPEC_CTRL |
+          CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+      .features[FEAT_ARCH_CAPABILITIES] =
+          MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_IBRS_ALL |
+          MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY | MSR_ARCH_CAP_MDS_NO |
+          MSR_ARCH_CAP_PSCHANGE_MC_NO | MSR_ARCH_CAP_TAA_NO,
+      .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+                              CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES |
+                              CPUID_D_1_EAX_XFD,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_7_1_EAX] = CPUID_7_1_EAX_AVX_VNNI |
+                                CPUID_7_1_EAX_AVX512_BF16 | CPUID_7_1_EAX_FZRM |
+                                CPUID_7_1_EAX_FSRS | CPUID_7_1_EAX_FSRC,
+      .features[FEAT_VMX_BASIC] =
+          MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+      .features[FEAT_VMX_ENTRY_CTLS] =
+          VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_IA32E_MODE |
+          VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
+          VMX_VM_ENTRY_LOAD_IA32_EFER,
+      .features[FEAT_VMX_EPT_VPID_CAPS] =
+          MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+          MSR_VMX_EPT_PAGE_WALK_LENGTH_5 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
+          MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_AD_BITS |
+          MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+          MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
+      .features[FEAT_VMX_EXIT_CTLS] =
+          VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+          VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
+          VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_IA32_PAT |
+          VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
+          VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+      .features[FEAT_VMX_MISC] = MSR_VMX_MISC_STORE_LMA |
+                                 MSR_VMX_MISC_ACTIVITY_HLT |
+                                 MSR_VMX_MISC_VMWRITE_VMEXIT,
+      .features[FEAT_VMX_PINBASED_CTLS] =
+          VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+          VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+          VMX_PIN_BASED_POSTED_INTR,
+      .features[FEAT_VMX_PROCBASED_CTLS] =
+          VMX_CPU_BASED_VIRTUAL_INTR_PENDING | VMX_CPU_BASED_USE_TSC_OFFSETING |
+          VMX_CPU_BASED_HLT_EXITING | VMX_CPU_BASED_INVLPG_EXITING |
+          VMX_CPU_BASED_MWAIT_EXITING | VMX_CPU_BASED_RDPMC_EXITING |
+          VMX_CPU_BASED_RDTSC_EXITING | VMX_CPU_BASED_CR3_LOAD_EXITING |
+          VMX_CPU_BASED_CR3_STORE_EXITING | VMX_CPU_BASED_CR8_LOAD_EXITING |
+          VMX_CPU_BASED_CR8_STORE_EXITING | VMX_CPU_BASED_TPR_SHADOW |
+          VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_MOV_DR_EXITING |
+          VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
+          VMX_CPU_BASED_MONITOR_TRAP_FLAG | VMX_CPU_BASED_USE_MSR_BITMAPS |
+          VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
+          VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+      .features[FEAT_VMX_SECONDARY_CTLS] =
+          VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+          VMX_SECONDARY_EXEC_ENABLE_EPT | VMX_SECONDARY_EXEC_DESC |
+          VMX_SECONDARY_EXEC_RDTSCP |
+          VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+          VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_WBINVD_EXITING |
+          VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+          VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+          VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+          VMX_SECONDARY_EXEC_RDRAND_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_INVPCID | VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
+          VMX_SECONDARY_EXEC_SHADOW_VMCS | VMX_SECONDARY_EXEC_RDSEED_EXITING |
+          VMX_SECONDARY_EXEC_ENABLE_PML | VMX_SECONDARY_EXEC_XSAVES,
+      .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+      .xlevel = 0x80000008,
+      .model_id = "Intel Xeon Processor (SapphireRapids)",
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .props = (PropValue[]){ { "sbdr-ssdp-no", "on" },
+                                        { "fbsdp-no", "on" },
+                                        { "psdp-no", "on" },
+                                        { /* end of list */ } } },
+              { /* end of list */ } } },
     {
         .name = "GraniteRapids",
         .level = 0x20,
@@ -3979,13 +3885,12 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
             CPUID_EXT_POPCNT | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES |
             CPUID_EXT_XSAVE | CPUID_EXT_AVX | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_SYSCALL | CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB |
-            CPUID_EXT2_RDTSCP | CPUID_EXT2_LM,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_SYSCALL | CPUID_EXT2_NX |
+                                        CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+                                        CPUID_EXT2_LM,
         .features[FEAT_8000_0001_ECX] =
             CPUID_EXT3_LAHF_LM | CPUID_EXT3_ABM | CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_8000_0008_EBX] =
-            CPUID_8000_0008_EBX_WBNOINVD,
+        .features[FEAT_8000_0008_EBX] = CPUID_8000_0008_EBX_WBNOINVD,
         .features[FEAT_7_0_EBX] =
             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_HLE |
             CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
@@ -4014,19 +3919,16 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             MSR_ARCH_CAP_PSCHANGE_MC_NO | MSR_ARCH_CAP_TAA_NO |
             MSR_ARCH_CAP_SBDR_SSDP_NO | MSR_ARCH_CAP_FBSDP_NO |
             MSR_ARCH_CAP_PSDP_NO | MSR_ARCH_CAP_PBRSB_NO,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES | CPUID_D_1_EAX_XFD,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_7_1_EAX] =
-            CPUID_7_1_EAX_AVX_VNNI | CPUID_7_1_EAX_AVX512_BF16 |
-            CPUID_7_1_EAX_FZRM | CPUID_7_1_EAX_FSRS | CPUID_7_1_EAX_FSRC |
-            CPUID_7_1_EAX_AMX_FP16,
-        .features[FEAT_7_1_EDX] =
-            CPUID_7_1_EDX_PREFETCHITI,
-        .features[FEAT_7_2_EDX] =
-            CPUID_7_2_EDX_MCDT_NO,
+        .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+                                CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES |
+                                CPUID_D_1_EAX_XFD,
+        .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+        .features[FEAT_7_1_EAX] = CPUID_7_1_EAX_AVX_VNNI |
+                                  CPUID_7_1_EAX_AVX512_BF16 |
+                                  CPUID_7_1_EAX_FZRM | CPUID_7_1_EAX_FSRS |
+                                  CPUID_7_1_EAX_FSRC | CPUID_7_1_EAX_AMX_FP16,
+        .features[FEAT_7_1_EDX] = CPUID_7_1_EDX_PREFETCHITI,
+        .features[FEAT_7_2_EDX] = CPUID_7_2_EDX_MCDT_NO,
         .features[FEAT_VMX_BASIC] =
             MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
         .features[FEAT_VMX_ENTRY_CTLS] =
@@ -4034,10 +3936,9 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
         .features[FEAT_VMX_EPT_VPID_CAPS] =
-            MSR_VMX_EPT_EXECONLY |
-            MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_PAGE_WALK_LENGTH_5 |
-            MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
-            MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_AD_BITS |
+            MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+            MSR_VMX_EPT_PAGE_WALK_LENGTH_5 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
+            MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_AD_BITS |
             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
@@ -4049,9 +3950,9 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_IA32_PAT |
             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
             VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-        .features[FEAT_VMX_MISC] =
-            MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_ACTIVITY_HLT |
-            MSR_VMX_MISC_VMWRITE_VMEXIT,
+        .features[FEAT_VMX_MISC] = MSR_VMX_MISC_STORE_LMA |
+                                   MSR_VMX_MISC_ACTIVITY_HLT |
+                                   MSR_VMX_MISC_VMWRITE_VMEXIT,
         .features[FEAT_VMX_PINBASED_CTLS] =
             VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
             VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
@@ -4083,14 +3984,14 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML |
             VMX_SECONDARY_EXEC_XSAVES,
-        .features[FEAT_VMX_VMFUNC] =
-            MSR_VMX_VMFUNC_EPT_SWITCHING,
+        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
         .xlevel = 0x80000008,
         .model_id = "Intel Xeon Processor (GraniteRapids)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            { /* end of list */ },
-        },
+        .versions =
+            (X86CPUVersionDefinition[]){
+                { .version = 1 },
+                { /* end of list */ },
+            },
     },
     {
         .name = "Denverton",
@@ -4109,98 +4010,107 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
             CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | CPUID_EXT_SSE41 |
             CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
-            CPUID_EXT_POPCNT | CPUID_EXT_TSC_DEADLINE_TIMER |
-            CPUID_EXT_AES | CPUID_EXT_XSAVE | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_SYSCALL | CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB |
-            CPUID_EXT2_RDTSCP | CPUID_EXT2_LM,
+            CPUID_EXT_POPCNT | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES |
+            CPUID_EXT_XSAVE | CPUID_EXT_RDRAND,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_SYSCALL | CPUID_EXT2_NX |
+                                        CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+                                        CPUID_EXT2_LM,
         .features[FEAT_8000_0001_ECX] =
             CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
         .features[FEAT_7_0_EBX] =
             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_ERMS |
             CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_SMAP |
             CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_SHA_NI,
-        .features[FEAT_7_0_EDX] =
-            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_ARCH_CAPABILITIES |
-            CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+        .features[FEAT_7_0_EDX] = CPUID_7_0_EDX_SPEC_CTRL |
+                                  CPUID_7_0_EDX_ARCH_CAPABILITIES |
+                                  CPUID_7_0_EDX_SPEC_CTRL_SSBD,
         /* XSAVES is added in version 3 */
         .features[FEAT_XSAVE] =
             CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
+        .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
         .features[FEAT_ARCH_CAPABILITIES] =
             MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY,
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+        .features[FEAT_VMX_BASIC] =
+            MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+        .features[FEAT_VMX_ENTRY_CTLS] =
+            VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+            VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+            VMX_VM_ENTRY_LOAD_IA32_EFER,
+        .features[FEAT_VMX_EPT_VPID_CAPS] =
+            MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+            MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+            MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+            MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+            MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
+            MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+            MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+            MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
         .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+            VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+            VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+            VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
         .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+                                   MSR_VMX_MISC_STORE_LMA |
+                                   MSR_VMX_MISC_VMWRITE_VMEXIT,
+        .features[FEAT_VMX_PINBASED_CTLS] =
+            VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+            VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+            VMX_PIN_BASED_POSTED_INTR,
+        .features[FEAT_VMX_PROCBASED_CTLS] =
+            VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
+            VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
+            VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
+            VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
+            VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
+            VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
+            VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
+            VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
+            VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
+            VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
+            VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+            VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
         .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
+            VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+            VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+            VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+            VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+            VMX_SECONDARY_EXEC_ENABLE_VPID |
+            VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+            VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+            VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+            VMX_SECONDARY_EXEC_RDRAND_EXITING |
+            VMX_SECONDARY_EXEC_ENABLE_INVPCID |
+            VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
+            VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
         .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
         .xlevel = 0x80000008,
         .model_id = "Intel Atom Processor (Denverton)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .note = "no MPX, no MONITOR",
-                .props = (PropValue[]) {
-                    { "monitor", "off" },
-                    { "mpx", "off" },
-                    { /* end of list */ },
+        .versions =
+            (X86CPUVersionDefinition[]){
+                { .version = 1 },
+                {
+                    .version = 2,
+                    .note = "no MPX, no MONITOR",
+                    .props =
+                        (PropValue[]){
+                            { "monitor", "off" },
+                            { "mpx", "off" },
+                            { /* end of list */ },
+                        },
                 },
-            },
-            {
-                .version = 3,
-                .note = "XSAVES, no MPX, no MONITOR",
-                .props = (PropValue[]) {
-                    { "xsaves", "on" },
-                    { "vmx-xsaves", "on" },
-                    { /* end of list */ },
+                {
+                    .version = 3,
+                    .note = "XSAVES, no MPX, no MONITOR",
+                    .props =
+                        (PropValue[]){
+                            { "xsaves", "on" },
+                            { "vmx-xsaves", "on" },
+                            { /* end of list */ },
+                        },
                 },
+                { /* end of list */ },
             },
-            { /* end of list */ },
-        },
     },
     {
         .name = "Snowridge",
@@ -4211,137 +4121,133 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .stepping = 1,
         .features[FEAT_1_EDX] =
             /* missing: CPUID_PN CPUID_IA64 */
-            /* missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
-            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE |
-            CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |
-            CPUID_CX8 | CPUID_APIC | CPUID_SEP |
-            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
-            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH |
-            CPUID_MMX |
-            CPUID_FXSR | CPUID_SSE | CPUID_SSE2,
+        /* missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
+        CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC | CPUID_MSR |
+        CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP |
+        CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT |
+        CPUID_PSE36 | CPUID_CLFLUSH | CPUID_MMX | CPUID_FXSR | CPUID_SSE |
+        CPUID_SSE2,
         .features[FEAT_1_ECX] =
             CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
-            CPUID_EXT_SSSE3 |
-            CPUID_EXT_CX16 |
-            CPUID_EXT_SSE41 |
+            CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | CPUID_EXT_SSE41 |
             CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
-            CPUID_EXT_POPCNT |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES | CPUID_EXT_XSAVE |
-            CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_SYSCALL |
-            CPUID_EXT2_NX |
-            CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-            CPUID_EXT2_LM,
+            CPUID_EXT_POPCNT | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES |
+            CPUID_EXT_XSAVE | CPUID_EXT_RDRAND,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_SYSCALL | CPUID_EXT2_NX |
+                                        CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+                                        CPUID_EXT2_LM,
         .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_LAHF_LM |
-            CPUID_EXT3_3DNOWPREFETCH,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE |
-            CPUID_7_0_EBX_SMEP |
-            CPUID_7_0_EBX_ERMS |
-            CPUID_7_0_EBX_MPX |  /* missing bits 13, 15 */
-            CPUID_7_0_EBX_RDSEED |
-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-            CPUID_7_0_EBX_CLWB |
-            CPUID_7_0_EBX_SHA_NI,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_UMIP |
-            /* missing bit 5 */
-            CPUID_7_0_ECX_GFNI |
-            CPUID_7_0_ECX_MOVDIRI | CPUID_7_0_ECX_CLDEMOTE |
-            CPUID_7_0_ECX_MOVDIR64B,
+            CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+        .features[FEAT_7_0_EBX] = CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP |
+                                  CPUID_7_0_EBX_ERMS |
+                                  CPUID_7_0_EBX_MPX | /* missing bits 13, 15 */
+                                  CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_SMAP |
+                                  CPUID_7_0_EBX_CLFLUSHOPT |
+                                  CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_SHA_NI,
+        .features[FEAT_7_0_ECX] = CPUID_7_0_ECX_UMIP |
+                                  /* missing bit 5 */
+                                  CPUID_7_0_ECX_GFNI | CPUID_7_0_ECX_MOVDIRI |
+                                  CPUID_7_0_ECX_CLDEMOTE |
+                                  CPUID_7_0_ECX_MOVDIR64B,
         .features[FEAT_7_0_EDX] =
-            CPUID_7_0_EDX_SPEC_CTRL |
-            CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
-            CPUID_7_0_EDX_CORE_CAPABILITY,
-        .features[FEAT_CORE_CAPABILITY] =
-            MSR_CORE_CAP_SPLIT_LOCK_DETECT,
+            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_ARCH_CAPABILITIES |
+            CPUID_7_0_EDX_SPEC_CTRL_SSBD | CPUID_7_0_EDX_CORE_CAPABILITY,
+        .features[FEAT_CORE_CAPABILITY] = MSR_CORE_CAP_SPLIT_LOCK_DETECT,
         /* XSAVES is added in version 3 */
         .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_VMX_BASIC] = MSR_VMX_BASIC_INS_OUTS |
-             MSR_VMX_BASIC_TRUE_CTLS,
-        .features[FEAT_VMX_ENTRY_CTLS] = VMX_VM_ENTRY_IA32E_MODE |
-             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD_IA32_PAT |
-             VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS | VMX_VM_ENTRY_LOAD_IA32_EFER,
-        .features[FEAT_VMX_EPT_VPID_CAPS] = MSR_VMX_EPT_EXECONLY |
-             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB |
-             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
-             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+        .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+        .features[FEAT_VMX_BASIC] =
+            MSR_VMX_BASIC_INS_OUTS | MSR_VMX_BASIC_TRUE_CTLS,
+        .features[FEAT_VMX_ENTRY_CTLS] =
+            VMX_VM_ENTRY_IA32E_MODE | VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+            VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS |
+            VMX_VM_ENTRY_LOAD_IA32_EFER,
+        .features[FEAT_VMX_EPT_VPID_CAPS] =
+            MSR_VMX_EPT_EXECONLY | MSR_VMX_EPT_PAGE_WALK_LENGTH_4 |
+            MSR_VMX_EPT_WB | MSR_VMX_EPT_2MB | MSR_VMX_EPT_1GB |
+            MSR_VMX_EPT_INVEPT | MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT |
+            MSR_VMX_EPT_INVEPT_ALL_CONTEXT | MSR_VMX_EPT_INVVPID |
+            MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
+            MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT |
+            MSR_VMX_EPT_INVVPID_ALL_CONTEXT |
+            MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_AD_BITS,
         .features[FEAT_VMX_EXIT_CTLS] =
-             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
-             VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-             VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_LOAD_IA32_EFER |
-             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
+            VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTROLS |
+            VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_EXIT_LOAD_IA32_PAT |
+            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_IA32_PAT |
+            VMX_VM_EXIT_SAVE_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
         .features[FEAT_VMX_MISC] = MSR_VMX_MISC_ACTIVITY_HLT |
-             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-        .features[FEAT_VMX_PINBASED_CTLS] = VMX_PIN_BASED_EXT_INTR_MASK |
-             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_INTR,
-        .features[FEAT_VMX_PROCBASED_CTLS] = VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
-             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
-             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
-             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
-             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
-             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
-             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
-             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
-             VMX_CPU_BASED_MONITOR_TRAP_FLAG |
-             VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
+                                   MSR_VMX_MISC_STORE_LMA |
+                                   MSR_VMX_MISC_VMWRITE_VMEXIT,
+        .features[FEAT_VMX_PINBASED_CTLS] =
+            VMX_PIN_BASED_EXT_INTR_MASK | VMX_PIN_BASED_NMI_EXITING |
+            VMX_PIN_BASED_VIRTUAL_NMIS | VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
+            VMX_PIN_BASED_POSTED_INTR,
+        .features[FEAT_VMX_PROCBASED_CTLS] =
+            VMX_CPU_BASED_VIRTUAL_INTR_PENDING |
+            VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING |
+            VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING |
+            VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
+            VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EXITING |
+            VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
+            VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITMAPS |
+            VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING |
+            VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_BITMAPS |
+            VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EXITING |
+            VMX_CPU_BASED_MONITOR_TRAP_FLAG |
+            VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS,
         .features[FEAT_VMX_SECONDARY_CTLS] =
-             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
-             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
-             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
+            VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+            VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENABLE_EPT |
+            VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
+            VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+            VMX_SECONDARY_EXEC_ENABLE_VPID |
+            VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST |
+            VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+            VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+            VMX_SECONDARY_EXEC_RDRAND_EXITING |
+            VMX_SECONDARY_EXEC_ENABLE_INVPCID |
+            VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
+            VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
         .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
         .xlevel = 0x80000008,
         .model_id = "Intel Atom Processor (SnowRidge)",
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .props = (PropValue[]) {
-                    { "mpx", "off" },
-                    { "model-id", "Intel Atom Processor (Snowridge, no MPX)" },
-                    { /* end of list */ },
+        .versions =
+            (X86CPUVersionDefinition[]){
+                { .version = 1 },
+                {
+                    .version = 2,
+                    .props =
+                        (PropValue[]){
+                            { "mpx", "off" },
+                            { "model-id",
+                              "Intel Atom Processor (Snowridge, no MPX)" },
+                            { /* end of list */ },
+                        },
                 },
-            },
-            {
-                .version = 3,
-                .note = "XSAVES, no MPX",
-                .props = (PropValue[]) {
-                    { "xsaves", "on" },
-                    { "vmx-xsaves", "on" },
-                    { /* end of list */ },
+                {
+                    .version = 3,
+                    .note = "XSAVES, no MPX",
+                    .props =
+                        (PropValue[]){
+                            { "xsaves", "on" },
+                            { "vmx-xsaves", "on" },
+                            { /* end of list */ },
+                        },
                 },
-            },
-            {
-                .version = 4,
-                .note = "no split lock detect, no core-capability",
-                .props = (PropValue[]) {
-                    { "split-lock-detect", "off" },
-                    { "core-capability", "off" },
-                    { /* end of list */ },
+                {
+                    .version = 4,
+                    .note = "no split lock detect, no core-capability",
+                    .props =
+                        (PropValue[]){
+                            { "split-lock-detect", "off" },
+                            { "core-capability", "off" },
+                            { /* end of list */ },
+                        },
                 },
+                { /* end of list */ },
             },
-            { /* end of list */ },
-        },
     },
     {
         .name = "KnightsMill",
@@ -4357,15 +4263,14 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_CX8 | CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
             CPUID_PSE | CPUID_DE | CPUID_FP87,
         .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-            CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+            CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+            CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+            CPUID_EXT_SSE3 | CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+            CPUID_EXT_MOVBE | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB |
+                                        CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+                                        CPUID_EXT2_SYSCALL,
         .features[FEAT_8000_0001_ECX] =
             CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
         .features[FEAT_7_0_EBX] =
@@ -4374,14 +4279,11 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_AVX512F |
             CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_AVX512PF |
             CPUID_7_0_EBX_AVX512ER,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
+        .features[FEAT_7_0_ECX] = CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
         .features[FEAT_7_0_EDX] =
             CPUID_7_0_EDX_AVX512_4VNNIW | CPUID_7_0_EDX_AVX512_4FMAPS,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
+        .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT,
+        .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
         .xlevel = 0x80000008,
         .model_id = "Intel Xeon Phi Processor (Knights Mill)",
     },
@@ -4398,8 +4300,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
             CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_SSE3,
+        .features[FEAT_1_ECX] = CPUID_EXT_SSE3,
         .features[FEAT_8000_0001_EDX] =
             CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
         .xlevel = 0x80000008,
@@ -4418,12 +4319,10 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
             CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_CX16 | CPUID_EXT_SSE3,
+        .features[FEAT_1_ECX] = CPUID_EXT_CX16 | CPUID_EXT_SSE3,
         .features[FEAT_8000_0001_EDX] =
             CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+        .features[FEAT_8000_0001_ECX] = CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
         .xlevel = 0x80000008,
         .model_id = "AMD Opteron 22xx (Gen 2 Class Opteron)",
     },
@@ -4440,15 +4339,13 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
             CPUID_DE | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_POPCNT | CPUID_EXT_CX16 | CPUID_EXT_MONITOR |
-            CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL |
-            CPUID_EXT2_RDTSCP,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
-            CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+        .features[FEAT_1_ECX] = CPUID_EXT_POPCNT | CPUID_EXT_CX16 |
+                                CPUID_EXT_MONITOR | CPUID_EXT_SSE3,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_NX |
+                                        CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
+        .features[FEAT_8000_0001_ECX] = CPUID_EXT3_MISALIGNSSE |
+                                        CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+                                        CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
         .xlevel = 0x80000008,
         .model_id = "AMD Opteron 23xx (Gen 3 Class Opteron)",
     },
@@ -4466,20 +4363,17 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
             CPUID_DE | CPUID_FP87,
         .features[FEAT_1_ECX] =
-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-            CPUID_EXT_POPCNT | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
-            CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
+            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
+            CPUID_EXT_SSE42 | CPUID_EXT_SSE41 | CPUID_EXT_CX16 |
+            CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB |
+                                        CPUID_EXT2_NX | CPUID_EXT2_SYSCALL |
+                                        CPUID_EXT2_RDTSCP,
         .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
-            CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
-            CPUID_EXT3_SSE4A | CPUID_EXT3_ABM | CPUID_EXT3_SVM |
-            CPUID_EXT3_LAHF_LM,
-        .features[FEAT_SVM] =
-            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
+            CPUID_EXT3_FMA4 | CPUID_EXT3_XOP | CPUID_EXT3_3DNOWPREFETCH |
+            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+            CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+        .features[FEAT_SVM] = CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
         /* no xsaveopt! */
         .xlevel = 0x8000001A,
         .model_id = "AMD Opteron 62xx class CPU",
@@ -4498,317 +4392,261 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
             CPUID_DE | CPUID_FP87,
         .features[FEAT_1_ECX] =
-            CPUID_EXT_F16C | CPUID_EXT_AVX | CPUID_EXT_XSAVE |
-            CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_FMA |
-            CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
+            CPUID_EXT_F16C | CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+            CPUID_EXT_POPCNT | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
+            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB |
+                                        CPUID_EXT2_NX | CPUID_EXT2_SYSCALL |
+                                        CPUID_EXT2_RDTSCP,
         .features[FEAT_8000_0001_ECX] =
             CPUID_EXT3_TBM | CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
             CPUID_EXT3_SSE4A | CPUID_EXT3_ABM | CPUID_EXT3_SVM |
             CPUID_EXT3_LAHF_LM,
-        .features[FEAT_SVM] =
-            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
+        .features[FEAT_SVM] = CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
         /* no xsaveopt! */
         .xlevel = 0x8000001A,
         .model_id = "AMD Opteron 63xx class CPU",
     },
-    {
-        .name = "EPYC",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_AMD,
-        .family = 23,
-        .model = 1,
-        .stepping = 2,
-        .features[FEAT_1_EDX] =
-            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
-            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
-            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
-            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
-            CPUID_VME | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
-            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
-            CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-            CPUID_EXT3_TOPOEXT,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-            CPUID_7_0_EBX_SHA_NI,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_SVM] =
-            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
-        .xlevel = 0x8000001E,
-        .model_id = "AMD EPYC Processor",
-        .cache_info = &epyc_cache_info,
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
+    { .name = "EPYC",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_AMD,
+      .family = 23,
+      .model = 1,
+      .stepping = 2,
+      .features[FEAT_1_EDX] = CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+                              CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT |
+                              CPUID_CMOV | CPUID_MCA | CPUID_PGE | CPUID_MTRR |
+                              CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
+                              CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+                              CPUID_DE | CPUID_VME | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX | CPUID_EXT_XSAVE |
+          CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_MOVBE | CPUID_EXT_SSE42 |
+          CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
+          CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_PDPE1GB | CPUID_EXT2_FFXSR |
+                                      CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
+                                      CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+          CPUID_EXT3_SSE4A | CPUID_EXT3_ABM | CPUID_EXT3_CR8LEG |
+          CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_TOPOEXT,
+      .features[FEAT_7_0_EBX] = CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+                                CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+                                CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
+                                CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP |
+                                CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_SHA_NI,
+      .features[FEAT_XSAVE] =
+          CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_SVM] = CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
+      .xlevel = 0x8000001E,
+      .model_id = "AMD EPYC Processor",
+      .cache_info = &epyc_cache_info,
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
                 .alias = "EPYC-IBPB",
-                .props = (PropValue[]) {
-                    { "ibpb", "on" },
-                    { "model-id",
-                      "AMD EPYC Processor (with IBPB)" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 3,
-                .props = (PropValue[]) {
-                    { "ibpb", "on" },
-                    { "perfctr-core", "on" },
-                    { "clzero", "on" },
-                    { "xsaveerptr", "on" },
-                    { "xsaves", "on" },
-                    { "model-id",
-                      "AMD EPYC Processor" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 4,
-                .props = (PropValue[]) {
-                    { "model-id",
-                      "AMD EPYC-v4 Processor" },
-                    { /* end of list */ }
-                },
-                .cache_info = &epyc_v4_cache_info
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "Dhyana",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_HYGON,
-        .family = 24,
-        .model = 0,
-        .stepping = 1,
-        .features[FEAT_1_EDX] =
-            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
-            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
-            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
-            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
-            CPUID_VME | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-            CPUID_EXT_XSAVE | CPUID_EXT_POPCNT |
-            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
-            CPUID_EXT_MONITOR | CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-            CPUID_EXT3_TOPOEXT,
-        .features[FEAT_8000_0008_EBX] =
-            CPUID_8000_0008_EBX_IBPB,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT,
-        /* XSAVES is added in version 2 */
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_SVM] =
-            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
-        .xlevel = 0x8000001E,
-        .model_id = "Hygon Dhyana Processor",
-        .cache_info = &epyc_cache_info,
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            { .version = 2,
-              .note = "XSAVES",
-              .props = (PropValue[]) {
-                  { "xsaves", "on" },
-                  { /* end of list */ }
+                .props = (PropValue[]){ { "ibpb", "on" },
+                                        { "model-id",
+                                          "AMD EPYC Processor (with IBPB)" },
+                                        { /* end of list */ } } },
+              { .version = 3,
+                .props = (PropValue[]){ { "ibpb", "on" },
+                                        { "perfctr-core", "on" },
+                                        { "clzero", "on" },
+                                        { "xsaveerptr", "on" },
+                                        { "xsaves", "on" },
+                                        { "model-id", "AMD EPYC Processor" },
+                                        { /* end of list */ } } },
+              { .version = 4,
+                .props = (PropValue[]){ { "model-id", "AMD EPYC-v4 Processor" },
+                                        { /* end of list */ } },
+                .cache_info = &epyc_v4_cache_info },
+              { /* end of list */ } } },
+    { .name = "Dhyana",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_HYGON,
+      .family = 24,
+      .model = 0,
+      .stepping = 1,
+      .features[FEAT_1_EDX] = CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+                              CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT |
+                              CPUID_CMOV | CPUID_MCA | CPUID_PGE | CPUID_MTRR |
+                              CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
+                              CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+                              CPUID_DE | CPUID_VME | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX | CPUID_EXT_XSAVE |
+          CPUID_EXT_POPCNT | CPUID_EXT_MOVBE | CPUID_EXT_SSE42 |
+          CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
+          CPUID_EXT_MONITOR | CPUID_EXT_SSE3,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_PDPE1GB | CPUID_EXT2_FFXSR |
+                                      CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
+                                      CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+          CPUID_EXT3_SSE4A | CPUID_EXT3_ABM | CPUID_EXT3_CR8LEG |
+          CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_TOPOEXT,
+      .features[FEAT_8000_0008_EBX] = CPUID_8000_0008_EBX_IBPB,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
+          CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
+          CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT,
+      /* XSAVES is added in version 2 */
+      .features[FEAT_XSAVE] =
+          CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_SVM] = CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
+      .xlevel = 0x8000001E,
+      .model_id = "Hygon Dhyana Processor",
+      .cache_info = &epyc_cache_info,
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              {
+                  .version = 2,
+                  .note = "XSAVES",
+                  .props = (PropValue[]){ { "xsaves", "on" },
+                                          { /* end of list */ } },
               },
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "EPYC-Rome",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_AMD,
-        .family = 23,
-        .model = 49,
-        .stepping = 0,
-        .features[FEAT_1_EDX] =
-            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
-            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
-            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
-            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
-            CPUID_VME | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
-            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
-            CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-            CPUID_EXT3_TOPOEXT | CPUID_EXT3_PERFCORE,
-        .features[FEAT_8000_0008_EBX] =
-            CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR |
-            CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
-            CPUID_8000_0008_EBX_STIBP,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-            CPUID_7_0_EBX_SHA_NI | CPUID_7_0_EBX_CLWB,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_RDPID,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_SVM] =
-            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
-        .xlevel = 0x8000001E,
-        .model_id = "AMD EPYC-Rome Processor",
-        .cache_info = &epyc_rome_cache_info,
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .props = (PropValue[]) {
-                    { "ibrs", "on" },
-                    { "amd-ssbd", "on" },
-                    { /* end of list */ }
-                }
-            },
-            {
-                .version = 3,
-                .props = (PropValue[]) {
-                    { "model-id",
-                      "AMD EPYC-Rome-v3 Processor" },
-                    { /* end of list */ }
-                },
-                .cache_info = &epyc_rome_v3_cache_info
-            },
-            {
-                .version = 4,
-                .props = (PropValue[]) {
-                    /* Erratum 1386 */
-                    { "model-id",
-                      "AMD EPYC-Rome-v4 Processor (no XSAVES)" },
-                    { "xsaves", "off" },
-                    { /* end of list */ }
-                },
-            },
-            { /* end of list */ }
-        }
-    },
-    {
-        .name = "EPYC-Milan",
-        .level = 0xd,
-        .vendor = CPUID_VENDOR_AMD,
-        .family = 25,
-        .model = 1,
-        .stepping = 1,
-        .features[FEAT_1_EDX] =
-            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
-            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
-            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
-            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
-            CPUID_VME | CPUID_FP87,
-        .features[FEAT_1_ECX] =
-            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
-            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
-            CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-            CPUID_EXT_PCID,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
-        .features[FEAT_8000_0001_ECX] =
-            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-            CPUID_EXT3_TOPOEXT | CPUID_EXT3_PERFCORE,
-        .features[FEAT_8000_0008_EBX] =
-            CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR |
-            CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
-            CPUID_8000_0008_EBX_IBRS | CPUID_8000_0008_EBX_STIBP |
-            CPUID_8000_0008_EBX_AMD_SSBD,
-        .features[FEAT_7_0_EBX] =
-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-            CPUID_7_0_EBX_SHA_NI | CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_ERMS |
-            CPUID_7_0_EBX_INVPCID,
-        .features[FEAT_7_0_ECX] =
-            CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_RDPID | CPUID_7_0_ECX_PKU,
-        .features[FEAT_7_0_EDX] =
-            CPUID_7_0_EDX_FSRM,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_SVM] =
-            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE | CPUID_SVM_SVME_ADDR_CHK,
-        .xlevel = 0x8000001E,
-        .model_id = "AMD EPYC-Milan Processor",
-        .cache_info = &epyc_milan_cache_info,
-        .versions = (X86CPUVersionDefinition[]) {
-            { .version = 1 },
-            {
-                .version = 2,
-                .props = (PropValue[]) {
-                    { "model-id",
-                      "AMD EPYC-Milan-v2 Processor" },
-                    { "vaes", "on" },
-                    { "vpclmulqdq", "on" },
-                    { "stibp-always-on", "on" },
-                    { "amd-psfd", "on" },
-                    { "no-nested-data-bp", "on" },
-                    { "lfence-always-serializing", "on" },
-                    { "null-sel-clr-base", "on" },
-                    { /* end of list */ }
-                },
-                .cache_info = &epyc_milan_v2_cache_info
-            },
-            { /* end of list */ }
-        }
-    },
+              { /* end of list */ } } },
+    { .name = "EPYC-Rome",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_AMD,
+      .family = 23,
+      .model = 49,
+      .stepping = 0,
+      .features[FEAT_1_EDX] = CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+                              CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT |
+                              CPUID_CMOV | CPUID_MCA | CPUID_PGE | CPUID_MTRR |
+                              CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
+                              CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+                              CPUID_DE | CPUID_VME | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX | CPUID_EXT_XSAVE |
+          CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_MOVBE | CPUID_EXT_SSE42 |
+          CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
+          CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_PDPE1GB | CPUID_EXT2_FFXSR |
+                                      CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
+                                      CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+          CPUID_EXT3_SSE4A | CPUID_EXT3_ABM | CPUID_EXT3_CR8LEG |
+          CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_TOPOEXT |
+          CPUID_EXT3_PERFCORE,
+      .features[FEAT_8000_0008_EBX] =
+          CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR |
+          CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
+          CPUID_8000_0008_EBX_STIBP,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
+          CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
+          CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
+          CPUID_7_0_EBX_SHA_NI | CPUID_7_0_EBX_CLWB,
+      .features[FEAT_7_0_ECX] = CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_RDPID,
+      .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+                              CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_SVM] = CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
+      .xlevel = 0x8000001E,
+      .model_id = "AMD EPYC-Rome Processor",
+      .cache_info = &epyc_rome_cache_info,
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .props = (PropValue[]){ { "ibrs", "on" },
+                                        { "amd-ssbd", "on" },
+                                        { /* end of list */ } } },
+              { .version = 3,
+                .props =
+                    (PropValue[]){ { "model-id", "AMD EPYC-Rome-v3 Processor" },
+                                   { /* end of list */ } },
+                .cache_info = &epyc_rome_v3_cache_info },
+              {
+                  .version = 4,
+                  .props =
+                      (PropValue[]){
+                          /* Erratum 1386 */
+                          { "model-id",
+                            "AMD EPYC-Rome-v4 Processor (no XSAVES)" },
+                          { "xsaves", "off" },
+                          { /* end of list */ } },
+              },
+              { /* end of list */ } } },
+    { .name = "EPYC-Milan",
+      .level = 0xd,
+      .vendor = CPUID_VENDOR_AMD,
+      .family = 25,
+      .model = 1,
+      .stepping = 1,
+      .features[FEAT_1_EDX] = CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+                              CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT |
+                              CPUID_CMOV | CPUID_MCA | CPUID_PGE | CPUID_MTRR |
+                              CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
+                              CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+                              CPUID_DE | CPUID_VME | CPUID_FP87,
+      .features[FEAT_1_ECX] =
+          CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX | CPUID_EXT_XSAVE |
+          CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_MOVBE | CPUID_EXT_SSE42 |
+          CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
+          CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+          CPUID_EXT_PCID,
+      .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                      CPUID_EXT2_PDPE1GB | CPUID_EXT2_FFXSR |
+                                      CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
+                                      CPUID_EXT2_SYSCALL,
+      .features[FEAT_8000_0001_ECX] =
+          CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+          CPUID_EXT3_SSE4A | CPUID_EXT3_ABM | CPUID_EXT3_CR8LEG |
+          CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_TOPOEXT |
+          CPUID_EXT3_PERFCORE,
+      .features[FEAT_8000_0008_EBX] =
+          CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR |
+          CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
+          CPUID_8000_0008_EBX_IBRS | CPUID_8000_0008_EBX_STIBP |
+          CPUID_8000_0008_EBX_AMD_SSBD,
+      .features[FEAT_7_0_EBX] =
+          CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
+          CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
+          CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
+          CPUID_7_0_EBX_SHA_NI | CPUID_7_0_EBX_CLWB | CPUID_7_0_EBX_ERMS |
+          CPUID_7_0_EBX_INVPCID,
+      .features[FEAT_7_0_ECX] =
+          CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_RDPID | CPUID_7_0_ECX_PKU,
+      .features[FEAT_7_0_EDX] = CPUID_7_0_EDX_FSRM,
+      .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+                              CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
+      .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+      .features[FEAT_SVM] =
+          CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE | CPUID_SVM_SVME_ADDR_CHK,
+      .xlevel = 0x8000001E,
+      .model_id = "AMD EPYC-Milan Processor",
+      .cache_info = &epyc_milan_cache_info,
+      .versions =
+          (X86CPUVersionDefinition[]){
+              { .version = 1 },
+              { .version = 2,
+                .props = (PropValue[]){ { "model-id",
+                                          "AMD EPYC-Milan-v2 Processor" },
+                                        { "vaes", "on" },
+                                        { "vpclmulqdq", "on" },
+                                        { "stibp-always-on", "on" },
+                                        { "amd-psfd", "on" },
+                                        { "no-nested-data-bp", "on" },
+                                        { "lfence-always-serializing", "on" },
+                                        { "null-sel-clr-base", "on" },
+                                        { /* end of list */ } },
+                .cache_info = &epyc_milan_v2_cache_info },
+              { /* end of list */ } } },
     {
         .name = "EPYC-Genoa",
         .level = 0xd,
@@ -4824,15 +4662,14 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_VME | CPUID_FP87,
         .features[FEAT_1_ECX] =
             CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
+            CPUID_EXT_XSAVE | CPUID_EXT_AES | CPUID_EXT_POPCNT |
             CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-            CPUID_EXT_PCID | CPUID_EXT_CX16 | CPUID_EXT_FMA |
-            CPUID_EXT_SSSE3 | CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ |
-            CPUID_EXT_SSE3,
-        .features[FEAT_8000_0001_EDX] =
-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-            CPUID_EXT2_SYSCALL,
+            CPUID_EXT_PCID | CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
+            CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+        .features[FEAT_8000_0001_EDX] = CPUID_EXT2_LM | CPUID_EXT2_RDTSCP |
+                                        CPUID_EXT2_PDPE1GB | CPUID_EXT2_FFXSR |
+                                        CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
+                                        CPUID_EXT2_SYSCALL,
         .features[FEAT_8000_0001_ECX] =
             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
@@ -4842,8 +4679,8 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR |
             CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
             CPUID_8000_0008_EBX_IBRS | CPUID_8000_0008_EBX_STIBP |
-            CPUID_8000_0008_EBX_STIBP_ALWAYS_ON |
-            CPUID_8000_0008_EBX_AMD_SSBD | CPUID_8000_0008_EBX_AMD_PSFD,
+            CPUID_8000_0008_EBX_STIBP_ALWAYS_ON | CPUID_8000_0008_EBX_AMD_SSBD |
+            CPUID_8000_0008_EBX_AMD_PSFD,
         .features[FEAT_8000_0021_EAX] =
             CPUID_8000_0021_EAX_No_NESTED_DATA_BP |
             CPUID_8000_0021_EAX_LFENCE_ALWAYS_SERIALIZING |
@@ -4865,18 +4702,13 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
             CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57 |
             CPUID_7_0_ECX_RDPID,
-        .features[FEAT_7_0_EDX] =
-            CPUID_7_0_EDX_FSRM,
-        .features[FEAT_7_1_EAX] =
-            CPUID_7_1_EAX_AVX512_BF16,
-        .features[FEAT_XSAVE] =
-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
-        .features[FEAT_6_EAX] =
-            CPUID_6_EAX_ARAT,
-        .features[FEAT_SVM] =
-            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE | CPUID_SVM_VNMI |
-            CPUID_SVM_SVME_ADDR_CHK,
+        .features[FEAT_7_0_EDX] = CPUID_7_0_EDX_FSRM,
+        .features[FEAT_7_1_EAX] = CPUID_7_1_EAX_AVX512_BF16,
+        .features[FEAT_XSAVE] = CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+                                CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
+        .features[FEAT_6_EAX] = CPUID_6_EAX_ARAT,
+        .features[FEAT_SVM] = CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE |
+                              CPUID_SVM_VNMI | CPUID_SVM_SVME_ADDR_CHK,
         .xlevel = 0x80000022,
         .model_id = "AMD EPYC-Genoa Processor",
         .cache_info = &epyc_genoa_cache_info,
@@ -4996,16 +4828,13 @@ static char *feature_word_description(FeatureWordInfo *f, uint32_t bit)
     assert(f->type == CPUID_FEATURE_WORD || f->type == MSR_FEATURE_WORD);
 
     switch (f->type) {
-    case CPUID_FEATURE_WORD:
-        {
-            const char *reg = get_register_name_32(f->cpuid.reg);
-            assert(reg);
-            return g_strdup_printf("CPUID.%02XH:%s",
-                                   f->cpuid.eax, reg);
-        }
+    case CPUID_FEATURE_WORD: {
+        const char *reg = get_register_name_32(f->cpuid.reg);
+        assert(reg);
+        return g_strdup_printf("CPUID.%02XH:%s", f->cpuid.eax, reg);
+    }
     case MSR_FEATURE_WORD:
-        return g_strdup_printf("MSR(%02XH)",
-                               f->msr.index);
+        return g_strdup_printf("MSR(%02XH)", f->msr.index);
     }
 
     return NULL;
@@ -5043,9 +4872,7 @@ static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
     for (i = 0; i < 64; ++i) {
         if ((1ULL << i) & mask) {
             g_autofree char *feat_word_str = feature_word_description(f, i);
-            warn_report("%s: %s%s%s [bit %d]",
-                        verbose_prefix,
-                        feat_word_str,
+            warn_report("%s: %s%s%s [bit %d]", verbose_prefix, feat_word_str,
                         f->feat_names[i] ? "." : "",
                         f->feat_names[i] ? f->feat_names[i] : "", i);
         }
@@ -5177,8 +5004,7 @@ static char *x86_cpuid_get_vendor(Object *obj, Error **errp)
     return value;
 }
 
-static void x86_cpuid_set_vendor(Object *obj, const char *value,
-                                 Error **errp)
+static void x86_cpuid_set_vendor(Object *obj, const char *value, Error **errp)
 {
     X86CPU *cpu = X86_CPU(obj);
     CPUX86State *env = &cpu->env;
@@ -5193,7 +5019,7 @@ static void x86_cpuid_set_vendor(Object *obj, const char *value,
     env->cpuid_vendor2 = 0;
     env->cpuid_vendor3 = 0;
     for (i = 0; i < 4; i++) {
-        env->cpuid_vendor1 |= ((uint8_t)value[i    ]) << (8 * i);
+        env->cpuid_vendor1 |= ((uint8_t)value[i]) << (8 * i);
         env->cpuid_vendor2 |= ((uint8_t)value[i + 4]) << (8 * i);
         env->cpuid_vendor3 |= ((uint8_t)value[i + 8]) << (8 * i);
     }
@@ -5267,22 +5093,21 @@ static void x86_cpuid_set_tsc_freq(Object *obj, Visitor *v, const char *name,
 }
 
 /* Generic getter for "feature-words" and "filtered-features" properties */
-static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
-                                      const char *name, void *opaque,
-                                      Error **errp)
+static void x86_cpu_get_feature_words(Object *obj, Visitor *v, const char *name,
+                                      void *opaque, Error **errp)
 {
     uint64_t *array = (uint64_t *)opaque;
     FeatureWord w;
-    X86CPUFeatureWordInfo word_infos[FEATURE_WORDS] = { };
-    X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS] = { };
+    X86CPUFeatureWordInfo word_infos[FEATURE_WORDS] = {};
+    X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS] = {};
     X86CPUFeatureWordInfoList *list = NULL;
 
     for (w = 0; w < FEATURE_WORDS; w++) {
         FeatureWordInfo *wi = &feature_word_info[w];
         /*
-                * We didn't have MSR features when "feature-words" was
-                *  introduced. Therefore skipped other type entries.
-                */
+         * We didn't have MSR features when "feature-words" was
+         *  introduced. Therefore skipped other type entries.
+         */
         if (wi->type != CPUID_FEATURE_WORD) {
             continue;
         }
@@ -5332,7 +5157,8 @@ static const char *x86_cpu_feature_name(FeatureWord w, int bitnr)
     assert(bitnr < 64);
     assert(w < FEATURE_WORDS);
     name = feature_word_info[w].feat_names[bitnr];
-    assert(bitnr < 32 || !(name && feature_word_info[w].type == CPUID_FEATURE_WORD));
+    assert(bitnr < 32 ||
+           !(name && feature_word_info[w].type == CPUID_FEATURE_WORD));
     return name;
 }
 
@@ -5366,8 +5192,7 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
         return;
     }
 
-    for (featurestr = strtok(features, ",");
-         featurestr;
+    for (featurestr = strtok(features, ","); featurestr;
          featurestr = strtok(NULL, ",")) {
         const char *name;
         const char *val = NULL;
@@ -5377,12 +5202,12 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
 
         /* Compatibility syntax: */
         if (featurestr[0] == '+') {
-            plus_features = g_list_append(plus_features,
-                                          g_strdup(featurestr + 1));
+            plus_features =
+                g_list_append(plus_features, g_strdup(featurestr + 1));
             continue;
         } else if (featurestr[0] == '-') {
-            minus_features = g_list_append(minus_features,
-                                           g_strdup(featurestr + 1));
+            minus_features =
+                g_list_append(minus_features, g_strdup(featurestr + 1));
             continue;
         }
 
@@ -5675,8 +5500,7 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
 
 #endif /* !CONFIG_USER_ONLY */
 
-uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
-                                            bool migratable_only)
+uint64_t x86_cpu_get_supported_feature_word(FeatureWord w, bool migratable_only)
 {
     FeatureWordInfo *wi = &feature_word_info[w];
     uint64_t r = 0;
@@ -5685,20 +5509,17 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
         switch (wi->type) {
         case CPUID_FEATURE_WORD:
             r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid.eax,
-                                                        wi->cpuid.ecx,
-                                                        wi->cpuid.reg);
+                                             wi->cpuid.ecx, wi->cpuid.reg);
             break;
         case MSR_FEATURE_WORD:
-            r = kvm_arch_get_supported_msr_feature(kvm_state,
-                        wi->msr.index);
+            r = kvm_arch_get_supported_msr_feature(kvm_state, wi->msr.index);
             break;
         }
     } else if (hvf_enabled()) {
         if (wi->type != CPUID_FEATURE_WORD) {
             return 0;
         }
-        r = hvf_get_supported_cpuid(wi->cpuid.eax,
-                                    wi->cpuid.ecx,
+        r = hvf_get_supported_cpuid(wi->cpuid.eax, wi->cpuid.ecx,
                                     wi->cpuid.reg);
     } else if (tcg_enabled()) {
         r = wi->tcg_features;
@@ -5712,9 +5533,9 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
          * way for userspace to get out of its 32-bit jail, we can leave
          * the LM bit set.
          */
-        uint32_t unavail = tcg_enabled()
-            ? CPUID_EXT2_LM & ~CPUID_EXT2_KERNEL_FEATURES
-            : CPUID_EXT2_LM;
+        uint32_t unavail = tcg_enabled() ?
+                               CPUID_EXT2_LM & ~CPUID_EXT2_KERNEL_FEATURES :
+                               CPUID_EXT2_LM;
         r &= ~unavail;
     }
 #endif
@@ -5747,8 +5568,8 @@ static void x86_cpu_get_supported_cpuid(uint32_t func, uint32_t index,
 }
 
 static void x86_cpu_get_cache_cpuid(uint32_t func, uint32_t index,
-                                    uint32_t *eax, uint32_t *ebx,
-                                    uint32_t *ecx, uint32_t *edx)
+                                    uint32_t *eax, uint32_t *ebx, uint32_t *ecx,
+                                    uint32_t *edx)
 {
     uint32_t level, unused;
 
@@ -5787,8 +5608,7 @@ void x86_cpu_apply_props(X86CPU *cpu, PropValue *props)
         if (!pv->value) {
             continue;
         }
-        object_property_parse(OBJECT(cpu), pv->prop, pv->value,
-                              &error_abort);
+        object_property_parse(OBJECT(cpu), pv->prop, pv->value, &error_abort);
     }
 }
 
@@ -5806,12 +5626,12 @@ static void x86_cpu_apply_version_props(X86CPU *cpu, X86CPUModel *model)
         return;
     }
 
-    for (vdef = x86_cpu_def_get_versions(model->cpudef); vdef->version; vdef++) {
+    for (vdef = x86_cpu_def_get_versions(model->cpudef); vdef->version;
+         vdef++) {
         PropValue *p;
 
         for (p = vdef->props; p && p->prop; p++) {
-            object_property_parse(OBJECT(cpu), p->prop, p->value,
-                                  &error_abort);
+            object_property_parse(OBJECT(cpu), p->prop, p->value, &error_abort);
         }
 
         if (vdef->version == version) {
@@ -5836,7 +5656,8 @@ static const CPUCaches *x86_cpu_get_versioned_cache_info(X86CPU *cpu,
         return cache_info;
     }
 
-    for (vdef = x86_cpu_def_get_versions(model->cpudef); vdef->version; vdef++) {
+    for (vdef = x86_cpu_def_get_versions(model->cpudef); vdef->version;
+         vdef++) {
         if (vdef->cache_info) {
             cache_info = vdef->cache_info;
         }
@@ -5987,12 +5808,11 @@ static void x86_register_cpudef_types(const X86CPUDefinition *def)
             x86_register_cpu_model_type(vdef->alias, am);
         }
     }
-
 }
 
 uint32_t cpu_x86_virtual_addr_width(CPUX86State *env)
 {
-    if  (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_LA57) {
+    if (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_LA57) {
         return 57; /* 57 bits virtual */
     } else {
         return 48; /* 48 bits virtual */
@@ -6000,8 +5820,7 @@ uint32_t cpu_x86_virtual_addr_width(CPUX86State *env)
 }
 
 void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                   uint32_t *eax, uint32_t *ebx,
-                   uint32_t *ecx, uint32_t *edx)
+                   uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
     X86CPU *cpu = env_archcpu(env);
     CPUState *cs = env_cpu(env);
@@ -6033,7 +5852,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
         index = env->cpuid_level;
     }
 
-    switch(index) {
+    switch (index) {
     case 0:
         *eax = env->cpuid_level;
         *ebx = env->cpuid_vendor1;
@@ -6073,9 +5892,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
         } else {
             *ecx = cpuid2_cache_descriptor(env->cache_info_cpuid2.l3_cache);
         }
-        *edx = (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1d_cache) << 16) |
-               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1i_cache) <<  8) |
-               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l2_cache));
+        *edx =
+            (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1d_cache) << 16) |
+            (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1i_cache) << 8) |
+            (cpuid2_cache_descriptor(env->cache_info_cpuid2.l2_cache));
         break;
     case 4:
         /* cache info: needed for Core compatibility */
@@ -6087,8 +5907,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
              */
             if (*eax & 31) {
                 int host_vcpus_per_cache = 1 + ((*eax & 0x3FFC000) >> 14);
-                int vcpus_per_socket = env->nr_dies * cs->nr_cores *
-                                       cs->nr_threads;
+                int vcpus_per_socket =
+                    env->nr_dies * cs->nr_cores * cs->nr_threads;
                 if (cs->nr_cores > 1) {
                     *eax &= ~0xFC000000;
                     *eax |= (pow2ceil(cs->nr_cores) - 1) << 26;
@@ -6104,26 +5924,24 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
             *eax = 0;
             switch (count) {
             case 0: /* L1 dcache info */
-                encode_cache_cpuid4(env->cache_info_cpuid4.l1d_cache,
-                                    1, cs->nr_cores,
-                                    eax, ebx, ecx, edx);
+                encode_cache_cpuid4(env->cache_info_cpuid4.l1d_cache, 1,
+                                    cs->nr_cores, eax, ebx, ecx, edx);
                 break;
             case 1: /* L1 icache info */
-                encode_cache_cpuid4(env->cache_info_cpuid4.l1i_cache,
-                                    1, cs->nr_cores,
-                                    eax, ebx, ecx, edx);
+                encode_cache_cpuid4(env->cache_info_cpuid4.l1i_cache, 1,
+                                    cs->nr_cores, eax, ebx, ecx, edx);
                 break;
             case 2: /* L2 cache info */
                 encode_cache_cpuid4(env->cache_info_cpuid4.l2_cache,
-                                    cs->nr_threads, cs->nr_cores,
-                                    eax, ebx, ecx, edx);
+                                    cs->nr_threads, cs->nr_cores, eax, ebx, ecx,
+                                    edx);
                 break;
             case 3: /* L3 cache info */
                 die_offset = apicid_die_offset(&topo_info);
                 if (cpu->enable_l3_cache) {
                     encode_cache_cpuid4(env->cache_info_cpuid4.l3_cache,
-                                        (1 << die_offset), cs->nr_cores,
-                                        eax, ebx, ecx, edx);
+                                        (1 << die_offset), cs->nr_cores, eax,
+                                        ebx, ecx, edx);
                     break;
                 }
                 /* fall through */
@@ -6167,14 +5985,14 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
             if ((*ebx & CPUID_7_0_EBX_SGX) &&
                 (!kvm_enabled() ||
                  !(kvm_arch_get_supported_cpuid(cs->kvm_state, 0x7, 0, R_EBX) &
-                    CPUID_7_0_EBX_SGX))) {
+                   CPUID_7_0_EBX_SGX))) {
                 *ebx &= ~CPUID_7_0_EBX_SGX;
             }
 
             if ((*ecx & CPUID_7_0_ECX_SGX_LC) &&
                 (!(*ebx & CPUID_7_0_EBX_SGX) || !kvm_enabled() ||
                  !(kvm_arch_get_supported_cpuid(cs->kvm_state, 0x7, 0, R_ECX) &
-                    CPUID_7_0_ECX_SGX_LC))) {
+                   CPUID_7_0_ECX_SGX_LC))) {
                 *ecx &= ~CPUID_7_0_ECX_SGX_LC;
             }
         } else if (count == 1) {
@@ -6215,8 +6033,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
     case 0xB:
         /* Extended Topology Enumeration Leaf */
         if (!cpu->enable_cpuid_0xb) {
-                *eax = *ebx = *ecx = *edx = 0;
-                break;
+            *eax = *ebx = *ecx = *edx = 0;
+            break;
         }
 
         *ecx = count & 0xff;
@@ -6318,8 +6136,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
             } else {
                 *ecx &= ~XSTATE_ARCH_LBR_MASK;
             }
-        } else if (count == 0xf &&
-                   accel_uses_host_cpuid() && cpu->enable_pmu &&
+        } else if (count == 0xf && accel_uses_host_cpuid() && cpu->enable_pmu &&
                    (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_ARCH_LBR)) {
             x86_cpu_get_supported_cpuid(0xD, count, eax, ebx, ecx, edx);
         } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
@@ -6433,8 +6250,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
             /* Highest numbered palette subleaf */
             *eax = INTEL_AMX_TILE_MAX_SUBLEAF;
         } else if (count == 1) {
-            *eax = INTEL_AMX_TOTAL_TILE_BYTES |
-                   (INTEL_AMX_BYTES_PER_TILE << 16);
+            *eax =
+                INTEL_AMX_TOTAL_TILE_BYTES | (INTEL_AMX_BYTES_PER_TILE << 16);
             *ebx = INTEL_AMX_BYTES_PER_ROW | (INTEL_AMX_TILE_MAX_NAMES << 16);
             *ecx = INTEL_AMX_TILE_MAX_ROWS;
         }
@@ -6500,7 +6317,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
             if (env->cpuid_vendor1 != CPUID_VENDOR_INTEL_1 ||
                 env->cpuid_vendor2 != CPUID_VENDOR_INTEL_2 ||
                 env->cpuid_vendor3 != CPUID_VENDOR_INTEL_3) {
-                *ecx |= 1 << 1;    /* CmpLegacy bit */
+                *ecx |= 1 << 1; /* CmpLegacy bit */
             }
         }
         if (tcg_enabled() && env->cpuid_vendor1 == CPUID_VENDOR_INTEL_1 &&
@@ -6523,9 +6340,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
             break;
         }
         *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
-               (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+               (L1_ITLB_2M_ASSOC << 8) | (L1_ITLB_2M_ENTRIES);
         *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
-               (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
+               (L1_ITLB_4K_ASSOC << 8) | (L1_ITLB_4K_ENTRIES);
         *ecx = encode_cache_cpuid80000005(env->cache_info_amd.l1d_cache);
         *edx = encode_cache_cpuid80000005(env->cache_info_amd.l1i_cache);
         break;
@@ -6537,16 +6354,14 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
         }
         *eax = (AMD_ENC_ASSOC(L2_DTLB_2M_ASSOC) << 28) |
                (L2_DTLB_2M_ENTRIES << 16) |
-               (AMD_ENC_ASSOC(L2_ITLB_2M_ASSOC) << 12) |
-               (L2_ITLB_2M_ENTRIES);
+               (AMD_ENC_ASSOC(L2_ITLB_2M_ASSOC) << 12) | (L2_ITLB_2M_ENTRIES);
         *ebx = (AMD_ENC_ASSOC(L2_DTLB_4K_ASSOC) << 28) |
                (L2_DTLB_4K_ENTRIES << 16) |
-               (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) |
-               (L2_ITLB_4K_ENTRIES);
-        encode_cache_cpuid80000006(env->cache_info_amd.l2_cache,
-                                   cpu->enable_l3_cache ?
-                                   env->cache_info_amd.l3_cache : NULL,
-                                   ecx, edx);
+               (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) | (L2_ITLB_4K_ENTRIES);
+        encode_cache_cpuid80000006(
+            env->cache_info_amd.l2_cache,
+            cpu->enable_l3_cache ? env->cache_info_amd.l3_cache : NULL, ecx,
+            edx);
         break;
     case 0x80000007:
         *eax = 0;
@@ -6559,7 +6374,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
         *eax = cpu->phys_bits;
         if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
             /* 64 bit processor */
-             *eax |= (cpu_x86_virtual_addr_width(env) << 8);
+            *eax |= (cpu_x86_virtual_addr_width(env) << 8);
         }
         *ebx = env->features[FEAT_8000_0008_EBX];
         if (cs->nr_cores * cs->nr_threads > 1) {
@@ -6605,12 +6420,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
                                        &topo_info, eax, ebx, ecx, edx);
             break;
         case 2: /* L2 cache info */
-            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache,
-                                       &topo_info, eax, ebx, ecx, edx);
+            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache, &topo_info,
+                                       eax, ebx, ecx, edx);
             break;
         case 3: /* L3 cache info */
-            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache,
-                                       &topo_info, eax, ebx, ecx, edx);
+            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache, &topo_info,
+                                       eax, ebx, ecx, edx);
             break;
         default: /* end of info */
             *eax = *ebx = *ecx = *edx = 0;
@@ -6721,22 +6536,22 @@ static void x86_cpu_reset_hold(Object *obj)
 
     cpu_x86_load_seg_cache(env, R_CS, 0xf000, 0xffff0000, 0xffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_CS_MASK |
-                           DESC_R_MASK | DESC_A_MASK);
+                               DESC_R_MASK | DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_DS, 0, 0, 0xffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_A_MASK);
+                               DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_ES, 0, 0, 0xffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_A_MASK);
+                               DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_SS, 0, 0, 0xffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_A_MASK);
+                               DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_FS, 0, 0, 0xffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_A_MASK);
+                               DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_GS, 0, 0, 0xffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_A_MASK);
+                               DESC_A_MASK);
 
     env->eip = 0xfff0;
     env->regs[R_EDX] = env->cpuid_version;
@@ -6837,7 +6652,7 @@ static void x86_cpu_reset_hold(Object *obj)
 
     x86_cpu_set_sgxlepubkeyhash(env);
 
-    env->amd_tsc_scale_msr =  MSR_AMD64_TSC_RATIO_DEFAULT;
+    env->amd_tsc_scale_msr = MSR_AMD64_TSC_RATIO_DEFAULT;
 
 #endif
 }
@@ -6860,11 +6675,11 @@ static void mce_init(X86CPU *cpu)
     CPUX86State *cenv = &cpu->env;
     unsigned int bank;
 
-    if (((cenv->cpuid_version >> 8) & 0xf) >= 6
-        && (cenv->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) ==
+    if (((cenv->cpuid_version >> 8) & 0xf) >= 6 &&
+        (cenv->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) ==
             (CPUID_MCE | CPUID_MCA)) {
-        cenv->mcg_cap = MCE_CAP_DEF | MCE_BANKS_DEF |
-                        (cpu->enable_lmce ? MCG_LMCE_P : 0);
+        cenv->mcg_cap =
+            MCE_CAP_DEF | MCE_BANKS_DEF | (cpu->enable_lmce ? MCG_LMCE_P : 0);
         cenv->mcg_ctl = ~(uint64_t)0;
         for (bank = 0; bank < MCE_BANKS_DEF; bank++) {
             cenv->mce_banks[bank * 4] = ~(uint64_t)0;
@@ -6895,18 +6710,17 @@ static void x86_cpu_adjust_feat_level(X86CPU *cpu, FeatureWord w)
     switch (region) {
     case 0x00000000:
         x86_cpu_adjust_level(cpu, &env->cpuid_min_level, eax);
-    break;
+        break;
     case 0x80000000:
         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, eax);
-    break;
+        break;
     case 0xC0000000:
         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel2, eax);
-    break;
+        break;
     }
 
     if (eax == 7) {
-        x86_cpu_adjust_level(cpu, &env->cpuid_min_level_func7,
-                             fi->cpuid.ecx);
+        x86_cpu_adjust_level(cpu, &env->cpuid_min_level_func7, fi->cpuid.ecx);
     }
 }
 
@@ -7025,12 +6839,16 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
     for (i = 0; i < ARRAY_SIZE(feature_dependencies); i++) {
         FeatureDep *d = &feature_dependencies[i];
         if (!(env->features[d->from.index] & d->from.mask)) {
-            uint64_t unavailable_features = env->features[d->to.index] & d->to.mask;
+            uint64_t unavailable_features =
+                env->features[d->to.index] & d->to.mask;
 
-            /* Not an error unless the dependent feature was added explicitly.  */
+            /* Not an error unless the dependent feature was added explicitly.
+             */
             mark_unavailable_features(cpu, d->to.index,
-                                      unavailable_features & env->user_features[d->to.index],
-                                      "This feature depends on other features that were not requested");
+                                      unavailable_features &
+                                          env->user_features[d->to.index],
+                                      "This feature depends on other features "
+                                      "that were not requested");
 
             env->features[d->to.index] &= ~unavailable_features;
         }
@@ -7065,9 +6883,10 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
             if (cpu->intel_pt_auto_level) {
                 x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
             } else if (cpu->env.cpuid_min_level < 0x14) {
-                mark_unavailable_features(cpu, FEAT_7_0_EBX,
-                    CPUID_7_0_EBX_INTEL_PT,
-                    "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,intel-pt=on,min-level=0x14\"");
+                mark_unavailable_features(
+                    cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT,
+                    "Intel PT need CPUID leaf 0x14, please set by \"-cpu "
+                    "...,intel-pt=on,min-level=0x14\"");
             }
         }
 
@@ -7135,14 +6954,13 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
     const char *prefix = NULL;
 
     if (verbose) {
-        prefix = accel_uses_host_cpuid()
-                 ? "host doesn't support requested feature"
-                 : "TCG doesn't support requested feature";
+        prefix = accel_uses_host_cpuid() ?
+                     "host doesn't support requested feature" :
+                     "TCG doesn't support requested feature";
     }
 
     for (w = 0; w < FEATURE_WORDS; w++) {
-        uint64_t host_feat =
-            x86_cpu_get_supported_feature_word(w, false);
+        uint64_t host_feat = x86_cpu_get_supported_feature_word(w, false);
         uint64_t requested_features = env->features[w];
         uint64_t unavailable_features = requested_features & ~host_feat;
         mark_unavailable_features(cpu, w, unavailable_features, prefix);
@@ -7158,21 +6976,22 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
         uint32_t ebx_1 = kvm_arch_get_supported_cpuid(s, 0x14, 1, R_EBX);
 
         if (!eax_0 ||
-           ((ebx_0 & INTEL_PT_MINIMAL_EBX) != INTEL_PT_MINIMAL_EBX) ||
-           ((ecx_0 & INTEL_PT_MINIMAL_ECX) != INTEL_PT_MINIMAL_ECX) ||
-           ((eax_1 & INTEL_PT_MTC_BITMAP) != INTEL_PT_MTC_BITMAP) ||
-           ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) <
-                                           INTEL_PT_ADDR_RANGES_NUM) ||
-           ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) !=
-                (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) ||
-           ((ecx_0 & CPUID_14_0_ECX_LIP) !=
-                (env->features[FEAT_14_0_ECX] & CPUID_14_0_ECX_LIP))) {
+            ((ebx_0 & INTEL_PT_MINIMAL_EBX) != INTEL_PT_MINIMAL_EBX) ||
+            ((ecx_0 & INTEL_PT_MINIMAL_ECX) != INTEL_PT_MINIMAL_ECX) ||
+            ((eax_1 & INTEL_PT_MTC_BITMAP) != INTEL_PT_MTC_BITMAP) ||
+            ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) <
+             INTEL_PT_ADDR_RANGES_NUM) ||
+            ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) !=
+             (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) ||
+            ((ecx_0 & CPUID_14_0_ECX_LIP) !=
+             (env->features[FEAT_14_0_ECX] & CPUID_14_0_ECX_LIP))) {
             /*
              * Processor Trace capabilities aren't configurable, so if the
              * host can't emulate the capabilities we report on
              * cpu_x86_cpuid(), intel-pt can't be enabled on the current host.
              */
-            mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, prefix);
+            mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT,
+                                      prefix);
         }
     }
 }
@@ -7266,9 +7085,10 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
             return;
         }
         if (requested_lbr_fmt != host_lbr_fmt) {
-            error_setg(errp, "vPMU: the lbr-fmt value (0x%x) does not match "
-                        "the host value (0x%x).",
-                        requested_lbr_fmt, host_lbr_fmt);
+            error_setg(errp,
+                       "vPMU: the lbr-fmt value (0x%x) does not match "
+                       "the host value (0x%x).",
+                       requested_lbr_fmt, host_lbr_fmt);
             return;
         }
     }
@@ -7276,10 +7096,9 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
     x86_cpu_filter_features(cpu, cpu->check_cpuid || cpu->enforce_cpuid);
 
     if (cpu->enforce_cpuid && x86_cpu_have_filtered_features(cpu)) {
-        error_setg(&local_err,
-                   accel_uses_host_cpuid() ?
-                       "Host doesn't support requested features" :
-                       "TCG doesn't support requested features");
+        error_setg(&local_err, accel_uses_host_cpuid() ?
+                                   "Host doesn't support requested features" :
+                                   "TCG doesn't support requested features");
         goto out;
     }
 
@@ -7288,8 +7107,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
      */
     if (IS_AMD_CPU(env)) {
         env->features[FEAT_8000_0001_EDX] &= ~CPUID_EXT2_AMD_ALIASES;
-        env->features[FEAT_8000_0001_EDX] |= (env->features[FEAT_1_EDX]
-           & CPUID_EXT2_AMD_ALIASES);
+        env->features[FEAT_8000_0001_EDX] |=
+            (env->features[FEAT_1_EDX] & CPUID_EXT2_AMD_ALIASES);
     }
 
     x86_cpu_set_sgxlepubkeyhash(env);
@@ -7346,12 +7165,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
      * accel-specific code in cpu_exec_realizefn.
      */
     if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
-        if (cpu->phys_bits &&
-            (cpu->phys_bits > TARGET_PHYS_ADDR_SPACE_BITS ||
-            cpu->phys_bits < 32)) {
-            error_setg(errp, "phys-bits should be between 32 and %u "
-                             " (but is %u)",
-                             TARGET_PHYS_ADDR_SPACE_BITS, cpu->phys_bits);
+        if (cpu->phys_bits && (cpu->phys_bits > TARGET_PHYS_ADDR_SPACE_BITS ||
+                               cpu->phys_bits < 32)) {
+            error_setg(errp,
+                       "phys-bits should be between 32 and %u "
+                       " (but is %u)",
+                       TARGET_PHYS_ADDR_SPACE_BITS, cpu->phys_bits);
             return;
         }
         /*
@@ -7385,8 +7204,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
 
         if (!xcc->model || !cache_info) {
             g_autofree char *name = x86_cpu_class_get_model_name(xcc);
-            error_setg(errp,
-                       "CPU model '%s' doesn't support legacy-cache=off", name);
+            error_setg(errp, "CPU model '%s' doesn't support legacy-cache=off",
+                       name);
             return;
         }
         env->cache_info_cpuid2 = env->cache_info_cpuid4 = env->cache_info_amd =
@@ -7437,12 +7256,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
     if (IS_AMD_CPU(env) &&
         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
         cs->nr_threads > 1 && !ht_warned) {
-            warn_report("This family of AMD CPU doesn't support "
-                        "hyperthreading(%d)",
-                        cs->nr_threads);
-            error_printf("Please configure -smp options properly"
-                         " or try enabling topoext feature.\n");
-            ht_warned = true;
+        warn_report("This family of AMD CPU doesn't support "
+                    "hyperthreading(%d)",
+                    cs->nr_threads);
+        error_printf("Please configure -smp options properly"
+                     " or try enabling topoext feature.\n");
+        ht_warned = true;
     }
 
 #ifndef CONFIG_USER_ONLY
@@ -7526,10 +7345,8 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
  * multiple bits in the same FeatureWord. In that case, the getter will return
  * true only if all bits are set.
  */
-static void x86_cpu_register_bit_prop(X86CPUClass *xcc,
-                                      const char *prop_name,
-                                      FeatureWord w,
-                                      int bitnr)
+static void x86_cpu_register_bit_prop(X86CPUClass *xcc, const char *prop_name,
+                                      FeatureWord w, int bitnr)
 {
     ObjectClass *oc = OBJECT_CLASS(xcc);
     BitProperty *fp;
@@ -7545,15 +7362,12 @@ static void x86_cpu_register_bit_prop(X86CPUClass *xcc,
         fp = g_new0(BitProperty, 1);
         fp->w = w;
         fp->mask = mask;
-        object_class_property_add(oc, prop_name, "bool",
-                                  x86_cpu_get_bit_prop,
-                                  x86_cpu_set_bit_prop,
-                                  NULL, fp);
+        object_class_property_add(oc, prop_name, "bool", x86_cpu_get_bit_prop,
+                                  x86_cpu_set_bit_prop, NULL, fp);
     }
 }
 
-static void x86_cpu_register_feature_bit_props(X86CPUClass *xcc,
-                                               FeatureWord w,
+static void x86_cpu_register_feature_bit_props(X86CPUClass *xcc, FeatureWord w,
                                                int bitnr)
 {
     FeatureWordInfo *fi = &feature_word_info[w];
@@ -7589,11 +7403,11 @@ static void x86_cpu_initfn(Object *obj)
     cpu_set_cpustate_pointers(cpu);
 
     object_property_add(obj, "feature-words", "X86CPUFeatureWordInfo",
-                        x86_cpu_get_feature_words,
-                        NULL, NULL, (void *)env->features);
+                        x86_cpu_get_feature_words, NULL, NULL,
+                        (void *)env->features);
     object_property_add(obj, "filtered-features", "X86CPUFeatureWordInfo",
-                        x86_cpu_get_feature_words,
-                        NULL, NULL, (void *)cpu->filtered_features);
+                        x86_cpu_get_feature_words, NULL, NULL,
+                        (void *)cpu->filtered_features);
 
     object_property_add_alias(obj, "sse3", obj, "pni");
     object_property_add_alias(obj, "pclmuldq", obj, "pclmulqdq");
@@ -7699,10 +7513,10 @@ int x86_cpu_pending_interrupt(CPUState *cs, int interrupt_request)
             return CPU_INTERRUPT_HARD;
 #if !defined(CONFIG_USER_ONLY)
         } else if (env->hflags2 & HF2_VGIF_MASK) {
-            if((interrupt_request & CPU_INTERRUPT_VIRQ) &&
-                   (env->eflags & IF_MASK) &&
-                   !(env->hflags & HF_INHIBIT_IRQ_MASK)) {
-                        return CPU_INTERRUPT_VIRQ;
+            if ((interrupt_request & CPU_INTERRUPT_VIRQ) &&
+                (env->eflags & IF_MASK) &&
+                !(env->hflags & HF_INHIBIT_IRQ_MASK)) {
+                return CPU_INTERRUPT_VIRQ;
             }
 #endif
         }
@@ -7721,32 +7535,31 @@ static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
     X86CPU *cpu = X86_CPU(cs);
     CPUX86State *env = &cpu->env;
 
-    info->mach = (env->hflags & HF_CS64_MASK ? bfd_mach_x86_64
-                  : env->hflags & HF_CS32_MASK ? bfd_mach_i386_i386
-                  : bfd_mach_i386_i8086);
+    info->mach = (env->hflags & HF_CS64_MASK ? bfd_mach_x86_64 :
+                  env->hflags & HF_CS32_MASK ? bfd_mach_i386_i386 :
+                                               bfd_mach_i386_i8086);
 
     info->cap_arch = CS_ARCH_X86;
-    info->cap_mode = (env->hflags & HF_CS64_MASK ? CS_MODE_64
-                      : env->hflags & HF_CS32_MASK ? CS_MODE_32
-                      : CS_MODE_16);
+    info->cap_mode = (env->hflags & HF_CS64_MASK ? CS_MODE_64 :
+                      env->hflags & HF_CS32_MASK ? CS_MODE_32 :
+                                                   CS_MODE_16);
     info->cap_insn_unit = 1;
     info->cap_insn_split = 8;
 }
 
 void x86_update_hflags(CPUX86State *env)
 {
-   uint32_t hflags;
-#define HFLAG_COPY_MASK \
-    ~( HF_CPL_MASK | HF_PE_MASK | HF_MP_MASK | HF_EM_MASK | \
-       HF_TS_MASK | HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK | \
-       HF_OSFXSR_MASK | HF_LMA_MASK | HF_CS32_MASK | \
-       HF_SS32_MASK | HF_CS64_MASK | HF_ADDSEG_MASK)
+    uint32_t hflags;
+#define HFLAG_COPY_MASK                                                       \
+    ~(HF_CPL_MASK | HF_PE_MASK | HF_MP_MASK | HF_EM_MASK | HF_TS_MASK |       \
+      HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK | HF_OSFXSR_MASK | HF_LMA_MASK | \
+      HF_CS32_MASK | HF_SS32_MASK | HF_CS64_MASK | HF_ADDSEG_MASK)
 
     hflags = env->hflags & HFLAG_COPY_MASK;
     hflags |= (env->segs[R_SS].flags >> DESC_DPL_SHIFT) & HF_CPL_MASK;
     hflags |= (env->cr[0] & CR0_PE_MASK) << (HF_PE_SHIFT - CR0_PE_SHIFT);
     hflags |= (env->cr[0] << (HF_MP_SHIFT - CR0_MP_SHIFT)) &
-                (HF_MP_MASK | HF_EM_MASK | HF_TS_MASK);
+              (HF_MP_MASK | HF_EM_MASK | HF_TS_MASK);
     hflags |= (env->eflags & (HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK));
 
     if (env->cr[4] & CR4_OSFXSR_MASK) {
@@ -7761,15 +7574,16 @@ void x86_update_hflags(CPUX86State *env)
         hflags |= HF_CS32_MASK | HF_SS32_MASK | HF_CS64_MASK;
     } else {
         hflags |= (env->segs[R_CS].flags & DESC_B_MASK) >>
-                    (DESC_B_SHIFT - HF_CS32_SHIFT);
+                  (DESC_B_SHIFT - HF_CS32_SHIFT);
         hflags |= (env->segs[R_SS].flags & DESC_B_MASK) >>
-                    (DESC_B_SHIFT - HF_SS32_SHIFT);
+                  (DESC_B_SHIFT - HF_SS32_SHIFT);
         if (!(env->cr[0] & CR0_PE_MASK) || (env->eflags & VM_MASK) ||
             !(hflags & HF_CS32_MASK)) {
             hflags |= HF_ADDSEG_MASK;
         } else {
             hflags |= ((env->segs[R_DS].base | env->segs[R_ES].base |
-                        env->segs[R_SS].base) != 0) << HF_ADDSEG_SHIFT;
+                        env->segs[R_SS].base) != 0)
+                      << HF_ADDSEG_SHIFT;
         }
     }
     env->hflags = hflags;
@@ -7798,36 +7612,33 @@ static Property x86_cpu_properties[] = {
                        HYPERV_SPINLOCK_NEVER_NOTIFY),
     DEFINE_PROP_BIT64("hv-relaxed", X86CPU, hyperv_features,
                       HYPERV_FEAT_RELAXED, 0),
-    DEFINE_PROP_BIT64("hv-vapic", X86CPU, hyperv_features,
-                      HYPERV_FEAT_VAPIC, 0),
-    DEFINE_PROP_BIT64("hv-time", X86CPU, hyperv_features,
-                      HYPERV_FEAT_TIME, 0),
-    DEFINE_PROP_BIT64("hv-crash", X86CPU, hyperv_features,
-                      HYPERV_FEAT_CRASH, 0),
-    DEFINE_PROP_BIT64("hv-reset", X86CPU, hyperv_features,
-                      HYPERV_FEAT_RESET, 0),
+    DEFINE_PROP_BIT64("hv-vapic", X86CPU, hyperv_features, HYPERV_FEAT_VAPIC,
+                      0),
+    DEFINE_PROP_BIT64("hv-time", X86CPU, hyperv_features, HYPERV_FEAT_TIME, 0),
+    DEFINE_PROP_BIT64("hv-crash", X86CPU, hyperv_features, HYPERV_FEAT_CRASH,
+                      0),
+    DEFINE_PROP_BIT64("hv-reset", X86CPU, hyperv_features, HYPERV_FEAT_RESET,
+                      0),
     DEFINE_PROP_BIT64("hv-vpindex", X86CPU, hyperv_features,
                       HYPERV_FEAT_VPINDEX, 0),
     DEFINE_PROP_BIT64("hv-runtime", X86CPU, hyperv_features,
                       HYPERV_FEAT_RUNTIME, 0),
-    DEFINE_PROP_BIT64("hv-synic", X86CPU, hyperv_features,
-                      HYPERV_FEAT_SYNIC, 0),
-    DEFINE_PROP_BIT64("hv-stimer", X86CPU, hyperv_features,
-                      HYPERV_FEAT_STIMER, 0),
+    DEFINE_PROP_BIT64("hv-synic", X86CPU, hyperv_features, HYPERV_FEAT_SYNIC,
+                      0),
+    DEFINE_PROP_BIT64("hv-stimer", X86CPU, hyperv_features, HYPERV_FEAT_STIMER,
+                      0),
     DEFINE_PROP_BIT64("hv-frequencies", X86CPU, hyperv_features,
                       HYPERV_FEAT_FREQUENCIES, 0),
     DEFINE_PROP_BIT64("hv-reenlightenment", X86CPU, hyperv_features,
                       HYPERV_FEAT_REENLIGHTENMENT, 0),
     DEFINE_PROP_BIT64("hv-tlbflush", X86CPU, hyperv_features,
                       HYPERV_FEAT_TLBFLUSH, 0),
-    DEFINE_PROP_BIT64("hv-evmcs", X86CPU, hyperv_features,
-                      HYPERV_FEAT_EVMCS, 0),
-    DEFINE_PROP_BIT64("hv-ipi", X86CPU, hyperv_features,
-                      HYPERV_FEAT_IPI, 0),
+    DEFINE_PROP_BIT64("hv-evmcs", X86CPU, hyperv_features, HYPERV_FEAT_EVMCS,
+                      0),
+    DEFINE_PROP_BIT64("hv-ipi", X86CPU, hyperv_features, HYPERV_FEAT_IPI, 0),
     DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
                       HYPERV_FEAT_STIMER_DIRECT, 0),
-    DEFINE_PROP_BIT64("hv-avic", X86CPU, hyperv_features,
-                      HYPERV_FEAT_AVIC, 0),
+    DEFINE_PROP_BIT64("hv-avic", X86CPU, hyperv_features, HYPERV_FEAT_AVIC, 0),
     DEFINE_PROP_BIT64("hv-emsr-bitmap", X86CPU, hyperv_features,
                       HYPERV_FEAT_MSR_BITMAP, 0),
     DEFINE_PROP_BIT64("hv-xmm-input", X86CPU, hyperv_features,
@@ -7838,8 +7649,8 @@ static Property x86_cpu_properties[] = {
                       HYPERV_FEAT_TLBFLUSH_DIRECT, 0),
     DEFINE_PROP_ON_OFF_AUTO("hv-no-nonarch-coresharing", X86CPU,
                             hyperv_no_nonarch_cs, ON_OFF_AUTO_OFF),
-    DEFINE_PROP_BIT64("hv-syndbg", X86CPU, hyperv_features,
-                      HYPERV_FEAT_SYNDBG, 0),
+    DEFINE_PROP_BIT64("hv-syndbg", X86CPU, hyperv_features, HYPERV_FEAT_SYNDBG,
+                      0),
     DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
     DEFINE_PROP_BOOL("hv-enforce-cpuid", X86CPU, hyperv_enforce_cpuid, false),
 
@@ -7871,7 +7682,8 @@ static Property x86_cpu_properties[] = {
     DEFINE_PROP_UINT32("min-xlevel", X86CPU, env.cpuid_min_xlevel, 0),
     DEFINE_PROP_UINT32("min-xlevel2", X86CPU, env.cpuid_min_xlevel2, 0),
     DEFINE_PROP_UINT64("ucode-rev", X86CPU, ucode_rev, 0),
-    DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
+    DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level,
+                     true),
     DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor),
     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
     DEFINE_PROP_BOOL("x-vendor-cpuid-only", X86CPU, vendor_cpuid_only, true),
@@ -7883,8 +7695,7 @@ static Property x86_cpu_properties[] = {
                      false),
     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
-    DEFINE_PROP_BOOL("x-migrate-smi-count", X86CPU, migrate_smi_count,
-                     true),
+    DEFINE_PROP_BOOL("x-migrate-smi-count", X86CPU, migrate_smi_count, true),
     /*
      * lecacy_cache defaults to true unless the CPU model provides its
      * own cache information (see x86_cpu_load_def()).
@@ -7973,24 +7784,20 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
 
     dc->user_creatable = true;
 
-    object_class_property_add(oc, "family", "int",
-                              x86_cpuid_version_get_family,
+    object_class_property_add(oc, "family", "int", x86_cpuid_version_get_family,
                               x86_cpuid_version_set_family, NULL, NULL);
-    object_class_property_add(oc, "model", "int",
-                              x86_cpuid_version_get_model,
+    object_class_property_add(oc, "model", "int", x86_cpuid_version_get_model,
                               x86_cpuid_version_set_model, NULL, NULL);
     object_class_property_add(oc, "stepping", "int",
                               x86_cpuid_version_get_stepping,
                               x86_cpuid_version_set_stepping, NULL, NULL);
-    object_class_property_add_str(oc, "vendor",
-                                  x86_cpuid_get_vendor,
+    object_class_property_add_str(oc, "vendor", x86_cpuid_get_vendor,
                                   x86_cpuid_set_vendor);
-    object_class_property_add_str(oc, "model-id",
-                                  x86_cpuid_get_model_id,
+    object_class_property_add_str(oc, "model-id", x86_cpuid_get_model_id,
                                   x86_cpuid_set_model_id);
     object_class_property_add(oc, "tsc-frequency", "int",
-                              x86_cpuid_get_tsc_freq,
-                              x86_cpuid_set_tsc_freq, NULL, NULL);
+                              x86_cpuid_get_tsc_freq, x86_cpuid_set_tsc_freq,
+                              NULL, NULL);
     /*
      * The "unavailable-features" property has the same semantics as
      * CpuDefinitionInfo.unavailable-features on the "query-cpu-definitions"
@@ -7998,8 +7805,8 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
      * CPU from running if the "enforce" flag was set.
      */
     object_class_property_add(oc, "unavailable-features", "strList",
-                              x86_cpu_get_unavailable_features,
-                              NULL, NULL, NULL);
+                              x86_cpu_get_unavailable_features, NULL, NULL,
+                              NULL);
 
 #if !defined(CONFIG_USER_ONLY)
     object_class_property_add(oc, "crash-information", "GuestPanicInformation",
@@ -8038,9 +7845,9 @@ static void x86_cpu_base_class_init(ObjectClass *oc, void *data)
 }
 
 static const TypeInfo x86_base_cpu_type_info = {
-        .name = X86_CPU_TYPE_NAME("base"),
-        .parent = TYPE_X86_CPU,
-        .class_init = x86_cpu_base_class_init,
+    .name = X86_CPU_TYPE_NAME("base"),
+    .parent = TYPE_X86_CPU,
+    .class_init = x86_cpu_base_class_init,
 };
 
 static void x86_cpu_register_types(void)

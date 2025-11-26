@@ -27,7 +27,7 @@
         .base = VMCS_GUEST_##seg##_BASE,              \
         .limit = VMCS_GUEST_##seg##_LIMIT,            \
         .ar_bytes = VMCS_GUEST_##seg##_ACCESS_RIGHTS, \
-}
+    }
 
 static const struct vmx_segment_field {
     int selector;
@@ -35,14 +35,9 @@ static const struct vmx_segment_field {
     int limit;
     int ar_bytes;
 } vmx_segment_fields[] = {
-    VMX_SEGMENT_FIELD(ES),
-    VMX_SEGMENT_FIELD(CS),
-    VMX_SEGMENT_FIELD(SS),
-    VMX_SEGMENT_FIELD(DS),
-    VMX_SEGMENT_FIELD(FS),
-    VMX_SEGMENT_FIELD(GS),
-    VMX_SEGMENT_FIELD(LDTR),
-    VMX_SEGMENT_FIELD(TR),
+    VMX_SEGMENT_FIELD(ES),   VMX_SEGMENT_FIELD(CS), VMX_SEGMENT_FIELD(SS),
+    VMX_SEGMENT_FIELD(DS),   VMX_SEGMENT_FIELD(FS), VMX_SEGMENT_FIELD(GS),
+    VMX_SEGMENT_FIELD(LDTR), VMX_SEGMENT_FIELD(TR),
 };
 
 uint32_t vmx_read_segment_limit(CPUState *cpu, X86Seg seg)
@@ -67,12 +62,14 @@ x68_segment_selector vmx_read_segment_selector(CPUState *cpu, X86Seg seg)
     return sel;
 }
 
-void vmx_write_segment_selector(struct CPUState *cpu, x68_segment_selector selector, X86Seg seg)
+void vmx_write_segment_selector(struct CPUState *cpu,
+                                x68_segment_selector selector, X86Seg seg)
 {
     wvmcs(cpu->accel->fd, vmx_segment_fields[seg].selector, selector.sel);
 }
 
-void vmx_read_segment_descriptor(struct CPUState *cpu, struct vmx_segment *desc, X86Seg seg)
+void vmx_read_segment_descriptor(struct CPUState *cpu, struct vmx_segment *desc,
+                                 X86Seg seg)
 {
     desc->sel = rvmcs(cpu->accel->fd, vmx_segment_fields[seg].selector);
     desc->base = rvmcs(cpu->accel->fd, vmx_segment_fields[seg].base);
@@ -80,7 +77,8 @@ void vmx_read_segment_descriptor(struct CPUState *cpu, struct vmx_segment *desc,
     desc->ar = rvmcs(cpu->accel->fd, vmx_segment_fields[seg].ar_bytes);
 }
 
-void vmx_write_segment_descriptor(CPUState *cpu, struct vmx_segment *desc, X86Seg seg)
+void vmx_write_segment_descriptor(CPUState *cpu, struct vmx_segment *desc,
+                                  X86Seg seg)
 {
     const struct vmx_segment_field *sf = &vmx_segment_fields[seg];
 
@@ -90,28 +88,27 @@ void vmx_write_segment_descriptor(CPUState *cpu, struct vmx_segment *desc, X86Se
     wvmcs(cpu->accel->fd, sf->ar_bytes, desc->ar);
 }
 
-void x86_segment_descriptor_to_vmx(struct CPUState *cpu, x68_segment_selector selector, struct x86_segment_descriptor *desc, struct vmx_segment *vmx_desc)
+void x86_segment_descriptor_to_vmx(struct CPUState *cpu,
+                                   x68_segment_selector selector,
+                                   struct x86_segment_descriptor *desc,
+                                   struct vmx_segment *vmx_desc)
 {
     vmx_desc->sel = selector.sel;
     vmx_desc->base = x86_segment_base(desc);
     vmx_desc->limit = x86_segment_limit(desc);
 
-    vmx_desc->ar = (selector.sel ? 0 : 1) << 16 |
-                    desc->g << 15 |
-                    desc->db << 14 |
-                    desc->l << 13 |
-                    desc->avl << 12 |
-                    desc->p << 7 |
-                    desc->dpl << 5 |
-                    desc->s << 4 |
-                    desc->type;
+    vmx_desc->ar = (selector.sel ? 0 : 1) << 16 | desc->g << 15 |
+                   desc->db << 14 | desc->l << 13 | desc->avl << 12 |
+                   desc->p << 7 | desc->dpl << 5 | desc->s << 4 | desc->type;
 }
 
-void vmx_segment_to_x86_descriptor(struct CPUState *cpu, struct vmx_segment *vmx_desc, struct x86_segment_descriptor *desc)
+void vmx_segment_to_x86_descriptor(struct CPUState *cpu,
+                                   struct vmx_segment *vmx_desc,
+                                   struct x86_segment_descriptor *desc)
 {
     x86_set_segment_limit(desc, vmx_desc->limit);
     x86_set_segment_base(desc, vmx_desc->base);
-    
+
     desc->type = vmx_desc->ar & 15;
     desc->s = (vmx_desc->ar >> 4) & 1;
     desc->dpl = (vmx_desc->ar >> 5) & 3;
@@ -121,4 +118,3 @@ void vmx_segment_to_x86_descriptor(struct CPUState *cpu, struct vmx_segment *vmx
     desc->db = (vmx_desc->ar >> 14) & 1;
     desc->g = (vmx_desc->ar >> 15) & 1;
 }
-

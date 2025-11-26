@@ -39,8 +39,8 @@ static void tb_invalidate_virtual_addr(CPUXtensaState *env, uint32_t vaddr)
     uint32_t paddr;
     uint32_t page_size;
     unsigned access;
-    int ret = xtensa_get_physical_addr(env, false, vaddr, 2, 0,
-                                       &paddr, &page_size, &access);
+    int ret = xtensa_get_physical_addr(env, false, vaddr, 2, 0, &paddr,
+                                       &page_size, &access);
     if (ret == 0) {
         tb_invalidate_phys_addr(&address_space_memory, paddr,
                                 MEMTXATTRS_UNSPECIFIED);
@@ -70,7 +70,7 @@ void HELPER(wsr_ibreaka)(CPUXtensaState *env, uint32_t i, uint32_t v)
 }
 
 static void set_dbreak(CPUXtensaState *env, unsigned i, uint32_t dbreaka,
-        uint32_t dbreakc)
+                       uint32_t dbreakc)
 {
     CPUState *cs = env_cpu(env);
     int flags = BP_CPU | BP_STOP_BEFORE_ACCESS;
@@ -92,8 +92,8 @@ static void set_dbreak(CPUXtensaState *env, unsigned i, uint32_t dbreaka,
         /* cut mask after the first zero bit */
         mask = 0xffffffff << (32 - clo32(mask));
     }
-    if (cpu_watchpoint_insert(cs, dbreaka & mask, ~mask + 1,
-                              flags, &env->cpu_watchpoint[i])) {
+    if (cpu_watchpoint_insert(cs, dbreaka & mask, ~mask + 1, flags,
+                              &env->cpu_watchpoint[i])) {
         env->cpu_watchpoint[i] = NULL;
         qemu_log_mask(LOG_GUEST_ERROR,
                       "Failed to set data breakpoint at 0x%08x/%d\n",
@@ -105,8 +105,7 @@ void HELPER(wsr_dbreaka)(CPUXtensaState *env, uint32_t i, uint32_t v)
 {
     uint32_t dbreakc = env->sregs[DBREAKC + i];
 
-    if ((dbreakc & DBREAKC_SB_LB) &&
-        env->sregs[DBREAKA + i] != v) {
+    if ((dbreakc & DBREAKC_SB_LB) && env->sregs[DBREAKA + i] != v) {
         set_dbreak(env, i, v, dbreakc);
     }
     env->sregs[DBREAKA + i] = v;

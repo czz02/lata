@@ -26,7 +26,7 @@
 #include "helper-tcg.h"
 
 G_NORETURN void helper_raise_interrupt(CPUX86State *env, int intno,
-                                          int next_eip_addend)
+                                       int next_eip_addend)
 {
     raise_interrupt(env, intno, 1, 0, next_eip_addend);
 }
@@ -44,19 +44,19 @@ G_NORETURN void helper_raise_exception(CPUX86State *env, int exception_index)
 static int check_exception(CPUX86State *env, int intno, int *error_code,
                            uintptr_t retaddr)
 {
-    int first_contributory = env->old_exception == 0 ||
-                              (env->old_exception >= 10 &&
-                               env->old_exception <= 13);
-    int second_contributory = intno == 0 ||
-                               (intno >= 10 && intno <= 13);
+    int first_contributory =
+        env->old_exception == 0 ||
+        (env->old_exception >= 10 && env->old_exception <= 13);
+    int second_contributory = intno == 0 || (intno >= 10 && intno <= 13);
 
     qemu_log_mask(CPU_LOG_INT, "check_exception old: 0x%x new 0x%x\n",
-                env->old_exception, intno);
+                  env->old_exception, intno);
 
 #if !defined(CONFIG_USER_ONLY)
     if (env->old_exception == EXCP08_DBLE) {
         if (env->hflags & HF_GUEST_MASK) {
-            cpu_vmexit(env, SVM_EXIT_SHUTDOWN, 0, retaddr); /* does not return */
+            cpu_vmexit(env, SVM_EXIT_SHUTDOWN, 0,
+                       retaddr); /* does not return */
         }
 
         qemu_log_mask(CPU_LOG_RESET, "Triple fault\n");
@@ -66,9 +66,9 @@ static int check_exception(CPUX86State *env, int intno, int *error_code,
     }
 #endif
 
-    if ((first_contributory && second_contributory)
-        || (env->old_exception == EXCP0E_PAGE &&
-            (second_contributory || (intno == EXCP0E_PAGE)))) {
+    if ((first_contributory && second_contributory) ||
+        (env->old_exception == EXCP0E_PAGE &&
+         (second_contributory || (intno == EXCP0E_PAGE)))) {
         intno = EXCP08_DBLE;
         *error_code = 0;
     }
@@ -87,11 +87,9 @@ static int check_exception(CPUX86State *env, int intno, int *error_code,
  * env->eip value AFTER the interrupt instruction. It is only relevant if
  * is_int is TRUE.
  */
-static G_NORETURN
-void raise_interrupt2(CPUX86State *env, int intno,
-                      int is_int, int error_code,
-                      int next_eip_addend,
-                      uintptr_t retaddr)
+static G_NORETURN void raise_interrupt2(CPUX86State *env, int intno, int is_int,
+                                        int error_code, int next_eip_addend,
+                                        uintptr_t retaddr)
 {
     CPUState *cs = env_cpu(env);
 

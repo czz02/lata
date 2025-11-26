@@ -20,13 +20,13 @@
  * main loop that it should wind the guest PC backwards so it will
  * re-execute the syscall after handling any pending signals.
  */
-#define QEMU_ERESTARTSYS  512
+#define QEMU_ERESTARTSYS 512
 
 /*
  * This is returned after a successful sigreturn syscall, to indicate
  * that it has correctly set the guest registers and so the main loop
  * should not touch them.
  */
-#define QEMU_ESIGRETURN   513
+#define QEMU_ESIGRETURN 513
 
 #endif /* SPECIAL_ERRNO_H */

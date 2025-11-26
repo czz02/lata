@@ -147,9 +147,8 @@ void mttcg_start_vcpu_thread(CPUState *cpu)
     qemu_cond_init(cpu->halt_cond);
 
     /* create a thread per vCPU with TCG (MTTCG) */
-    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
-             cpu->cpu_index);
+    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG", cpu->cpu_index);
 
-    qemu_thread_create(cpu->thread, thread_name, mttcg_cpu_thread_fn,
-                       cpu, QEMU_THREAD_JOINABLE);
+    qemu_thread_create(cpu->thread, thread_name, mttcg_cpu_thread_fn, cpu,
+                       QEMU_THREAD_JOINABLE);
 }

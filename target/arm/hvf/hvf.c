@@ -33,79 +33,39 @@
 
 #include "exec/gdbstub.h"
 
-#define MDSCR_EL1_SS_SHIFT  0
+#define MDSCR_EL1_SS_SHIFT 0
 #define MDSCR_EL1_MDE_SHIFT 15
 
 static uint16_t dbgbcr_regs[] = {
-    HV_SYS_REG_DBGBCR0_EL1,
-    HV_SYS_REG_DBGBCR1_EL1,
-    HV_SYS_REG_DBGBCR2_EL1,
-    HV_SYS_REG_DBGBCR3_EL1,
-    HV_SYS_REG_DBGBCR4_EL1,
-    HV_SYS_REG_DBGBCR5_EL1,
-    HV_SYS_REG_DBGBCR6_EL1,
-    HV_SYS_REG_DBGBCR7_EL1,
-    HV_SYS_REG_DBGBCR8_EL1,
-    HV_SYS_REG_DBGBCR9_EL1,
-    HV_SYS_REG_DBGBCR10_EL1,
-    HV_SYS_REG_DBGBCR11_EL1,
-    HV_SYS_REG_DBGBCR12_EL1,
-    HV_SYS_REG_DBGBCR13_EL1,
-    HV_SYS_REG_DBGBCR14_EL1,
+    HV_SYS_REG_DBGBCR0_EL1,  HV_SYS_REG_DBGBCR1_EL1,  HV_SYS_REG_DBGBCR2_EL1,
+    HV_SYS_REG_DBGBCR3_EL1,  HV_SYS_REG_DBGBCR4_EL1,  HV_SYS_REG_DBGBCR5_EL1,
+    HV_SYS_REG_DBGBCR6_EL1,  HV_SYS_REG_DBGBCR7_EL1,  HV_SYS_REG_DBGBCR8_EL1,
+    HV_SYS_REG_DBGBCR9_EL1,  HV_SYS_REG_DBGBCR10_EL1, HV_SYS_REG_DBGBCR11_EL1,
+    HV_SYS_REG_DBGBCR12_EL1, HV_SYS_REG_DBGBCR13_EL1, HV_SYS_REG_DBGBCR14_EL1,
     HV_SYS_REG_DBGBCR15_EL1,
 };
 static uint16_t dbgbvr_regs[] = {
-    HV_SYS_REG_DBGBVR0_EL1,
-    HV_SYS_REG_DBGBVR1_EL1,
-    HV_SYS_REG_DBGBVR2_EL1,
-    HV_SYS_REG_DBGBVR3_EL1,
-    HV_SYS_REG_DBGBVR4_EL1,
-    HV_SYS_REG_DBGBVR5_EL1,
-    HV_SYS_REG_DBGBVR6_EL1,
-    HV_SYS_REG_DBGBVR7_EL1,
-    HV_SYS_REG_DBGBVR8_EL1,
-    HV_SYS_REG_DBGBVR9_EL1,
-    HV_SYS_REG_DBGBVR10_EL1,
-    HV_SYS_REG_DBGBVR11_EL1,
-    HV_SYS_REG_DBGBVR12_EL1,
-    HV_SYS_REG_DBGBVR13_EL1,
-    HV_SYS_REG_DBGBVR14_EL1,
+    HV_SYS_REG_DBGBVR0_EL1,  HV_SYS_REG_DBGBVR1_EL1,  HV_SYS_REG_DBGBVR2_EL1,
+    HV_SYS_REG_DBGBVR3_EL1,  HV_SYS_REG_DBGBVR4_EL1,  HV_SYS_REG_DBGBVR5_EL1,
+    HV_SYS_REG_DBGBVR6_EL1,  HV_SYS_REG_DBGBVR7_EL1,  HV_SYS_REG_DBGBVR8_EL1,
+    HV_SYS_REG_DBGBVR9_EL1,  HV_SYS_REG_DBGBVR10_EL1, HV_SYS_REG_DBGBVR11_EL1,
+    HV_SYS_REG_DBGBVR12_EL1, HV_SYS_REG_DBGBVR13_EL1, HV_SYS_REG_DBGBVR14_EL1,
     HV_SYS_REG_DBGBVR15_EL1,
 };
 static uint16_t dbgwcr_regs[] = {
-    HV_SYS_REG_DBGWCR0_EL1,
-    HV_SYS_REG_DBGWCR1_EL1,
-    HV_SYS_REG_DBGWCR2_EL1,
-    HV_SYS_REG_DBGWCR3_EL1,
-    HV_SYS_REG_DBGWCR4_EL1,
-    HV_SYS_REG_DBGWCR5_EL1,
-    HV_SYS_REG_DBGWCR6_EL1,
-    HV_SYS_REG_DBGWCR7_EL1,
-    HV_SYS_REG_DBGWCR8_EL1,
-    HV_SYS_REG_DBGWCR9_EL1,
-    HV_SYS_REG_DBGWCR10_EL1,
-    HV_SYS_REG_DBGWCR11_EL1,
-    HV_SYS_REG_DBGWCR12_EL1,
-    HV_SYS_REG_DBGWCR13_EL1,
-    HV_SYS_REG_DBGWCR14_EL1,
+    HV_SYS_REG_DBGWCR0_EL1,  HV_SYS_REG_DBGWCR1_EL1,  HV_SYS_REG_DBGWCR2_EL1,
+    HV_SYS_REG_DBGWCR3_EL1,  HV_SYS_REG_DBGWCR4_EL1,  HV_SYS_REG_DBGWCR5_EL1,
+    HV_SYS_REG_DBGWCR6_EL1,  HV_SYS_REG_DBGWCR7_EL1,  HV_SYS_REG_DBGWCR8_EL1,
+    HV_SYS_REG_DBGWCR9_EL1,  HV_SYS_REG_DBGWCR10_EL1, HV_SYS_REG_DBGWCR11_EL1,
+    HV_SYS_REG_DBGWCR12_EL1, HV_SYS_REG_DBGWCR13_EL1, HV_SYS_REG_DBGWCR14_EL1,
     HV_SYS_REG_DBGWCR15_EL1,
 };
 static uint16_t dbgwvr_regs[] = {
-    HV_SYS_REG_DBGWVR0_EL1,
-    HV_SYS_REG_DBGWVR1_EL1,
-    HV_SYS_REG_DBGWVR2_EL1,
-    HV_SYS_REG_DBGWVR3_EL1,
-    HV_SYS_REG_DBGWVR4_EL1,
-    HV_SYS_REG_DBGWVR5_EL1,
-    HV_SYS_REG_DBGWVR6_EL1,
-    HV_SYS_REG_DBGWVR7_EL1,
-    HV_SYS_REG_DBGWVR8_EL1,
-    HV_SYS_REG_DBGWVR9_EL1,
-    HV_SYS_REG_DBGWVR10_EL1,
-    HV_SYS_REG_DBGWVR11_EL1,
-    HV_SYS_REG_DBGWVR12_EL1,
-    HV_SYS_REG_DBGWVR13_EL1,
-    HV_SYS_REG_DBGWVR14_EL1,
+    HV_SYS_REG_DBGWVR0_EL1,  HV_SYS_REG_DBGWVR1_EL1,  HV_SYS_REG_DBGWVR2_EL1,
+    HV_SYS_REG_DBGWVR3_EL1,  HV_SYS_REG_DBGWVR4_EL1,  HV_SYS_REG_DBGWVR5_EL1,
+    HV_SYS_REG_DBGWVR6_EL1,  HV_SYS_REG_DBGWVR7_EL1,  HV_SYS_REG_DBGWVR8_EL1,
+    HV_SYS_REG_DBGWVR9_EL1,  HV_SYS_REG_DBGWVR10_EL1, HV_SYS_REG_DBGWVR11_EL1,
+    HV_SYS_REG_DBGWVR12_EL1, HV_SYS_REG_DBGWVR13_EL1, HV_SYS_REG_DBGWVR14_EL1,
     HV_SYS_REG_DBGWVR15_EL1,
 };
 
@@ -144,151 +104,146 @@ void hvf_arm_init_debug(void)
 }
 
 #define HVF_SYSREG(crn, crm, op0, op1, op2) \
-        ENCODE_AA64_CP_REG(CP_REG_ARM64_SYSREG_CP, crn, crm, op0, op1, op2)
+    ENCODE_AA64_CP_REG(CP_REG_ARM64_SYSREG_CP, crn, crm, op0, op1, op2)
 #define PL1_WRITE_MASK 0x4
 
-#define SYSREG_OP0_SHIFT      20
-#define SYSREG_OP0_MASK       0x3
-#define SYSREG_OP0(sysreg)    ((sysreg >> SYSREG_OP0_SHIFT) & SYSREG_OP0_MASK)
-#define SYSREG_OP1_SHIFT      14
-#define SYSREG_OP1_MASK       0x7
-#define SYSREG_OP1(sysreg)    ((sysreg >> SYSREG_OP1_SHIFT) & SYSREG_OP1_MASK)
-#define SYSREG_CRN_SHIFT      10
-#define SYSREG_CRN_MASK       0xf
-#define SYSREG_CRN(sysreg)    ((sysreg >> SYSREG_CRN_SHIFT) & SYSREG_CRN_MASK)
-#define SYSREG_CRM_SHIFT      1
-#define SYSREG_CRM_MASK       0xf
-#define SYSREG_CRM(sysreg)    ((sysreg >> SYSREG_CRM_SHIFT) & SYSREG_CRM_MASK)
-#define SYSREG_OP2_SHIFT      17
-#define SYSREG_OP2_MASK       0x7
-#define SYSREG_OP2(sysreg)    ((sysreg >> SYSREG_OP2_SHIFT) & SYSREG_OP2_MASK)
+#define SYSREG_OP0_SHIFT 20
+#define SYSREG_OP0_MASK 0x3
+#define SYSREG_OP0(sysreg) ((sysreg >> SYSREG_OP0_SHIFT) & SYSREG_OP0_MASK)
+#define SYSREG_OP1_SHIFT 14
+#define SYSREG_OP1_MASK 0x7
+#define SYSREG_OP1(sysreg) ((sysreg >> SYSREG_OP1_SHIFT) & SYSREG_OP1_MASK)
+#define SYSREG_CRN_SHIFT 10
+#define SYSREG_CRN_MASK 0xf
+#define SYSREG_CRN(sysreg) ((sysreg >> SYSREG_CRN_SHIFT) & SYSREG_CRN_MASK)
+#define SYSREG_CRM_SHIFT 1
+#define SYSREG_CRM_MASK 0xf
+#define SYSREG_CRM(sysreg) ((sysreg >> SYSREG_CRM_SHIFT) & SYSREG_CRM_MASK)
+#define SYSREG_OP2_SHIFT 17
+#define SYSREG_OP2_MASK 0x7
+#define SYSREG_OP2(sysreg) ((sysreg >> SYSREG_OP2_SHIFT) & SYSREG_OP2_MASK)
 
-#define SYSREG(op0, op1, crn, crm, op2) \
-    ((op0 << SYSREG_OP0_SHIFT) | \
-     (op1 << SYSREG_OP1_SHIFT) | \
-     (crn << SYSREG_CRN_SHIFT) | \
-     (crm << SYSREG_CRM_SHIFT) | \
+#define SYSREG(op0, op1, crn, crm, op2)                      \
+    ((op0 << SYSREG_OP0_SHIFT) | (op1 << SYSREG_OP1_SHIFT) | \
+     (crn << SYSREG_CRN_SHIFT) | (crm << SYSREG_CRM_SHIFT) | \
      (op2 << SYSREG_OP2_SHIFT))
-#define SYSREG_MASK \
-    SYSREG(SYSREG_OP0_MASK, \
-           SYSREG_OP1_MASK, \
-           SYSREG_CRN_MASK, \
-           SYSREG_CRM_MASK, \
+#define SYSREG_MASK                                                            \
+    SYSREG(SYSREG_OP0_MASK, SYSREG_OP1_MASK, SYSREG_CRN_MASK, SYSREG_CRM_MASK, \
            SYSREG_OP2_MASK)
-#define SYSREG_OSLAR_EL1      SYSREG(2, 0, 1, 0, 4)
-#define SYSREG_OSLSR_EL1      SYSREG(2, 0, 1, 1, 4)
-#define SYSREG_OSDLR_EL1      SYSREG(2, 0, 1, 3, 4)
-#define SYSREG_CNTPCT_EL0     SYSREG(3, 3, 14, 0, 1)
-#define SYSREG_PMCR_EL0       SYSREG(3, 3, 9, 12, 0)
-#define SYSREG_PMUSERENR_EL0  SYSREG(3, 3, 9, 14, 0)
+#define SYSREG_OSLAR_EL1 SYSREG(2, 0, 1, 0, 4)
+#define SYSREG_OSLSR_EL1 SYSREG(2, 0, 1, 1, 4)
+#define SYSREG_OSDLR_EL1 SYSREG(2, 0, 1, 3, 4)
+#define SYSREG_CNTPCT_EL0 SYSREG(3, 3, 14, 0, 1)
+#define SYSREG_PMCR_EL0 SYSREG(3, 3, 9, 12, 0)
+#define SYSREG_PMUSERENR_EL0 SYSREG(3, 3, 9, 14, 0)
 #define SYSREG_PMCNTENSET_EL0 SYSREG(3, 3, 9, 12, 1)
 #define SYSREG_PMCNTENCLR_EL0 SYSREG(3, 3, 9, 12, 2)
 #define SYSREG_PMINTENCLR_EL1 SYSREG(3, 0, 9, 14, 2)
-#define SYSREG_PMOVSCLR_EL0   SYSREG(3, 3, 9, 12, 3)
-#define SYSREG_PMSWINC_EL0    SYSREG(3, 3, 9, 12, 4)
-#define SYSREG_PMSELR_EL0     SYSREG(3, 3, 9, 12, 5)
-#define SYSREG_PMCEID0_EL0    SYSREG(3, 3, 9, 12, 6)
-#define SYSREG_PMCEID1_EL0    SYSREG(3, 3, 9, 12, 7)
-#define SYSREG_PMCCNTR_EL0    SYSREG(3, 3, 9, 13, 0)
-#define SYSREG_PMCCFILTR_EL0  SYSREG(3, 3, 14, 15, 7)
+#define SYSREG_PMOVSCLR_EL0 SYSREG(3, 3, 9, 12, 3)
+#define SYSREG_PMSWINC_EL0 SYSREG(3, 3, 9, 12, 4)
+#define SYSREG_PMSELR_EL0 SYSREG(3, 3, 9, 12, 5)
+#define SYSREG_PMCEID0_EL0 SYSREG(3, 3, 9, 12, 6)
+#define SYSREG_PMCEID1_EL0 SYSREG(3, 3, 9, 12, 7)
+#define SYSREG_PMCCNTR_EL0 SYSREG(3, 3, 9, 13, 0)
+#define SYSREG_PMCCFILTR_EL0 SYSREG(3, 3, 14, 15, 7)
 
-#define SYSREG_ICC_AP0R0_EL1     SYSREG(3, 0, 12, 8, 4)
-#define SYSREG_ICC_AP0R1_EL1     SYSREG(3, 0, 12, 8, 5)
-#define SYSREG_ICC_AP0R2_EL1     SYSREG(3, 0, 12, 8, 6)
-#define SYSREG_ICC_AP0R3_EL1     SYSREG(3, 0, 12, 8, 7)
-#define SYSREG_ICC_AP1R0_EL1     SYSREG(3, 0, 12, 9, 0)
-#define SYSREG_ICC_AP1R1_EL1     SYSREG(3, 0, 12, 9, 1)
-#define SYSREG_ICC_AP1R2_EL1     SYSREG(3, 0, 12, 9, 2)
-#define SYSREG_ICC_AP1R3_EL1     SYSREG(3, 0, 12, 9, 3)
-#define SYSREG_ICC_ASGI1R_EL1    SYSREG(3, 0, 12, 11, 6)
-#define SYSREG_ICC_BPR0_EL1      SYSREG(3, 0, 12, 8, 3)
-#define SYSREG_ICC_BPR1_EL1      SYSREG(3, 0, 12, 12, 3)
-#define SYSREG_ICC_CTLR_EL1      SYSREG(3, 0, 12, 12, 4)
-#define SYSREG_ICC_DIR_EL1       SYSREG(3, 0, 12, 11, 1)
-#define SYSREG_ICC_EOIR0_EL1     SYSREG(3, 0, 12, 8, 1)
-#define SYSREG_ICC_EOIR1_EL1     SYSREG(3, 0, 12, 12, 1)
-#define SYSREG_ICC_HPPIR0_EL1    SYSREG(3, 0, 12, 8, 2)
-#define SYSREG_ICC_HPPIR1_EL1    SYSREG(3, 0, 12, 12, 2)
-#define SYSREG_ICC_IAR0_EL1      SYSREG(3, 0, 12, 8, 0)
-#define SYSREG_ICC_IAR1_EL1      SYSREG(3, 0, 12, 12, 0)
-#define SYSREG_ICC_IGRPEN0_EL1   SYSREG(3, 0, 12, 12, 6)
-#define SYSREG_ICC_IGRPEN1_EL1   SYSREG(3, 0, 12, 12, 7)
-#define SYSREG_ICC_PMR_EL1       SYSREG(3, 0, 4, 6, 0)
-#define SYSREG_ICC_RPR_EL1       SYSREG(3, 0, 12, 11, 3)
-#define SYSREG_ICC_SGI0R_EL1     SYSREG(3, 0, 12, 11, 7)
-#define SYSREG_ICC_SGI1R_EL1     SYSREG(3, 0, 12, 11, 5)
-#define SYSREG_ICC_SRE_EL1       SYSREG(3, 0, 12, 12, 5)
+#define SYSREG_ICC_AP0R0_EL1 SYSREG(3, 0, 12, 8, 4)
+#define SYSREG_ICC_AP0R1_EL1 SYSREG(3, 0, 12, 8, 5)
+#define SYSREG_ICC_AP0R2_EL1 SYSREG(3, 0, 12, 8, 6)
+#define SYSREG_ICC_AP0R3_EL1 SYSREG(3, 0, 12, 8, 7)
+#define SYSREG_ICC_AP1R0_EL1 SYSREG(3, 0, 12, 9, 0)
+#define SYSREG_ICC_AP1R1_EL1 SYSREG(3, 0, 12, 9, 1)
+#define SYSREG_ICC_AP1R2_EL1 SYSREG(3, 0, 12, 9, 2)
+#define SYSREG_ICC_AP1R3_EL1 SYSREG(3, 0, 12, 9, 3)
+#define SYSREG_ICC_ASGI1R_EL1 SYSREG(3, 0, 12, 11, 6)
+#define SYSREG_ICC_BPR0_EL1 SYSREG(3, 0, 12, 8, 3)
+#define SYSREG_ICC_BPR1_EL1 SYSREG(3, 0, 12, 12, 3)
+#define SYSREG_ICC_CTLR_EL1 SYSREG(3, 0, 12, 12, 4)
+#define SYSREG_ICC_DIR_EL1 SYSREG(3, 0, 12, 11, 1)
+#define SYSREG_ICC_EOIR0_EL1 SYSREG(3, 0, 12, 8, 1)
+#define SYSREG_ICC_EOIR1_EL1 SYSREG(3, 0, 12, 12, 1)
+#define SYSREG_ICC_HPPIR0_EL1 SYSREG(3, 0, 12, 8, 2)
+#define SYSREG_ICC_HPPIR1_EL1 SYSREG(3, 0, 12, 12, 2)
+#define SYSREG_ICC_IAR0_EL1 SYSREG(3, 0, 12, 8, 0)
+#define SYSREG_ICC_IAR1_EL1 SYSREG(3, 0, 12, 12, 0)
+#define SYSREG_ICC_IGRPEN0_EL1 SYSREG(3, 0, 12, 12, 6)
+#define SYSREG_ICC_IGRPEN1_EL1 SYSREG(3, 0, 12, 12, 7)
+#define SYSREG_ICC_PMR_EL1 SYSREG(3, 0, 4, 6, 0)
+#define SYSREG_ICC_RPR_EL1 SYSREG(3, 0, 12, 11, 3)
+#define SYSREG_ICC_SGI0R_EL1 SYSREG(3, 0, 12, 11, 7)
+#define SYSREG_ICC_SGI1R_EL1 SYSREG(3, 0, 12, 11, 5)
+#define SYSREG_ICC_SRE_EL1 SYSREG(3, 0, 12, 12, 5)
 
-#define SYSREG_MDSCR_EL1      SYSREG(2, 0, 0, 2, 2)
-#define SYSREG_DBGBVR0_EL1    SYSREG(2, 0, 0, 0, 4)
-#define SYSREG_DBGBCR0_EL1    SYSREG(2, 0, 0, 0, 5)
-#define SYSREG_DBGWVR0_EL1    SYSREG(2, 0, 0, 0, 6)
-#define SYSREG_DBGWCR0_EL1    SYSREG(2, 0, 0, 0, 7)
-#define SYSREG_DBGBVR1_EL1    SYSREG(2, 0, 0, 1, 4)
-#define SYSREG_DBGBCR1_EL1    SYSREG(2, 0, 0, 1, 5)
-#define SYSREG_DBGWVR1_EL1    SYSREG(2, 0, 0, 1, 6)
-#define SYSREG_DBGWCR1_EL1    SYSREG(2, 0, 0, 1, 7)
-#define SYSREG_DBGBVR2_EL1    SYSREG(2, 0, 0, 2, 4)
-#define SYSREG_DBGBCR2_EL1    SYSREG(2, 0, 0, 2, 5)
-#define SYSREG_DBGWVR2_EL1    SYSREG(2, 0, 0, 2, 6)
-#define SYSREG_DBGWCR2_EL1    SYSREG(2, 0, 0, 2, 7)
-#define SYSREG_DBGBVR3_EL1    SYSREG(2, 0, 0, 3, 4)
-#define SYSREG_DBGBCR3_EL1    SYSREG(2, 0, 0, 3, 5)
-#define SYSREG_DBGWVR3_EL1    SYSREG(2, 0, 0, 3, 6)
-#define SYSREG_DBGWCR3_EL1    SYSREG(2, 0, 0, 3, 7)
-#define SYSREG_DBGBVR4_EL1    SYSREG(2, 0, 0, 4, 4)
-#define SYSREG_DBGBCR4_EL1    SYSREG(2, 0, 0, 4, 5)
-#define SYSREG_DBGWVR4_EL1    SYSREG(2, 0, 0, 4, 6)
-#define SYSREG_DBGWCR4_EL1    SYSREG(2, 0, 0, 4, 7)
-#define SYSREG_DBGBVR5_EL1    SYSREG(2, 0, 0, 5, 4)
-#define SYSREG_DBGBCR5_EL1    SYSREG(2, 0, 0, 5, 5)
-#define SYSREG_DBGWVR5_EL1    SYSREG(2, 0, 0, 5, 6)
-#define SYSREG_DBGWCR5_EL1    SYSREG(2, 0, 0, 5, 7)
-#define SYSREG_DBGBVR6_EL1    SYSREG(2, 0, 0, 6, 4)
-#define SYSREG_DBGBCR6_EL1    SYSREG(2, 0, 0, 6, 5)
-#define SYSREG_DBGWVR6_EL1    SYSREG(2, 0, 0, 6, 6)
-#define SYSREG_DBGWCR6_EL1    SYSREG(2, 0, 0, 6, 7)
-#define SYSREG_DBGBVR7_EL1    SYSREG(2, 0, 0, 7, 4)
-#define SYSREG_DBGBCR7_EL1    SYSREG(2, 0, 0, 7, 5)
-#define SYSREG_DBGWVR7_EL1    SYSREG(2, 0, 0, 7, 6)
-#define SYSREG_DBGWCR7_EL1    SYSREG(2, 0, 0, 7, 7)
-#define SYSREG_DBGBVR8_EL1    SYSREG(2, 0, 0, 8, 4)
-#define SYSREG_DBGBCR8_EL1    SYSREG(2, 0, 0, 8, 5)
-#define SYSREG_DBGWVR8_EL1    SYSREG(2, 0, 0, 8, 6)
-#define SYSREG_DBGWCR8_EL1    SYSREG(2, 0, 0, 8, 7)
-#define SYSREG_DBGBVR9_EL1    SYSREG(2, 0, 0, 9, 4)
-#define SYSREG_DBGBCR9_EL1    SYSREG(2, 0, 0, 9, 5)
-#define SYSREG_DBGWVR9_EL1    SYSREG(2, 0, 0, 9, 6)
-#define SYSREG_DBGWCR9_EL1    SYSREG(2, 0, 0, 9, 7)
-#define SYSREG_DBGBVR10_EL1   SYSREG(2, 0, 0, 10, 4)
-#define SYSREG_DBGBCR10_EL1   SYSREG(2, 0, 0, 10, 5)
-#define SYSREG_DBGWVR10_EL1   SYSREG(2, 0, 0, 10, 6)
-#define SYSREG_DBGWCR10_EL1   SYSREG(2, 0, 0, 10, 7)
-#define SYSREG_DBGBVR11_EL1   SYSREG(2, 0, 0, 11, 4)
-#define SYSREG_DBGBCR11_EL1   SYSREG(2, 0, 0, 11, 5)
-#define SYSREG_DBGWVR11_EL1   SYSREG(2, 0, 0, 11, 6)
-#define SYSREG_DBGWCR11_EL1   SYSREG(2, 0, 0, 11, 7)
-#define SYSREG_DBGBVR12_EL1   SYSREG(2, 0, 0, 12, 4)
-#define SYSREG_DBGBCR12_EL1   SYSREG(2, 0, 0, 12, 5)
-#define SYSREG_DBGWVR12_EL1   SYSREG(2, 0, 0, 12, 6)
-#define SYSREG_DBGWCR12_EL1   SYSREG(2, 0, 0, 12, 7)
-#define SYSREG_DBGBVR13_EL1   SYSREG(2, 0, 0, 13, 4)
-#define SYSREG_DBGBCR13_EL1   SYSREG(2, 0, 0, 13, 5)
-#define SYSREG_DBGWVR13_EL1   SYSREG(2, 0, 0, 13, 6)
-#define SYSREG_DBGWCR13_EL1   SYSREG(2, 0, 0, 13, 7)
-#define SYSREG_DBGBVR14_EL1   SYSREG(2, 0, 0, 14, 4)
-#define SYSREG_DBGBCR14_EL1   SYSREG(2, 0, 0, 14, 5)
-#define SYSREG_DBGWVR14_EL1   SYSREG(2, 0, 0, 14, 6)
-#define SYSREG_DBGWCR14_EL1   SYSREG(2, 0, 0, 14, 7)
-#define SYSREG_DBGBVR15_EL1   SYSREG(2, 0, 0, 15, 4)
-#define SYSREG_DBGBCR15_EL1   SYSREG(2, 0, 0, 15, 5)
-#define SYSREG_DBGWVR15_EL1   SYSREG(2, 0, 0, 15, 6)
-#define SYSREG_DBGWCR15_EL1   SYSREG(2, 0, 0, 15, 7)
+#define SYSREG_MDSCR_EL1 SYSREG(2, 0, 0, 2, 2)
+#define SYSREG_DBGBVR0_EL1 SYSREG(2, 0, 0, 0, 4)
+#define SYSREG_DBGBCR0_EL1 SYSREG(2, 0, 0, 0, 5)
+#define SYSREG_DBGWVR0_EL1 SYSREG(2, 0, 0, 0, 6)
+#define SYSREG_DBGWCR0_EL1 SYSREG(2, 0, 0, 0, 7)
+#define SYSREG_DBGBVR1_EL1 SYSREG(2, 0, 0, 1, 4)
+#define SYSREG_DBGBCR1_EL1 SYSREG(2, 0, 0, 1, 5)
+#define SYSREG_DBGWVR1_EL1 SYSREG(2, 0, 0, 1, 6)
+#define SYSREG_DBGWCR1_EL1 SYSREG(2, 0, 0, 1, 7)
+#define SYSREG_DBGBVR2_EL1 SYSREG(2, 0, 0, 2, 4)
+#define SYSREG_DBGBCR2_EL1 SYSREG(2, 0, 0, 2, 5)
+#define SYSREG_DBGWVR2_EL1 SYSREG(2, 0, 0, 2, 6)
+#define SYSREG_DBGWCR2_EL1 SYSREG(2, 0, 0, 2, 7)
+#define SYSREG_DBGBVR3_EL1 SYSREG(2, 0, 0, 3, 4)
+#define SYSREG_DBGBCR3_EL1 SYSREG(2, 0, 0, 3, 5)
+#define SYSREG_DBGWVR3_EL1 SYSREG(2, 0, 0, 3, 6)
+#define SYSREG_DBGWCR3_EL1 SYSREG(2, 0, 0, 3, 7)
+#define SYSREG_DBGBVR4_EL1 SYSREG(2, 0, 0, 4, 4)
+#define SYSREG_DBGBCR4_EL1 SYSREG(2, 0, 0, 4, 5)
+#define SYSREG_DBGWVR4_EL1 SYSREG(2, 0, 0, 4, 6)
+#define SYSREG_DBGWCR4_EL1 SYSREG(2, 0, 0, 4, 7)
+#define SYSREG_DBGBVR5_EL1 SYSREG(2, 0, 0, 5, 4)
+#define SYSREG_DBGBCR5_EL1 SYSREG(2, 0, 0, 5, 5)
+#define SYSREG_DBGWVR5_EL1 SYSREG(2, 0, 0, 5, 6)
+#define SYSREG_DBGWCR5_EL1 SYSREG(2, 0, 0, 5, 7)
+#define SYSREG_DBGBVR6_EL1 SYSREG(2, 0, 0, 6, 4)
+#define SYSREG_DBGBCR6_EL1 SYSREG(2, 0, 0, 6, 5)
+#define SYSREG_DBGWVR6_EL1 SYSREG(2, 0, 0, 6, 6)
+#define SYSREG_DBGWCR6_EL1 SYSREG(2, 0, 0, 6, 7)
+#define SYSREG_DBGBVR7_EL1 SYSREG(2, 0, 0, 7, 4)
+#define SYSREG_DBGBCR7_EL1 SYSREG(2, 0, 0, 7, 5)
+#define SYSREG_DBGWVR7_EL1 SYSREG(2, 0, 0, 7, 6)
+#define SYSREG_DBGWCR7_EL1 SYSREG(2, 0, 0, 7, 7)
+#define SYSREG_DBGBVR8_EL1 SYSREG(2, 0, 0, 8, 4)
+#define SYSREG_DBGBCR8_EL1 SYSREG(2, 0, 0, 8, 5)
+#define SYSREG_DBGWVR8_EL1 SYSREG(2, 0, 0, 8, 6)
+#define SYSREG_DBGWCR8_EL1 SYSREG(2, 0, 0, 8, 7)
+#define SYSREG_DBGBVR9_EL1 SYSREG(2, 0, 0, 9, 4)
+#define SYSREG_DBGBCR9_EL1 SYSREG(2, 0, 0, 9, 5)
+#define SYSREG_DBGWVR9_EL1 SYSREG(2, 0, 0, 9, 6)
+#define SYSREG_DBGWCR9_EL1 SYSREG(2, 0, 0, 9, 7)
+#define SYSREG_DBGBVR10_EL1 SYSREG(2, 0, 0, 10, 4)
+#define SYSREG_DBGBCR10_EL1 SYSREG(2, 0, 0, 10, 5)
+#define SYSREG_DBGWVR10_EL1 SYSREG(2, 0, 0, 10, 6)
+#define SYSREG_DBGWCR10_EL1 SYSREG(2, 0, 0, 10, 7)
+#define SYSREG_DBGBVR11_EL1 SYSREG(2, 0, 0, 11, 4)
+#define SYSREG_DBGBCR11_EL1 SYSREG(2, 0, 0, 11, 5)
+#define SYSREG_DBGWVR11_EL1 SYSREG(2, 0, 0, 11, 6)
+#define SYSREG_DBGWCR11_EL1 SYSREG(2, 0, 0, 11, 7)
+#define SYSREG_DBGBVR12_EL1 SYSREG(2, 0, 0, 12, 4)
+#define SYSREG_DBGBCR12_EL1 SYSREG(2, 0, 0, 12, 5)
+#define SYSREG_DBGWVR12_EL1 SYSREG(2, 0, 0, 12, 6)
+#define SYSREG_DBGWCR12_EL1 SYSREG(2, 0, 0, 12, 7)
+#define SYSREG_DBGBVR13_EL1 SYSREG(2, 0, 0, 13, 4)
+#define SYSREG_DBGBCR13_EL1 SYSREG(2, 0, 0, 13, 5)
+#define SYSREG_DBGWVR13_EL1 SYSREG(2, 0, 0, 13, 6)
+#define SYSREG_DBGWCR13_EL1 SYSREG(2, 0, 0, 13, 7)
+#define SYSREG_DBGBVR14_EL1 SYSREG(2, 0, 0, 14, 4)
+#define SYSREG_DBGBCR14_EL1 SYSREG(2, 0, 0, 14, 5)
+#define SYSREG_DBGWVR14_EL1 SYSREG(2, 0, 0, 14, 6)
+#define SYSREG_DBGWCR14_EL1 SYSREG(2, 0, 0, 14, 7)
+#define SYSREG_DBGBVR15_EL1 SYSREG(2, 0, 0, 15, 4)
+#define SYSREG_DBGBCR15_EL1 SYSREG(2, 0, 0, 15, 5)
+#define SYSREG_DBGWVR15_EL1 SYSREG(2, 0, 0, 15, 6)
+#define SYSREG_DBGWCR15_EL1 SYSREG(2, 0, 0, 15, 7)
 
 #define WFX_IS_WFE (1 << 0)
 
-#define TMR_CTL_ENABLE  (1 << 0)
-#define TMR_CTL_IMASK   (1 << 1)
+#define TMR_CTL_ENABLE (1 << 0)
+#define TMR_CTL_IMASK (1 << 1)
 #define TMR_CTL_ISTATUS (1 << 2)
 
 static void hvf_wfi(CPUState *cpu);
@@ -316,51 +271,51 @@ struct hvf_reg_match {
 };
 
 static const struct hvf_reg_match hvf_reg_match[] = {
-    { HV_REG_X0,   offsetof(CPUARMState, xregs[0]) },
-    { HV_REG_X1,   offsetof(CPUARMState, xregs[1]) },
-    { HV_REG_X2,   offsetof(CPUARMState, xregs[2]) },
-    { HV_REG_X3,   offsetof(CPUARMState, xregs[3]) },
-    { HV_REG_X4,   offsetof(CPUARMState, xregs[4]) },
-    { HV_REG_X5,   offsetof(CPUARMState, xregs[5]) },
-    { HV_REG_X6,   offsetof(CPUARMState, xregs[6]) },
-    { HV_REG_X7,   offsetof(CPUARMState, xregs[7]) },
-    { HV_REG_X8,   offsetof(CPUARMState, xregs[8]) },
-    { HV_REG_X9,   offsetof(CPUARMState, xregs[9]) },
-    { HV_REG_X10,  offsetof(CPUARMState, xregs[10]) },
-    { HV_REG_X11,  offsetof(CPUARMState, xregs[11]) },
-    { HV_REG_X12,  offsetof(CPUARMState, xregs[12]) },
-    { HV_REG_X13,  offsetof(CPUARMState, xregs[13]) },
-    { HV_REG_X14,  offsetof(CPUARMState, xregs[14]) },
-    { HV_REG_X15,  offsetof(CPUARMState, xregs[15]) },
-    { HV_REG_X16,  offsetof(CPUARMState, xregs[16]) },
-    { HV_REG_X17,  offsetof(CPUARMState, xregs[17]) },
-    { HV_REG_X18,  offsetof(CPUARMState, xregs[18]) },
-    { HV_REG_X19,  offsetof(CPUARMState, xregs[19]) },
-    { HV_REG_X20,  offsetof(CPUARMState, xregs[20]) },
-    { HV_REG_X21,  offsetof(CPUARMState, xregs[21]) },
-    { HV_REG_X22,  offsetof(CPUARMState, xregs[22]) },
-    { HV_REG_X23,  offsetof(CPUARMState, xregs[23]) },
-    { HV_REG_X24,  offsetof(CPUARMState, xregs[24]) },
-    { HV_REG_X25,  offsetof(CPUARMState, xregs[25]) },
-    { HV_REG_X26,  offsetof(CPUARMState, xregs[26]) },
-    { HV_REG_X27,  offsetof(CPUARMState, xregs[27]) },
-    { HV_REG_X28,  offsetof(CPUARMState, xregs[28]) },
-    { HV_REG_X29,  offsetof(CPUARMState, xregs[29]) },
-    { HV_REG_X30,  offsetof(CPUARMState, xregs[30]) },
-    { HV_REG_PC,   offsetof(CPUARMState, pc) },
+    { HV_REG_X0, offsetof(CPUARMState, xregs[0]) },
+    { HV_REG_X1, offsetof(CPUARMState, xregs[1]) },
+    { HV_REG_X2, offsetof(CPUARMState, xregs[2]) },
+    { HV_REG_X3, offsetof(CPUARMState, xregs[3]) },
+    { HV_REG_X4, offsetof(CPUARMState, xregs[4]) },
+    { HV_REG_X5, offsetof(CPUARMState, xregs[5]) },
+    { HV_REG_X6, offsetof(CPUARMState, xregs[6]) },
+    { HV_REG_X7, offsetof(CPUARMState, xregs[7]) },
+    { HV_REG_X8, offsetof(CPUARMState, xregs[8]) },
+    { HV_REG_X9, offsetof(CPUARMState, xregs[9]) },
+    { HV_REG_X10, offsetof(CPUARMState, xregs[10]) },
+    { HV_REG_X11, offsetof(CPUARMState, xregs[11]) },
+    { HV_REG_X12, offsetof(CPUARMState, xregs[12]) },
+    { HV_REG_X13, offsetof(CPUARMState, xregs[13]) },
+    { HV_REG_X14, offsetof(CPUARMState, xregs[14]) },
+    { HV_REG_X15, offsetof(CPUARMState, xregs[15]) },
+    { HV_REG_X16, offsetof(CPUARMState, xregs[16]) },
+    { HV_REG_X17, offsetof(CPUARMState, xregs[17]) },
+    { HV_REG_X18, offsetof(CPUARMState, xregs[18]) },
+    { HV_REG_X19, offsetof(CPUARMState, xregs[19]) },
+    { HV_REG_X20, offsetof(CPUARMState, xregs[20]) },
+    { HV_REG_X21, offsetof(CPUARMState, xregs[21]) },
+    { HV_REG_X22, offsetof(CPUARMState, xregs[22]) },
+    { HV_REG_X23, offsetof(CPUARMState, xregs[23]) },
+    { HV_REG_X24, offsetof(CPUARMState, xregs[24]) },
+    { HV_REG_X25, offsetof(CPUARMState, xregs[25]) },
+    { HV_REG_X26, offsetof(CPUARMState, xregs[26]) },
+    { HV_REG_X27, offsetof(CPUARMState, xregs[27]) },
+    { HV_REG_X28, offsetof(CPUARMState, xregs[28]) },
+    { HV_REG_X29, offsetof(CPUARMState, xregs[29]) },
+    { HV_REG_X30, offsetof(CPUARMState, xregs[30]) },
+    { HV_REG_PC, offsetof(CPUARMState, pc) },
 };
 
 static const struct hvf_reg_match hvf_fpreg_match[] = {
-    { HV_SIMD_FP_REG_Q0,  offsetof(CPUARMState, vfp.zregs[0]) },
-    { HV_SIMD_FP_REG_Q1,  offsetof(CPUARMState, vfp.zregs[1]) },
-    { HV_SIMD_FP_REG_Q2,  offsetof(CPUARMState, vfp.zregs[2]) },
-    { HV_SIMD_FP_REG_Q3,  offsetof(CPUARMState, vfp.zregs[3]) },
-    { HV_SIMD_FP_REG_Q4,  offsetof(CPUARMState, vfp.zregs[4]) },
-    { HV_SIMD_FP_REG_Q5,  offsetof(CPUARMState, vfp.zregs[5]) },
-    { HV_SIMD_FP_REG_Q6,  offsetof(CPUARMState, vfp.zregs[6]) },
-    { HV_SIMD_FP_REG_Q7,  offsetof(CPUARMState, vfp.zregs[7]) },
-    { HV_SIMD_FP_REG_Q8,  offsetof(CPUARMState, vfp.zregs[8]) },
-    { HV_SIMD_FP_REG_Q9,  offsetof(CPUARMState, vfp.zregs[9]) },
+    { HV_SIMD_FP_REG_Q0, offsetof(CPUARMState, vfp.zregs[0]) },
+    { HV_SIMD_FP_REG_Q1, offsetof(CPUARMState, vfp.zregs[1]) },
+    { HV_SIMD_FP_REG_Q2, offsetof(CPUARMState, vfp.zregs[2]) },
+    { HV_SIMD_FP_REG_Q3, offsetof(CPUARMState, vfp.zregs[3]) },
+    { HV_SIMD_FP_REG_Q4, offsetof(CPUARMState, vfp.zregs[4]) },
+    { HV_SIMD_FP_REG_Q5, offsetof(CPUARMState, vfp.zregs[5]) },
+    { HV_SIMD_FP_REG_Q6, offsetof(CPUARMState, vfp.zregs[6]) },
+    { HV_SIMD_FP_REG_Q7, offsetof(CPUARMState, vfp.zregs[7]) },
+    { HV_SIMD_FP_REG_Q8, offsetof(CPUARMState, vfp.zregs[8]) },
+    { HV_SIMD_FP_REG_Q9, offsetof(CPUARMState, vfp.zregs[9]) },
     { HV_SIMD_FP_REG_Q10, offsetof(CPUARMState, vfp.zregs[10]) },
     { HV_SIMD_FP_REG_Q11, offsetof(CPUARMState, vfp.zregs[11]) },
     { HV_SIMD_FP_REG_Q12, offsetof(CPUARMState, vfp.zregs[12]) },
@@ -652,7 +607,8 @@ int hvf_get_registers(CPUState *cpu)
                  * environment.
                  */
                 const ARMCPRegInfo *ri;
-                ri = get_arm_cp_reginfo(arm_cpu->cp_regs, hvf_sreg_match[i].key);
+                ri =
+                    get_arm_cp_reginfo(arm_cpu->cp_regs, hvf_sreg_match[i].key);
                 val = read_raw_cp_reg(env, ri);
 
                 arm_cpu->cpreg_values[hvf_sreg_match[i].cp_idx] = val;
@@ -857,10 +813,8 @@ static bool hvf_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
     int i;
 
     ahcf->dtb_compatible = "arm,arm-v8";
-    ahcf->features = (1ULL << ARM_FEATURE_V8) |
-                     (1ULL << ARM_FEATURE_NEON) |
-                     (1ULL << ARM_FEATURE_AARCH64) |
-                     (1ULL << ARM_FEATURE_PMU) |
+    ahcf->features = (1ULL << ARM_FEATURE_V8) | (1ULL << ARM_FEATURE_NEON) |
+                     (1ULL << ARM_FEATURE_AARCH64) | (1ULL << ARM_FEATURE_PMU) |
                      (1ULL << ARM_FEATURE_GENERIC_TIMER);
 
     /* We set up a small vcpu to extract host registers */
@@ -936,16 +890,14 @@ int hvf_arch_init_vcpu(CPUState *cpu)
     asm volatile("mrs %0, cntfrq_el0" : "=r"(arm_cpu->gt_cntfrq_hz));
 
     /* Allocate enough space for our sysreg sync */
-    arm_cpu->cpreg_indexes = g_renew(uint64_t, arm_cpu->cpreg_indexes,
-                                     sregs_match_len);
-    arm_cpu->cpreg_values = g_renew(uint64_t, arm_cpu->cpreg_values,
-                                    sregs_match_len);
-    arm_cpu->cpreg_vmstate_indexes = g_renew(uint64_t,
-                                             arm_cpu->cpreg_vmstate_indexes,
-                                             sregs_match_len);
-    arm_cpu->cpreg_vmstate_values = g_renew(uint64_t,
-                                            arm_cpu->cpreg_vmstate_values,
-                                            sregs_match_len);
+    arm_cpu->cpreg_indexes =
+        g_renew(uint64_t, arm_cpu->cpreg_indexes, sregs_match_len);
+    arm_cpu->cpreg_values =
+        g_renew(uint64_t, arm_cpu->cpreg_values, sregs_match_len);
+    arm_cpu->cpreg_vmstate_indexes =
+        g_renew(uint64_t, arm_cpu->cpreg_vmstate_indexes, sregs_match_len);
+    arm_cpu->cpreg_vmstate_values =
+        g_renew(uint64_t, arm_cpu->cpreg_vmstate_values, sregs_match_len);
 
     memset(arm_cpu->cpreg_values, 0, sregs_match_len * sizeof(uint64_t));
 
@@ -969,8 +921,8 @@ int hvf_arch_init_vcpu(CPUState *cpu)
     assert(write_cpustate_to_list(arm_cpu, false));
 
     /* Set CP_NO_RAW system registers on init */
-    ret = hv_vcpu_set_sys_reg(cpu->accel->fd, HV_SYS_REG_MIDR_EL1,
-                              arm_cpu->midr);
+    ret =
+        hv_vcpu_set_sys_reg(cpu->accel->fd, HV_SYS_REG_MIDR_EL1, arm_cpu->midr);
     assert_hvf_ok(ret);
 
     ret = hv_vcpu_set_sys_reg(cpu->accel->fd, HV_SYS_REG_MPIDR_EL1,
@@ -997,8 +949,7 @@ void hvf_kick_vcpu_thread(CPUState *cpu)
     hv_vcpus_exit(&cpu->accel->fd, 1);
 }
 
-static void hvf_raise_exception(CPUState *cpu, uint32_t excp,
-                                uint32_t syndrome)
+static void hvf_raise_exception(CPUState *cpu, uint32_t excp, uint32_t syndrome)
 {
     ARMCPU *arm_cpu = ARM_CPU(cpu);
     CPUARMState *env = &arm_cpu->env;
@@ -1026,12 +977,8 @@ static bool hvf_handle_psci_call(CPUState *cpu)
 {
     ARMCPU *arm_cpu = ARM_CPU(cpu);
     CPUARMState *env = &arm_cpu->env;
-    uint64_t param[4] = {
-        env->xregs[0],
-        env->xregs[1],
-        env->xregs[2],
-        env->xregs[3]
-    };
+    uint64_t param[4] = { env->xregs[0], env->xregs[1], env->xregs[2],
+                          env->xregs[3] };
     uint64_t context_id, mpidr;
     bool target_aarch64 = true;
     CPUState *target_cpu_state;
@@ -1090,8 +1037,8 @@ static bool hvf_handle_psci_call(CPUState *cpu)
         mpidr = param[1];
         entry = param[2];
         context_id = param[3];
-        ret = arm_set_cpu_on(mpidr, entry, context_id,
-                             target_el, target_aarch64);
+        ret =
+            arm_set_cpu_on(mpidr, entry, context_id, target_el, target_aarch64);
         break;
     case QEMU_PSCI_0_1_FN_CPU_OFF:
     case QEMU_PSCI_0_2_FN_CPU_OFF:
@@ -1148,11 +1095,8 @@ static bool hvf_handle_psci_call(CPUState *cpu)
 
 static bool is_id_sysreg(uint32_t reg)
 {
-    return SYSREG_OP0(reg) == 3 &&
-           SYSREG_OP1(reg) == 0 &&
-           SYSREG_CRN(reg) == 0 &&
-           SYSREG_CRM(reg) >= 1 &&
-           SYSREG_CRM(reg) < 8;
+    return SYSREG_OP0(reg) == 3 && SYSREG_OP1(reg) == 0 &&
+           SYSREG_CRN(reg) == 0 && SYSREG_CRM(reg) >= 1 && SYSREG_CRM(reg) < 8;
 }
 
 static uint32_t hvf_reg2cp_reg(uint32_t reg)
@@ -1352,22 +1296,15 @@ static int hvf_sysreg_read(CPUState *cpu, uint32_t reg, uint32_t rt)
             break;
         }
         cpu_synchronize_state(cpu);
-        trace_hvf_unhandled_sysreg_read(env->pc, reg,
-                                        SYSREG_OP0(reg),
-                                        SYSREG_OP1(reg),
-                                        SYSREG_CRN(reg),
-                                        SYSREG_CRM(reg),
-                                        SYSREG_OP2(reg));
+        trace_hvf_unhandled_sysreg_read(env->pc, reg, SYSREG_OP0(reg),
+                                        SYSREG_OP1(reg), SYSREG_CRN(reg),
+                                        SYSREG_CRM(reg), SYSREG_OP2(reg));
         hvf_raise_exception(cpu, EXCP_UDEF, syn_uncategorized());
         return 1;
     }
 
-    trace_hvf_sysreg_read(reg,
-                          SYSREG_OP0(reg),
-                          SYSREG_OP1(reg),
-                          SYSREG_CRN(reg),
-                          SYSREG_CRM(reg),
-                          SYSREG_OP2(reg),
+    trace_hvf_sysreg_read(reg, SYSREG_OP0(reg), SYSREG_OP1(reg),
+                          SYSREG_CRN(reg), SYSREG_CRM(reg), SYSREG_OP2(reg),
                           val);
     hvf_set_reg(cpu, rt, val);
 
@@ -1377,8 +1314,9 @@ static int hvf_sysreg_read(CPUState *cpu, uint32_t reg, uint32_t rt)
 static void pmu_update_irq(CPUARMState *env)
 {
     ARMCPU *cpu = env_archcpu(env);
-    qemu_set_irq(cpu->pmu_interrupt, (env->cp15.c9_pmcr & PMCRE) &&
-            (env->cp15.c9_pminten & env->cp15.c9_pmovsr));
+    qemu_set_irq(cpu->pmu_interrupt,
+                 (env->cp15.c9_pmcr & PMCRE) &&
+                     (env->cp15.c9_pminten & env->cp15.c9_pmovsr));
 }
 
 static bool pmu_event_supported(uint16_t number)
@@ -1395,8 +1333,8 @@ static bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
     bool enabled, filtered = true;
     int el = arm_current_el(env);
 
-    enabled = (env->cp15.c9_pmcr & PMCRE) &&
-              (env->cp15.c9_pmcnten & (1 << counter));
+    enabled =
+        (env->cp15.c9_pmcr & PMCRE) && (env->cp15.c9_pmcnten & (1 << counter));
 
     if (counter == 31) {
         filter = env->cp15.pmccfiltr_el0;
@@ -1430,10 +1368,10 @@ static void pmswinc_write(CPUARMState *env, uint64_t value)
     for (i = 0; i < pmu_num_counters(env); i++) {
         /* Increment a counter's count iff: */
         if ((value & (1 << i)) && /* counter's bit is set */
-                /* counter is enabled and not filtered */
-                pmu_counter_enabled(env, i) &&
-                /* counter is SW_INCR */
-                (env->cp15.c14_pmevtyper[i] & PMXEVTYPER_EVTCOUNT) == 0x0) {
+            /* counter is enabled and not filtered */
+            pmu_counter_enabled(env, i) &&
+            /* counter is SW_INCR */
+            (env->cp15.c14_pmevtyper[i] & PMXEVTYPER_EVTCOUNT) == 0x0) {
             /*
              * Detect if this write causes an overflow since we can't predict
              * PMSWINC overflows like we can for other events
@@ -1482,12 +1420,8 @@ static int hvf_sysreg_write(CPUState *cpu, uint32_t reg, uint64_t val)
     ARMCPU *arm_cpu = ARM_CPU(cpu);
     CPUARMState *env = &arm_cpu->env;
 
-    trace_hvf_sysreg_write(reg,
-                           SYSREG_OP0(reg),
-                           SYSREG_OP1(reg),
-                           SYSREG_CRN(reg),
-                           SYSREG_CRM(reg),
-                           SYSREG_OP2(reg),
+    trace_hvf_sysreg_write(reg, SYSREG_OP0(reg), SYSREG_OP1(reg),
+                           SYSREG_CRN(reg), SYSREG_CRM(reg), SYSREG_OP2(reg),
                            val);
 
     switch (reg) {
@@ -1661,12 +1595,9 @@ static int hvf_sysreg_write(CPUState *cpu, uint32_t reg, uint64_t val)
         break;
     default:
         cpu_synchronize_state(cpu);
-        trace_hvf_unhandled_sysreg_write(env->pc, reg,
-                                         SYSREG_OP0(reg),
-                                         SYSREG_OP1(reg),
-                                         SYSREG_CRN(reg),
-                                         SYSREG_CRM(reg),
-                                         SYSREG_OP2(reg));
+        trace_hvf_unhandled_sysreg_write(env->pc, reg, SYSREG_OP0(reg),
+                                         SYSREG_OP1(reg), SYSREG_CRN(reg),
+                                         SYSREG_CRM(reg), SYSREG_OP2(reg));
         hvf_raise_exception(cpu, EXCP_UDEF, syn_uncategorized());
         return 1;
     }
@@ -1770,7 +1701,7 @@ static void hvf_wfi(CPUState *cpu)
         return;
     }
 
-    ts = (struct timespec) { seconds, nanos };
+    ts = (struct timespec){ seconds, nanos };
     hvf_wait_for_ipi(cpu, &ts);
 }
 
@@ -1902,8 +1833,8 @@ int hvf_vcpu_exec(CPUState *cpu)
         uint64_t val = 0;
 
         trace_hvf_data_abort(env->pc, hvf_exit->exception.virtual_address,
-                             hvf_exit->exception.physical_address, isv,
-                             iswrite, s1ptw, len, srt);
+                             hvf_exit->exception.physical_address, isv, iswrite,
+                             s1ptw, len, srt);
 
         if (cm) {
             /* We don't cache MMIO regions */
@@ -1956,7 +1887,8 @@ int hvf_vcpu_exec(CPUState *cpu)
         if (arm_cpu->psci_conduit == QEMU_PSCI_CONDUIT_HVC) {
             if (!hvf_handle_psci_call(cpu)) {
                 trace_hvf_unknown_hvc(env->xregs[0]);
-                /* SMCCC 1.3 section 5.2 says every unknown SMCCC call returns -1 */
+                /* SMCCC 1.3 section 5.2 says every unknown SMCCC call returns
+                 * -1 */
                 env->xregs[0] = -1;
             }
         } else {
@@ -1971,7 +1903,8 @@ int hvf_vcpu_exec(CPUState *cpu)
 
             if (!hvf_handle_psci_call(cpu)) {
                 trace_hvf_unknown_smc(env->xregs[0]);
-                /* SMCCC 1.3 section 5.2 says every unknown SMCCC call returns -1 */
+                /* SMCCC 1.3 section 5.2 says every unknown SMCCC call returns
+                 * -1 */
                 env->xregs[0] = -1;
             }
         } else {
@@ -2009,10 +1942,8 @@ static const VMStateDescription vmstate_hvf_vtimer = {
     .name = "hvf-vtimer",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(vtimer_val, HVFVTimer),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields = (VMStateField[]){ VMSTATE_UINT64(vtimer_val, HVFVTimer),
+                                VMSTATE_END_OF_LIST() },
 };
 
 static void hvf_vm_state_change(void *opaque, bool running, RunState state)
@@ -2183,10 +2114,10 @@ static void hvf_arch_set_traps(void)
 
     /* Check whether guest debugging is enabled for at least one vCPU; if it
      * is, enable exiting the guest on all vCPUs */
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         should_enable_traps |= cpu->accel->guest_debug_enabled;
     }
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         /* Set whether debug exceptions exit the guest */
         r = hv_vcpu_set_trap_debug_exceptions(cpu->accel->fd,
                                               should_enable_traps);
@@ -2206,8 +2137,8 @@ void hvf_arch_update_guest_debug(CPUState *cpu)
 
     /* Check whether guest debugging is enabled */
     cpu->accel->guest_debug_enabled = cpu->singlestep_enabled ||
-                                    hvf_sw_breakpoints_active(cpu) ||
-                                    hvf_arm_hw_debug_active(cpu);
+                                      hvf_sw_breakpoints_active(cpu) ||
+                                      hvf_arm_hw_debug_active(cpu);
 
     /* Update debug registers */
     if (cpu->accel->guest_debug_enabled) {

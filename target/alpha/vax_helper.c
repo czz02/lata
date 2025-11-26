@@ -86,7 +86,7 @@ static float32 f_to_float32(CPUAlphaState *env, uintptr_t retaddr, uint64_t a)
 uint32_t helper_f_to_memory(uint64_t a)
 {
     uint32_t r;
-    r =  (a & 0x00001fffe0000000ull) >> 13;
+    r = (a & 0x00001fffe0000000ull) >> 13;
     r |= (a & 0x07ffe00000000000ull) >> 45;
     r |= (a & 0xc000000000000000ull) >> 48;
     return r;
@@ -95,7 +95,7 @@ uint32_t helper_f_to_memory(uint64_t a)
 uint64_t helper_memory_to_f(uint32_t a)
 {
     uint64_t r;
-    r =  ((uint64_t)(a & 0x0000c000)) << 48;
+    r = ((uint64_t)(a & 0x0000c000)) << 48;
     r |= ((uint64_t)(a & 0x003fffff)) << 45;
     r |= ((uint64_t)(a & 0xffff0000)) << 13;
     if (!(a & 0x00004000)) {
@@ -217,7 +217,7 @@ static float64 g_to_float64(CPUAlphaState *env, uintptr_t retaddr, uint64_t a)
 uint64_t helper_g_to_memory(uint64_t a)
 {
     uint64_t r;
-    r =  (a & 0x000000000000ffffull) << 48;
+    r = (a & 0x000000000000ffffull) << 48;
     r |= (a & 0x00000000ffff0000ull) << 16;
     r |= (a & 0x0000ffff00000000ull) >> 16;
     r |= (a & 0xffff000000000000ull) >> 48;
@@ -227,7 +227,7 @@ uint64_t helper_g_to_memory(uint64_t a)
 uint64_t helper_memory_to_g(uint64_t a)
 {
     uint64_t r;
-    r =  (a & 0x000000000000ffffull) << 48;
+    r = (a & 0x000000000000ffffull) << 48;
     r |= (a & 0x00000000ffff0000ull) << 16;
     r |= (a & 0x0000ffff00000000ull) >> 16;
     r |= (a & 0xffff000000000000ull) >> 48;

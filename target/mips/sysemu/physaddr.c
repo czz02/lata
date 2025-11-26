@@ -78,8 +78,7 @@ static int get_seg_physical_address(CPUMIPSState *env, hwaddr *physical,
                                     int *prot, target_ulong real_address,
                                     MMUAccessType access_type, int mmu_idx,
                                     unsigned int am, bool eu,
-                                    target_ulong segmask,
-                                    hwaddr physical_base)
+                                    target_ulong segmask, hwaddr physical_base)
 {
     int mapped = is_seg_am_mapped(am, eu, mmu_idx);
 
@@ -112,9 +111,9 @@ static int get_segctl_physical_address(CPUMIPSState *env, hwaddr *physical,
                                     pa & ~(hwaddr)segmask);
 }
 
-int get_physical_address(CPUMIPSState *env, hwaddr *physical,
-                         int *prot, target_ulong real_address,
-                         MMUAccessType access_type, int mmu_idx)
+int get_physical_address(CPUMIPSState *env, hwaddr *physical, int *prot,
+                         target_ulong real_address, MMUAccessType access_type,
+                         int mmu_idx)
 {
     /* User mode can only access useg/xuseg */
 #if defined(TARGET_MIPS64)
@@ -138,24 +137,24 @@ int get_physical_address(CPUMIPSState *env, hwaddr *physical,
         } else {
             segctl = env->CP0_SegCtl2 >> 16;
         }
-        ret = get_segctl_physical_address(env, physical, prot,
-                                          real_address, access_type,
-                                          mmu_idx, segctl, 0x3FFFFFFF);
+        ret = get_segctl_physical_address(env, physical, prot, real_address,
+                                          access_type, mmu_idx, segctl,
+                                          0x3FFFFFFF);
 #if defined(TARGET_MIPS64)
     } else if (address < 0x4000000000000000ULL) {
         /* xuseg */
         if (UX && address <= (0x3FFFFFFFFFFFFFFFULL & env->SEGMask)) {
-            ret = env->tlb->map_address(env, physical, prot,
-                                        real_address, access_type);
+            ret = env->tlb->map_address(env, physical, prot, real_address,
+                                        access_type);
         } else {
             ret = TLBRET_BADADDR;
         }
     } else if (address < 0x8000000000000000ULL) {
         /* xsseg */
-        if ((supervisor_mode || kernel_mode) &&
-            SX && address <= (0x7FFFFFFFFFFFFFFFULL & env->SEGMask)) {
-            ret = env->tlb->map_address(env, physical, prot,
-                                        real_address, access_type);
+        if ((supervisor_mode || kernel_mode) && SX &&
+            address <= (0x7FFFFFFFFFFFFFFFULL & env->SEGMask)) {
+            ret = env->tlb->map_address(env, physical, prot, real_address,
+                                        access_type);
         } else {
             ret = TLBRET_BADADDR;
         }
@@ -164,14 +163,14 @@ int get_physical_address(CPUMIPSState *env, hwaddr *physical,
         if ((address & 0x07FFFFFFFFFFFFFFULL) <= env->PAMask) {
             /* KX/SX/UX bit to check for each xkphys EVA access mode */
             static const uint8_t am_ksux[8] = {
-                [CP0SC_AM_UK]    = (1u << CP0St_KX),
-                [CP0SC_AM_MK]    = (1u << CP0St_KX),
-                [CP0SC_AM_MSK]   = (1u << CP0St_SX),
-                [CP0SC_AM_MUSK]  = (1u << CP0St_UX),
+                [CP0SC_AM_UK] = (1u << CP0St_KX),
+                [CP0SC_AM_MK] = (1u << CP0St_KX),
+                [CP0SC_AM_MSK] = (1u << CP0St_SX),
+                [CP0SC_AM_MUSK] = (1u << CP0St_UX),
                 [CP0SC_AM_MUSUK] = (1u << CP0St_UX),
-                [CP0SC_AM_USK]   = (1u << CP0St_SX),
-                [6]              = (1u << CP0St_KX),
-                [CP0SC_AM_UUSK]  = (1u << CP0St_UX),
+                [CP0SC_AM_USK] = (1u << CP0St_SX),
+                [6] = (1u << CP0St_KX),
+                [CP0SC_AM_UUSK] = (1u << CP0St_UX),
             };
             unsigned int am = CP0SC_AM_UK;
             unsigned int xr = (env->CP0_SegCtl2 & CP0SC2_XR_MASK) >> CP0SC2_XR;
@@ -181,10 +180,9 @@ int get_physical_address(CPUMIPSState *env, hwaddr *physical,
             }
             /* Does CP0_Status.KX/SX/UX permit the access mode (am) */
             if (env->CP0_Status & am_ksux[am]) {
-                ret = get_seg_physical_address(env, physical, prot,
-                                               real_address, access_type,
-                                               mmu_idx, am, false, env->PAMask,
-                                               0);
+                ret = get_seg_physical_address(
+                    env, physical, prot, real_address, access_type, mmu_idx, am,
+                    false, env->PAMask, 0);
             } else {
                 ret = TLBRET_BADADDR;
             }
@@ -195,8 +193,8 @@ int get_physical_address(CPUMIPSState *env, hwaddr *physical,
         /* xkseg */
         if (kernel_mode && KX &&
             address <= (0xFFFFFFFF7FFFFFFFULL & env->SEGMask)) {
-            ret = env->tlb->map_address(env, physical, prot,
-                                        real_address, access_type);
+            ret = env->tlb->map_address(env, physical, prot, real_address,
+                                        access_type);
         } else {
             ret = TLBRET_BADADDR;
         }

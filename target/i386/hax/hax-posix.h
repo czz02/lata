@@ -17,7 +17,7 @@
 
 #include <sys/ioctl.h>
 
-#define HAX_INVALID_FD  (-1)
+#define HAX_INVALID_FD (-1)
 static inline int hax_invalid_fd(hax_fd fd)
 {
     return fd <= 0;
@@ -46,16 +46,16 @@ static inline void hax_close_fd(hax_fd fd)
 #define HAX_VM_IOCTL_NOTIFY_QEMU_VERSION _IOW(0, 0x84, struct hax_qemu_version)
 #define HAX_VM_IOCTL_ADD_RAMBLOCK _IOW(0, 0x85, struct hax_ramblock_info)
 
-#define HAX_VCPU_IOCTL_RUN  _IO(0, 0xc0)
+#define HAX_VCPU_IOCTL_RUN _IO(0, 0xc0)
 #define HAX_VCPU_IOCTL_SET_MSRS _IOWR(0, 0xc1, struct hax_msr_data)
 #define HAX_VCPU_IOCTL_GET_MSRS _IOWR(0, 0xc2, struct hax_msr_data)
 
-#define HAX_VCPU_IOCTL_SET_FPU  _IOW(0, 0xc3, struct fx_layout)
-#define HAX_VCPU_IOCTL_GET_FPU  _IOR(0, 0xc4, struct fx_layout)
+#define HAX_VCPU_IOCTL_SET_FPU _IOW(0, 0xc3, struct fx_layout)
+#define HAX_VCPU_IOCTL_GET_FPU _IOR(0, 0xc4, struct fx_layout)
 
 #define HAX_VCPU_IOCTL_SETUP_TUNNEL _IOWR(0, 0xc5, struct hax_tunnel_info)
 #define HAX_VCPU_IOCTL_INTERRUPT _IOWR(0, 0xc6, uint32_t)
-#define HAX_VCPU_SET_REGS       _IOWR(0, 0xc7, struct vcpu_state_t)
-#define HAX_VCPU_GET_REGS       _IOWR(0, 0xc8, struct vcpu_state_t)
+#define HAX_VCPU_SET_REGS _IOWR(0, 0xc7, struct vcpu_state_t)
+#define HAX_VCPU_GET_REGS _IOWR(0, 0xc8, struct vcpu_state_t)
 
 #endif /* TARGET_I386_HAX_POSIX_H */

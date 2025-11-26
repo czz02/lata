@@ -25,9 +25,8 @@
 #include "fpu/softfloat.h"
 #include "tcg/debug-assert.h"
 
-static inline G_NORETURN
-void raise_exception(CPURXState *env, int index,
-                     uintptr_t retaddr);
+static inline G_NORETURN void raise_exception(CPURXState *env, int index,
+                                              uintptr_t retaddr);
 
 static void _set_psw(CPURXState *env, uint32_t psw, uint32_t rte)
 {
@@ -61,12 +60,12 @@ uint32_t helper_pack_psw(CPURXState *env)
     return rx_cpu_pack_psw(env);
 }
 
-#define SET_FPSW(b)                                             \
-    do {                                                        \
-        env->fpsw = FIELD_DP32(env->fpsw, FPSW, C ## b, 1);     \
-        if (!FIELD_EX32(env->fpsw, FPSW, E ## b)) {             \
-            env->fpsw = FIELD_DP32(env->fpsw, FPSW, F ## b, 1); \
-        }                                                       \
+#define SET_FPSW(b)                                           \
+    do {                                                      \
+        env->fpsw = FIELD_DP32(env->fpsw, FPSW, C##b, 1);     \
+        if (!FIELD_EX32(env->fpsw, FPSW, E##b)) {             \
+            env->fpsw = FIELD_DP32(env->fpsw, FPSW, F##b, 1); \
+        }                                                     \
     } while (0)
 
 /* fp operations */
@@ -99,9 +98,8 @@ static void update_fpsw(CPURXState *env, float32 ret, uintptr_t retaddr)
         if (xcpt & float_flag_inexact) {
             SET_FPSW(X);
         }
-        if ((xcpt & (float_flag_input_denormal
-                     | float_flag_output_denormal))
-            && !FIELD_EX32(env->fpsw, FPSW, DN)) {
+        if ((xcpt & (float_flag_input_denormal | float_flag_output_denormal)) &&
+            !FIELD_EX32(env->fpsw, FPSW, DN)) {
             env->fpsw = FIELD_DP32(env->fpsw, FPSW, CE, 1);
         }
 
@@ -138,13 +136,13 @@ void helper_set_fpsw(CPURXState *env, uint32_t val)
                             &env->fp_status);
 }
 
-#define FLOATOP(op, func)                                           \
-    float32 helper_##op(CPURXState *env, float32 t0, float32 t1)    \
-    {                                                               \
-        float32 ret;                                                \
-        ret = func(t0, t1, &env->fp_status);                        \
-        update_fpsw(env, *(uint32_t *)&ret, GETPC());               \
-        return ret;                                                 \
+#define FLOATOP(op, func)                                        \
+    float32 helper_##op(CPURXState *env, float32 t0, float32 t1) \
+    {                                                            \
+        float32 ret;                                             \
+        ret = func(t0, t1, &env->fp_status);                     \
+        update_fpsw(env, *(uint32_t *)&ret, GETPC());            \
+        return ret;                                              \
     }
 
 FLOATOP(fadd, float32_add)
@@ -215,23 +213,25 @@ void helper_scmpu(CPURXState *env)
     env->psw_c = (tmp0 >= tmp1);
 }
 
-static uint32_t (* const cpu_ldufn[])(CPUArchState *env,
-                                     target_ulong ptr,
+static uint32_t (*const cpu_ldufn[])(CPUArchState *env, target_ulong ptr,
                                      uintptr_t retaddr) = {
-    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
+    cpu_ldub_data_ra,
+    cpu_lduw_data_ra,
+    cpu_ldl_data_ra,
 };
 
-static uint32_t (* const cpu_ldfn[])(CPUArchState *env,
-                                     target_ulong ptr,
-                                     uintptr_t retaddr) = {
-    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
+static uint32_t (*const cpu_ldfn[])(CPUArchState *env, target_ulong ptr,
+                                    uintptr_t retaddr) = {
+    cpu_ldub_data_ra,
+    cpu_lduw_data_ra,
+    cpu_ldl_data_ra,
 };
 
-static void (* const cpu_stfn[])(CPUArchState *env,
-                                 target_ulong ptr,
-                                 uint32_t val,
-                                 uintptr_t retaddr) = {
-    cpu_stb_data_ra, cpu_stw_data_ra, cpu_stl_data_ra,
+static void (*const cpu_stfn[])(CPUArchState *env, target_ulong ptr,
+                                uint32_t val, uintptr_t retaddr) = {
+    cpu_stb_data_ra,
+    cpu_stw_data_ra,
+    cpu_stl_data_ra,
 };
 
 void helper_sstr(CPURXState *env, uint32_t sz)
@@ -420,9 +420,8 @@ uint32_t helper_divu(CPURXState *env, uint32_t num, uint32_t den)
 }
 
 /* exception */
-static inline G_NORETURN
-void raise_exception(CPURXState *env, int index,
-                     uintptr_t retaddr)
+static inline G_NORETURN void raise_exception(CPURXState *env, int index,
+                                              uintptr_t retaddr)
 {
     CPUState *cs = env_cpu(env);
 

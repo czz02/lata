@@ -56,12 +56,9 @@ target_ulong cpu_get_psr(CPUSPARCState *env)
     helper_compute_psr(env);
 
 #if !defined(TARGET_SPARC64)
-    return env->version | (env->psr & PSR_ICC) |
-        (env->psref ? PSR_EF : 0) |
-        (env->psrpil << 8) |
-        (env->psrs ? PSR_S : 0) |
-        (env->psrps ? PSR_PS : 0) |
-        (env->psret ? PSR_ET : 0) | env->cwp;
+    return env->version | (env->psr & PSR_ICC) | (env->psref ? PSR_EF : 0) |
+           (env->psrpil << 8) | (env->psrs ? PSR_S : 0) |
+           (env->psrps ? PSR_PS : 0) | (env->psret ? PSR_ET : 0) | env->cwp;
 #else
     return env->psr & PSR_ICC;
 #endif
@@ -118,7 +115,7 @@ void helper_rett(CPUSPARCState *env)
     }
 
     env->psret = 1;
-    cwp = cpu_cwp_inc(env, env->cwp + 1) ;
+    cwp = cpu_cwp_inc(env, env->cwp + 1);
     if (env->wim & (1 << cwp)) {
         cpu_raise_exception_ra(env, TT_WIN_UNF, GETPC());
     }
@@ -176,9 +173,9 @@ void helper_save(CPUSPARCState *env)
 
     cwp = cpu_cwp_dec(env, env->cwp - 1);
     if (env->cansave == 0) {
-        int tt = TT_SPILL | (env->otherwin != 0
-                             ? (TT_WOTHER | ((env->wstate & 0x38) >> 1))
-                             : ((env->wstate & 0x7) << 2));
+        int tt = TT_SPILL | (env->otherwin != 0 ?
+                                 (TT_WOTHER | ((env->wstate & 0x38) >> 1)) :
+                                 ((env->wstate & 0x7) << 2));
         cpu_raise_exception_ra(env, tt, GETPC());
     } else {
         if (env->cleanwin - env->canrestore == 0) {
@@ -198,9 +195,9 @@ void helper_restore(CPUSPARCState *env)
 
     cwp = cpu_cwp_inc(env, env->cwp + 1);
     if (env->canrestore == 0) {
-        int tt = TT_FILL | (env->otherwin != 0
-                            ? (TT_WOTHER | ((env->wstate & 0x38) >> 1))
-                            : ((env->wstate & 0x7) << 2));
+        int tt = TT_FILL | (env->otherwin != 0 ?
+                                (TT_WOTHER | ((env->wstate & 0x38) >> 1)) :
+                                ((env->wstate & 0x7) << 2));
         cpu_raise_exception_ra(env, tt, GETPC());
     } else {
         env->cansave++;
@@ -212,9 +209,9 @@ void helper_restore(CPUSPARCState *env)
 void helper_flushw(CPUSPARCState *env)
 {
     if (env->cansave != env->nwindows - 2) {
-        int tt = TT_SPILL | (env->otherwin != 0
-                             ? (TT_WOTHER | ((env->wstate & 0x38) >> 1))
-                             : ((env->wstate & 0x7) << 2));
+        int tt = TT_SPILL | (env->otherwin != 0 ?
+                                 (TT_WOTHER | ((env->wstate & 0x38) >> 1)) :
+                                 ((env->wstate & 0x7) << 2));
         cpu_raise_exception_ra(env, tt, GETPC());
     }
 }

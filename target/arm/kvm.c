@@ -60,12 +60,11 @@ int kvm_arm_vcpu_finalize(CPUState *cs, int feature)
 
 void kvm_arm_init_serror_injection(CPUState *cs)
 {
-    cap_has_inject_serror_esr = kvm_check_extension(cs->kvm_state,
-                                    KVM_CAP_ARM_INJECT_SERROR_ESR);
+    cap_has_inject_serror_esr =
+        kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_INJECT_SERROR_ESR);
 }
 
-bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
-                                      int *fdarray,
+bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try, int *fdarray,
                                       struct kvm_vcpu_init *init)
 {
     int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
@@ -275,8 +274,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
             error_report("Failed to enable KVM_CAP_ARM_NISV_TO_USER cap");
         } else {
             /* Set status for supporting the external dabt injection */
-            cap_has_inject_ext_dabt = kvm_check_extension(s,
-                                    KVM_CAP_ARM_INJECT_EXT_DABT);
+            cap_has_inject_ext_dabt =
+                kvm_check_extension(s, KVM_CAP_ARM_INJECT_EXT_DABT);
         }
     }
 
@@ -318,7 +317,7 @@ static void kvm_arm_devlistener_add(MemoryListener *listener,
 {
     KVMDevice *kd;
 
-    QSLIST_FOREACH(kd, &kvm_devices_head, entries) {
+    QSLIST_FOREACH (kd, &kvm_devices_head, entries) {
         if (section->mr == kd->mr) {
             kd->kda.addr = section->offset_within_address_space;
         }
@@ -330,7 +329,7 @@ static void kvm_arm_devlistener_del(MemoryListener *listener,
 {
     KVMDevice *kd;
 
-    QSLIST_FOREACH(kd, &kvm_devices_head, entries) {
+    QSLIST_FOREACH (kd, &kvm_devices_head, entries) {
         if (section->mr == kd->mr) {
             kd->kda.addr = -1;
         }
@@ -363,8 +362,7 @@ static void kvm_arm_set_device_addr(KVMDevice *kd)
     }
 
     if (ret < 0) {
-        fprintf(stderr, "Failed to set device address: %s\n",
-                strerror(-ret));
+        fprintf(stderr, "Failed to set device address: %s\n", strerror(-ret));
         abort();
     }
 }
@@ -373,7 +371,7 @@ static void kvm_arm_machine_init_done(Notifier *notifier, void *data)
 {
     KVMDevice *kd, *tkd;
 
-    QSLIST_FOREACH_SAFE(kd, &kvm_devices_head, entries, tkd) {
+    QSLIST_FOREACH_SAFE (kd, &kvm_devices_head, entries, tkd) {
         if (kd->kda.addr != -1) {
             kvm_arm_set_device_addr(kd);
         }
@@ -487,10 +485,10 @@ int kvm_arm_init_cpreg_list(ARMCPU *cpu)
 
     cpu->cpreg_indexes = g_renew(uint64_t, cpu->cpreg_indexes, arraylen);
     cpu->cpreg_values = g_renew(uint64_t, cpu->cpreg_values, arraylen);
-    cpu->cpreg_vmstate_indexes = g_renew(uint64_t, cpu->cpreg_vmstate_indexes,
-                                         arraylen);
-    cpu->cpreg_vmstate_values = g_renew(uint64_t, cpu->cpreg_vmstate_values,
-                                        arraylen);
+    cpu->cpreg_vmstate_indexes =
+        g_renew(uint64_t, cpu->cpreg_vmstate_indexes, arraylen);
+    cpu->cpreg_vmstate_values =
+        g_renew(uint64_t, cpu->cpreg_vmstate_values, arraylen);
     cpu->cpreg_array_len = arraylen;
     cpu->cpreg_vmstate_array_len = arraylen;
 
@@ -643,14 +641,14 @@ void kvm_arm_reset_vcpu(ARMCPU *cpu)
 int kvm_arm_sync_mpstate_to_kvm(ARMCPU *cpu)
 {
     if (cap_has_mp_state) {
-        struct kvm_mp_state mp_state = {
-            .mp_state = (cpu->power_state == PSCI_OFF) ?
-            KVM_MP_STATE_STOPPED : KVM_MP_STATE_RUNNABLE
-        };
+        struct kvm_mp_state mp_state = { .mp_state =
+                                             (cpu->power_state == PSCI_OFF) ?
+                                                 KVM_MP_STATE_STOPPED :
+                                                 KVM_MP_STATE_RUNNABLE };
         int ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MP_STATE, &mp_state);
         if (ret) {
-            fprintf(stderr, "%s: failed to set MP_STATE %d/%s\n",
-                    __func__, ret, strerror(-ret));
+            fprintf(stderr, "%s: failed to set MP_STATE %d/%s\n", __func__, ret,
+                    strerror(-ret));
             return -1;
         }
     }
@@ -667,12 +665,12 @@ int kvm_arm_sync_mpstate_to_qemu(ARMCPU *cpu)
         struct kvm_mp_state mp_state;
         int ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MP_STATE, &mp_state);
         if (ret) {
-            fprintf(stderr, "%s: failed to get MP_STATE %d/%s\n",
-                    __func__, ret, strerror(-ret));
+            fprintf(stderr, "%s: failed to get MP_STATE %d/%s\n", __func__, ret,
+                    strerror(-ret));
             abort();
         }
-        cpu->power_state = (mp_state.mp_state == KVM_MP_STATE_STOPPED) ?
-            PSCI_OFF : PSCI_ON;
+        cpu->power_state =
+            (mp_state.mp_state == KVM_MP_STATE_STOPPED) ? PSCI_OFF : PSCI_ON;
     }
 
     return 0;
@@ -790,15 +788,14 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
          */
         if (!arm_feature(env, ARM_FEATURE_AARCH64) &&
             unlikely(!kvm_arm_verify_ext_dabt_pending(cs))) {
-
             error_report("Data abort exception with no valid ISS generated by "
-                   "guest memory access. KVM unable to emulate faulting "
-                   "instruction. Failed to inject an external data abort "
-                   "into the guest.");
+                         "guest memory access. KVM unable to emulate faulting "
+                         "instruction. Failed to inject an external data abort "
+                         "into the guest.");
             abort();
-       }
-       /* Clear the status */
-       env->ext_dabt_raised = 0;
+        }
+        /* Clear the status */
+        env->ext_dabt_raised = 0;
     }
 }
 
@@ -824,16 +821,16 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
         qemu_mutex_lock_iothread();
 
         if (switched_level & KVM_ARM_DEV_EL1_VTIMER) {
-            qemu_set_irq(cpu->gt_timer_outputs[GTIMER_VIRT],
-                         !!(run->s.regs.device_irq_level &
-                            KVM_ARM_DEV_EL1_VTIMER));
+            qemu_set_irq(
+                cpu->gt_timer_outputs[GTIMER_VIRT],
+                !!(run->s.regs.device_irq_level & KVM_ARM_DEV_EL1_VTIMER));
             switched_level &= ~KVM_ARM_DEV_EL1_VTIMER;
         }
 
         if (switched_level & KVM_ARM_DEV_EL1_PTIMER) {
-            qemu_set_irq(cpu->gt_timer_outputs[GTIMER_PHYS],
-                         !!(run->s.regs.device_irq_level &
-                            KVM_ARM_DEV_EL1_PTIMER));
+            qemu_set_irq(
+                cpu->gt_timer_outputs[GTIMER_PHYS],
+                !!(run->s.regs.device_irq_level & KVM_ARM_DEV_EL1_PTIMER));
             switched_level &= ~KVM_ARM_DEV_EL1_PTIMER;
         }
 
@@ -890,7 +887,7 @@ static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
      * Request KVM to inject the external data abort into the guest
      */
     if (cap_has_inject_ext_dabt) {
-        struct kvm_vcpu_events events = { };
+        struct kvm_vcpu_events events = {};
         /*
          * The external data abort event will be handled immediately by KVM
          * using the address fault that triggered the exit on given VCPU.
@@ -906,7 +903,7 @@ static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
         }
     } else {
         error_report("Data abort exception triggered by guest memory access "
-                     "at physical address: 0x"  TARGET_FMT_lx,
+                     "at physical address: 0x" TARGET_FMT_lx,
                      (target_ulong)fault_ipa);
         error_printf("KVM unable to emulate faulting instruction.\n");
     }
@@ -929,8 +926,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
                                        run->arm_nisv.fault_ipa);
         break;
     default:
-        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-                      __func__, run->exit_reason);
+        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n", __func__,
+                      run->exit_reason);
         break;
     }
     return ret;
@@ -978,12 +975,10 @@ int kvm_arm_vgic_probe(void)
 {
     int val = 0;
 
-    if (kvm_create_device(kvm_state,
-                          KVM_DEV_TYPE_ARM_VGIC_V3, true) == 0) {
+    if (kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_V3, true) == 0) {
         val |= KVM_ARM_VGIC_V3;
     }
-    if (kvm_create_device(kvm_state,
-                          KVM_DEV_TYPE_ARM_VGIC_V2, true) == 0) {
+    if (kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_V2, true) == 0) {
         val |= KVM_ARM_VGIC_V2;
     }
     return val;
@@ -1041,8 +1036,8 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
     return 0;
 }
 
-int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
-                                int vector, PCIDevice *dev)
+int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route, int vector,
+                                PCIDevice *dev)
 {
     return 0;
 }

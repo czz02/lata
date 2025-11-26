@@ -345,8 +345,8 @@ static uint64_t cc_calc_muls_64(int64_t res_high, uint64_t res_low)
     return 2;
 }
 
-static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
-                                  uint64_t src, uint64_t dst, uint64_t vr)
+static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op, uint64_t src,
+                           uint64_t dst, uint64_t vr)
 {
     uint32_t r = 0;
 
@@ -362,28 +362,28 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
         r = cc_calc_ltgt0_32(dst);
         break;
     case CC_OP_LTGT0_64:
-        r =  cc_calc_ltgt0_64(dst);
+        r = cc_calc_ltgt0_64(dst);
         break;
     case CC_OP_LTGT_32:
-        r =  cc_calc_ltgt_32(src, dst);
+        r = cc_calc_ltgt_32(src, dst);
         break;
     case CC_OP_LTGT_64:
-        r =  cc_calc_ltgt_64(src, dst);
+        r = cc_calc_ltgt_64(src, dst);
         break;
     case CC_OP_LTUGTU_32:
-        r =  cc_calc_ltugtu_32(src, dst);
+        r = cc_calc_ltugtu_32(src, dst);
         break;
     case CC_OP_LTUGTU_64:
-        r =  cc_calc_ltugtu_64(src, dst);
+        r = cc_calc_ltugtu_64(src, dst);
         break;
     case CC_OP_TM_32:
-        r =  cc_calc_tm_32(src, dst);
+        r = cc_calc_tm_32(src, dst);
         break;
     case CC_OP_TM_64:
-        r =  cc_calc_tm_64(src, dst);
+        r = cc_calc_tm_64(src, dst);
         break;
     case CC_OP_NZ:
-        r =  cc_calc_nz(dst);
+        r = cc_calc_nz(dst);
         break;
     case CC_OP_ADDU:
         r = cc_calc_addu(src, dst);
@@ -392,48 +392,48 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
         r = cc_calc_subu(src, dst);
         break;
     case CC_OP_ADD_64:
-        r =  cc_calc_add_64(src, dst, vr);
+        r = cc_calc_add_64(src, dst, vr);
         break;
     case CC_OP_SUB_64:
-        r =  cc_calc_sub_64(src, dst, vr);
+        r = cc_calc_sub_64(src, dst, vr);
         break;
     case CC_OP_ABS_64:
-        r =  cc_calc_abs_64(dst);
+        r = cc_calc_abs_64(dst);
         break;
     case CC_OP_NABS_64:
-        r =  cc_calc_nabs_64(dst);
+        r = cc_calc_nabs_64(dst);
         break;
     case CC_OP_COMP_64:
-        r =  cc_calc_comp_64(dst);
+        r = cc_calc_comp_64(dst);
         break;
     case CC_OP_MULS_64:
         r = cc_calc_muls_64(src, dst);
         break;
 
     case CC_OP_ADD_32:
-        r =  cc_calc_add_32(src, dst, vr);
+        r = cc_calc_add_32(src, dst, vr);
         break;
     case CC_OP_SUB_32:
-        r =  cc_calc_sub_32(src, dst, vr);
+        r = cc_calc_sub_32(src, dst, vr);
         break;
     case CC_OP_ABS_32:
-        r =  cc_calc_abs_32(dst);
+        r = cc_calc_abs_32(dst);
         break;
     case CC_OP_NABS_32:
-        r =  cc_calc_nabs_32(dst);
+        r = cc_calc_nabs_32(dst);
         break;
     case CC_OP_COMP_32:
-        r =  cc_calc_comp_32(dst);
+        r = cc_calc_comp_32(dst);
         break;
     case CC_OP_MULS_32:
         r = cc_calc_muls_32(dst);
         break;
 
     case CC_OP_ICM:
-        r =  cc_calc_icm(src, dst);
+        r = cc_calc_icm(src, dst);
         break;
     case CC_OP_SLA:
-        r =  cc_calc_sla(src, dst);
+        r = cc_calc_sla(src, dst);
         break;
     case CC_OP_FLOGR:
         r = cc_calc_flogr(dst);

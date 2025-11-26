@@ -52,14 +52,14 @@
 #include "exec/translator.h"
 #include "exec/helper-proto-common.h"
 
-#define HELPER_H  "accel/tcg/plugin-helpers.h"
+#define HELPER_H "accel/tcg/plugin-helpers.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
 #ifdef CONFIG_SOFTMMU
-# define CONFIG_SOFTMMU_GATE 1
+#define CONFIG_SOFTMMU_GATE 1
 #else
-# define CONFIG_SOFTMMU_GATE 0
+#define CONFIG_SOFTMMU_GATE 0
 #endif
 
 /*
@@ -91,12 +91,14 @@ enum plugin_gen_cb {
  * direct to the plugin if they are subscribed to.
  */
 void HELPER(plugin_vcpu_udata_cb)(uint32_t cpu_index, void *udata)
-{ }
+{
+}
 
 void HELPER(plugin_vcpu_mem_cb)(unsigned int vcpu_index,
                                 qemu_plugin_meminfo_t info, uint64_t vaddr,
                                 void *userdata)
-{ }
+{
+}
 
 static void gen_empty_udata_cb(void)
 {
@@ -157,8 +159,8 @@ static void gen_empty_mem_helper(void)
     TCGv_ptr ptr = tcg_temp_ebb_new_ptr();
 
     tcg_gen_movi_ptr(ptr, 0);
-    tcg_gen_st_ptr(ptr, cpu_env, offsetof(CPUState, plugin_mem_cbs) -
-                                 offsetof(ArchCPU, env));
+    tcg_gen_st_ptr(ptr, cpu_env,
+                   offsetof(CPUState, plugin_mem_cbs) - offsetof(ArchCPU, env));
     tcg_temp_free_ptr(ptr);
 }
 
@@ -168,8 +170,8 @@ static void gen_plugin_cb_start(enum plugin_gen_from from,
     tcg_gen_plugin_cb_start(from, type, wr);
 }
 
-static void gen_wrapped(enum plugin_gen_from from,
-                        enum plugin_gen_cb type, void (*func)(void))
+static void gen_wrapped(enum plugin_gen_from from, enum plugin_gen_cb type,
+                        void (*func)(void))
 {
     gen_plugin_cb_start(from, type, 0);
     func();
@@ -180,16 +182,14 @@ static void plugin_gen_empty_callback(enum plugin_gen_from from)
 {
     switch (from) {
     case PLUGIN_GEN_AFTER_INSN:
-        gen_wrapped(from, PLUGIN_GEN_DISABLE_MEM_HELPER,
-                    gen_empty_mem_helper);
+        gen_wrapped(from, PLUGIN_GEN_DISABLE_MEM_HELPER, gen_empty_mem_helper);
         break;
     case PLUGIN_GEN_FROM_INSN:
         /*
          * Note: plugin_gen_inject() relies on ENABLE_MEM_HELPER being
          * the first callback of an instruction
          */
-        gen_wrapped(from, PLUGIN_GEN_ENABLE_MEM_HELPER,
-                    gen_empty_mem_helper);
+        gen_wrapped(from, PLUGIN_GEN_ENABLE_MEM_HELPER, gen_empty_mem_helper);
         /* fall through */
     case PLUGIN_GEN_FROM_TB:
         gen_wrapped(from, PLUGIN_GEN_CB_UDATA, gen_empty_udata_cb);
@@ -379,8 +379,7 @@ static TCGOp *append_udata_cb(const struct qemu_plugin_dyn_cb *cb,
 }
 
 static TCGOp *append_inline_cb(const struct qemu_plugin_dyn_cb *cb,
-                               TCGOp *begin_op, TCGOp *op,
-                               int *unused)
+                               TCGOp *begin_op, TCGOp *op, int *unused)
 {
     /* const_ptr */
     op = copy_const_ptr(&begin_op, op, cb->userp);
@@ -444,8 +443,8 @@ static bool op_rw(const TCGOp *op, const struct qemu_plugin_dyn_cb *cb)
     return !!(cb->rw & (w + 1));
 }
 
-static void inject_cb_type(const GArray *cbs, TCGOp *begin_op,
-                           inject_fn inject, op_ok_fn ok)
+static void inject_cb_type(const GArray *cbs, TCGOp *begin_op, inject_fn inject,
+                           op_ok_fn ok)
 {
     TCGOp *end_op;
     TCGOp *op;
@@ -473,20 +472,17 @@ static void inject_cb_type(const GArray *cbs, TCGOp *begin_op,
     rm_ops_range(begin_op, end_op);
 }
 
-static void
-inject_udata_cb(const GArray *cbs, TCGOp *begin_op)
+static void inject_udata_cb(const GArray *cbs, TCGOp *begin_op)
 {
     inject_cb_type(cbs, begin_op, append_udata_cb, op_ok);
 }
 
-static void
-inject_inline_cb(const GArray *cbs, TCGOp *begin_op, op_ok_fn ok)
+static void inject_inline_cb(const GArray *cbs, TCGOp *begin_op, op_ok_fn ok)
 {
     inject_cb_type(cbs, begin_op, append_inline_cb, ok);
 }
 
-static void
-inject_mem_cb(const GArray *cbs, TCGOp *begin_op)
+static void inject_mem_cb(const GArray *cbs, TCGOp *begin_op)
 {
     inject_cb_type(cbs, begin_op, append_mem_cb, op_rw);
 }
@@ -545,8 +541,8 @@ static void inject_mem_enable_helper(struct qemu_plugin_tb *ptb,
     }
     ptb->mem_helper = true;
 
-    arr = g_array_sized_new(false, false,
-                            sizeof(struct qemu_plugin_dyn_cb), n_cbs);
+    arr = g_array_sized_new(false, false, sizeof(struct qemu_plugin_dyn_cb),
+                            n_cbs);
 
     for (i = 0; i < ARRAY_SIZE(cbs); i++) {
         g_array_append_vals(arr, cbs[i]->data, cbs[i]->len);
@@ -609,8 +605,8 @@ static void plugin_gen_insn_inline(const struct qemu_plugin_tb *ptb,
                                    TCGOp *begin_op, int insn_idx)
 {
     struct qemu_plugin_insn *insn = g_ptr_array_index(ptb->insns, insn_idx);
-    inject_inline_cb(insn->cbs[PLUGIN_CB_INSN][PLUGIN_CB_INLINE],
-                     begin_op, op_ok);
+    inject_inline_cb(insn->cbs[PLUGIN_CB_INSN][PLUGIN_CB_INLINE], begin_op,
+                     op_ok);
 }
 
 static void plugin_gen_mem_regular(const struct qemu_plugin_tb *ptb,
@@ -651,7 +647,7 @@ static void pr_ops(void)
     TCGOp *op;
     int i = 0;
 
-    QTAILQ_FOREACH(op, &tcg_ctx->ops, link) {
+    QTAILQ_FOREACH (op, &tcg_ctx->ops, link) {
         const char *name = "";
         const char *type = "";
 
@@ -705,19 +701,17 @@ static void plugin_gen_inject(struct qemu_plugin_tb *plugin_tb)
 
     pr_ops();
 
-    QTAILQ_FOREACH(op, &tcg_ctx->ops, link) {
+    QTAILQ_FOREACH (op, &tcg_ctx->ops, link) {
         switch (op->opc) {
         case INDEX_op_insn_start:
             insn_idx++;
             break;
-        case INDEX_op_plugin_cb_start:
-        {
+        case INDEX_op_plugin_cb_start: {
             enum plugin_gen_from from = op->args[0];
             enum plugin_gen_cb type = op->args[1];
 
             switch (from) {
-            case PLUGIN_GEN_FROM_TB:
-            {
+            case PLUGIN_GEN_FROM_TB: {
                 g_assert(insn_idx == -1);
 
                 switch (type) {
@@ -732,8 +726,7 @@ static void plugin_gen_inject(struct qemu_plugin_tb *plugin_tb)
                 }
                 break;
             }
-            case PLUGIN_GEN_FROM_INSN:
-            {
+            case PLUGIN_GEN_FROM_INSN: {
                 g_assert(insn_idx >= 0);
 
                 switch (type) {
@@ -751,8 +744,7 @@ static void plugin_gen_inject(struct qemu_plugin_tb *plugin_tb)
                 }
                 break;
             }
-            case PLUGIN_GEN_FROM_MEM:
-            {
+            case PLUGIN_GEN_FROM_MEM: {
                 g_assert(insn_idx >= 0);
 
                 switch (type) {
@@ -768,8 +760,7 @@ static void plugin_gen_inject(struct qemu_plugin_tb *plugin_tb)
 
                 break;
             }
-            case PLUGIN_GEN_AFTER_INSN:
-            {
+            case PLUGIN_GEN_AFTER_INSN: {
                 g_assert(insn_idx >= 0);
 
                 switch (type) {

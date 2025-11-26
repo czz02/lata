@@ -11,9 +11,9 @@
 #include "internals.h"
 #include "cpu-csr.h"
 
-#define TIMER_PERIOD                10 /* 10 ns period for 100 MHz frequency */
-#define CONSTANT_TIMER_TICK_MASK    0xfffffffffffcUL
-#define CONSTANT_TIMER_ENABLE       0x1UL
+#define TIMER_PERIOD 10 /* 10 ns period for 100 MHz frequency */
+#define CONSTANT_TIMER_TICK_MASK 0xfffffffffffcUL
+#define CONSTANT_TIMER_ENABLE 0x1UL
 
 uint64_t cpu_loongarch_get_constant_timer_counter(LoongArchCPU *cpu)
 {
@@ -48,7 +48,7 @@ void cpu_loongarch_store_constant_timer_config(LoongArchCPU *cpu,
 
 void loongarch_constant_timer_cb(void *opaque)
 {
-    LoongArchCPU *cpu  = opaque;
+    LoongArchCPU *cpu = opaque;
     CPULoongArchState *env = &cpu->env;
     uint64_t now, next;
 

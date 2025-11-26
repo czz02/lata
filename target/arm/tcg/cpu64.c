@@ -213,16 +213,16 @@ static void aarch64_a55_initfn(Object *obj)
     cpu->clidr = 0x82000023;
     cpu->ctr = 0x84448004; /* L1Ip = VIPT */
     cpu->dcz_blocksize = 4; /* 64 bytes */
-    cpu->isar.id_aa64dfr0  = 0x0000000010305408ull;
+    cpu->isar.id_aa64dfr0 = 0x0000000010305408ull;
     cpu->isar.id_aa64isar0 = 0x0000100010211120ull;
     cpu->isar.id_aa64isar1 = 0x0000000000100001ull;
     cpu->isar.id_aa64mmfr0 = 0x0000000000101122ull;
     cpu->isar.id_aa64mmfr1 = 0x0000000010212122ull;
     cpu->isar.id_aa64mmfr2 = 0x0000000000001011ull;
-    cpu->isar.id_aa64pfr0  = 0x0000000010112222ull;
-    cpu->isar.id_aa64pfr1  = 0x0000000000000010ull;
-    cpu->id_afr0       = 0x00000000;
-    cpu->isar.id_dfr0  = 0x04010088;
+    cpu->isar.id_aa64pfr0 = 0x0000000010112222ull;
+    cpu->isar.id_aa64pfr1 = 0x0000000000000010ull;
+    cpu->id_afr0 = 0x00000000;
+    cpu->isar.id_dfr0 = 0x04010088;
     cpu->isar.id_isar0 = 0x02101110;
     cpu->isar.id_isar1 = 0x13112111;
     cpu->isar.id_isar2 = 0x21232042;
@@ -235,10 +235,10 @@ static void aarch64_a55_initfn(Object *obj)
     cpu->isar.id_mmfr2 = 0x01260000;
     cpu->isar.id_mmfr3 = 0x02122211;
     cpu->isar.id_mmfr4 = 0x00021110;
-    cpu->isar.id_pfr0  = 0x10010131;
-    cpu->isar.id_pfr1  = 0x00011011;
-    cpu->isar.id_pfr2  = 0x00000011;
-    cpu->midr = 0x412FD050;          /* r2p0 */
+    cpu->isar.id_pfr0 = 0x10010131;
+    cpu->isar.id_pfr1 = 0x00011011;
+    cpu->isar.id_pfr2 = 0x00000011;
+    cpu->midr = 0x412FD050; /* r2p0 */
     cpu->revidr = 0;
 
     /* From B2.23 CCSIDR_EL1 */
@@ -336,16 +336,16 @@ static void aarch64_a76_initfn(Object *obj)
     cpu->clidr = 0x82000023;
     cpu->ctr = 0x8444C004;
     cpu->dcz_blocksize = 4;
-    cpu->isar.id_aa64dfr0  = 0x0000000010305408ull;
+    cpu->isar.id_aa64dfr0 = 0x0000000010305408ull;
     cpu->isar.id_aa64isar0 = 0x0000100010211120ull;
     cpu->isar.id_aa64isar1 = 0x0000000000100001ull;
     cpu->isar.id_aa64mmfr0 = 0x0000000000101122ull;
     cpu->isar.id_aa64mmfr1 = 0x0000000010212122ull;
     cpu->isar.id_aa64mmfr2 = 0x0000000000001011ull;
-    cpu->isar.id_aa64pfr0  = 0x1100000010111112ull; /* GIC filled in later */
-    cpu->isar.id_aa64pfr1  = 0x0000000000000010ull;
-    cpu->id_afr0       = 0x00000000;
-    cpu->isar.id_dfr0  = 0x04010088;
+    cpu->isar.id_aa64pfr0 = 0x1100000010111112ull; /* GIC filled in later */
+    cpu->isar.id_aa64pfr1 = 0x0000000000000010ull;
+    cpu->id_afr0 = 0x00000000;
+    cpu->isar.id_dfr0 = 0x04010088;
     cpu->isar.id_isar0 = 0x02101110;
     cpu->isar.id_isar1 = 0x13112111;
     cpu->isar.id_isar2 = 0x21232042;
@@ -358,10 +358,10 @@ static void aarch64_a76_initfn(Object *obj)
     cpu->isar.id_mmfr2 = 0x01260000;
     cpu->isar.id_mmfr3 = 0x02122211;
     cpu->isar.id_mmfr4 = 0x00021110;
-    cpu->isar.id_pfr0  = 0x10010131;
-    cpu->isar.id_pfr1  = 0x00010000; /* GIC filled in later */
-    cpu->isar.id_pfr2  = 0x00000011;
-    cpu->midr = 0x414fd0b1;          /* r4p1 */
+    cpu->isar.id_pfr0 = 0x10010131;
+    cpu->isar.id_pfr1 = 0x00010000; /* GIC filled in later */
+    cpu->isar.id_pfr2 = 0x00000011;
+    cpu->midr = 0x414fd0b1; /* r4p1 */
     cpu->revidr = 0;
 
     /* From B2.18 CCSIDR_EL1 */
@@ -403,7 +403,7 @@ static void aarch64_a64fx_initfn(Object *obj)
     cpu->revidr = 0x00000000;
     cpu->ctr = 0x86668006;
     cpu->reset_sctlr = 0x30000180;
-    cpu->isar.id_aa64pfr0 =   0x0000000101111111; /* No RAS Extensions */
+    cpu->isar.id_aa64pfr0 = 0x0000000101111111; /* No RAS Extensions */
     cpu->isar.id_aa64pfr1 = 0x0000000000000000;
     cpu->isar.id_aa64dfr0 = 0x0000000010305408;
     cpu->isar.id_aa64dfr1 = 0x0000000000000000;
@@ -427,9 +427,9 @@ static void aarch64_a64fx_initfn(Object *obj)
 
     /* The A64FX supports only 128, 256 and 512 bit vector lengths */
     aarch64_add_sve_properties(obj);
-    cpu->sve_vq.supported = (1 << 0)  /* 128bit */
-                          | (1 << 1)  /* 256bit */
-                          | (1 << 3); /* 512bit */
+    cpu->sve_vq.supported = (1 << 0) /* 128bit */
+                            | (1 << 1) /* 256bit */
+                            | (1 << 3); /* 512bit */
 
     cpu->isar.reset_pmcr_el0 = 0x46014040;
 
@@ -437,64 +437,190 @@ static void aarch64_a64fx_initfn(Object *obj)
 }
 
 static const ARMCPRegInfo neoverse_n1_cp_reginfo[] = {
-    { .name = "ATCR_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 7, .opc2 = 0,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "ATCR_EL2", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 4, .crn = 15, .crm = 7, .opc2 = 0,
-      .access = PL2_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "ATCR_EL3", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 6, .crn = 15, .crm = 7, .opc2 = 0,
-      .access = PL3_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "ATCR_EL12", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 5, .crn = 15, .crm = 7, .opc2 = 0,
-      .access = PL2_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "AVTCR_EL2", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 4, .crn = 15, .crm = 7, .opc2 = 1,
-      .access = PL2_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUACTLR_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 1, .opc2 = 0,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUACTLR2_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 1, .opc2 = 1,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUACTLR3_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 1, .opc2 = 2,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
+    { .name = "ATCR_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 7,
+      .opc2 = 0,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "ATCR_EL2",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 4,
+      .crn = 15,
+      .crm = 7,
+      .opc2 = 0,
+      .access = PL2_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "ATCR_EL3",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 6,
+      .crn = 15,
+      .crm = 7,
+      .opc2 = 0,
+      .access = PL3_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "ATCR_EL12",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 5,
+      .crn = 15,
+      .crm = 7,
+      .opc2 = 0,
+      .access = PL2_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "AVTCR_EL2",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 4,
+      .crn = 15,
+      .crm = 7,
+      .opc2 = 1,
+      .access = PL2_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUACTLR_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 1,
+      .opc2 = 0,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUACTLR2_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 1,
+      .opc2 = 1,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUACTLR3_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 1,
+      .opc2 = 2,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
     /*
      * Report CPUCFR_EL1.SCU as 1, as we do not implement the DSU
      * (and in particular its system registers).
      */
-    { .name = "CPUCFR_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 0, .opc2 = 0,
-      .access = PL1_R, .type = ARM_CP_CONST, .resetvalue = 4 },
-    { .name = "CPUECTLR_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 1, .opc2 = 4,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0x961563010 },
-    { .name = "CPUPCR_EL3", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 6, .crn = 15, .crm = 8, .opc2 = 1,
-      .access = PL3_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUPMR_EL3", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 6, .crn = 15, .crm = 8, .opc2 = 3,
-      .access = PL3_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUPOR_EL3", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 6, .crn = 15, .crm = 8, .opc2 = 2,
-      .access = PL3_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUPSELR_EL3", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 6, .crn = 15, .crm = 8, .opc2 = 0,
-      .access = PL3_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUPWRCTLR_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 2, .opc2 = 7,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "ERXPFGCDN_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 2, .opc2 = 2,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "ERXPFGCTL_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 2, .opc2 = 1,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "ERXPFGF_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 2, .opc2 = 0,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
+    { .name = "CPUCFR_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 0,
+      .opc2 = 0,
+      .access = PL1_R,
+      .type = ARM_CP_CONST,
+      .resetvalue = 4 },
+    { .name = "CPUECTLR_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 1,
+      .opc2 = 4,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0x961563010 },
+    { .name = "CPUPCR_EL3",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 6,
+      .crn = 15,
+      .crm = 8,
+      .opc2 = 1,
+      .access = PL3_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUPMR_EL3",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 6,
+      .crn = 15,
+      .crm = 8,
+      .opc2 = 3,
+      .access = PL3_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUPOR_EL3",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 6,
+      .crn = 15,
+      .crm = 8,
+      .opc2 = 2,
+      .access = PL3_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUPSELR_EL3",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 6,
+      .crn = 15,
+      .crm = 8,
+      .opc2 = 0,
+      .access = PL3_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUPWRCTLR_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 2,
+      .opc2 = 7,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "ERXPFGCDN_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 2,
+      .opc2 = 2,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "ERXPFGCTL_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 2,
+      .opc2 = 1,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "ERXPFGF_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 2,
+      .opc2 = 0,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
 };
 
 static void define_neoverse_n1_cp_reginfo(ARMCPU *cpu)
@@ -503,18 +629,46 @@ static void define_neoverse_n1_cp_reginfo(ARMCPU *cpu)
 }
 
 static const ARMCPRegInfo neoverse_v1_cp_reginfo[] = {
-    { .name = "CPUECTLR2_EL1", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 0, .crn = 15, .crm = 1, .opc2 = 5,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUPPMCR_EL3", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 6, .crn = 15, .crm = 2, .opc2 = 0,
-      .access = PL3_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUPPMCR2_EL3", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 6, .crn = 15, .crm = 2, .opc2 = 1,
-      .access = PL3_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "CPUPPMCR3_EL3", .state = ARM_CP_STATE_AA64,
-      .opc0 = 3, .opc1 = 6, .crn = 15, .crm = 2, .opc2 = 6,
-      .access = PL3_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
+    { .name = "CPUECTLR2_EL1",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 1,
+      .opc2 = 5,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUPPMCR_EL3",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 6,
+      .crn = 15,
+      .crm = 2,
+      .opc2 = 0,
+      .access = PL3_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUPPMCR2_EL3",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 6,
+      .crn = 15,
+      .crm = 2,
+      .opc2 = 1,
+      .access = PL3_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "CPUPPMCR3_EL3",
+      .state = ARM_CP_STATE_AA64,
+      .opc0 = 3,
+      .opc1 = 6,
+      .crn = 15,
+      .crm = 2,
+      .opc2 = 6,
+      .access = PL3_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
 };
 
 static void define_neoverse_v1_cp_reginfo(ARMCPU *cpu)
@@ -545,16 +699,16 @@ static void aarch64_neoverse_n1_initfn(Object *obj)
     cpu->clidr = 0x82000023;
     cpu->ctr = 0x8444c004;
     cpu->dcz_blocksize = 4;
-    cpu->isar.id_aa64dfr0  = 0x0000000110305408ull;
+    cpu->isar.id_aa64dfr0 = 0x0000000110305408ull;
     cpu->isar.id_aa64isar0 = 0x0000100010211120ull;
     cpu->isar.id_aa64isar1 = 0x0000000000100001ull;
     cpu->isar.id_aa64mmfr0 = 0x0000000000101125ull;
     cpu->isar.id_aa64mmfr1 = 0x0000000010212122ull;
     cpu->isar.id_aa64mmfr2 = 0x0000000000001011ull;
-    cpu->isar.id_aa64pfr0  = 0x1100000010111112ull; /* GIC filled in later */
-    cpu->isar.id_aa64pfr1  = 0x0000000000000020ull;
-    cpu->id_afr0       = 0x00000000;
-    cpu->isar.id_dfr0  = 0x04010088;
+    cpu->isar.id_aa64pfr0 = 0x1100000010111112ull; /* GIC filled in later */
+    cpu->isar.id_aa64pfr1 = 0x0000000000000020ull;
+    cpu->id_afr0 = 0x00000000;
+    cpu->isar.id_dfr0 = 0x04010088;
     cpu->isar.id_isar0 = 0x02101110;
     cpu->isar.id_isar1 = 0x13112111;
     cpu->isar.id_isar2 = 0x21232042;
@@ -567,10 +721,10 @@ static void aarch64_neoverse_n1_initfn(Object *obj)
     cpu->isar.id_mmfr2 = 0x01260000;
     cpu->isar.id_mmfr3 = 0x02122211;
     cpu->isar.id_mmfr4 = 0x00021110;
-    cpu->isar.id_pfr0  = 0x10010131;
-    cpu->isar.id_pfr1  = 0x00010000; /* GIC filled in later */
-    cpu->isar.id_pfr2  = 0x00000011;
-    cpu->midr = 0x414fd0c1;          /* r4p1 */
+    cpu->isar.id_pfr0 = 0x10010131;
+    cpu->isar.id_pfr1 = 0x00010000; /* GIC filled in later */
+    cpu->isar.id_pfr2 = 0x00000011;
+    cpu->midr = 0x414fd0c1; /* r4p1 */
     cpu->revidr = 0;
 
     /* From B2.23 CCSIDR_EL1 */
@@ -618,17 +772,17 @@ static void aarch64_neoverse_v1_initfn(Object *obj)
     cpu->dcz_blocksize = 4;
     cpu->id_aa64afr0 = 0x00000000;
     cpu->id_aa64afr1 = 0x00000000;
-    cpu->isar.id_aa64dfr0  = 0x000001f210305519ull;
+    cpu->isar.id_aa64dfr0 = 0x000001f210305519ull;
     cpu->isar.id_aa64dfr1 = 0x00000000;
     cpu->isar.id_aa64isar0 = 0x1011111110212120ull; /* with FEAT_RNG */
     cpu->isar.id_aa64isar1 = 0x0111000001211032ull;
     cpu->isar.id_aa64mmfr0 = 0x0000000000101125ull;
     cpu->isar.id_aa64mmfr1 = 0x0000000010212122ull;
     cpu->isar.id_aa64mmfr2 = 0x0220011102101011ull;
-    cpu->isar.id_aa64pfr0  = 0x1101110120111112ull; /* GIC filled in later */
-    cpu->isar.id_aa64pfr1  = 0x0000000000000020ull;
-    cpu->id_afr0       = 0x00000000;
-    cpu->isar.id_dfr0  = 0x15011099;
+    cpu->isar.id_aa64pfr0 = 0x1101110120111112ull; /* GIC filled in later */
+    cpu->isar.id_aa64pfr1 = 0x0000000000000020ull;
+    cpu->id_afr0 = 0x00000000;
+    cpu->isar.id_dfr0 = 0x15011099;
     cpu->isar.id_isar0 = 0x02101110;
     cpu->isar.id_isar1 = 0x13112111;
     cpu->isar.id_isar2 = 0x21232042;
@@ -641,10 +795,10 @@ static void aarch64_neoverse_v1_initfn(Object *obj)
     cpu->isar.id_mmfr2 = 0x01260000;
     cpu->isar.id_mmfr3 = 0x02122211;
     cpu->isar.id_mmfr4 = 0x01021110;
-    cpu->isar.id_pfr0  = 0x21110131;
-    cpu->isar.id_pfr1  = 0x00010000; /* GIC filled in later */
-    cpu->isar.id_pfr2  = 0x00000011;
-    cpu->midr = 0x411FD402;          /* r1p2 */
+    cpu->isar.id_pfr0 = 0x21110131;
+    cpu->isar.id_pfr1 = 0x00010000; /* GIC filled in later */
+    cpu->isar.id_pfr2 = 0x00000011;
+    cpu->midr = 0x411FD402; /* r1p2 */
     cpu->revidr = 0;
 
     /*
@@ -688,8 +842,8 @@ static void aarch64_neoverse_v1_initfn(Object *obj)
 
     /* From 3.7.5 ID_AA64ZFR0_EL1 */
     cpu->isar.id_aa64zfr0 = 0x0000100000100000;
-    cpu->sve_vq.supported = (1 << 0)  /* 128bit */
-                            | (1 << 1);  /* 256bit */
+    cpu->sve_vq.supported = (1 << 0) /* 128bit */
+                            | (1 << 1); /* 256bit */
 
     /* From 5.5.1 AArch64 PMU register summary */
     cpu->isar.reset_pmcr_el0 = 0x41213000;
@@ -740,131 +894,133 @@ void aarch64_max_tcg_initfn(Object *obj)
     cpu->clidr = u;
 
     t = cpu->isar.id_aa64isar0;
-    t = FIELD_DP64(t, ID_AA64ISAR0, AES, 2);      /* FEAT_PMULL */
-    t = FIELD_DP64(t, ID_AA64ISAR0, SHA1, 1);     /* FEAT_SHA1 */
-    t = FIELD_DP64(t, ID_AA64ISAR0, SHA2, 2);     /* FEAT_SHA512 */
+    t = FIELD_DP64(t, ID_AA64ISAR0, AES, 2); /* FEAT_PMULL */
+    t = FIELD_DP64(t, ID_AA64ISAR0, SHA1, 1); /* FEAT_SHA1 */
+    t = FIELD_DP64(t, ID_AA64ISAR0, SHA2, 2); /* FEAT_SHA512 */
     t = FIELD_DP64(t, ID_AA64ISAR0, CRC32, 1);
-    t = FIELD_DP64(t, ID_AA64ISAR0, ATOMIC, 2);   /* FEAT_LSE */
-    t = FIELD_DP64(t, ID_AA64ISAR0, RDM, 1);      /* FEAT_RDM */
-    t = FIELD_DP64(t, ID_AA64ISAR0, SHA3, 1);     /* FEAT_SHA3 */
-    t = FIELD_DP64(t, ID_AA64ISAR0, SM3, 1);      /* FEAT_SM3 */
-    t = FIELD_DP64(t, ID_AA64ISAR0, SM4, 1);      /* FEAT_SM4 */
-    t = FIELD_DP64(t, ID_AA64ISAR0, DP, 1);       /* FEAT_DotProd */
-    t = FIELD_DP64(t, ID_AA64ISAR0, FHM, 1);      /* FEAT_FHM */
-    t = FIELD_DP64(t, ID_AA64ISAR0, TS, 2);       /* FEAT_FlagM2 */
-    t = FIELD_DP64(t, ID_AA64ISAR0, TLB, 2);      /* FEAT_TLBIRANGE */
-    t = FIELD_DP64(t, ID_AA64ISAR0, RNDR, 1);     /* FEAT_RNG */
+    t = FIELD_DP64(t, ID_AA64ISAR0, ATOMIC, 2); /* FEAT_LSE */
+    t = FIELD_DP64(t, ID_AA64ISAR0, RDM, 1); /* FEAT_RDM */
+    t = FIELD_DP64(t, ID_AA64ISAR0, SHA3, 1); /* FEAT_SHA3 */
+    t = FIELD_DP64(t, ID_AA64ISAR0, SM3, 1); /* FEAT_SM3 */
+    t = FIELD_DP64(t, ID_AA64ISAR0, SM4, 1); /* FEAT_SM4 */
+    t = FIELD_DP64(t, ID_AA64ISAR0, DP, 1); /* FEAT_DotProd */
+    t = FIELD_DP64(t, ID_AA64ISAR0, FHM, 1); /* FEAT_FHM */
+    t = FIELD_DP64(t, ID_AA64ISAR0, TS, 2); /* FEAT_FlagM2 */
+    t = FIELD_DP64(t, ID_AA64ISAR0, TLB, 2); /* FEAT_TLBIRANGE */
+    t = FIELD_DP64(t, ID_AA64ISAR0, RNDR, 1); /* FEAT_RNG */
     cpu->isar.id_aa64isar0 = t;
 
     t = cpu->isar.id_aa64isar1;
-    t = FIELD_DP64(t, ID_AA64ISAR1, DPB, 2);      /* FEAT_DPB2 */
-    t = FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 1);    /* FEAT_JSCVT */
-    t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);     /* FEAT_FCMA */
-    t = FIELD_DP64(t, ID_AA64ISAR1, LRCPC, 2);    /* FEAT_LRCPC2 */
-    t = FIELD_DP64(t, ID_AA64ISAR1, FRINTTS, 1);  /* FEAT_FRINTTS */
-    t = FIELD_DP64(t, ID_AA64ISAR1, SB, 1);       /* FEAT_SB */
-    t = FIELD_DP64(t, ID_AA64ISAR1, SPECRES, 1);  /* FEAT_SPECRES */
-    t = FIELD_DP64(t, ID_AA64ISAR1, BF16, 1);     /* FEAT_BF16 */
-    t = FIELD_DP64(t, ID_AA64ISAR1, DGH, 1);      /* FEAT_DGH */
-    t = FIELD_DP64(t, ID_AA64ISAR1, I8MM, 1);     /* FEAT_I8MM */
+    t = FIELD_DP64(t, ID_AA64ISAR1, DPB, 2); /* FEAT_DPB2 */
+    t = FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 1); /* FEAT_JSCVT */
+    t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1); /* FEAT_FCMA */
+    t = FIELD_DP64(t, ID_AA64ISAR1, LRCPC, 2); /* FEAT_LRCPC2 */
+    t = FIELD_DP64(t, ID_AA64ISAR1, FRINTTS, 1); /* FEAT_FRINTTS */
+    t = FIELD_DP64(t, ID_AA64ISAR1, SB, 1); /* FEAT_SB */
+    t = FIELD_DP64(t, ID_AA64ISAR1, SPECRES, 1); /* FEAT_SPECRES */
+    t = FIELD_DP64(t, ID_AA64ISAR1, BF16, 1); /* FEAT_BF16 */
+    t = FIELD_DP64(t, ID_AA64ISAR1, DGH, 1); /* FEAT_DGH */
+    t = FIELD_DP64(t, ID_AA64ISAR1, I8MM, 1); /* FEAT_I8MM */
     cpu->isar.id_aa64isar1 = t;
 
     t = cpu->isar.id_aa64pfr0;
-    t = FIELD_DP64(t, ID_AA64PFR0, FP, 1);        /* FEAT_FP16 */
-    t = FIELD_DP64(t, ID_AA64PFR0, ADVSIMD, 1);   /* FEAT_FP16 */
-    t = FIELD_DP64(t, ID_AA64PFR0, RAS, 2);       /* FEAT_RASv1p1 + FEAT_DoubleFault */
+    t = FIELD_DP64(t, ID_AA64PFR0, FP, 1); /* FEAT_FP16 */
+    t = FIELD_DP64(t, ID_AA64PFR0, ADVSIMD, 1); /* FEAT_FP16 */
+    t = FIELD_DP64(t, ID_AA64PFR0, RAS,
+                   2); /* FEAT_RASv1p1 + FEAT_DoubleFault */
 #ifdef CONFIG_LATA
     /* LATA does not support SVE yet, disable it.*/
     t = FIELD_DP64(t, ID_AA64PFR0, SVE, 0);
 #else
-    t = FIELD_DP64(t, ID_AA64PFR0, SVE, 1);        /* FEAT_SVE */
+    t = FIELD_DP64(t, ID_AA64PFR0, SVE, 1); /* FEAT_SVE */
 #endif
-    t = FIELD_DP64(t, ID_AA64PFR0, SEL2, 1);      /* FEAT_SEL2 */
-    t = FIELD_DP64(t, ID_AA64PFR0, DIT, 1);       /* FEAT_DIT */
-    t = FIELD_DP64(t, ID_AA64PFR0, CSV2, 2);      /* FEAT_CSV2_2 */
-    t = FIELD_DP64(t, ID_AA64PFR0, CSV3, 1);      /* FEAT_CSV3 */
+    t = FIELD_DP64(t, ID_AA64PFR0, SEL2, 1); /* FEAT_SEL2 */
+    t = FIELD_DP64(t, ID_AA64PFR0, DIT, 1); /* FEAT_DIT */
+    t = FIELD_DP64(t, ID_AA64PFR0, CSV2, 2); /* FEAT_CSV2_2 */
+    t = FIELD_DP64(t, ID_AA64PFR0, CSV3, 1); /* FEAT_CSV3 */
     cpu->isar.id_aa64pfr0 = t;
 
     t = cpu->isar.id_aa64pfr1;
-    t = FIELD_DP64(t, ID_AA64PFR1, BT, 1);        /* FEAT_BTI */
-    t = FIELD_DP64(t, ID_AA64PFR1, SSBS, 2);      /* FEAT_SSBS2 */
+    t = FIELD_DP64(t, ID_AA64PFR1, BT, 1); /* FEAT_BTI */
+    t = FIELD_DP64(t, ID_AA64PFR1, SSBS, 2); /* FEAT_SSBS2 */
     /*
      * Begin with full support for MTE. This will be downgraded to MTE=0
      * during realize if the board provides no tag memory, much like
      * we do for EL2 with the virtualization=on property.
      */
-    t = FIELD_DP64(t, ID_AA64PFR1, MTE, 3);       /* FEAT_MTE3 */
-    t = FIELD_DP64(t, ID_AA64PFR1, RAS_FRAC, 0);  /* FEAT_RASv1p1 + FEAT_DoubleFault */
+    t = FIELD_DP64(t, ID_AA64PFR1, MTE, 3); /* FEAT_MTE3 */
+    t = FIELD_DP64(t, ID_AA64PFR1, RAS_FRAC,
+                   0); /* FEAT_RASv1p1 + FEAT_DoubleFault */
 #ifdef CONFIG_LATA
     /* SME depends on SVE, disable it.*/
     t = FIELD_DP64(t, ID_AA64PFR1, SME, 0);
 #else
-    t = FIELD_DP64(t, ID_AA64PFR1, SME, 1);        /* FEAT_SME */
+    t = FIELD_DP64(t, ID_AA64PFR1, SME, 1); /* FEAT_SME */
 #endif
     t = FIELD_DP64(t, ID_AA64PFR1, CSV2_FRAC, 0); /* FEAT_CSV2_2 */
     cpu->isar.id_aa64pfr1 = t;
 
     t = cpu->isar.id_aa64mmfr0;
     t = FIELD_DP64(t, ID_AA64MMFR0, PARANGE, 6); /* FEAT_LPA: 52 bits */
-    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN16, 1);   /* 16k pages supported */
+    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN16, 1); /* 16k pages supported */
     t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN16_2, 2); /* 16k stage2 supported */
     t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN64_2, 2); /* 64k stage2 supported */
-    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN4_2, 2);  /*  4k stage2 supported */
-    t = FIELD_DP64(t, ID_AA64MMFR0, FGT, 1);       /* FEAT_FGT */
+    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN4_2, 2); /*  4k stage2 supported */
+    t = FIELD_DP64(t, ID_AA64MMFR0, FGT, 1); /* FEAT_FGT */
     cpu->isar.id_aa64mmfr0 = t;
 
     t = cpu->isar.id_aa64mmfr1;
-    t = FIELD_DP64(t, ID_AA64MMFR1, HAFDBS, 2);   /* FEAT_HAFDBS */
+    t = FIELD_DP64(t, ID_AA64MMFR1, HAFDBS, 2); /* FEAT_HAFDBS */
     t = FIELD_DP64(t, ID_AA64MMFR1, VMIDBITS, 2); /* FEAT_VMID16 */
-    t = FIELD_DP64(t, ID_AA64MMFR1, VH, 1);       /* FEAT_VHE */
-    t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1);     /* FEAT_HPDS */
-    t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);       /* FEAT_LOR */
-    t = FIELD_DP64(t, ID_AA64MMFR1, PAN, 3);      /* FEAT_PAN3 */
-    t = FIELD_DP64(t, ID_AA64MMFR1, XNX, 1);      /* FEAT_XNX */
-    t = FIELD_DP64(t, ID_AA64MMFR1, ETS, 1);      /* FEAT_ETS */
-    t = FIELD_DP64(t, ID_AA64MMFR1, HCX, 1);      /* FEAT_HCX */
+    t = FIELD_DP64(t, ID_AA64MMFR1, VH, 1); /* FEAT_VHE */
+    t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* FEAT_HPDS */
+    t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1); /* FEAT_LOR */
+    t = FIELD_DP64(t, ID_AA64MMFR1, PAN, 3); /* FEAT_PAN3 */
+    t = FIELD_DP64(t, ID_AA64MMFR1, XNX, 1); /* FEAT_XNX */
+    t = FIELD_DP64(t, ID_AA64MMFR1, ETS, 1); /* FEAT_ETS */
+    t = FIELD_DP64(t, ID_AA64MMFR1, HCX, 1); /* FEAT_HCX */
     cpu->isar.id_aa64mmfr1 = t;
 
     t = cpu->isar.id_aa64mmfr2;
-    t = FIELD_DP64(t, ID_AA64MMFR2, CNP, 1);      /* FEAT_TTCNP */
-    t = FIELD_DP64(t, ID_AA64MMFR2, UAO, 1);      /* FEAT_UAO */
-    t = FIELD_DP64(t, ID_AA64MMFR2, IESB, 1);     /* FEAT_IESB */
-    t = FIELD_DP64(t, ID_AA64MMFR2, VARANGE, 1);  /* FEAT_LVA */
-    t = FIELD_DP64(t, ID_AA64MMFR2, ST, 1);       /* FEAT_TTST */
-    t = FIELD_DP64(t, ID_AA64MMFR2, AT, 1);       /* FEAT_LSE2 */
-    t = FIELD_DP64(t, ID_AA64MMFR2, IDS, 1);      /* FEAT_IDST */
-    t = FIELD_DP64(t, ID_AA64MMFR2, FWB, 1);      /* FEAT_S2FWB */
-    t = FIELD_DP64(t, ID_AA64MMFR2, TTL, 1);      /* FEAT_TTL */
-    t = FIELD_DP64(t, ID_AA64MMFR2, BBM, 2);      /* FEAT_BBM at level 2 */
-    t = FIELD_DP64(t, ID_AA64MMFR2, EVT, 2);      /* FEAT_EVT */
-    t = FIELD_DP64(t, ID_AA64MMFR2, E0PD, 1);     /* FEAT_E0PD */
+    t = FIELD_DP64(t, ID_AA64MMFR2, CNP, 1); /* FEAT_TTCNP */
+    t = FIELD_DP64(t, ID_AA64MMFR2, UAO, 1); /* FEAT_UAO */
+    t = FIELD_DP64(t, ID_AA64MMFR2, IESB, 1); /* FEAT_IESB */
+    t = FIELD_DP64(t, ID_AA64MMFR2, VARANGE, 1); /* FEAT_LVA */
+    t = FIELD_DP64(t, ID_AA64MMFR2, ST, 1); /* FEAT_TTST */
+    t = FIELD_DP64(t, ID_AA64MMFR2, AT, 1); /* FEAT_LSE2 */
+    t = FIELD_DP64(t, ID_AA64MMFR2, IDS, 1); /* FEAT_IDST */
+    t = FIELD_DP64(t, ID_AA64MMFR2, FWB, 1); /* FEAT_S2FWB */
+    t = FIELD_DP64(t, ID_AA64MMFR2, TTL, 1); /* FEAT_TTL */
+    t = FIELD_DP64(t, ID_AA64MMFR2, BBM, 2); /* FEAT_BBM at level 2 */
+    t = FIELD_DP64(t, ID_AA64MMFR2, EVT, 2); /* FEAT_EVT */
+    t = FIELD_DP64(t, ID_AA64MMFR2, E0PD, 1); /* FEAT_E0PD */
     cpu->isar.id_aa64mmfr2 = t;
 
     t = cpu->isar.id_aa64zfr0;
     t = FIELD_DP64(t, ID_AA64ZFR0, SVEVER, 1);
-    t = FIELD_DP64(t, ID_AA64ZFR0, AES, 2);       /* FEAT_SVE_PMULL128 */
-    t = FIELD_DP64(t, ID_AA64ZFR0, BITPERM, 1);   /* FEAT_SVE_BitPerm */
-    t = FIELD_DP64(t, ID_AA64ZFR0, BFLOAT16, 1);  /* FEAT_BF16 */
-    t = FIELD_DP64(t, ID_AA64ZFR0, SHA3, 1);      /* FEAT_SVE_SHA3 */
-    t = FIELD_DP64(t, ID_AA64ZFR0, SM4, 1);       /* FEAT_SVE_SM4 */
-    t = FIELD_DP64(t, ID_AA64ZFR0, I8MM, 1);      /* FEAT_I8MM */
-    t = FIELD_DP64(t, ID_AA64ZFR0, F32MM, 1);     /* FEAT_F32MM */
-    t = FIELD_DP64(t, ID_AA64ZFR0, F64MM, 1);     /* FEAT_F64MM */
+    t = FIELD_DP64(t, ID_AA64ZFR0, AES, 2); /* FEAT_SVE_PMULL128 */
+    t = FIELD_DP64(t, ID_AA64ZFR0, BITPERM, 1); /* FEAT_SVE_BitPerm */
+    t = FIELD_DP64(t, ID_AA64ZFR0, BFLOAT16, 1); /* FEAT_BF16 */
+    t = FIELD_DP64(t, ID_AA64ZFR0, SHA3, 1); /* FEAT_SVE_SHA3 */
+    t = FIELD_DP64(t, ID_AA64ZFR0, SM4, 1); /* FEAT_SVE_SM4 */
+    t = FIELD_DP64(t, ID_AA64ZFR0, I8MM, 1); /* FEAT_I8MM */
+    t = FIELD_DP64(t, ID_AA64ZFR0, F32MM, 1); /* FEAT_F32MM */
+    t = FIELD_DP64(t, ID_AA64ZFR0, F64MM, 1); /* FEAT_F64MM */
     cpu->isar.id_aa64zfr0 = t;
 
     t = cpu->isar.id_aa64dfr0;
-    t = FIELD_DP64(t, ID_AA64DFR0, DEBUGVER, 9);  /* FEAT_Debugv8p4 */
-    t = FIELD_DP64(t, ID_AA64DFR0, PMUVER, 6);    /* FEAT_PMUv3p5 */
+    t = FIELD_DP64(t, ID_AA64DFR0, DEBUGVER, 9); /* FEAT_Debugv8p4 */
+    t = FIELD_DP64(t, ID_AA64DFR0, PMUVER, 6); /* FEAT_PMUv3p5 */
     cpu->isar.id_aa64dfr0 = t;
 
     t = cpu->isar.id_aa64smfr0;
-    t = FIELD_DP64(t, ID_AA64SMFR0, F32F32, 1);   /* FEAT_SME */
-    t = FIELD_DP64(t, ID_AA64SMFR0, B16F32, 1);   /* FEAT_SME */
-    t = FIELD_DP64(t, ID_AA64SMFR0, F16F32, 1);   /* FEAT_SME */
-    t = FIELD_DP64(t, ID_AA64SMFR0, I8I32, 0xf);  /* FEAT_SME */
-    t = FIELD_DP64(t, ID_AA64SMFR0, F64F64, 1);   /* FEAT_SME_F64F64 */
+    t = FIELD_DP64(t, ID_AA64SMFR0, F32F32, 1); /* FEAT_SME */
+    t = FIELD_DP64(t, ID_AA64SMFR0, B16F32, 1); /* FEAT_SME */
+    t = FIELD_DP64(t, ID_AA64SMFR0, F16F32, 1); /* FEAT_SME */
+    t = FIELD_DP64(t, ID_AA64SMFR0, I8I32, 0xf); /* FEAT_SME */
+    t = FIELD_DP64(t, ID_AA64SMFR0, F64F64, 1); /* FEAT_SME_F64F64 */
     t = FIELD_DP64(t, ID_AA64SMFR0, I16I64, 0xf); /* FEAT_SME_I16I64 */
-    t = FIELD_DP64(t, ID_AA64SMFR0, FA64, 1);     /* FEAT_SME_FA64 */
+    t = FIELD_DP64(t, ID_AA64SMFR0, FA64, 1); /* FEAT_SME_FA64 */
     cpu->isar.id_aa64smfr0 = t;
 
     /* Replicate the same data to the 32-bit id registers.  */
@@ -894,13 +1050,13 @@ void aarch64_max_tcg_initfn(Object *obj)
 }
 
 static const ARMCPUInfo aarch64_cpus[] = {
-    { .name = "cortex-a35",         .initfn = aarch64_a35_initfn },
-    { .name = "cortex-a55",         .initfn = aarch64_a55_initfn },
-    { .name = "cortex-a72",         .initfn = aarch64_a72_initfn },
-    { .name = "cortex-a76",         .initfn = aarch64_a76_initfn },
-    { .name = "a64fx",              .initfn = aarch64_a64fx_initfn },
-    { .name = "neoverse-n1",        .initfn = aarch64_neoverse_n1_initfn },
-    { .name = "neoverse-v1",        .initfn = aarch64_neoverse_v1_initfn },
+    { .name = "cortex-a35", .initfn = aarch64_a35_initfn },
+    { .name = "cortex-a55", .initfn = aarch64_a55_initfn },
+    { .name = "cortex-a72", .initfn = aarch64_a72_initfn },
+    { .name = "cortex-a76", .initfn = aarch64_a76_initfn },
+    { .name = "a64fx", .initfn = aarch64_a64fx_initfn },
+    { .name = "neoverse-n1", .initfn = aarch64_neoverse_n1_initfn },
+    { .name = "neoverse-v1", .initfn = aarch64_neoverse_v1_initfn },
 };
 
 static void aarch64_cpu_register_types(void)

@@ -21,18 +21,18 @@
 #include "gdbstub/helpers.h"
 
 
-#define LCX_REGNUM         32
-#define FCX_REGNUM         33
-#define PCXI_REGNUM        34
+#define LCX_REGNUM 32
+#define FCX_REGNUM 33
+#define PCXI_REGNUM 34
 #define TRICORE_PSW_REGNUM 35
-#define TRICORE_PC_REGNUM  36
-#define ICR_REGNUM         37
-#define ISP_REGNUM         38
-#define BTV_REGNUM         39
-#define BIV_REGNUM         40
-#define SYSCON_REGNUM      41
-#define PMUCON0_REGNUM     42
-#define DMUCON_REGNUM      43
+#define TRICORE_PC_REGNUM 36
+#define ICR_REGNUM 37
+#define ISP_REGNUM 38
+#define BTV_REGNUM 39
+#define BIV_REGNUM 40
+#define SYSCON_REGNUM 41
+#define PMUCON0_REGNUM 42
+#define DMUCON_REGNUM 43
 
 static uint32_t tricore_cpu_gdb_read_csfr(CPUTriCoreState *env, int n)
 {

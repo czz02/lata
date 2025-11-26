@@ -33,7 +33,7 @@
 
 __thread uintptr_t helper_retaddr;
 
-//#define DEBUG_SIGNAL
+// #define DEBUG_SIGNAL
 
 /*
  * Adjust the pc to pass to cpu_restore_state; return the memop type.
@@ -167,8 +167,7 @@ int walk_memory_regions(void *priv, walk_memory_regions_fn fn)
     int rc = 0;
 
     mmap_lock();
-    for (n = interval_tree_iter_first(&pageflags_root, 0, -1);
-         n != NULL;
+    for (n = interval_tree_iter_first(&pageflags_root, 0, -1); n != NULL;
          n = interval_tree_iter_next(n, 0, -1)) {
         PageFlagsNode *p = container_of(n, PageFlagsNode, itree);
 
@@ -182,14 +181,13 @@ int walk_memory_regions(void *priv, walk_memory_regions_fn fn)
     return rc;
 }
 
-static int dump_region(void *priv, target_ulong start,
-                       target_ulong end, unsigned long prot)
+static int dump_region(void *priv, target_ulong start, target_ulong end,
+                       unsigned long prot)
 {
     FILE *f = (FILE *)priv;
 
-    fprintf(f, TARGET_FMT_lx"-"TARGET_FMT_lx" "TARGET_FMT_lx" %c%c%c\n",
-            start, end, end - start,
-            ((prot & PAGE_READ) ? 'r' : '-'),
+    fprintf(f, TARGET_FMT_lx "-" TARGET_FMT_lx " " TARGET_FMT_lx " %c%c%c\n",
+            start, end, end - start, ((prot & PAGE_READ) ? 'r' : '-'),
             ((prot & PAGE_WRITE) ? 'w' : '-'),
             ((prot & PAGE_EXEC) ? 'x' : '-'));
     return 0;
@@ -200,8 +198,8 @@ void page_dump(FILE *f)
 {
     const int length = sizeof(target_ulong) * 2;
 
-    fprintf(f, "%-*s %-*s %-*s %s\n",
-            length, "start", length, "end", length, "size", "prot");
+    fprintf(f, "%-*s %-*s %-*s %s\n", length, "start", length, "end", length,
+            "size", "prot");
     walk_memory_regions(f, dump_region);
 }
 
@@ -331,9 +329,9 @@ static void pageflags_create_merge(target_ulong start, target_ulong last,
  * By default, they are not kept.
  */
 #ifndef PAGE_TARGET_STICKY
-#define PAGE_TARGET_STICKY  0
+#define PAGE_TARGET_STICKY 0
 #endif
-#define PAGE_STICKY  (PAGE_ANON | PAGE_PASSTHROUGH | PAGE_TARGET_STICKY)
+#define PAGE_STICKY (PAGE_ANON | PAGE_PASSTHROUGH | PAGE_TARGET_STICKY)
 
 /* A subroutine of page_set_flags: add flags to [start,last]. */
 static bool pageflags_set_clear(target_ulong start, target_ulong last,
@@ -344,7 +342,7 @@ static bool pageflags_set_clear(target_ulong start, target_ulong last,
     int p_flags, merge_flags;
     bool inval_tb = false;
 
- restart:
+restart:
     p = pageflags_find(start, last);
     if (!p) {
         if (set_flags) {
@@ -363,9 +361,8 @@ static bool pageflags_set_clear(target_ulong start, target_ulong last,
      * Need to flush if an overlapping executable region
      * removes exec, or adds write.
      */
-    if ((p_flags & PAGE_EXEC)
-        && (!(merge_flags & PAGE_EXEC)
-            || (merge_flags & ~p_flags & PAGE_WRITE))) {
+    if ((p_flags & PAGE_EXEC) &&
+        (!(merge_flags & PAGE_EXEC) || (merge_flags & ~p_flags & PAGE_WRITE))) {
         inval_tb = true;
     }
 
@@ -471,7 +468,7 @@ static bool pageflags_set_clear(target_ulong start, target_ulong last,
         pageflags_create(start, last, set_flags);
     }
 
- done:
+done:
     return inval_tb;
 }
 
@@ -512,8 +509,8 @@ void page_set_flags(target_ulong start, target_ulong last, int flags)
         inval_tb |= pageflags_unset(start, last);
     }
     if (flags) {
-        inval_tb |= pageflags_set_clear(start, last, flags,
-                                        ~(reset ? 0 : PAGE_STICKY));
+        inval_tb |=
+            pageflags_set_clear(start, last, flags, ~(reset ? 0 : PAGE_STICKY));
     }
     if (inval_tb) {
         tb_invalidate_phys_range(start, last);
@@ -524,11 +521,11 @@ bool page_check_range(target_ulong start, target_ulong len, int flags)
 {
     return true;
     target_ulong last;
-    int locked;  /* tri-state: =0: unlocked, +1: global, -1: local */
+    int locked; /* tri-state: =0: unlocked, +1: global, -1: local */
     bool ret;
 
     if (len == 0) {
-        return true;  /* trivial length */
+        return true; /* trivial length */
     }
 
     last = start + len - 1;
@@ -770,9 +767,9 @@ int page_unprotect(target_ulong address, uintptr_t pc)
     return current_tb_invalidated ? 2 : 1;
 }
 
-static int probe_access_internal(CPUArchState *env, vaddr addr,
-                                 int fault_size, MMUAccessType access_type,
-                                 bool nonfault, uintptr_t ra)
+static int probe_access_internal(CPUArchState *env, vaddr addr, int fault_size,
+                                 MMUAccessType access_type, bool nonfault,
+                                 uintptr_t ra)
 {
     int acc_flag;
     bool maperr;
@@ -794,8 +791,8 @@ static int probe_access_internal(CPUArchState *env, vaddr addr,
     if (guest_addr_valid_untagged(addr)) {
         int page_flags = page_get_flags(addr);
         if (page_flags & acc_flag) {
-            if ((acc_flag == PAGE_READ || acc_flag == PAGE_WRITE)
-                && cpu_plugin_mem_cbs_enabled(env_cpu(env))) {
+            if ((acc_flag == PAGE_READ || acc_flag == PAGE_WRITE) &&
+                cpu_plugin_mem_cbs_enabled(env_cpu(env))) {
                 return TLB_MMIO;
             }
             return 0; /* success */
@@ -813,8 +810,8 @@ static int probe_access_internal(CPUArchState *env, vaddr addr,
 }
 
 int probe_access_flags(CPUArchState *env, vaddr addr, int size,
-                       MMUAccessType access_type, int mmu_idx,
-                       bool nonfault, void **phost, uintptr_t ra)
+                       MMUAccessType access_type, int mmu_idx, bool nonfault,
+                       void **phost, uintptr_t ra)
 {
     int flags;
 
@@ -856,8 +853,8 @@ tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env, vaddr addr,
  * if we allocate one hunk per page, we have overhead of 40/128 or 40%.
  * Therefore, allocate memory for 64 pages at a time for overhead < 1%.
  */
-#define TPD_PAGES  64
-#define TBD_MASK   (TARGET_PAGE_MASK * TPD_PAGES)
+#define TPD_PAGES 64
+#define TBD_MASK (TARGET_PAGE_MASK * TPD_PAGES)
 
 typedef struct TargetPageDataNode {
     struct rcu_head rcu;
@@ -877,10 +874,9 @@ void page_reset_target_data(target_ulong start, target_ulong last)
     last |= ~TARGET_PAGE_MASK;
 
     for (n = interval_tree_iter_first(&targetdata_root, start, last),
-         next = n ? interval_tree_iter_next(n, start, last) : NULL;
-         n != NULL;
-         n = next,
-         next = next ? interval_tree_iter_next(n, start, last) : NULL) {
+        next = n ? interval_tree_iter_next(n, start, last) : NULL;
+         n != NULL; n = next,
+        next = next ? interval_tree_iter_next(n, start, last) : NULL) {
         target_ulong n_start, n_last, p_ofs, p_len;
         TargetPageDataNode *t = container_of(n, TargetPageDataNode, itree);
 
@@ -937,13 +933,15 @@ void *page_get_target_data(target_ulong address)
     return t->data[(page - region) >> TARGET_PAGE_BITS];
 }
 #else
-void page_reset_target_data(target_ulong start, target_ulong last) { }
+void page_reset_target_data(target_ulong start, target_ulong last)
+{
+}
 #endif /* TARGET_PAGE_DATA_SIZE */
 
 /* The softmmu versions of these helpers are in cputlb.c.  */
 
-static void *cpu_mmu_lookup(CPUArchState *env, vaddr addr,
-                            MemOp mop, uintptr_t ra, MMUAccessType type)
+static void *cpu_mmu_lookup(CPUArchState *env, vaddr addr, MemOp mop,
+                            uintptr_t ra, MMUAccessType type)
 {
     int a_bits = get_alignment_bits(mop);
     void *ret;
@@ -960,8 +958,8 @@ static void *cpu_mmu_lookup(CPUArchState *env, vaddr addr,
 
 #include "ldst_atomicity.c.inc"
 
-static uint8_t do_ld1_mmu(CPUArchState *env, abi_ptr addr,
-                          MemOp mop, uintptr_t ra)
+static uint8_t do_ld1_mmu(CPUArchState *env, abi_ptr addr, MemOp mop,
+                          uintptr_t ra)
 {
     void *haddr;
     uint8_t ret;
@@ -974,28 +972,27 @@ static uint8_t do_ld1_mmu(CPUArchState *env, abi_ptr addr,
     return ret;
 }
 
-tcg_target_ulong helper_ldub_mmu(CPUArchState *env, uint64_t addr,
-                                 MemOpIdx oi, uintptr_t ra)
+tcg_target_ulong helper_ldub_mmu(CPUArchState *env, uint64_t addr, MemOpIdx oi,
+                                 uintptr_t ra)
 {
     return do_ld1_mmu(env, addr, get_memop(oi), ra);
 }
 
-tcg_target_ulong helper_ldsb_mmu(CPUArchState *env, uint64_t addr,
-                                 MemOpIdx oi, uintptr_t ra)
+tcg_target_ulong helper_ldsb_mmu(CPUArchState *env, uint64_t addr, MemOpIdx oi,
+                                 uintptr_t ra)
 {
     return (int8_t)do_ld1_mmu(env, addr, get_memop(oi), ra);
 }
 
-uint8_t cpu_ldb_mmu(CPUArchState *env, abi_ptr addr,
-                    MemOpIdx oi, uintptr_t ra)
+uint8_t cpu_ldb_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi, uintptr_t ra)
 {
     uint8_t ret = do_ld1_mmu(env, addr, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_R);
     return ret;
 }
 
-static uint16_t do_ld2_mmu(CPUArchState *env, abi_ptr addr,
-                           MemOp mop, uintptr_t ra)
+static uint16_t do_ld2_mmu(CPUArchState *env, abi_ptr addr, MemOp mop,
+                           uintptr_t ra)
 {
     void *haddr;
     uint16_t ret;
@@ -1012,28 +1009,27 @@ static uint16_t do_ld2_mmu(CPUArchState *env, abi_ptr addr,
     return ret;
 }
 
-tcg_target_ulong helper_lduw_mmu(CPUArchState *env, uint64_t addr,
-                                 MemOpIdx oi, uintptr_t ra)
+tcg_target_ulong helper_lduw_mmu(CPUArchState *env, uint64_t addr, MemOpIdx oi,
+                                 uintptr_t ra)
 {
     return do_ld2_mmu(env, addr, get_memop(oi), ra);
 }
 
-tcg_target_ulong helper_ldsw_mmu(CPUArchState *env, uint64_t addr,
-                                 MemOpIdx oi, uintptr_t ra)
+tcg_target_ulong helper_ldsw_mmu(CPUArchState *env, uint64_t addr, MemOpIdx oi,
+                                 uintptr_t ra)
 {
     return (int16_t)do_ld2_mmu(env, addr, get_memop(oi), ra);
 }
 
-uint16_t cpu_ldw_mmu(CPUArchState *env, abi_ptr addr,
-                     MemOpIdx oi, uintptr_t ra)
+uint16_t cpu_ldw_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi, uintptr_t ra)
 {
     uint16_t ret = do_ld2_mmu(env, addr, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_R);
     return ret;
 }
 
-static uint32_t do_ld4_mmu(CPUArchState *env, abi_ptr addr,
-                           MemOp mop, uintptr_t ra)
+static uint32_t do_ld4_mmu(CPUArchState *env, abi_ptr addr, MemOp mop,
+                           uintptr_t ra)
 {
     void *haddr;
     uint32_t ret;
@@ -1050,28 +1046,27 @@ static uint32_t do_ld4_mmu(CPUArchState *env, abi_ptr addr,
     return ret;
 }
 
-tcg_target_ulong helper_ldul_mmu(CPUArchState *env, uint64_t addr,
-                                 MemOpIdx oi, uintptr_t ra)
+tcg_target_ulong helper_ldul_mmu(CPUArchState *env, uint64_t addr, MemOpIdx oi,
+                                 uintptr_t ra)
 {
     return do_ld4_mmu(env, addr, get_memop(oi), ra);
 }
 
-tcg_target_ulong helper_ldsl_mmu(CPUArchState *env, uint64_t addr,
-                                 MemOpIdx oi, uintptr_t ra)
+tcg_target_ulong helper_ldsl_mmu(CPUArchState *env, uint64_t addr, MemOpIdx oi,
+                                 uintptr_t ra)
 {
     return (int32_t)do_ld4_mmu(env, addr, get_memop(oi), ra);
 }
 
-uint32_t cpu_ldl_mmu(CPUArchState *env, abi_ptr addr,
-                     MemOpIdx oi, uintptr_t ra)
+uint32_t cpu_ldl_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi, uintptr_t ra)
 {
     uint32_t ret = do_ld4_mmu(env, addr, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_R);
     return ret;
 }
 
-static uint64_t do_ld8_mmu(CPUArchState *env, abi_ptr addr,
-                           MemOp mop, uintptr_t ra)
+static uint64_t do_ld8_mmu(CPUArchState *env, abi_ptr addr, MemOp mop,
+                           uintptr_t ra)
 {
     void *haddr;
     uint64_t ret;
@@ -1088,22 +1083,21 @@ static uint64_t do_ld8_mmu(CPUArchState *env, abi_ptr addr,
     return ret;
 }
 
-uint64_t helper_ldq_mmu(CPUArchState *env, uint64_t addr,
-                        MemOpIdx oi, uintptr_t ra)
+uint64_t helper_ldq_mmu(CPUArchState *env, uint64_t addr, MemOpIdx oi,
+                        uintptr_t ra)
 {
     return do_ld8_mmu(env, addr, get_memop(oi), ra);
 }
 
-uint64_t cpu_ldq_mmu(CPUArchState *env, abi_ptr addr,
-                     MemOpIdx oi, uintptr_t ra)
+uint64_t cpu_ldq_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi, uintptr_t ra)
 {
     uint64_t ret = do_ld8_mmu(env, addr, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_R);
     return ret;
 }
 
-static Int128 do_ld16_mmu(CPUArchState *env, abi_ptr addr,
-                          MemOp mop, uintptr_t ra)
+static Int128 do_ld16_mmu(CPUArchState *env, abi_ptr addr, MemOp mop,
+                          uintptr_t ra)
 {
     void *haddr;
     Int128 ret;
@@ -1120,8 +1114,8 @@ static Int128 do_ld16_mmu(CPUArchState *env, abi_ptr addr,
     return ret;
 }
 
-Int128 helper_ld16_mmu(CPUArchState *env, uint64_t addr,
-                       MemOpIdx oi, uintptr_t ra)
+Int128 helper_ld16_mmu(CPUArchState *env, uint64_t addr, MemOpIdx oi,
+                       uintptr_t ra)
 {
     return do_ld16_mmu(env, addr, get_memop(oi), ra);
 }
@@ -1131,16 +1125,15 @@ Int128 helper_ld_i128(CPUArchState *env, uint64_t addr, MemOpIdx oi)
     return helper_ld16_mmu(env, addr, oi, GETPC());
 }
 
-Int128 cpu_ld16_mmu(CPUArchState *env, abi_ptr addr,
-                    MemOpIdx oi, uintptr_t ra)
+Int128 cpu_ld16_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi, uintptr_t ra)
 {
     Int128 ret = do_ld16_mmu(env, addr, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_R);
     return ret;
 }
 
-static void do_st1_mmu(CPUArchState *env, abi_ptr addr, uint8_t val,
-                       MemOp mop, uintptr_t ra)
+static void do_st1_mmu(CPUArchState *env, abi_ptr addr, uint8_t val, MemOp mop,
+                       uintptr_t ra)
 {
     void *haddr;
 
@@ -1151,21 +1144,21 @@ static void do_st1_mmu(CPUArchState *env, abi_ptr addr, uint8_t val,
     clear_helper_retaddr();
 }
 
-void helper_stb_mmu(CPUArchState *env, uint64_t addr, uint32_t val,
-                    MemOpIdx oi, uintptr_t ra)
+void helper_stb_mmu(CPUArchState *env, uint64_t addr, uint32_t val, MemOpIdx oi,
+                    uintptr_t ra)
 {
     do_st1_mmu(env, addr, val, get_memop(oi), ra);
 }
 
-void cpu_stb_mmu(CPUArchState *env, abi_ptr addr, uint8_t val,
-                 MemOpIdx oi, uintptr_t ra)
+void cpu_stb_mmu(CPUArchState *env, abi_ptr addr, uint8_t val, MemOpIdx oi,
+                 uintptr_t ra)
 {
     do_st1_mmu(env, addr, val, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_W);
 }
 
-static void do_st2_mmu(CPUArchState *env, abi_ptr addr, uint16_t val,
-                       MemOp mop, uintptr_t ra)
+static void do_st2_mmu(CPUArchState *env, abi_ptr addr, uint16_t val, MemOp mop,
+                       uintptr_t ra)
 {
     void *haddr;
 
@@ -1180,21 +1173,21 @@ static void do_st2_mmu(CPUArchState *env, abi_ptr addr, uint16_t val,
     clear_helper_retaddr();
 }
 
-void helper_stw_mmu(CPUArchState *env, uint64_t addr, uint32_t val,
-                    MemOpIdx oi, uintptr_t ra)
+void helper_stw_mmu(CPUArchState *env, uint64_t addr, uint32_t val, MemOpIdx oi,
+                    uintptr_t ra)
 {
     do_st2_mmu(env, addr, val, get_memop(oi), ra);
 }
 
-void cpu_stw_mmu(CPUArchState *env, abi_ptr addr, uint16_t val,
-                    MemOpIdx oi, uintptr_t ra)
+void cpu_stw_mmu(CPUArchState *env, abi_ptr addr, uint16_t val, MemOpIdx oi,
+                 uintptr_t ra)
 {
     do_st2_mmu(env, addr, val, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_W);
 }
 
-static void do_st4_mmu(CPUArchState *env, abi_ptr addr, uint32_t val,
-                       MemOp mop, uintptr_t ra)
+static void do_st4_mmu(CPUArchState *env, abi_ptr addr, uint32_t val, MemOp mop,
+                       uintptr_t ra)
 {
     void *haddr;
 
@@ -1209,21 +1202,21 @@ static void do_st4_mmu(CPUArchState *env, abi_ptr addr, uint32_t val,
     clear_helper_retaddr();
 }
 
-void helper_stl_mmu(CPUArchState *env, uint64_t addr, uint32_t val,
-                    MemOpIdx oi, uintptr_t ra)
+void helper_stl_mmu(CPUArchState *env, uint64_t addr, uint32_t val, MemOpIdx oi,
+                    uintptr_t ra)
 {
     do_st4_mmu(env, addr, val, get_memop(oi), ra);
 }
 
-void cpu_stl_mmu(CPUArchState *env, abi_ptr addr, uint32_t val,
-                 MemOpIdx oi, uintptr_t ra)
+void cpu_stl_mmu(CPUArchState *env, abi_ptr addr, uint32_t val, MemOpIdx oi,
+                 uintptr_t ra)
 {
     do_st4_mmu(env, addr, val, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_W);
 }
 
-static void do_st8_mmu(CPUArchState *env, abi_ptr addr, uint64_t val,
-                       MemOp mop, uintptr_t ra)
+static void do_st8_mmu(CPUArchState *env, abi_ptr addr, uint64_t val, MemOp mop,
+                       uintptr_t ra)
 {
     void *haddr;
 
@@ -1238,21 +1231,21 @@ static void do_st8_mmu(CPUArchState *env, abi_ptr addr, uint64_t val,
     clear_helper_retaddr();
 }
 
-void helper_stq_mmu(CPUArchState *env, uint64_t addr, uint64_t val,
-                    MemOpIdx oi, uintptr_t ra)
+void helper_stq_mmu(CPUArchState *env, uint64_t addr, uint64_t val, MemOpIdx oi,
+                    uintptr_t ra)
 {
     do_st8_mmu(env, addr, val, get_memop(oi), ra);
 }
 
-void cpu_stq_mmu(CPUArchState *env, abi_ptr addr, uint64_t val,
-                    MemOpIdx oi, uintptr_t ra)
+void cpu_stq_mmu(CPUArchState *env, abi_ptr addr, uint64_t val, MemOpIdx oi,
+                 uintptr_t ra)
 {
     do_st8_mmu(env, addr, val, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_W);
 }
 
-static void do_st16_mmu(CPUArchState *env, abi_ptr addr, Int128 val,
-                        MemOp mop, uintptr_t ra)
+static void do_st16_mmu(CPUArchState *env, abi_ptr addr, Int128 val, MemOp mop,
+                        uintptr_t ra)
 {
     void *haddr;
 
@@ -1267,8 +1260,8 @@ static void do_st16_mmu(CPUArchState *env, abi_ptr addr, Int128 val,
     clear_helper_retaddr();
 }
 
-void helper_st16_mmu(CPUArchState *env, uint64_t addr, Int128 val,
-                     MemOpIdx oi, uintptr_t ra)
+void helper_st16_mmu(CPUArchState *env, uint64_t addr, Int128 val, MemOpIdx oi,
+                     uintptr_t ra)
 {
     do_st16_mmu(env, addr, val, get_memop(oi), ra);
 }
@@ -1278,8 +1271,8 @@ void helper_st_i128(CPUArchState *env, uint64_t addr, Int128 val, MemOpIdx oi)
     helper_st16_mmu(env, addr, val, oi, GETPC());
 }
 
-void cpu_st16_mmu(CPUArchState *env, abi_ptr addr,
-                  Int128 val, MemOpIdx oi, uintptr_t ra)
+void cpu_st16_mmu(CPUArchState *env, abi_ptr addr, Int128 val, MemOpIdx oi,
+                  uintptr_t ra)
 {
     do_st16_mmu(env, addr, val, get_memop(oi), ra);
     qemu_plugin_vcpu_mem_cb(env_cpu(env), addr, oi, QEMU_PLUGIN_MEM_W);
@@ -1325,8 +1318,8 @@ uint64_t cpu_ldq_code(CPUArchState *env, abi_ptr ptr)
     return ret;
 }
 
-uint8_t cpu_ldb_code_mmu(CPUArchState *env, abi_ptr addr,
-                         MemOpIdx oi, uintptr_t ra)
+uint8_t cpu_ldb_code_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi,
+                         uintptr_t ra)
 {
     void *haddr;
     uint8_t ret;
@@ -1337,8 +1330,8 @@ uint8_t cpu_ldb_code_mmu(CPUArchState *env, abi_ptr addr,
     return ret;
 }
 
-uint16_t cpu_ldw_code_mmu(CPUArchState *env, abi_ptr addr,
-                          MemOpIdx oi, uintptr_t ra)
+uint16_t cpu_ldw_code_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi,
+                          uintptr_t ra)
 {
     void *haddr;
     uint16_t ret;
@@ -1352,8 +1345,8 @@ uint16_t cpu_ldw_code_mmu(CPUArchState *env, abi_ptr addr,
     return ret;
 }
 
-uint32_t cpu_ldl_code_mmu(CPUArchState *env, abi_ptr addr,
-                          MemOpIdx oi, uintptr_t ra)
+uint32_t cpu_ldl_code_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi,
+                          uintptr_t ra)
 {
     void *haddr;
     uint32_t ret;
@@ -1367,8 +1360,8 @@ uint32_t cpu_ldl_code_mmu(CPUArchState *env, abi_ptr addr,
     return ret;
 }
 
-uint64_t cpu_ldq_code_mmu(CPUArchState *env, abi_ptr addr,
-                          MemOpIdx oi, uintptr_t ra)
+uint64_t cpu_ldq_code_mmu(CPUArchState *env, abi_ptr addr, MemOpIdx oi,
+                          uintptr_t ra)
 {
     void *haddr;
     uint64_t ret;
@@ -1416,9 +1409,11 @@ static void *atomic_mmu_lookup(CPUArchState *env, vaddr addr, MemOpIdx oi,
  * This makes them callable from other helpers.
  */
 
-#define ATOMIC_NAME(X) \
-    glue(glue(glue(cpu_atomic_ ## X, SUFFIX), END), _mmu)
-#define ATOMIC_MMU_CLEANUP do { clear_helper_retaddr(); } while (0)
+#define ATOMIC_NAME(X) glue(glue(glue(cpu_atomic_##X, SUFFIX), END), _mmu)
+#define ATOMIC_MMU_CLEANUP      \
+    do {                        \
+        clear_helper_retaddr(); \
+    } while (0)
 
 #define DATA_SIZE 1
 #include "atomic_template.h"

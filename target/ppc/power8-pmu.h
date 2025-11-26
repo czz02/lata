@@ -20,8 +20,12 @@
 void cpu_ppc_pmu_init(CPUPPCState *env);
 void pmu_mmcr01_updated(CPUPPCState *env);
 #else
-static inline void cpu_ppc_pmu_init(CPUPPCState *env) { }
-static inline void pmu_mmcr01_updated(CPUPPCState *env) { }
+static inline void cpu_ppc_pmu_init(CPUPPCState *env)
+{
+}
+static inline void pmu_mmcr01_updated(CPUPPCState *env)
+{
+}
 #endif
 
 #endif

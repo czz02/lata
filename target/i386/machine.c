@@ -18,40 +18,35 @@ static const VMStateDescription vmstate_segment = {
     .name = "segment",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT32(selector, SegmentCache),
-        VMSTATE_UINTTL(base, SegmentCache),
-        VMSTATE_UINT32(limit, SegmentCache),
-        VMSTATE_UINT32(flags, SegmentCache),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT32(selector, SegmentCache),
+                                VMSTATE_UINTTL(base, SegmentCache),
+                                VMSTATE_UINT32(limit, SegmentCache),
+                                VMSTATE_UINT32(flags, SegmentCache),
+                                VMSTATE_END_OF_LIST() }
 };
 
-#define VMSTATE_SEGMENT(_field, _state) {                            \
-    .name       = (stringify(_field)),                               \
-    .size       = sizeof(SegmentCache),                              \
-    .vmsd       = &vmstate_segment,                                  \
-    .flags      = VMS_STRUCT,                                        \
-    .offset     = offsetof(_state, _field)                           \
-            + type_check(SegmentCache,typeof_field(_state, _field))  \
-}
+#define VMSTATE_SEGMENT(_field, _state)                                  \
+    {                                                                    \
+        .name = (stringify(_field)), .size = sizeof(SegmentCache),       \
+        .vmsd = &vmstate_segment, .flags = VMS_STRUCT,                   \
+        .offset = offsetof(_state, _field) +                             \
+                  type_check(SegmentCache, typeof_field(_state, _field)) \
+    }
 
-#define VMSTATE_SEGMENT_ARRAY(_field, _state, _n)                    \
+#define VMSTATE_SEGMENT_ARRAY(_field, _state, _n) \
     VMSTATE_STRUCT_ARRAY(_field, _state, _n, 0, vmstate_segment, SegmentCache)
 
 static const VMStateDescription vmstate_xmm_reg = {
     .name = "xmm_reg",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(ZMM_Q(0), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(1), ZMMReg),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(ZMM_Q(0), ZMMReg),
+                                VMSTATE_UINT64(ZMM_Q(1), ZMMReg),
+                                VMSTATE_END_OF_LIST() }
 };
 
-#define VMSTATE_XMM_REGS(_field, _state, _start)                         \
-    VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, CPU_NB_REGS, 0,     \
+#define VMSTATE_XMM_REGS(_field, _state, _start)                     \
+    VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, CPU_NB_REGS, 0, \
                              vmstate_xmm_reg, ZMMReg)
 
 /* YMMH format is the same as XMM, but for bits 128-255 */
@@ -59,32 +54,28 @@ static const VMStateDescription vmstate_ymmh_reg = {
     .name = "ymmh_reg",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(ZMM_Q(2), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(3), ZMMReg),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(ZMM_Q(2), ZMMReg),
+                                VMSTATE_UINT64(ZMM_Q(3), ZMMReg),
+                                VMSTATE_END_OF_LIST() }
 };
 
-#define VMSTATE_YMMH_REGS_VARS(_field, _state, _start, _v)               \
-    VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, CPU_NB_REGS, _v,    \
+#define VMSTATE_YMMH_REGS_VARS(_field, _state, _start, _v)            \
+    VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, CPU_NB_REGS, _v, \
                              vmstate_ymmh_reg, ZMMReg)
 
 static const VMStateDescription vmstate_zmmh_reg = {
     .name = "zmmh_reg",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(ZMM_Q(4), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(5), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(6), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(7), ZMMReg),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(ZMM_Q(4), ZMMReg),
+                                VMSTATE_UINT64(ZMM_Q(5), ZMMReg),
+                                VMSTATE_UINT64(ZMM_Q(6), ZMMReg),
+                                VMSTATE_UINT64(ZMM_Q(7), ZMMReg),
+                                VMSTATE_END_OF_LIST() }
 };
 
-#define VMSTATE_ZMMH_REGS_VARS(_field, _state, _start)                   \
-    VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, CPU_NB_REGS, 0,     \
+#define VMSTATE_ZMMH_REGS_VARS(_field, _state, _start)               \
+    VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, CPU_NB_REGS, 0, \
                              vmstate_zmmh_reg, ZMMReg)
 
 #ifdef TARGET_X86_64
@@ -92,21 +83,17 @@ static const VMStateDescription vmstate_hi16_zmm_reg = {
     .name = "hi16_zmm_reg",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(ZMM_Q(0), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(1), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(2), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(3), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(4), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(5), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(6), ZMMReg),
-        VMSTATE_UINT64(ZMM_Q(7), ZMMReg),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINT64(ZMM_Q(0), ZMMReg), VMSTATE_UINT64(ZMM_Q(1), ZMMReg),
+            VMSTATE_UINT64(ZMM_Q(2), ZMMReg), VMSTATE_UINT64(ZMM_Q(3), ZMMReg),
+            VMSTATE_UINT64(ZMM_Q(4), ZMMReg), VMSTATE_UINT64(ZMM_Q(5), ZMMReg),
+            VMSTATE_UINT64(ZMM_Q(6), ZMMReg), VMSTATE_UINT64(ZMM_Q(7), ZMMReg),
+            VMSTATE_END_OF_LIST() }
 };
 
-#define VMSTATE_Hi16_ZMM_REGS_VARS(_field, _state, _start)               \
-    VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, CPU_NB_REGS, 0,     \
+#define VMSTATE_Hi16_ZMM_REGS_VARS(_field, _state, _start)           \
+    VMSTATE_STRUCT_SUB_ARRAY(_field, _state, _start, CPU_NB_REGS, 0, \
                              vmstate_hi16_zmm_reg, ZMMReg)
 #endif
 
@@ -114,43 +101,37 @@ static const VMStateDescription vmstate_bnd_regs = {
     .name = "bnd_regs",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(lb, BNDReg),
-        VMSTATE_UINT64(ub, BNDReg),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_UINT64(lb, BNDReg),
+                          VMSTATE_UINT64(ub, BNDReg), VMSTATE_END_OF_LIST() }
 };
 
-#define VMSTATE_BND_REGS(_field, _state, _n)          \
+#define VMSTATE_BND_REGS(_field, _state, _n) \
     VMSTATE_STRUCT_ARRAY(_field, _state, _n, 0, vmstate_bnd_regs, BNDReg)
 
 static const VMStateDescription vmstate_mtrr_var = {
     .name = "mtrr_var",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(base, MTRRVar),
-        VMSTATE_UINT64(mask, MTRRVar),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_UINT64(base, MTRRVar),
+                          VMSTATE_UINT64(mask, MTRRVar), VMSTATE_END_OF_LIST() }
 };
 
-#define VMSTATE_MTRR_VARS(_field, _state, _n, _v)                    \
+#define VMSTATE_MTRR_VARS(_field, _state, _n, _v) \
     VMSTATE_STRUCT_ARRAY(_field, _state, _n, _v, vmstate_mtrr_var, MTRRVar)
 
 static const VMStateDescription vmstate_lbr_records_var = {
     .name = "lbr_records_var",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(from, LBREntry),
-        VMSTATE_UINT64(to, LBREntry),
-        VMSTATE_UINT64(info, LBREntry),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(from, LBREntry),
+                                VMSTATE_UINT64(to, LBREntry),
+                                VMSTATE_UINT64(info, LBREntry),
+                                VMSTATE_END_OF_LIST() }
 };
 
-#define VMSTATE_LBR_VARS(_field, _state, _n, _v)                    \
+#define VMSTATE_LBR_VARS(_field, _state, _n, _v)                          \
     VMSTATE_STRUCT_ARRAY(_field, _state, _n, _v, vmstate_lbr_records_var, \
                          LBREntry)
 
@@ -200,20 +181,17 @@ static int fpreg_post_load(void *opaque, int version)
 static const VMStateDescription vmstate_fpreg_tmp = {
     .name = "fpreg_tmp",
     .post_load = fpreg_post_load,
-    .pre_save  = fpreg_pre_save,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(tmp_mant, x86_FPReg_tmp),
-        VMSTATE_UINT16(tmp_exp, x86_FPReg_tmp),
-        VMSTATE_END_OF_LIST()
-    }
+    .pre_save = fpreg_pre_save,
+    .fields = (VMStateField[]){ VMSTATE_UINT64(tmp_mant, x86_FPReg_tmp),
+                                VMSTATE_UINT16(tmp_exp, x86_FPReg_tmp),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static const VMStateDescription vmstate_fpreg = {
     .name = "fpreg",
-    .fields = (VMStateField[]) {
-        VMSTATE_WITH_TMP(FPReg, x86_FPReg_tmp, vmstate_fpreg_tmp),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_WITH_TMP(FPReg, x86_FPReg_tmp,
+                                                 vmstate_fpreg_tmp),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static int cpu_pre_save(void *opaque)
@@ -225,7 +203,7 @@ static int cpu_pre_save(void *opaque)
     /* FPU */
     env->fpus_vmstate = (env->fpus & ~0x3800) | (env->fpstt & 0x7) << 11;
     env->fptag_vmstate = 0;
-    for(i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++) {
         env->fptag_vmstate |= ((!env->fptags[i]) << i);
     }
 
@@ -266,8 +244,8 @@ static int cpu_pre_save(void *opaque)
          (!kvm_has_exception_payload() && (env->hflags & HF_GUEST_MASK) &&
           env->exception_injected))) {
         error_report("Guest maybe enabled nested virtualization but kernel "
-                "does not support required capabilities to save vCPU "
-                "nested state");
+                     "does not support required capabilities to save vCPU "
+                     "nested state");
         return -EINVAL;
     }
 #endif
@@ -357,7 +335,7 @@ static int cpu_post_load(void *opaque, int version_id)
 #ifdef CONFIG_KVM
     if ((env->hflags & HF_GUEST_MASK) &&
         (!env->nested_state ||
-        !(env->nested_state->flags & KVM_STATE_NESTED_GUEST_MODE))) {
+         !(env->nested_state->flags & KVM_STATE_NESTED_GUEST_MODE))) {
         error_report("vCPU set in guest-mode inconsistent with "
                      "migrated kernel nested state");
         return -EINVAL;
@@ -376,15 +354,15 @@ static int cpu_post_load(void *opaque, int version_id)
      * In those cases, we can just deduce that a valid exception_nr means
      * we can treat the exception as already injected.
      */
-    if ((env->exception_nr != -1) &&
-        !env->exception_pending && !env->exception_injected) {
+    if ((env->exception_nr != -1) && !env->exception_pending &&
+        !env->exception_injected) {
         env->exception_injected = 1;
     }
 
     env->fpstt = (env->fpus_vmstate >> 11) & 7;
     env->fpus = env->fpus_vmstate & ~0x3800;
     env->fptag_vmstate ^= 0xff;
-    for(i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++) {
         env->fptags[i] = (env->fptag_vmstate >> i) & 1;
     }
     if (tcg_enabled()) {
@@ -453,13 +431,12 @@ static const VMStateDescription vmstate_exception_info = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = exception_info_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT8(env.exception_pending, X86CPU),
-        VMSTATE_UINT8(env.exception_injected, X86CPU),
-        VMSTATE_UINT8(env.exception_has_payload, X86CPU),
-        VMSTATE_UINT64(env.exception_payload, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_UINT8(env.exception_pending, X86CPU),
+                          VMSTATE_UINT8(env.exception_injected, X86CPU),
+                          VMSTATE_UINT8(env.exception_has_payload, X86CPU),
+                          VMSTATE_UINT64(env.exception_payload, X86CPU),
+                          VMSTATE_END_OF_LIST() }
 };
 
 /* Poll control MSR enabled by default */
@@ -475,10 +452,8 @@ static const VMStateDescription vmstate_steal_time_msr = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = steal_time_msr_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.steal_time_msr, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.steal_time_msr, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static const VMStateDescription vmstate_async_pf_msr = {
@@ -486,10 +461,8 @@ static const VMStateDescription vmstate_async_pf_msr = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = async_pf_msr_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.async_pf_en_msr, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.async_pf_en_msr, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static const VMStateDescription vmstate_async_pf_int_msr = {
@@ -497,10 +470,8 @@ static const VMStateDescription vmstate_async_pf_int_msr = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = async_pf_int_msr_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.async_pf_int_msr, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.async_pf_int_msr, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static const VMStateDescription vmstate_pv_eoi_msr = {
@@ -508,10 +479,8 @@ static const VMStateDescription vmstate_pv_eoi_msr = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = pv_eoi_msr_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.pv_eoi_en_msr, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.pv_eoi_en_msr, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static const VMStateDescription vmstate_poll_control_msr = {
@@ -519,10 +488,8 @@ static const VMStateDescription vmstate_poll_control_msr = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = poll_control_msr_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.poll_control_msr, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.poll_control_msr, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool fpop_ip_dp_needed(void *opaque)
@@ -538,12 +505,10 @@ static const VMStateDescription vmstate_fpop_ip_dp = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = fpop_ip_dp_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT16(env.fpop, X86CPU),
-        VMSTATE_UINT64(env.fpip, X86CPU),
-        VMSTATE_UINT64(env.fpdp, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT16(env.fpop, X86CPU),
+                                VMSTATE_UINT64(env.fpip, X86CPU),
+                                VMSTATE_UINT64(env.fpdp, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool tsc_adjust_needed(void *opaque)
@@ -559,10 +524,8 @@ static const VMStateDescription vmstate_msr_tsc_adjust = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = tsc_adjust_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.tsc_adjust, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.tsc_adjust, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool msr_smi_count_needed(void *opaque)
@@ -578,10 +541,8 @@ static const VMStateDescription vmstate_msr_smi_count = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = msr_smi_count_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_smi_count, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.msr_smi_count, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool tscdeadline_needed(void *opaque)
@@ -597,10 +558,8 @@ static const VMStateDescription vmstate_msr_tscdeadline = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = tscdeadline_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.tsc_deadline, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.tsc_deadline, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool misc_enable_needed(void *opaque)
@@ -624,10 +583,9 @@ static const VMStateDescription vmstate_msr_ia32_misc_enable = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = misc_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_ia32_misc_enable, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_UINT64(env.msr_ia32_misc_enable, X86CPU),
+                          VMSTATE_END_OF_LIST() }
 };
 
 static const VMStateDescription vmstate_msr_ia32_feature_control = {
@@ -635,10 +593,9 @@ static const VMStateDescription vmstate_msr_ia32_feature_control = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = feature_control_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_ia32_feature_control, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_UINT64(env.msr_ia32_feature_control, X86CPU),
+                          VMSTATE_END_OF_LIST() }
 };
 
 static bool pmu_enable_needed(void *opaque)
@@ -670,16 +627,17 @@ static const VMStateDescription vmstate_msr_architectural_pmu = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = pmu_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_fixed_ctr_ctrl, X86CPU),
-        VMSTATE_UINT64(env.msr_global_ctrl, X86CPU),
-        VMSTATE_UINT64(env.msr_global_status, X86CPU),
-        VMSTATE_UINT64(env.msr_global_ovf_ctrl, X86CPU),
-        VMSTATE_UINT64_ARRAY(env.msr_fixed_counters, X86CPU, MAX_FIXED_COUNTERS),
-        VMSTATE_UINT64_ARRAY(env.msr_gp_counters, X86CPU, MAX_GP_COUNTERS),
-        VMSTATE_UINT64_ARRAY(env.msr_gp_evtsel, X86CPU, MAX_GP_COUNTERS),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINT64(env.msr_fixed_ctr_ctrl, X86CPU),
+            VMSTATE_UINT64(env.msr_global_ctrl, X86CPU),
+            VMSTATE_UINT64(env.msr_global_status, X86CPU),
+            VMSTATE_UINT64(env.msr_global_ovf_ctrl, X86CPU),
+            VMSTATE_UINT64_ARRAY(env.msr_fixed_counters, X86CPU,
+                                 MAX_FIXED_COUNTERS),
+            VMSTATE_UINT64_ARRAY(env.msr_gp_counters, X86CPU, MAX_GP_COUNTERS),
+            VMSTATE_UINT64_ARRAY(env.msr_gp_evtsel, X86CPU, MAX_GP_COUNTERS),
+            VMSTATE_END_OF_LIST() }
 };
 
 static bool mpx_needed(void *opaque)
@@ -706,13 +664,11 @@ static const VMStateDescription vmstate_mpx = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = mpx_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_BND_REGS(env.bnd_regs, X86CPU, 4),
-        VMSTATE_UINT64(env.bndcs_regs.cfgu, X86CPU),
-        VMSTATE_UINT64(env.bndcs_regs.sts, X86CPU),
-        VMSTATE_UINT64(env.msr_bndcfgs, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_BND_REGS(env.bnd_regs, X86CPU, 4),
+                                VMSTATE_UINT64(env.bndcs_regs.cfgu, X86CPU),
+                                VMSTATE_UINT64(env.bndcs_regs.sts, X86CPU),
+                                VMSTATE_UINT64(env.msr_bndcfgs, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool hyperv_hypercall_enable_needed(void *opaque)
@@ -728,11 +684,9 @@ static const VMStateDescription vmstate_msr_hyperv_hypercall = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = hyperv_hypercall_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_hv_guest_os_id, X86CPU),
-        VMSTATE_UINT64(env.msr_hv_hypercall, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.msr_hv_guest_os_id, X86CPU),
+                                VMSTATE_UINT64(env.msr_hv_hypercall, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool hyperv_vapic_enable_needed(void *opaque)
@@ -748,10 +702,8 @@ static const VMStateDescription vmstate_msr_hyperv_vapic = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = hyperv_vapic_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_hv_vapic, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.msr_hv_vapic, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool hyperv_time_enable_needed(void *opaque)
@@ -767,10 +719,8 @@ static const VMStateDescription vmstate_msr_hyperv_time = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = hyperv_time_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_hv_tsc, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.msr_hv_tsc, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool hyperv_crash_enable_needed(void *opaque)
@@ -792,10 +742,9 @@ static const VMStateDescription vmstate_msr_hyperv_crash = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = hyperv_crash_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64_ARRAY(env.msr_hv_crash_params, X86CPU, HV_CRASH_PARAMS),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64_ARRAY(env.msr_hv_crash_params,
+                                                     X86CPU, HV_CRASH_PARAMS),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool hyperv_runtime_enable_needed(void *opaque)
@@ -815,10 +764,8 @@ static const VMStateDescription vmstate_msr_hyperv_runtime = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = hyperv_runtime_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_hv_runtime, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.msr_hv_runtime, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool hyperv_synic_enable_needed(void *opaque)
@@ -827,8 +774,7 @@ static bool hyperv_synic_enable_needed(void *opaque)
     CPUX86State *env = &cpu->env;
     int i;
 
-    if (env->msr_hv_synic_control != 0 ||
-        env->msr_hv_synic_evt_page != 0 ||
+    if (env->msr_hv_synic_control != 0 || env->msr_hv_synic_evt_page != 0 ||
         env->msr_hv_synic_msg_page != 0) {
         return true;
     }
@@ -855,13 +801,13 @@ static const VMStateDescription vmstate_msr_hyperv_synic = {
     .minimum_version_id = 1,
     .needed = hyperv_synic_enable_needed,
     .post_load = hyperv_synic_post_load,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_hv_synic_control, X86CPU),
-        VMSTATE_UINT64(env.msr_hv_synic_evt_page, X86CPU),
-        VMSTATE_UINT64(env.msr_hv_synic_msg_page, X86CPU),
-        VMSTATE_UINT64_ARRAY(env.msr_hv_synic_sint, X86CPU, HV_SINT_COUNT),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINT64(env.msr_hv_synic_control, X86CPU),
+            VMSTATE_UINT64(env.msr_hv_synic_evt_page, X86CPU),
+            VMSTATE_UINT64(env.msr_hv_synic_msg_page, X86CPU),
+            VMSTATE_UINT64_ARRAY(env.msr_hv_synic_sint, X86CPU, HV_SINT_COUNT),
+            VMSTATE_END_OF_LIST() }
 };
 
 static bool hyperv_stimer_enable_needed(void *opaque)
@@ -883,12 +829,11 @@ static const VMStateDescription vmstate_msr_hyperv_stimer = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = hyperv_stimer_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64_ARRAY(env.msr_hv_stimer_config, X86CPU,
-                             HV_STIMER_COUNT),
-        VMSTATE_UINT64_ARRAY(env.msr_hv_stimer_count, X86CPU, HV_STIMER_COUNT),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64_ARRAY(env.msr_hv_stimer_config,
+                                                     X86CPU, HV_STIMER_COUNT),
+                                VMSTATE_UINT64_ARRAY(env.msr_hv_stimer_count,
+                                                     X86CPU, HV_STIMER_COUNT),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool hyperv_reenlightenment_enable_needed(void *opaque)
@@ -897,8 +842,8 @@ static bool hyperv_reenlightenment_enable_needed(void *opaque)
     CPUX86State *env = &cpu->env;
 
     return env->msr_hv_reenlightenment_control != 0 ||
-        env->msr_hv_tsc_emulation_control != 0 ||
-        env->msr_hv_tsc_emulation_status != 0;
+           env->msr_hv_tsc_emulation_control != 0 ||
+           env->msr_hv_tsc_emulation_status != 0;
 }
 
 static int hyperv_reenlightenment_post_load(void *opaque, int version_id)
@@ -926,12 +871,12 @@ static const VMStateDescription vmstate_msr_hyperv_reenlightenment = {
     .minimum_version_id = 1,
     .needed = hyperv_reenlightenment_enable_needed,
     .post_load = hyperv_reenlightenment_post_load,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_hv_reenlightenment_control, X86CPU),
-        VMSTATE_UINT64(env.msr_hv_tsc_emulation_control, X86CPU),
-        VMSTATE_UINT64(env.msr_hv_tsc_emulation_status, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINT64(env.msr_hv_reenlightenment_control, X86CPU),
+            VMSTATE_UINT64(env.msr_hv_tsc_emulation_control, X86CPU),
+            VMSTATE_UINT64(env.msr_hv_tsc_emulation_status, X86CPU),
+            VMSTATE_END_OF_LIST() }
 };
 
 static bool avx512_needed(void *opaque)
@@ -948,15 +893,13 @@ static bool avx512_needed(void *opaque)
 
     for (i = 0; i < CPU_NB_REGS; i++) {
 #define ENV_XMM(reg, field) (env->xmm_regs[reg].ZMM_Q(field))
-        if (ENV_XMM(i, 4) || ENV_XMM(i, 6) ||
-            ENV_XMM(i, 5) || ENV_XMM(i, 7)) {
+        if (ENV_XMM(i, 4) || ENV_XMM(i, 6) || ENV_XMM(i, 5) || ENV_XMM(i, 7)) {
             return true;
         }
 #ifdef TARGET_X86_64
-        if (ENV_XMM(i+16, 0) || ENV_XMM(i+16, 1) ||
-            ENV_XMM(i+16, 2) || ENV_XMM(i+16, 3) ||
-            ENV_XMM(i+16, 4) || ENV_XMM(i+16, 5) ||
-            ENV_XMM(i+16, 6) || ENV_XMM(i+16, 7)) {
+        if (ENV_XMM(i + 16, 0) || ENV_XMM(i + 16, 1) || ENV_XMM(i + 16, 2) ||
+            ENV_XMM(i + 16, 3) || ENV_XMM(i + 16, 4) || ENV_XMM(i + 16, 5) ||
+            ENV_XMM(i + 16, 6) || ENV_XMM(i + 16, 7)) {
             return true;
         }
 #endif
@@ -970,14 +913,14 @@ static const VMStateDescription vmstate_avx512 = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = avx512_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64_ARRAY(env.opmask_regs, X86CPU, NB_OPMASK_REGS),
-        VMSTATE_ZMMH_REGS_VARS(env.xmm_regs, X86CPU, 0),
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINT64_ARRAY(env.opmask_regs, X86CPU, NB_OPMASK_REGS),
+            VMSTATE_ZMMH_REGS_VARS(env.xmm_regs, X86CPU, 0),
 #ifdef TARGET_X86_64
-        VMSTATE_Hi16_ZMM_REGS_VARS(env.xmm_regs, X86CPU, 16),
+            VMSTATE_Hi16_ZMM_REGS_VARS(env.xmm_regs, X86CPU, 16),
 #endif
-        VMSTATE_END_OF_LIST()
-    }
+            VMSTATE_END_OF_LIST() }
 };
 
 static bool xss_needed(void *opaque)
@@ -993,10 +936,8 @@ static const VMStateDescription vmstate_xss = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = xss_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.xss, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.xss, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool umwait_needed(void *opaque)
@@ -1012,10 +953,8 @@ static const VMStateDescription vmstate_umwait = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = umwait_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT32(env.umwait, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT32(env.umwait, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool pkru_needed(void *opaque)
@@ -1031,10 +970,8 @@ static const VMStateDescription vmstate_pkru = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = pkru_needed,
-    .fields = (VMStateField[]){
-        VMSTATE_UINT32(env.pkru, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT32(env.pkru, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool pkrs_needed(void *opaque)
@@ -1050,10 +987,8 @@ static const VMStateDescription vmstate_pkrs = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = pkrs_needed,
-    .fields = (VMStateField[]){
-        VMSTATE_UINT32(env.pkrs, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT32(env.pkrs, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool tsc_khz_needed(void *opaque)
@@ -1070,10 +1005,8 @@ static const VMStateDescription vmstate_tsc_khz = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = tsc_khz_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_INT64(env.tsc_khz, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_INT64(env.tsc_khz, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 #ifdef CONFIG_KVM
@@ -1090,12 +1023,10 @@ static const VMStateDescription vmstate_vmx_vmcs12 = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = vmx_vmcs12_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT8_ARRAY(data.vmx[0].vmcs12,
-                            struct kvm_nested_state,
-                            KVM_STATE_NESTED_VMX_VMCS_SIZE),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT8_ARRAY(
+                                    data.vmx[0].vmcs12, struct kvm_nested_state,
+                                    KVM_STATE_NESTED_VMX_VMCS_SIZE),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool vmx_shadow_vmcs12_needed(void *opaque)
@@ -1110,12 +1041,11 @@ static const VMStateDescription vmstate_vmx_shadow_vmcs12 = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = vmx_shadow_vmcs12_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT8_ARRAY(data.vmx[0].shadow_vmcs12,
-                            struct kvm_nested_state,
-                            KVM_STATE_NESTED_VMX_VMCS_SIZE),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_UINT8_ARRAY(data.vmx[0].shadow_vmcs12,
+                                              struct kvm_nested_state,
+                                              KVM_STATE_NESTED_VMX_VMCS_SIZE),
+                          VMSTATE_END_OF_LIST() }
 };
 
 static bool vmx_nested_state_needed(void *opaque)
@@ -1131,17 +1061,18 @@ static const VMStateDescription vmstate_vmx_nested_state = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = vmx_nested_state_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_U64(hdr.vmx.vmxon_pa, struct kvm_nested_state),
-        VMSTATE_U64(hdr.vmx.vmcs12_pa, struct kvm_nested_state),
-        VMSTATE_U16(hdr.vmx.smm.flags, struct kvm_nested_state),
-        VMSTATE_END_OF_LIST()
-    },
-    .subsections = (const VMStateDescription*[]) {
-        &vmstate_vmx_vmcs12,
-        &vmstate_vmx_shadow_vmcs12,
-        NULL,
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_U64(hdr.vmx.vmxon_pa, struct kvm_nested_state),
+            VMSTATE_U64(hdr.vmx.vmcs12_pa, struct kvm_nested_state),
+            VMSTATE_U16(hdr.vmx.smm.flags, struct kvm_nested_state),
+            VMSTATE_END_OF_LIST() },
+    .subsections =
+        (const VMStateDescription *[]){
+            &vmstate_vmx_vmcs12,
+            &vmstate_vmx_shadow_vmcs12,
+            NULL,
+        }
 };
 
 static bool svm_nested_state_needed(void *opaque)
@@ -1162,13 +1093,12 @@ static const VMStateDescription vmstate_svm_nested_state = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = svm_nested_state_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_U64(hdr.svm.vmcb_pa, struct kvm_nested_state),
-        VMSTATE_UINT8_ARRAY(data.svm[0].vmcb12,
-                            struct kvm_nested_state,
-                            KVM_STATE_NESTED_SVM_VMCB_SIZE),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_U64(hdr.svm.vmcb_pa, struct kvm_nested_state),
+                          VMSTATE_UINT8_ARRAY(data.svm[0].vmcb12,
+                                              struct kvm_nested_state,
+                                              KVM_STATE_NESTED_SVM_VMCB_SIZE),
+                          VMSTATE_END_OF_LIST() }
 };
 
 static bool nested_state_needed(void *opaque)
@@ -1176,9 +1106,8 @@ static bool nested_state_needed(void *opaque)
     X86CPU *cpu = opaque;
     CPUX86State *env = &cpu->env;
 
-    return (env->nested_state &&
-            (vmx_nested_state_needed(env->nested_state) ||
-             svm_nested_state_needed(env->nested_state)));
+    return (env->nested_state && (vmx_nested_state_needed(env->nested_state) ||
+                                  svm_nested_state_needed(env->nested_state)));
 }
 
 static int nested_state_post_load(void *opaque, int version_id)
@@ -1232,17 +1161,13 @@ static const VMStateDescription vmstate_kvm_nested_state = {
     .name = "cpu/kvm_nested_state",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_U16(flags, struct kvm_nested_state),
-        VMSTATE_U16(format, struct kvm_nested_state),
-        VMSTATE_U32(size, struct kvm_nested_state),
-        VMSTATE_END_OF_LIST()
-    },
-    .subsections = (const VMStateDescription*[]) {
-        &vmstate_vmx_nested_state,
-        &vmstate_svm_nested_state,
-        NULL
-    }
+    .fields = (VMStateField[]){ VMSTATE_U16(flags, struct kvm_nested_state),
+                                VMSTATE_U16(format, struct kvm_nested_state),
+                                VMSTATE_U32(size, struct kvm_nested_state),
+                                VMSTATE_END_OF_LIST() },
+    .subsections =
+        (const VMStateDescription *[]){ &vmstate_vmx_nested_state,
+                                        &vmstate_svm_nested_state, NULL }
 };
 
 static const VMStateDescription vmstate_nested_state = {
@@ -1251,12 +1176,10 @@ static const VMStateDescription vmstate_nested_state = {
     .minimum_version_id = 1,
     .needed = nested_state_needed,
     .post_load = nested_state_post_load,
-    .fields = (VMStateField[]) {
-        VMSTATE_STRUCT_POINTER(env.nested_state, X86CPU,
-                vmstate_kvm_nested_state,
-                struct kvm_nested_state),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_STRUCT_POINTER(env.nested_state, X86CPU,
+                                                       vmstate_kvm_nested_state,
+                                                       struct kvm_nested_state),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool xen_vcpu_needed(void *opaque)
@@ -1269,17 +1192,17 @@ static const VMStateDescription vmstate_xen_vcpu = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = xen_vcpu_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.xen_vcpu_info_gpa, X86CPU),
-        VMSTATE_UINT64(env.xen_vcpu_info_default_gpa, X86CPU),
-        VMSTATE_UINT64(env.xen_vcpu_time_info_gpa, X86CPU),
-        VMSTATE_UINT64(env.xen_vcpu_runstate_gpa, X86CPU),
-        VMSTATE_UINT8(env.xen_vcpu_callback_vector, X86CPU),
-        VMSTATE_UINT16_ARRAY(env.xen_virq, X86CPU, XEN_NR_VIRQS),
-        VMSTATE_UINT64(env.xen_singleshot_timer_ns, X86CPU),
-        VMSTATE_UINT64(env.xen_periodic_timer_period, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINT64(env.xen_vcpu_info_gpa, X86CPU),
+            VMSTATE_UINT64(env.xen_vcpu_info_default_gpa, X86CPU),
+            VMSTATE_UINT64(env.xen_vcpu_time_info_gpa, X86CPU),
+            VMSTATE_UINT64(env.xen_vcpu_runstate_gpa, X86CPU),
+            VMSTATE_UINT8(env.xen_vcpu_callback_vector, X86CPU),
+            VMSTATE_UINT16_ARRAY(env.xen_virq, X86CPU, XEN_NR_VIRQS),
+            VMSTATE_UINT64(env.xen_singleshot_timer_ns, X86CPU),
+            VMSTATE_UINT64(env.xen_periodic_timer_period, X86CPU),
+            VMSTATE_END_OF_LIST() }
 };
 #endif
 
@@ -1295,10 +1218,8 @@ static const VMStateDescription vmstate_mcg_ext_ctl = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = mcg_ext_ctl_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.mcg_ext_ctl, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.mcg_ext_ctl, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool spec_ctrl_needed(void *opaque)
@@ -1314,10 +1235,8 @@ static const VMStateDescription vmstate_spec_ctrl = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = spec_ctrl_needed,
-    .fields = (VMStateField[]){
-        VMSTATE_UINT64(env.spec_ctrl, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.spec_ctrl, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 
@@ -1334,10 +1253,8 @@ static const VMStateDescription amd_tsc_scale_msr_ctrl = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = amd_tsc_scale_msr_needed,
-    .fields = (VMStateField[]){
-        VMSTATE_UINT64(env.amd_tsc_scale_msr, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.amd_tsc_scale_msr, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 
@@ -1367,15 +1284,15 @@ static const VMStateDescription vmstate_msr_intel_pt = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = intel_pt_enable_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
-        VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
-        VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
-        VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
-        VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
-        VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
+            VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
+            VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
+            VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
+            VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
+            VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
+            VMSTATE_END_OF_LIST() }
 };
 
 static bool virt_ssbd_needed(void *opaque)
@@ -1391,10 +1308,8 @@ static const VMStateDescription vmstate_msr_virt_ssbd = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = virt_ssbd_needed,
-    .fields = (VMStateField[]){
-        VMSTATE_UINT64(env.virt_ssbd, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.virt_ssbd, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool svm_npt_needed(void *opaque)
@@ -1410,11 +1325,9 @@ static const VMStateDescription vmstate_svm_npt = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = svm_npt_needed,
-    .fields = (VMStateField[]){
-        VMSTATE_UINT64(env.nested_cr3, X86CPU),
-        VMSTATE_UINT32(env.nested_pg_mode, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.nested_cr3, X86CPU),
+                                VMSTATE_UINT32(env.nested_pg_mode, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool svm_guest_needed(void *opaque)
@@ -1430,10 +1343,8 @@ static const VMStateDescription vmstate_svm_guest = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = svm_guest_needed,
-    .fields = (VMStateField[]){
-        VMSTATE_UINT32(env.int_ctl, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT32(env.int_ctl, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 #ifndef TARGET_X86_64
@@ -1450,10 +1361,8 @@ static const VMStateDescription vmstate_efer32 = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = intel_efer32_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.efer, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.efer, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 #endif
 
@@ -1470,10 +1379,8 @@ static const VMStateDescription vmstate_msr_tsx_ctrl = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = msr_tsx_ctrl_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT32(env.tsx_ctrl, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT32(env.tsx_ctrl, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool intel_sgx_msrs_needed(void *opaque)
@@ -1489,11 +1396,10 @@ static const VMStateDescription vmstate_msr_intel_sgx = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = intel_sgx_msrs_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64_ARRAY(env.msr_ia32_sgxlepubkeyhash, X86CPU, 4),
-                VMSTATE_END_OF_LIST()
-            }
-        };
+    .fields = (VMStateField[]){ VMSTATE_UINT64_ARRAY(
+                                    env.msr_ia32_sgxlepubkeyhash, X86CPU, 4),
+                                VMSTATE_END_OF_LIST() }
+};
 
 static bool pdptrs_needed(void *opaque)
 {
@@ -1517,10 +1423,8 @@ static const VMStateDescription vmstate_pdptrs = {
     .minimum_version_id = 1,
     .needed = pdptrs_needed,
     .post_load = pdptrs_post_load,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64_ARRAY(env.pdptrs, X86CPU, 4),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64_ARRAY(env.pdptrs, X86CPU, 4),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool xfd_msrs_needed(void *opaque)
@@ -1536,11 +1440,9 @@ static const VMStateDescription vmstate_msr_xfd = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = xfd_msrs_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_xfd, X86CPU),
-        VMSTATE_UINT64(env.msr_xfd_err, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.msr_xfd, X86CPU),
+                                VMSTATE_UINT64(env.msr_xfd_err, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 #ifdef TARGET_X86_64
@@ -1557,11 +1459,10 @@ static const VMStateDescription vmstate_amx_xtile = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = amx_xtile_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT8_ARRAY(env.xtilecfg, X86CPU, 64),
-        VMSTATE_UINT8_ARRAY(env.xtiledata, X86CPU, 8192),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_UINT8_ARRAY(env.xtilecfg, X86CPU, 64),
+                          VMSTATE_UINT8_ARRAY(env.xtiledata, X86CPU, 8192),
+                          VMSTATE_END_OF_LIST() }
 };
 #endif
 
@@ -1578,12 +1479,11 @@ static const VMStateDescription vmstate_arch_lbr = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = arch_lbr_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.msr_lbr_ctl, X86CPU),
-        VMSTATE_UINT64(env.msr_lbr_depth, X86CPU),
-        VMSTATE_LBR_VARS(env.lbr_records, X86CPU, ARCH_LBR_NR_ENTRIES, 1),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.msr_lbr_ctl, X86CPU),
+                                VMSTATE_UINT64(env.msr_lbr_depth, X86CPU),
+                                VMSTATE_LBR_VARS(env.lbr_records, X86CPU,
+                                                 ARCH_LBR_NR_ENTRIES, 1),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool triple_fault_needed(void *opaque)
@@ -1599,10 +1499,8 @@ static const VMStateDescription vmstate_triple_fault = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = triple_fault_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT8(env.triple_fault_pending, X86CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT8(env.triple_fault_pending, X86CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 const VMStateDescription vmstate_x86_cpu = {
@@ -1611,146 +1509,143 @@ const VMStateDescription vmstate_x86_cpu = {
     .minimum_version_id = 11,
     .pre_save = cpu_pre_save,
     .post_load = cpu_post_load,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINTTL_ARRAY(env.regs, X86CPU, CPU_NB_REGS),
-        VMSTATE_UINTTL(env.eip, X86CPU),
-        VMSTATE_UINTTL(env.eflags, X86CPU),
-        VMSTATE_UINT32(env.hflags, X86CPU),
-        /* FPU */
-        VMSTATE_UINT16(env.fpuc, X86CPU),
-        VMSTATE_UINT16(env.fpus_vmstate, X86CPU),
-        VMSTATE_UINT16(env.fptag_vmstate, X86CPU),
-        VMSTATE_UINT16(env.fpregs_format_vmstate, X86CPU),
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINTTL_ARRAY(env.regs, X86CPU, CPU_NB_REGS),
+            VMSTATE_UINTTL(env.eip, X86CPU), VMSTATE_UINTTL(env.eflags, X86CPU),
+            VMSTATE_UINT32(env.hflags, X86CPU),
+            /* FPU */
+            VMSTATE_UINT16(env.fpuc, X86CPU),
+            VMSTATE_UINT16(env.fpus_vmstate, X86CPU),
+            VMSTATE_UINT16(env.fptag_vmstate, X86CPU),
+            VMSTATE_UINT16(env.fpregs_format_vmstate, X86CPU),
 
-        VMSTATE_STRUCT_ARRAY(env.fpregs, X86CPU, 8, 0, vmstate_fpreg, FPReg),
+            VMSTATE_STRUCT_ARRAY(env.fpregs, X86CPU, 8, 0, vmstate_fpreg,
+                                 FPReg),
 
-        VMSTATE_SEGMENT_ARRAY(env.segs, X86CPU, 6),
-        VMSTATE_SEGMENT(env.ldt, X86CPU),
-        VMSTATE_SEGMENT(env.tr, X86CPU),
-        VMSTATE_SEGMENT(env.gdt, X86CPU),
-        VMSTATE_SEGMENT(env.idt, X86CPU),
+            VMSTATE_SEGMENT_ARRAY(env.segs, X86CPU, 6),
+            VMSTATE_SEGMENT(env.ldt, X86CPU), VMSTATE_SEGMENT(env.tr, X86CPU),
+            VMSTATE_SEGMENT(env.gdt, X86CPU), VMSTATE_SEGMENT(env.idt, X86CPU),
 
-        VMSTATE_UINT32(env.sysenter_cs, X86CPU),
-        VMSTATE_UINTTL(env.sysenter_esp, X86CPU),
-        VMSTATE_UINTTL(env.sysenter_eip, X86CPU),
+            VMSTATE_UINT32(env.sysenter_cs, X86CPU),
+            VMSTATE_UINTTL(env.sysenter_esp, X86CPU),
+            VMSTATE_UINTTL(env.sysenter_eip, X86CPU),
 
-        VMSTATE_UINTTL(env.cr[0], X86CPU),
-        VMSTATE_UINTTL(env.cr[2], X86CPU),
-        VMSTATE_UINTTL(env.cr[3], X86CPU),
-        VMSTATE_UINTTL(env.cr[4], X86CPU),
-        VMSTATE_UINTTL_ARRAY(env.dr, X86CPU, 8),
-        /* MMU */
-        VMSTATE_INT32(env.a20_mask, X86CPU),
-        /* XMM */
-        VMSTATE_UINT32(env.mxcsr, X86CPU),
-        VMSTATE_XMM_REGS(env.xmm_regs, X86CPU, 0),
+            VMSTATE_UINTTL(env.cr[0], X86CPU),
+            VMSTATE_UINTTL(env.cr[2], X86CPU),
+            VMSTATE_UINTTL(env.cr[3], X86CPU),
+            VMSTATE_UINTTL(env.cr[4], X86CPU),
+            VMSTATE_UINTTL_ARRAY(env.dr, X86CPU, 8),
+            /* MMU */
+            VMSTATE_INT32(env.a20_mask, X86CPU),
+            /* XMM */
+            VMSTATE_UINT32(env.mxcsr, X86CPU),
+            VMSTATE_XMM_REGS(env.xmm_regs, X86CPU, 0),
 
 #ifdef TARGET_X86_64
-        VMSTATE_UINT64(env.efer, X86CPU),
-        VMSTATE_UINT64(env.star, X86CPU),
-        VMSTATE_UINT64(env.lstar, X86CPU),
-        VMSTATE_UINT64(env.cstar, X86CPU),
-        VMSTATE_UINT64(env.fmask, X86CPU),
-        VMSTATE_UINT64(env.kernelgsbase, X86CPU),
+            VMSTATE_UINT64(env.efer, X86CPU), VMSTATE_UINT64(env.star, X86CPU),
+            VMSTATE_UINT64(env.lstar, X86CPU),
+            VMSTATE_UINT64(env.cstar, X86CPU),
+            VMSTATE_UINT64(env.fmask, X86CPU),
+            VMSTATE_UINT64(env.kernelgsbase, X86CPU),
 #endif
-        VMSTATE_UINT32(env.smbase, X86CPU),
+            VMSTATE_UINT32(env.smbase, X86CPU),
 
-        VMSTATE_UINT64(env.pat, X86CPU),
-        VMSTATE_UINT32(env.hflags2, X86CPU),
+            VMSTATE_UINT64(env.pat, X86CPU),
+            VMSTATE_UINT32(env.hflags2, X86CPU),
 
-        VMSTATE_UINT64(env.vm_hsave, X86CPU),
-        VMSTATE_UINT64(env.vm_vmcb, X86CPU),
-        VMSTATE_UINT64(env.tsc_offset, X86CPU),
-        VMSTATE_UINT64(env.intercept, X86CPU),
-        VMSTATE_UINT16(env.intercept_cr_read, X86CPU),
-        VMSTATE_UINT16(env.intercept_cr_write, X86CPU),
-        VMSTATE_UINT16(env.intercept_dr_read, X86CPU),
-        VMSTATE_UINT16(env.intercept_dr_write, X86CPU),
-        VMSTATE_UINT32(env.intercept_exceptions, X86CPU),
-        VMSTATE_UINT8(env.v_tpr, X86CPU),
-        /* MTRRs */
-        VMSTATE_UINT64_ARRAY(env.mtrr_fixed, X86CPU, 11),
-        VMSTATE_UINT64(env.mtrr_deftype, X86CPU),
-        VMSTATE_MTRR_VARS(env.mtrr_var, X86CPU, MSR_MTRRcap_VCNT, 8),
-        /* KVM-related states */
-        VMSTATE_INT32(env.interrupt_injected, X86CPU),
-        VMSTATE_UINT32(env.mp_state, X86CPU),
-        VMSTATE_UINT64(env.tsc, X86CPU),
-        VMSTATE_INT32(env.exception_nr, X86CPU),
-        VMSTATE_UINT8(env.soft_interrupt, X86CPU),
-        VMSTATE_UINT8(env.nmi_injected, X86CPU),
-        VMSTATE_UINT8(env.nmi_pending, X86CPU),
-        VMSTATE_UINT8(env.has_error_code, X86CPU),
-        VMSTATE_UINT32(env.sipi_vector, X86CPU),
-        /* MCE */
-        VMSTATE_UINT64(env.mcg_cap, X86CPU),
-        VMSTATE_UINT64(env.mcg_status, X86CPU),
-        VMSTATE_UINT64(env.mcg_ctl, X86CPU),
-        VMSTATE_UINT64_ARRAY(env.mce_banks, X86CPU, MCE_BANKS_DEF * 4),
-        /* rdtscp */
-        VMSTATE_UINT64(env.tsc_aux, X86CPU),
-        /* KVM pvclock msr */
-        VMSTATE_UINT64(env.system_time_msr, X86CPU),
-        VMSTATE_UINT64(env.wall_clock_msr, X86CPU),
-        /* XSAVE related fields */
-        VMSTATE_UINT64_V(env.xcr0, X86CPU, 12),
-        VMSTATE_UINT64_V(env.xstate_bv, X86CPU, 12),
-        VMSTATE_YMMH_REGS_VARS(env.xmm_regs, X86CPU, 0, 12),
-        VMSTATE_END_OF_LIST()
-        /* The above list is not sorted /wrt version numbers, watch out! */
-    },
-    .subsections = (const VMStateDescription*[]) {
-        &vmstate_exception_info,
-        &vmstate_async_pf_msr,
-        &vmstate_async_pf_int_msr,
-        &vmstate_pv_eoi_msr,
-        &vmstate_steal_time_msr,
-        &vmstate_poll_control_msr,
-        &vmstate_fpop_ip_dp,
-        &vmstate_msr_tsc_adjust,
-        &vmstate_msr_tscdeadline,
-        &vmstate_msr_ia32_misc_enable,
-        &vmstate_msr_ia32_feature_control,
-        &vmstate_msr_architectural_pmu,
-        &vmstate_mpx,
-        &vmstate_msr_hyperv_hypercall,
-        &vmstate_msr_hyperv_vapic,
-        &vmstate_msr_hyperv_time,
-        &vmstate_msr_hyperv_crash,
-        &vmstate_msr_hyperv_runtime,
-        &vmstate_msr_hyperv_synic,
-        &vmstate_msr_hyperv_stimer,
-        &vmstate_msr_hyperv_reenlightenment,
-        &vmstate_avx512,
-        &vmstate_xss,
-        &vmstate_umwait,
-        &vmstate_tsc_khz,
-        &vmstate_msr_smi_count,
-        &vmstate_pkru,
-        &vmstate_pkrs,
-        &vmstate_spec_ctrl,
-        &amd_tsc_scale_msr_ctrl,
-        &vmstate_mcg_ext_ctl,
-        &vmstate_msr_intel_pt,
-        &vmstate_msr_virt_ssbd,
-        &vmstate_svm_npt,
-        &vmstate_svm_guest,
+            VMSTATE_UINT64(env.vm_hsave, X86CPU),
+            VMSTATE_UINT64(env.vm_vmcb, X86CPU),
+            VMSTATE_UINT64(env.tsc_offset, X86CPU),
+            VMSTATE_UINT64(env.intercept, X86CPU),
+            VMSTATE_UINT16(env.intercept_cr_read, X86CPU),
+            VMSTATE_UINT16(env.intercept_cr_write, X86CPU),
+            VMSTATE_UINT16(env.intercept_dr_read, X86CPU),
+            VMSTATE_UINT16(env.intercept_dr_write, X86CPU),
+            VMSTATE_UINT32(env.intercept_exceptions, X86CPU),
+            VMSTATE_UINT8(env.v_tpr, X86CPU),
+            /* MTRRs */
+            VMSTATE_UINT64_ARRAY(env.mtrr_fixed, X86CPU, 11),
+            VMSTATE_UINT64(env.mtrr_deftype, X86CPU),
+            VMSTATE_MTRR_VARS(env.mtrr_var, X86CPU, MSR_MTRRcap_VCNT, 8),
+            /* KVM-related states */
+            VMSTATE_INT32(env.interrupt_injected, X86CPU),
+            VMSTATE_UINT32(env.mp_state, X86CPU),
+            VMSTATE_UINT64(env.tsc, X86CPU),
+            VMSTATE_INT32(env.exception_nr, X86CPU),
+            VMSTATE_UINT8(env.soft_interrupt, X86CPU),
+            VMSTATE_UINT8(env.nmi_injected, X86CPU),
+            VMSTATE_UINT8(env.nmi_pending, X86CPU),
+            VMSTATE_UINT8(env.has_error_code, X86CPU),
+            VMSTATE_UINT32(env.sipi_vector, X86CPU),
+            /* MCE */
+            VMSTATE_UINT64(env.mcg_cap, X86CPU),
+            VMSTATE_UINT64(env.mcg_status, X86CPU),
+            VMSTATE_UINT64(env.mcg_ctl, X86CPU),
+            VMSTATE_UINT64_ARRAY(env.mce_banks, X86CPU, MCE_BANKS_DEF * 4),
+            /* rdtscp */
+            VMSTATE_UINT64(env.tsc_aux, X86CPU),
+            /* KVM pvclock msr */
+            VMSTATE_UINT64(env.system_time_msr, X86CPU),
+            VMSTATE_UINT64(env.wall_clock_msr, X86CPU),
+            /* XSAVE related fields */
+            VMSTATE_UINT64_V(env.xcr0, X86CPU, 12),
+            VMSTATE_UINT64_V(env.xstate_bv, X86CPU, 12),
+            VMSTATE_YMMH_REGS_VARS(env.xmm_regs, X86CPU, 0, 12),
+            VMSTATE_END_OF_LIST()
+            /* The above list is not sorted /wrt version numbers, watch out! */
+        },
+    .subsections =
+        (const VMStateDescription *[]){ &vmstate_exception_info,
+                                        &vmstate_async_pf_msr,
+                                        &vmstate_async_pf_int_msr,
+                                        &vmstate_pv_eoi_msr,
+                                        &vmstate_steal_time_msr,
+                                        &vmstate_poll_control_msr,
+                                        &vmstate_fpop_ip_dp,
+                                        &vmstate_msr_tsc_adjust,
+                                        &vmstate_msr_tscdeadline,
+                                        &vmstate_msr_ia32_misc_enable,
+                                        &vmstate_msr_ia32_feature_control,
+                                        &vmstate_msr_architectural_pmu,
+                                        &vmstate_mpx,
+                                        &vmstate_msr_hyperv_hypercall,
+                                        &vmstate_msr_hyperv_vapic,
+                                        &vmstate_msr_hyperv_time,
+                                        &vmstate_msr_hyperv_crash,
+                                        &vmstate_msr_hyperv_runtime,
+                                        &vmstate_msr_hyperv_synic,
+                                        &vmstate_msr_hyperv_stimer,
+                                        &vmstate_msr_hyperv_reenlightenment,
+                                        &vmstate_avx512,
+                                        &vmstate_xss,
+                                        &vmstate_umwait,
+                                        &vmstate_tsc_khz,
+                                        &vmstate_msr_smi_count,
+                                        &vmstate_pkru,
+                                        &vmstate_pkrs,
+                                        &vmstate_spec_ctrl,
+                                        &amd_tsc_scale_msr_ctrl,
+                                        &vmstate_mcg_ext_ctl,
+                                        &vmstate_msr_intel_pt,
+                                        &vmstate_msr_virt_ssbd,
+                                        &vmstate_svm_npt,
+                                        &vmstate_svm_guest,
 #ifndef TARGET_X86_64
-        &vmstate_efer32,
+                                        &vmstate_efer32,
 #endif
 #ifdef CONFIG_KVM
-        &vmstate_nested_state,
-        &vmstate_xen_vcpu,
+                                        &vmstate_nested_state,
+                                        &vmstate_xen_vcpu,
 #endif
-        &vmstate_msr_tsx_ctrl,
-        &vmstate_msr_intel_sgx,
-        &vmstate_pdptrs,
-        &vmstate_msr_xfd,
+                                        &vmstate_msr_tsx_ctrl,
+                                        &vmstate_msr_intel_sgx,
+                                        &vmstate_pdptrs,
+                                        &vmstate_msr_xfd,
 #ifdef TARGET_X86_64
-        &vmstate_amx_xtile,
+                                        &vmstate_amx_xtile,
 #endif
-        &vmstate_arch_lbr,
-        &vmstate_triple_fault,
-        NULL
-    }
+                                        &vmstate_arch_lbr,
+                                        &vmstate_triple_fault,
+                                        NULL }
 };

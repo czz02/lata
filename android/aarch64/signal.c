@@ -64,7 +64,7 @@ struct target_fpsimd_context {
     uint64_t vregs[32 * 2]; /* really uint128_t vregs[32] */
 };
 
-#define TARGET_EXTRA_MAGIC  0x45585401
+#define TARGET_EXTRA_MAGIC 0x45585401
 
 struct target_extra_context {
     struct target_aarch64_ctx head;
@@ -73,7 +73,7 @@ struct target_extra_context {
     uint32_t reserved[3];
 };
 
-#define TARGET_SVE_MAGIC    0x53564501
+#define TARGET_SVE_MAGIC 0x53564501
 
 struct target_sve_context {
     struct target_aarch64_ctx head;
@@ -86,10 +86,10 @@ struct target_sve_context {
      */
 };
 
-#define TARGET_SVE_VQ_BYTES  16
+#define TARGET_SVE_VQ_BYTES 16
 
-#define TARGET_SVE_SIG_ZREG_SIZE(VQ)  ((VQ) * TARGET_SVE_VQ_BYTES)
-#define TARGET_SVE_SIG_PREG_SIZE(VQ)  ((VQ) * (TARGET_SVE_VQ_BYTES / 8))
+#define TARGET_SVE_SIG_ZREG_SIZE(VQ) ((VQ) * TARGET_SVE_VQ_BYTES)
+#define TARGET_SVE_SIG_PREG_SIZE(VQ) ((VQ) * (TARGET_SVE_VQ_BYTES / 8))
 
 #define TARGET_SVE_SIG_REGS_OFFSET \
     QEMU_ALIGN_UP(sizeof(struct target_sve_context), TARGET_SVE_VQ_BYTES)
@@ -97,14 +97,12 @@ struct target_sve_context {
     (TARGET_SVE_SIG_REGS_OFFSET + TARGET_SVE_SIG_ZREG_SIZE(VQ) * (N))
 #define TARGET_SVE_SIG_PREG_OFFSET(VQ, N) \
     (TARGET_SVE_SIG_ZREG_OFFSET(VQ, 32) + TARGET_SVE_SIG_PREG_SIZE(VQ) * (N))
-#define TARGET_SVE_SIG_FFR_OFFSET(VQ) \
-    (TARGET_SVE_SIG_PREG_OFFSET(VQ, 16))
-#define TARGET_SVE_SIG_CONTEXT_SIZE(VQ) \
-    (TARGET_SVE_SIG_PREG_OFFSET(VQ, 17))
+#define TARGET_SVE_SIG_FFR_OFFSET(VQ) (TARGET_SVE_SIG_PREG_OFFSET(VQ, 16))
+#define TARGET_SVE_SIG_CONTEXT_SIZE(VQ) (TARGET_SVE_SIG_PREG_OFFSET(VQ, 17))
 
-#define TARGET_SVE_SIG_FLAG_SM  1
+#define TARGET_SVE_SIG_FLAG_SM 1
 
-#define TARGET_ZA_MAGIC        0x54366345
+#define TARGET_ZA_MAGIC 0x54366345
 
 struct target_za_context {
     struct target_aarch64_ctx head;
@@ -118,7 +116,7 @@ struct target_za_context {
 #define TARGET_ZA_SIG_ZAV_OFFSET(VQ, N) \
     (TARGET_ZA_SIG_REGS_OFFSET + (VQ) * TARGET_SVE_VQ_BYTES * (N))
 #define TARGET_ZA_SIG_CONTEXT_SIZE(VQ) \
-    TARGET_ZA_SIG_ZAV_OFFSET(VQ, VQ * TARGET_SVE_VQ_BYTES)
+    TARGET_ZA_SIG_ZAV_OFFSET(VQ, VQ *TARGET_SVE_VQ_BYTES)
 
 struct target_rt_sigframe {
     struct target_siginfo info;
@@ -296,8 +294,8 @@ static void target_restore_fpsimd_record(CPUARMState *env,
 }
 
 static bool target_restore_sve_record(CPUARMState *env,
-                                      struct target_sve_context *sve,
-                                      int size, int *svcr)
+                                      struct target_sve_context *sve, int size,
+                                      int *svcr)
 {
     int i, j, vl, vq, flags;
     bool sm;
@@ -308,9 +306,8 @@ static bool target_restore_sve_record(CPUARMState *env,
     sm = flags & TARGET_SVE_SIG_FLAG_SM;
 
     /* The cpu must support Streaming or Non-streaming SVE. */
-    if (sm
-        ? !cpu_isar_feature(aa64_sme, env_archcpu(env))
-        : !cpu_isar_feature(aa64_sve, env_archcpu(env))) {
+    if (sm ? !cpu_isar_feature(aa64_sme, env_archcpu(env)) :
+             !cpu_isar_feature(aa64_sve, env_archcpu(env))) {
         return false;
     }
 
@@ -364,8 +361,8 @@ static bool target_restore_sve_record(CPUARMState *env,
 }
 
 static bool target_restore_za_record(CPUARMState *env,
-                                     struct target_za_context *za,
-                                     int size, int *svcr)
+                                     struct target_za_context *za, int size,
+                                     int *svcr)
 {
     int i, j, vl, vq;
 
@@ -465,8 +462,7 @@ static int target_restore_sigframe(CPUARMState *env,
             }
             __get_user(extra_datap,
                        &((struct target_extra_context *)ctx)->datap);
-            __get_user(extra_size,
-                       &((struct target_extra_context *)ctx)->size);
+            __get_user(extra_size, &((struct target_extra_context *)ctx)->size);
             extra = lock_user(VERIFY_READ, extra_datap, extra_size, 0);
             if (!extra) {
                 return 1;
@@ -503,13 +499,13 @@ static int target_restore_sigframe(CPUARMState *env,
     unlock_user(extra, extra_datap, 0);
     return 0;
 
- err:
+err:
     unlock_user(extra, extra_datap, 0);
     return 1;
 }
 
-static abi_ulong get_sigframe(struct target_sigaction *ka,
-                              CPUARMState *env, int size)
+static abi_ulong get_sigframe(struct target_sigaction *ka, CPUARMState *env,
+                              int size)
 {
     abi_ulong sp;
 
@@ -532,8 +528,8 @@ typedef struct {
 static int alloc_sigframe_space(int this_size, target_sigframe_layout *l)
 {
     /* Make sure there will always be space for the end marker.  */
-    const int std_size = sizeof(struct target_rt_sigframe)
-                         - sizeof(struct target_aarch64_ctx);
+    const int std_size =
+        sizeof(struct target_rt_sigframe) - sizeof(struct target_aarch64_ctx);
     int this_loc = l->total_size;
 
     if (l->extra_base) {
@@ -564,8 +560,8 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
 {
     target_sigframe_layout layout = {
         /* Begin with the size pointing to the reserved space.  */
-        .total_size = offsetof(struct target_rt_sigframe,
-                               uc.tuc_mcontext.__reserved),
+        .total_size =
+            offsetof(struct target_rt_sigframe, uc.tuc_mcontext.__reserved),
     };
     int fpsimd_ofs, fr_ofs, sve_ofs = 0, za_ofs = 0;
     int sve_size = 0, za_size = 0;
@@ -574,8 +570,8 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
     abi_ulong frame_addr, return_addr;
 
     /* FPSIMD record is always in the standard space.  */
-    fpsimd_ofs = alloc_sigframe_space(sizeof(struct target_fpsimd_context),
-                                      &layout);
+    fpsimd_ofs =
+        alloc_sigframe_space(sizeof(struct target_fpsimd_context), &layout);
 
     /* SVE state needs saving only if it exists.  */
     if (cpu_isar_feature(aa64_sve, env_archcpu(env)) ||
@@ -597,8 +593,8 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
         /* Reserve space for the extra end marker.  The standard end marker
          * will have been allocated when we allocated the extra record.
          */
-        layout.extra_end_ofs
-            = alloc_sigframe_space(sizeof(struct target_aarch64_ctx), &layout);
+        layout.extra_end_ofs =
+            alloc_sigframe_space(sizeof(struct target_aarch64_ctx), &layout);
     } else {
         /* Reserve space for the standard end marker.
          * Do not use alloc_sigframe_space because we cheat
@@ -611,8 +607,8 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
     /* We must always provide at least the standard 4K reserved space,
      * even if we don't use all of it (this is part of the ABI)
      */
-    layout.total_size = MAX(layout.total_size,
-                            sizeof(struct target_rt_sigframe));
+    layout.total_size =
+        MAX(layout.total_size, sizeof(struct target_rt_sigframe));
 
     /*
      * Reserve space for the standard frame unwind pair: fp, lr.
@@ -677,7 +673,7 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
     unlock_user(frame, frame_addr, layout.total_size);
     return;
 
- give_sigsegv:
+give_sigsegv:
     unlock_user(frame, frame_addr, layout.total_size);
     force_sigsegv(usig);
 }
@@ -689,8 +685,8 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
     target_setup_frame(sig, ka, info, set, env);
 }
 
-void setup_frame(int sig, struct target_sigaction *ka,
-                 target_sigset_t *set, CPUARMState *env)
+void setup_frame(int sig, struct target_sigaction *ka, target_sigset_t *set,
+                 CPUARMState *env)
 {
     target_setup_frame(sig, ka, 0, set, env);
 }
@@ -705,7 +701,7 @@ long do_rt_sigreturn(CPUARMState *env)
         goto badframe;
     }
 
-    if  (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
+    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
         goto badframe;
     }
 
@@ -718,7 +714,7 @@ long do_rt_sigreturn(CPUARMState *env)
     unlock_user_struct(frame, frame_addr, 0);
     return -QEMU_ESIGRETURN;
 
- badframe:
+badframe:
     unlock_user_struct(frame, frame_addr, 0);
     force_sig(TARGET_SIGSEGV);
     return -QEMU_ESIGRETURN;

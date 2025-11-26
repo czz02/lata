@@ -22,7 +22,10 @@ void *mm_realloc(void *ptr, int size)
     return retval;
 }
 
-void mm_free(void *ptr) { free(ptr); }
+void mm_free(void *ptr)
+{
+    free(ptr);
+}
 
 void *mmi_palloc(int size, char *file_name, int line_num)
 {

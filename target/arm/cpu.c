@@ -75,8 +75,7 @@ static vaddr arm_cpu_get_pc(CPUState *cs)
 }
 
 #ifdef CONFIG_TCG
-void arm_cpu_synchronize_from_tb(CPUState *cs,
-                                 const TranslationBlock *tb)
+void arm_cpu_synchronize_from_tb(CPUState *cs, const TranslationBlock *tb)
 {
     /* The program counter is always up to date with CF_PCREL. */
     if (!(tb_cflags(tb) & CF_PCREL)) {
@@ -93,8 +92,7 @@ void arm_cpu_synchronize_from_tb(CPUState *cs,
     }
 }
 
-void arm_restore_state_to_opc(CPUState *cs,
-                              const TranslationBlock *tb,
+void arm_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                               const uint64_t *data)
 {
     CPUARMState *env = cs->env_ptr;
@@ -123,15 +121,14 @@ static bool arm_cpu_has_work(CPUState *cs)
 {
     ARMCPU *cpu = ARM_CPU(cs);
 
-    return (cpu->power_state != PSCI_OFF)
-        && cs->interrupt_request &
-        (CPU_INTERRUPT_FIQ | CPU_INTERRUPT_HARD
-         | CPU_INTERRUPT_VFIQ | CPU_INTERRUPT_VIRQ | CPU_INTERRUPT_VSERR
-         | CPU_INTERRUPT_EXITTB);
+    return (cpu->power_state != PSCI_OFF) &&
+           cs->interrupt_request & (CPU_INTERRUPT_FIQ | CPU_INTERRUPT_HARD |
+                                    CPU_INTERRUPT_VFIQ | CPU_INTERRUPT_VIRQ |
+                                    CPU_INTERRUPT_VSERR | CPU_INTERRUPT_EXITTB);
 }
 
 void arm_register_pre_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook,
-                                 void *opaque)
+                                     void *opaque)
 {
     ARMELChangeHook *entry = g_new0(ARMELChangeHook, 1);
 
@@ -183,7 +180,7 @@ static void cp_reg_reset(gpointer key, gpointer value, gpointer opaque)
     }
 }
 
-static void cp_reg_check_reset(gpointer key, gpointer value,  gpointer opaque)
+static void cp_reg_check_reset(gpointer key, gpointer value, gpointer opaque)
 {
     /* Purely an assertion check: we've already done reset once,
      * so now check that running the reset for the cpreg doesn't
@@ -239,28 +236,28 @@ static void arm_cpu_reset_hold(Object *obj)
         /* Userspace expects access to DC ZVA, CTL_EL0 and the cache ops */
         env->cp15.sctlr_el[1] |= SCTLR_UCT | SCTLR_UCI | SCTLR_DZE;
         /* Enable all PAC keys.  */
-        env->cp15.sctlr_el[1] |= (SCTLR_EnIA | SCTLR_EnIB |
-                                  SCTLR_EnDA | SCTLR_EnDB);
+        env->cp15.sctlr_el[1] |=
+            (SCTLR_EnIA | SCTLR_EnIB | SCTLR_EnDA | SCTLR_EnDB);
         /* Trap on btype=3 for PACIxSP. */
         env->cp15.sctlr_el[1] |= SCTLR_BT0;
         /* and to the FP/Neon instructions */
-        env->cp15.cpacr_el1 = FIELD_DP64(env->cp15.cpacr_el1,
-                                         CPACR_EL1, FPEN, 3);
+        env->cp15.cpacr_el1 =
+            FIELD_DP64(env->cp15.cpacr_el1, CPACR_EL1, FPEN, 3);
         /* and to the SVE instructions, with default vector length */
         if (cpu_isar_feature(aa64_sve, cpu)) {
-            env->cp15.cpacr_el1 = FIELD_DP64(env->cp15.cpacr_el1,
-                                             CPACR_EL1, ZEN, 3);
+            env->cp15.cpacr_el1 =
+                FIELD_DP64(env->cp15.cpacr_el1, CPACR_EL1, ZEN, 3);
             env->vfp.zcr_el[1] = cpu->sve_default_vq - 1;
         }
         /* and for SME instructions, with default vector length, and TPIDR2 */
         if (cpu_isar_feature(aa64_sme, cpu)) {
             env->cp15.sctlr_el[1] |= SCTLR_EnTP2;
-            env->cp15.cpacr_el1 = FIELD_DP64(env->cp15.cpacr_el1,
-                                             CPACR_EL1, SMEN, 3);
+            env->cp15.cpacr_el1 =
+                FIELD_DP64(env->cp15.cpacr_el1, CPACR_EL1, SMEN, 3);
             env->vfp.smcr_el[1] = cpu->sme_default_vq - 1;
             if (cpu_isar_feature(aa64_sme_fa64, cpu)) {
-                env->vfp.smcr_el[1] = FIELD_DP64(env->vfp.smcr_el[1],
-                                                 SMCR, FA64, 1);
+                env->vfp.smcr_el[1] =
+                    FIELD_DP64(env->vfp.smcr_el[1], SMCR, FA64, 1);
             }
         }
         /*
@@ -308,10 +305,8 @@ static void arm_cpu_reset_hold(Object *obj)
     } else {
 #if defined(CONFIG_USER_ONLY)
         /* Userspace expects access to cp10 and cp11 for FP/Neon */
-        env->cp15.cpacr_el1 = FIELD_DP64(env->cp15.cpacr_el1,
-                                         CPACR, CP10, 3);
-        env->cp15.cpacr_el1 = FIELD_DP64(env->cp15.cpacr_el1,
-                                         CPACR, CP11, 3);
+        env->cp15.cpacr_el1 = FIELD_DP64(env->cp15.cpacr_el1, CPACR, CP10, 3);
+        env->cp15.cpacr_el1 = FIELD_DP64(env->cp15.cpacr_el1, CPACR, CP11, 3);
 #endif
         if (arm_feature(env, ARM_FEATURE_V8)) {
             env->cp15.rvbar = cpu->rvbar_prop;
@@ -412,7 +407,8 @@ static void arm_cpu_reset_hold(Object *obj)
         if (cpu_isar_feature(aa32_vfp_simd, cpu)) {
             env->v7m.fpccr[M_REG_NS] = R_V7M_FPCCR_ASPEN_MASK;
             env->v7m.fpccr[M_REG_S] = R_V7M_FPCCR_ASPEN_MASK |
-                R_V7M_FPCCR_LSPEN_MASK | R_V7M_FPCCR_S_MASK;
+                                      R_V7M_FPCCR_LSPEN_MASK |
+                                      R_V7M_FPCCR_S_MASK;
         }
 
 #ifndef CONFIG_USER_ONLY
@@ -473,18 +469,18 @@ static void arm_cpu_reset_hold(Object *obj)
         if (cpu->pmsav7_dregion > 0) {
             if (arm_feature(env, ARM_FEATURE_V8)) {
                 memset(env->pmsav8.rbar[M_REG_NS], 0,
-                       sizeof(*env->pmsav8.rbar[M_REG_NS])
-                       * cpu->pmsav7_dregion);
+                       sizeof(*env->pmsav8.rbar[M_REG_NS]) *
+                           cpu->pmsav7_dregion);
                 memset(env->pmsav8.rlar[M_REG_NS], 0,
-                       sizeof(*env->pmsav8.rlar[M_REG_NS])
-                       * cpu->pmsav7_dregion);
+                       sizeof(*env->pmsav8.rlar[M_REG_NS]) *
+                           cpu->pmsav7_dregion);
                 if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
                     memset(env->pmsav8.rbar[M_REG_S], 0,
-                           sizeof(*env->pmsav8.rbar[M_REG_S])
-                           * cpu->pmsav7_dregion);
+                           sizeof(*env->pmsav8.rbar[M_REG_S]) *
+                               cpu->pmsav7_dregion);
                     memset(env->pmsav8.rlar[M_REG_S], 0,
-                           sizeof(*env->pmsav8.rlar[M_REG_S])
-                           * cpu->pmsav7_dregion);
+                           sizeof(*env->pmsav8.rlar[M_REG_S]) *
+                               cpu->pmsav7_dregion);
                 }
             } else if (arm_feature(env, ARM_FEATURE_V7)) {
                 memset(env->pmsav7.drbar, 0,
@@ -617,7 +613,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
                  * part again once we need to support NMI.
                  */
                 if ((hcr_el2 & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
-                        unmasked = true;
+                    unmasked = true;
                 }
                 break;
             case 3:
@@ -698,40 +694,40 @@ static bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
     if (interrupt_request & CPU_INTERRUPT_FIQ) {
         excp_idx = EXCP_FIQ;
         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
-        if (arm_excp_unmasked(cs, excp_idx, target_el,
-                              cur_el, secure, hcr_el2)) {
+        if (arm_excp_unmasked(cs, excp_idx, target_el, cur_el, secure,
+                              hcr_el2)) {
             goto found;
         }
     }
     if (interrupt_request & CPU_INTERRUPT_HARD) {
         excp_idx = EXCP_IRQ;
         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
-        if (arm_excp_unmasked(cs, excp_idx, target_el,
-                              cur_el, secure, hcr_el2)) {
+        if (arm_excp_unmasked(cs, excp_idx, target_el, cur_el, secure,
+                              hcr_el2)) {
             goto found;
         }
     }
     if (interrupt_request & CPU_INTERRUPT_VIRQ) {
         excp_idx = EXCP_VIRQ;
         target_el = 1;
-        if (arm_excp_unmasked(cs, excp_idx, target_el,
-                              cur_el, secure, hcr_el2)) {
+        if (arm_excp_unmasked(cs, excp_idx, target_el, cur_el, secure,
+                              hcr_el2)) {
             goto found;
         }
     }
     if (interrupt_request & CPU_INTERRUPT_VFIQ) {
         excp_idx = EXCP_VFIQ;
         target_el = 1;
-        if (arm_excp_unmasked(cs, excp_idx, target_el,
-                              cur_el, secure, hcr_el2)) {
+        if (arm_excp_unmasked(cs, excp_idx, target_el, cur_el, secure,
+                              hcr_el2)) {
             goto found;
         }
     }
     if (interrupt_request & CPU_INTERRUPT_VSERR) {
         excp_idx = EXCP_VSERR;
         target_el = 1;
-        if (arm_excp_unmasked(cs, excp_idx, target_el,
-                              cur_el, secure, hcr_el2)) {
+        if (arm_excp_unmasked(cs, excp_idx, target_el, cur_el, secure,
+                              hcr_el2)) {
             /* Taking a virtual abort clears HCR_EL2.VSE */
             env->cp15.hcr_el2 &= ~HCR_VSE;
             cpu_reset_interrupt(cs, CPU_INTERRUPT_VSERR);
@@ -740,7 +736,7 @@ static bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
     }
     return false;
 
- found:
+found:
     cs->exception_index = excp_idx;
     env->exception.target_el = target_el;
     cc->tcg_ops->do_interrupt(cs);
@@ -759,7 +755,7 @@ void arm_cpu_update_virq(ARMCPU *cpu)
     CPUState *cs = CPU(cpu);
 
     bool new_state = (env->cp15.hcr_el2 & HCR_VI) ||
-        (env->irq_line_state & CPU_INTERRUPT_VIRQ);
+                     (env->irq_line_state & CPU_INTERRUPT_VIRQ);
 
     if (new_state != ((cs->interrupt_request & CPU_INTERRUPT_VIRQ) != 0)) {
         if (new_state) {
@@ -780,7 +776,7 @@ void arm_cpu_update_vfiq(ARMCPU *cpu)
     CPUState *cs = CPU(cpu);
 
     bool new_state = (env->cp15.hcr_el2 & HCR_VF) ||
-        (env->irq_line_state & CPU_INTERRUPT_VFIQ);
+                     (env->irq_line_state & CPU_INTERRUPT_VFIQ);
 
     if (new_state != ((cs->interrupt_request & CPU_INTERRUPT_VFIQ) != 0)) {
         if (new_state) {
@@ -816,12 +812,10 @@ static void arm_cpu_set_irq(void *opaque, int irq, int level)
     ARMCPU *cpu = opaque;
     CPUARMState *env = &cpu->env;
     CPUState *cs = CPU(cpu);
-    static const int mask[] = {
-        [ARM_CPU_IRQ] = CPU_INTERRUPT_HARD,
-        [ARM_CPU_FIQ] = CPU_INTERRUPT_FIQ,
-        [ARM_CPU_VIRQ] = CPU_INTERRUPT_VIRQ,
-        [ARM_CPU_VFIQ] = CPU_INTERRUPT_VFIQ
-    };
+    static const int mask[] = { [ARM_CPU_IRQ] = CPU_INTERRUPT_HARD,
+                                [ARM_CPU_FIQ] = CPU_INTERRUPT_FIQ,
+                                [ARM_CPU_VIRQ] = CPU_INTERRUPT_VIRQ,
+                                [ARM_CPU_VFIQ] = CPU_INTERRUPT_VFIQ };
 
     if (!arm_feature(env, ARM_FEATURE_EL2) &&
         (irq == ARM_CPU_VIRQ || irq == ARM_CPU_VFIQ)) {
@@ -975,19 +969,13 @@ static void aarch64_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     } else {
         ns_status = "";
     }
-    qemu_fprintf(f, "PSTATE=%08x %c%c%c%c %sEL%d%c",
-                 psr,
-                 psr & PSTATE_N ? 'N' : '-',
-                 psr & PSTATE_Z ? 'Z' : '-',
-                 psr & PSTATE_C ? 'C' : '-',
-                 psr & PSTATE_V ? 'V' : '-',
-                 ns_status,
-                 el,
-                 psr & PSTATE_SP ? 'h' : 't');
+    qemu_fprintf(f, "PSTATE=%08x %c%c%c%c %sEL%d%c", psr,
+                 psr & PSTATE_N ? 'N' : '-', psr & PSTATE_Z ? 'Z' : '-',
+                 psr & PSTATE_C ? 'C' : '-', psr & PSTATE_V ? 'V' : '-',
+                 ns_status, el, psr & PSTATE_SP ? 'h' : 't');
 
     if (cpu_isar_feature(aa64_sme, cpu)) {
-        qemu_fprintf(f, "  SVCR=%08" PRIx64 " %c%c",
-                     env->svcr,
+        qemu_fprintf(f, "  SVCR=%08" PRIx64 " %c%c", env->svcr,
                      (FIELD_EX64(env->svcr, SVCR, ZA) ? 'Z' : '-'),
                      (FIELD_EX64(env->svcr, SVCR, SM) ? 'S' : '-'));
     }
@@ -1002,8 +990,8 @@ static void aarch64_cpu_dump_state(CPUState *cs, FILE *f, int flags)
         qemu_fprintf(f, "    FPU disabled\n");
         return;
     }
-    qemu_fprintf(f, "     FPCR=%08x FPSR=%08x\n",
-                 vfp_get_fpcr(env), vfp_get_fpsr(env));
+    qemu_fprintf(f, "     FPCR=%08x FPSR=%08x\n", vfp_get_fpcr(env),
+                 vfp_get_fpsr(env));
 
     if (cpu_isar_feature(aa64_sme, cpu) && FIELD_EX64(env->svcr, SVCR, SM)) {
         sve = sme_exception_el(env, el) == 0;
@@ -1050,7 +1038,9 @@ static void aarch64_cpu_dump_state(CPUState *cs, FILE *f, int flags)
                 }
                 qemu_fprintf(f, "%0*" PRIx64 "%s", digits,
                              env->vfp.pregs[i].p[j],
-                             j ? ":" : eol ? "\n" : " ");
+                             j   ? ":" :
+                             eol ? "\n" :
+                                   " ");
             }
         }
 
@@ -1060,9 +1050,9 @@ static void aarch64_cpu_dump_state(CPUState *cs, FILE *f, int flags)
              * so output two registers per line.
              */
             for (i = 0; i < 32; i++) {
-                qemu_fprintf(f, "Z%02d=%016" PRIx64 ":%016" PRIx64 "%s",
-                             i, env->vfp.zregs[i].d[1],
-                             env->vfp.zregs[i].d[0], i & 1 ? "\n" : " ");
+                qemu_fprintf(f, "Z%02d=%016" PRIx64 ":%016" PRIx64 "%s", i,
+                             env->vfp.zregs[i].d[1], env->vfp.zregs[i].d[0],
+                             i & 1 ? "\n" : " ");
             }
         } else {
             for (i = 0; i < 32; i++) {
@@ -1078,13 +1068,12 @@ static void aarch64_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     } else {
         for (i = 0; i < 32; i++) {
             uint64_t *q = aa64_vfp_qreg(env, i);
-            qemu_fprintf(f, "Q%02d=%016" PRIx64 ":%016" PRIx64 "%s",
-                         i, q[1], q[0], (i & 1 ? "\n" : " "));
+            qemu_fprintf(f, "Q%02d=%016" PRIx64 ":%016" PRIx64 "%s", i, q[1],
+                         q[0], (i & 1 ? "\n" : " "));
         }
     }
 
-    if (cpu_isar_feature(aa64_sme, cpu) &&
-        FIELD_EX64(env->svcr, SVCR, ZA) &&
+    if (cpu_isar_feature(aa64_sme, cpu) && FIELD_EX64(env->svcr, SVCR, ZA) &&
         sme_exception_el(env, el) == 0) {
         int zcr_len = sve_vqm1_for_el_sm(env, el, true);
         int svl = (zcr_len + 1) * 16;
@@ -1095,8 +1084,7 @@ static void aarch64_cpu_dump_state(CPUState *cs, FILE *f, int flags)
             for (j = zcr_len; j >= 0; --j) {
                 qemu_fprintf(f, "%016" PRIx64 ":%016" PRIx64 "%c",
                              env->zarray[i].d[2 * j + 1],
-                             env->zarray[i].d[2 * j],
-                             j ? ':' : '\n');
+                             env->zarray[i].d[2 * j], j ? ':' : '\n');
             }
         }
     }
@@ -1150,15 +1138,10 @@ static void arm_cpu_dump_state(CPUState *cs, FILE *f, int flags)
             }
         }
 
-        qemu_fprintf(f, "XPSR=%08x %c%c%c%c %c %s%s\n",
-                     xpsr,
-                     xpsr & XPSR_N ? 'N' : '-',
-                     xpsr & XPSR_Z ? 'Z' : '-',
-                     xpsr & XPSR_C ? 'C' : '-',
-                     xpsr & XPSR_V ? 'V' : '-',
-                     xpsr & XPSR_T ? 'T' : 'A',
-                     ns_status,
-                     mode);
+        qemu_fprintf(f, "XPSR=%08x %c%c%c%c %c %s%s\n", xpsr,
+                     xpsr & XPSR_N ? 'N' : '-', xpsr & XPSR_Z ? 'Z' : '-',
+                     xpsr & XPSR_C ? 'C' : '-', xpsr & XPSR_V ? 'V' : '-',
+                     xpsr & XPSR_T ? 'T' : 'A', ns_status, mode);
     } else {
         uint32_t psr = cpsr_read(env);
         const char *ns_status = "";
@@ -1168,14 +1151,10 @@ static void arm_cpu_dump_state(CPUState *cs, FILE *f, int flags)
             ns_status = env->cp15.scr_el3 & SCR_NS ? "NS " : "S ";
         }
 
-        qemu_fprintf(f, "PSR=%08x %c%c%c%c %c %s%s%d\n",
-                     psr,
-                     psr & CPSR_N ? 'N' : '-',
-                     psr & CPSR_Z ? 'Z' : '-',
-                     psr & CPSR_C ? 'C' : '-',
-                     psr & CPSR_V ? 'V' : '-',
-                     psr & CPSR_T ? 'T' : 'A',
-                     ns_status,
+        qemu_fprintf(f, "PSR=%08x %c%c%c%c %c %s%s%d\n", psr,
+                     psr & CPSR_N ? 'N' : '-', psr & CPSR_Z ? 'Z' : '-',
+                     psr & CPSR_C ? 'C' : '-', psr & CPSR_V ? 'V' : '-',
+                     psr & CPSR_T ? 'T' : 'A', ns_status,
                      aarch32_mode_name(psr), (psr & 0x10) ? 32 : 26);
     }
 
@@ -1189,9 +1168,8 @@ static void arm_cpu_dump_state(CPUState *cs, FILE *f, int flags)
         for (i = 0; i < numvfpregs; i++) {
             uint64_t v = *aa32_vfp_dreg(env, i);
             qemu_fprintf(f, "s%02d=%08x s%02d=%08x d%02d=%016" PRIx64 "\n",
-                         i * 2, (uint32_t)v,
-                         i * 2 + 1, (uint32_t)(v >> 32),
-                         i, v);
+                         i * 2, (uint32_t)v, i * 2 + 1, (uint32_t)(v >> 32), i,
+                         v);
         }
         qemu_fprintf(f, "FPSCR: %08x\n", vfp_get_fpscr(env));
         if (cpu_isar_feature(aa32_mve, cpu)) {
@@ -1212,14 +1190,14 @@ static void arm_cpu_initfn(Object *obj)
     ARMCPU *cpu = ARM_CPU(obj);
 
     cpu_set_cpustate_pointers(cpu);
-    cpu->cp_regs = g_hash_table_new_full(g_direct_hash, g_direct_equal,
-                                         NULL, g_free);
+    cpu->cp_regs =
+        g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, g_free);
 
     QLIST_INIT(&cpu->pre_el_change_hooks);
     QLIST_INIT(&cpu->el_change_hooks);
 
 #ifdef CONFIG_USER_ONLY
-# ifdef TARGET_AARCH64
+#ifdef TARGET_AARCH64
     /*
      * The linux kernel defaults to 512-bit for SVE, and 256-bit for SME.
      * These values were chosen to fit within the default signal frame.
@@ -1228,7 +1206,7 @@ static void arm_cpu_initfn(Object *obj)
      */
     cpu->sve_default_vq = 4;
     cpu->sme_default_vq = 2;
-# endif
+#endif
 #else
     /* Our inbound IRQ and FIQ lines */
     if (kvm_enabled()) {
@@ -1245,8 +1223,8 @@ static void arm_cpu_initfn(Object *obj)
 
     qdev_init_gpio_out_named(DEVICE(cpu), &cpu->gicv3_maintenance_interrupt,
                              "gicv3-maintenance-interrupt", 1);
-    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->pmu_interrupt,
-                             "pmu-interrupt", 1);
+    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->pmu_interrupt, "pmu-interrupt",
+                             1);
 #endif
 
     /* DTB consumers generally don't in fact care what the 'compatible'
@@ -1263,41 +1241,40 @@ static void arm_cpu_initfn(Object *obj)
     }
 }
 
-static Property arm_cpu_gt_cntfrq_property =
-            DEFINE_PROP_UINT64("cntfrq", ARMCPU, gt_cntfrq_hz,
-                               NANOSECONDS_PER_SECOND / GTIMER_SCALE);
+static Property arm_cpu_gt_cntfrq_property = DEFINE_PROP_UINT64(
+    "cntfrq", ARMCPU, gt_cntfrq_hz, NANOSECONDS_PER_SECOND / GTIMER_SCALE);
 
 static Property arm_cpu_reset_cbar_property =
-            DEFINE_PROP_UINT64("reset-cbar", ARMCPU, reset_cbar, 0);
+    DEFINE_PROP_UINT64("reset-cbar", ARMCPU, reset_cbar, 0);
 
 static Property arm_cpu_reset_hivecs_property =
-            DEFINE_PROP_BOOL("reset-hivecs", ARMCPU, reset_hivecs, false);
+    DEFINE_PROP_BOOL("reset-hivecs", ARMCPU, reset_hivecs, false);
 
 #ifndef CONFIG_USER_ONLY
 static Property arm_cpu_has_el2_property =
-            DEFINE_PROP_BOOL("has_el2", ARMCPU, has_el2, true);
+    DEFINE_PROP_BOOL("has_el2", ARMCPU, has_el2, true);
 
 static Property arm_cpu_has_el3_property =
-            DEFINE_PROP_BOOL("has_el3", ARMCPU, has_el3, true);
+    DEFINE_PROP_BOOL("has_el3", ARMCPU, has_el3, true);
 #endif
 
 static Property arm_cpu_cfgend_property =
-            DEFINE_PROP_BOOL("cfgend", ARMCPU, cfgend, false);
+    DEFINE_PROP_BOOL("cfgend", ARMCPU, cfgend, false);
 
 static Property arm_cpu_has_vfp_property =
-            DEFINE_PROP_BOOL("vfp", ARMCPU, has_vfp, true);
+    DEFINE_PROP_BOOL("vfp", ARMCPU, has_vfp, true);
 
 static Property arm_cpu_has_vfp_d32_property =
-            DEFINE_PROP_BOOL("vfp-d32", ARMCPU, has_vfp_d32, true);
+    DEFINE_PROP_BOOL("vfp-d32", ARMCPU, has_vfp_d32, true);
 
 static Property arm_cpu_has_neon_property =
-            DEFINE_PROP_BOOL("neon", ARMCPU, has_neon, true);
+    DEFINE_PROP_BOOL("neon", ARMCPU, has_neon, true);
 
 static Property arm_cpu_has_dsp_property =
-            DEFINE_PROP_BOOL("dsp", ARMCPU, has_dsp, true);
+    DEFINE_PROP_BOOL("dsp", ARMCPU, has_dsp, true);
 
 static Property arm_cpu_has_mpu_property =
-            DEFINE_PROP_BOOL("has-mpu", ARMCPU, has_mpu, true);
+    DEFINE_PROP_BOOL("has-mpu", ARMCPU, has_mpu, true);
 
 /* This is like DEFINE_PROP_UINT32 but it doesn't set the default value,
  * because the CPU initfn will have already set cpu->pmsav7_dregion to
@@ -1305,9 +1282,8 @@ static Property arm_cpu_has_mpu_property =
  * to override that with an incorrect constant value.
  */
 static Property arm_cpu_pmsav7_dregion_property =
-            DEFINE_PROP_UNSIGNED_NODEFAULT("pmsav7-dregion", ARMCPU,
-                                           pmsav7_dregion,
-                                           qdev_prop_uint32, uint32_t);
+    DEFINE_PROP_UNSIGNED_NODEFAULT("pmsav7-dregion", ARMCPU, pmsav7_dregion,
+                                   qdev_prop_uint32, uint32_t);
 
 static bool arm_get_pmu(Object *obj, Error **errp)
 {
@@ -1353,7 +1329,8 @@ unsigned int gt_cntfrq_period_ns(ARMCPU *cpu)
      * cannot become zero.
      */
     return NANOSECONDS_PER_SECOND > cpu->gt_cntfrq_hz ?
-      NANOSECONDS_PER_SECOND / cpu->gt_cntfrq_hz : 1;
+               NANOSECONDS_PER_SECOND / cpu->gt_cntfrq_hz :
+               1;
 }
 
 void arm_cpu_post_init(Object *obj)
@@ -1378,8 +1355,7 @@ void arm_cpu_post_init(Object *obj)
     }
 
     if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-        object_property_add_uint64_ptr(obj, "rvbar",
-                                       &cpu->rvbar_prop,
+        object_property_add_uint64_ptr(obj, "rvbar", &cpu->rvbar_prop,
                                        OBJ_PROP_FLAG_READWRITE);
     }
 
@@ -1390,8 +1366,7 @@ void arm_cpu_post_init(Object *obj)
          */
         qdev_property_add_static(DEVICE(obj), &arm_cpu_has_el3_property);
 
-        object_property_add_link(obj, "secure-memory",
-                                 TYPE_MEMORY_REGION,
+        object_property_add_link(obj, "secure-memory", TYPE_MEMORY_REGION,
                                  (Object **)&cpu->secure_memory,
                                  qdev_prop_allow_set_link_before_realize,
                                  OBJ_PROP_LINK_STRONG);
@@ -1430,9 +1405,9 @@ void arm_cpu_post_init(Object *obj)
              * Armv8-A are either 0b0000 and 0b0010. On such CPUs,
              * make sure that has_vfp_d32 can not be set to false.
              */
-            if ((tcg_enabled() || qtest_enabled())
-                && !(arm_feature(&cpu->env, ARM_FEATURE_V8)
-                     && !arm_feature(&cpu->env, ARM_FEATURE_M))) {
+            if ((tcg_enabled() || qtest_enabled()) &&
+                !(arm_feature(&cpu->env, ARM_FEATURE_V8) &&
+                  !arm_feature(&cpu->env, ARM_FEATURE_M))) {
                 qdev_property_add_static(DEVICE(obj),
                                          &arm_cpu_has_vfp_d32_property);
             }
@@ -1468,8 +1443,7 @@ void arm_cpu_post_init(Object *obj)
          * a simple DEFINE_PROP_UINT32 for this because we want to permit
          * the property to be set after realize.
          */
-        object_property_add_uint32_ptr(obj, "init-svtor",
-                                       &cpu->init_svtor,
+        object_property_add_uint32_ptr(obj, "init-svtor", &cpu->init_svtor,
                                        OBJ_PROP_FLAG_READWRITE);
     }
     if (arm_feature(&cpu->env, ARM_FEATURE_M)) {
@@ -1477,14 +1451,12 @@ void arm_cpu_post_init(Object *obj)
          * Initial value of the NS VTOR (for cores without the Security
          * extension, this is the only VTOR)
          */
-        object_property_add_uint32_ptr(obj, "init-nsvtor",
-                                       &cpu->init_nsvtor,
+        object_property_add_uint32_ptr(obj, "init-nsvtor", &cpu->init_nsvtor,
                                        OBJ_PROP_FLAG_READWRITE);
     }
 
     /* Not DEFINE_PROP_UINT32: we want this to be settable after realize */
-    object_property_add_uint32_ptr(obj, "psci-conduit",
-                                   &cpu->psci_conduit,
+    object_property_add_uint32_ptr(obj, "psci-conduit", &cpu->psci_conduit,
                                    OBJ_PROP_FLAG_READWRITE);
 
     qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property);
@@ -1500,18 +1472,15 @@ void arm_cpu_post_init(Object *obj)
 #ifndef CONFIG_USER_ONLY
     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) &&
         cpu_isar_feature(aa64_mte, cpu)) {
-        object_property_add_link(obj, "tag-memory",
-                                 TYPE_MEMORY_REGION,
-                                 (Object **)&cpu->tag_memory,
-                                 qdev_prop_allow_set_link_before_realize,
-                                 OBJ_PROP_LINK_STRONG);
+        object_property_add_link(
+            obj, "tag-memory", TYPE_MEMORY_REGION, (Object **)&cpu->tag_memory,
+            qdev_prop_allow_set_link_before_realize, OBJ_PROP_LINK_STRONG);
 
         if (arm_feature(&cpu->env, ARM_FEATURE_EL3)) {
-            object_property_add_link(obj, "secure-tag-memory",
-                                     TYPE_MEMORY_REGION,
-                                     (Object **)&cpu->secure_tag_memory,
-                                     qdev_prop_allow_set_link_before_realize,
-                                     OBJ_PROP_LINK_STRONG);
+            object_property_add_link(
+                obj, "secure-tag-memory", TYPE_MEMORY_REGION,
+                (Object **)&cpu->secure_tag_memory,
+                qdev_prop_allow_set_link_before_realize, OBJ_PROP_LINK_STRONG);
         }
     }
 #endif
@@ -1524,11 +1493,11 @@ static void arm_cpu_finalizefn(Object *obj)
 
     g_hash_table_destroy(cpu->cp_regs);
 
-    QLIST_FOREACH_SAFE(hook, &cpu->pre_el_change_hooks, node, next) {
+    QLIST_FOREACH_SAFE (hook, &cpu->pre_el_change_hooks, node, next) {
         QLIST_REMOVE(hook, node);
         g_free(hook);
     }
-    QLIST_FOREACH_SAFE(hook, &cpu->el_change_hooks, node, next) {
+    QLIST_FOREACH_SAFE (hook, &cpu->el_change_hooks, node, next) {
         QLIST_REMOVE(hook, node);
         g_free(hook);
     }
@@ -1601,7 +1570,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
      */
     if (cpu->host_cpu_probe_failed) {
         if (!kvm_enabled() && !hvf_enabled()) {
-            error_setg(errp, "The 'host' CPU type can only be used with KVM or HVF");
+            error_setg(errp,
+                       "The 'host' CPU type can only be used with KVM or HVF");
         } else {
             error_setg(errp, "Failed to retrieve host CPU features");
         }
@@ -1642,14 +1612,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
             return;
         }
         if (cpu->has_el3) {
-            error_setg(errp,
-                       "Cannot enable %s when guest CPU has EL3 enabled",
+            error_setg(errp, "Cannot enable %s when guest CPU has EL3 enabled",
                        current_accel_name());
             return;
         }
         if (cpu->tag_memory) {
-            error_setg(errp,
-                       "Cannot enable %s when guest CPUs has MTE enabled",
+            error_setg(errp, "Cannot enable %s when guest CPUs has MTE enabled",
                        current_accel_name());
             return;
         }
@@ -1660,7 +1628,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
 
         if (arm_feature(env, ARM_FEATURE_GENERIC_TIMER)) {
             if (!cpu->gt_cntfrq_hz) {
-                error_setg(errp, "Invalid CNTFRQ: %"PRId64"Hz",
+                error_setg(errp, "Invalid CNTFRQ: %" PRId64 "Hz",
                            cpu->gt_cntfrq_hz);
                 return;
             }
@@ -1669,16 +1637,16 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
             scale = GTIMER_SCALE;
         }
 
-        cpu->gt_timer[GTIMER_PHYS] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
-                                               arm_gt_ptimer_cb, cpu);
-        cpu->gt_timer[GTIMER_VIRT] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
-                                               arm_gt_vtimer_cb, cpu);
-        cpu->gt_timer[GTIMER_HYP] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
-                                              arm_gt_htimer_cb, cpu);
-        cpu->gt_timer[GTIMER_SEC] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
-                                              arm_gt_stimer_cb, cpu);
-        cpu->gt_timer[GTIMER_HYPVIRT] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
-                                                  arm_gt_hvtimer_cb, cpu);
+        cpu->gt_timer[GTIMER_PHYS] =
+            timer_new(QEMU_CLOCK_VIRTUAL, scale, arm_gt_ptimer_cb, cpu);
+        cpu->gt_timer[GTIMER_VIRT] =
+            timer_new(QEMU_CLOCK_VIRTUAL, scale, arm_gt_vtimer_cb, cpu);
+        cpu->gt_timer[GTIMER_HYP] =
+            timer_new(QEMU_CLOCK_VIRTUAL, scale, arm_gt_htimer_cb, cpu);
+        cpu->gt_timer[GTIMER_SEC] =
+            timer_new(QEMU_CLOCK_VIRTUAL, scale, arm_gt_stimer_cb, cpu);
+        cpu->gt_timer[GTIMER_HYPVIRT] =
+            timer_new(QEMU_CLOCK_VIRTUAL, scale, arm_gt_hvtimer_cb, cpu);
     }
 #endif
 
@@ -1711,8 +1679,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
          * This is an architectural requirement for AArch64; AArch32 is
          * more flexible and permits VFP-no-Neon and Neon-no-VFP.
          */
-        error_setg(errp,
-                   "AArch64 CPUs must have both VFP and Neon or neither");
+        error_setg(errp, "AArch64 CPUs must have both VFP and Neon or neither");
         return;
     }
 
@@ -1721,7 +1688,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
         return;
     }
 
-   if (!cpu->has_vfp_d32) {
+    if (!cpu->has_vfp_d32) {
         uint32_t u;
 
         u = cpu->isar.mvfr0;
@@ -1953,8 +1920,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
            !cpu_isar_feature(aa32_vfp_simd, cpu) ||
            !arm_feature(env, ARM_FEATURE_XSCALE));
 
-    if (arm_feature(env, ARM_FEATURE_V7) &&
-        !arm_feature(env, ARM_FEATURE_M) &&
+    if (arm_feature(env, ARM_FEATURE_V7) && !arm_feature(env, ARM_FEATURE_M) &&
         !arm_feature(env, ARM_FEATURE_PMSA)) {
         /* v7VMSA drops support for the old ARMv5 tiny pages, so we
          * can use 4K pages.
@@ -1972,7 +1938,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
          * promised via minimum_page_size that it will not.
          */
         error_setg(errp, "This CPU requires a smaller page size than the "
-                   "system is using");
+                         "system is using");
         return;
     }
 
@@ -1982,12 +1948,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
      * so these bits always RAZ.
      */
     if (cpu->mp_affinity == ARM64_AFFINITY_INVALID) {
-        cpu->mp_affinity = arm_cpu_mp_affinity(cs->cpu_index,
-                                               ARM_DEFAULT_CPUS_PER_CLUSTER);
+        cpu->mp_affinity =
+            arm_cpu_mp_affinity(cs->cpu_index, ARM_DEFAULT_CPUS_PER_CLUSTER);
     }
 
     if (cpu->reset_hivecs) {
-            cpu->reset_sctlr |= (1 << 13);
+        cpu->reset_sctlr |= (1 << 13);
     }
 
     if (cpu->cfgend) {
@@ -2010,12 +1976,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
          */
         cpu->isar.id_pfr1 = FIELD_DP32(cpu->isar.id_pfr1, ID_PFR1, SECURITY, 0);
         cpu->isar.id_dfr0 = FIELD_DP32(cpu->isar.id_dfr0, ID_DFR0, COPSDBG, 0);
-        cpu->isar.id_aa64pfr0 = FIELD_DP64(cpu->isar.id_aa64pfr0,
-                                           ID_AA64PFR0, EL3, 0);
+        cpu->isar.id_aa64pfr0 =
+            FIELD_DP64(cpu->isar.id_aa64pfr0, ID_AA64PFR0, EL3, 0);
 
         /* Disable the realm management extension, which requires EL3. */
-        cpu->isar.id_aa64pfr0 = FIELD_DP64(cpu->isar.id_aa64pfr0,
-                                           ID_AA64PFR0, RME, 0);
+        cpu->isar.id_aa64pfr0 =
+            FIELD_DP64(cpu->isar.id_aa64pfr0, ID_AA64PFR0, RME, 0);
     }
 
     if (!cpu->has_el2) {
@@ -2034,8 +2000,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
         }
 
 #ifndef CONFIG_USER_ONLY
-        cpu->pmu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, arm_pmu_timer_cb,
-                cpu);
+        cpu->pmu_timer =
+            timer_new_ns(QEMU_CLOCK_VIRTUAL, arm_pmu_timer_cb, cpu);
 #endif
     } else {
         cpu->isar.id_aa64dfr0 =
@@ -2050,10 +2016,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
          * Disable the hypervisor feature bits in the processor feature
          * registers if we don't have EL2.
          */
-        cpu->isar.id_aa64pfr0 = FIELD_DP64(cpu->isar.id_aa64pfr0,
-                                           ID_AA64PFR0, EL2, 0);
-        cpu->isar.id_pfr1 = FIELD_DP32(cpu->isar.id_pfr1,
-                                       ID_PFR1, VIRTUALIZATION, 0);
+        cpu->isar.id_aa64pfr0 =
+            FIELD_DP64(cpu->isar.id_aa64pfr0, ID_AA64PFR0, EL2, 0);
+        cpu->isar.id_pfr1 =
+            FIELD_DP32(cpu->isar.id_pfr1, ID_PFR1, VIRTUALIZATION, 0);
     }
 
 #ifndef CONFIG_USER_ONLY
@@ -2085,16 +2051,13 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
         /* Trace Macrocell system register access */
         cpu->isar.id_aa64dfr0 =
             FIELD_DP64(cpu->isar.id_aa64dfr0, ID_AA64DFR0, TRACEVER, 0);
-        cpu->isar.id_dfr0 =
-            FIELD_DP32(cpu->isar.id_dfr0, ID_DFR0, COPTRC, 0);
+        cpu->isar.id_dfr0 = FIELD_DP32(cpu->isar.id_dfr0, ID_DFR0, COPTRC, 0);
         /* Memory mapped trace */
-        cpu->isar.id_dfr0 =
-            FIELD_DP32(cpu->isar.id_dfr0, ID_DFR0, MMAPTRC, 0);
+        cpu->isar.id_dfr0 = FIELD_DP32(cpu->isar.id_dfr0, ID_DFR0, MMAPTRC, 0);
         /* FEAT_AMU (Activity Monitors Extension) */
         cpu->isar.id_aa64pfr0 =
             FIELD_DP64(cpu->isar.id_aa64pfr0, ID_AA64PFR0, AMU, 0);
-        cpu->isar.id_pfr0 =
-            FIELD_DP32(cpu->isar.id_pfr0, ID_PFR0, AMU, 0);
+        cpu->isar.id_pfr0 = FIELD_DP32(cpu->isar.id_pfr0, ID_PFR0, AMU, 0);
         /* FEAT_MPAM (Memory Partitioning and Monitoring Extension) */
         cpu->isar.id_aa64pfr0 =
             FIELD_DP64(cpu->isar.id_aa64pfr0, ID_AA64PFR0, MPAM, 0);
@@ -2139,15 +2102,13 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
 
         if (cpu->pmsav8r_hdregion > 0xff) {
             error_setg(errp, "PMSAv8 MPU EL2 #regions invalid %" PRIu32,
-                              cpu->pmsav8r_hdregion);
+                       cpu->pmsav8r_hdregion);
             return;
         }
 
         if (cpu->pmsav8r_hdregion) {
-            env->pmsav8.hprbar = g_new0(uint32_t,
-                                        cpu->pmsav8r_hdregion);
-            env->pmsav8.hprlar = g_new0(uint32_t,
-                                        cpu->pmsav8r_hdregion);
+            env->pmsav8.hprbar = g_new0(uint32_t, cpu->pmsav8r_hdregion);
+            env->pmsav8.hprlar = g_new0(uint32_t, cpu->pmsav8r_hdregion);
         }
     }
 
@@ -2274,8 +2235,8 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
 
 static Property arm_cpu_properties[] = {
     DEFINE_PROP_UINT64("midr", ARMCPU, midr, 0),
-    DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-                        mp_affinity, ARM64_AFFINITY_INVALID),
+    DEFINE_PROP_UINT64("mp-affinity", ARMCPU, mp_affinity,
+                       ARM64_AFFINITY_INVALID),
     DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
     DEFINE_PROP_INT32("core-count", ARMCPU, core_count, -1),
     DEFINE_PROP_END_OF_LIST()

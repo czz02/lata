@@ -37,41 +37,18 @@ static const struct {
     uint8_t version_id;
 } mb_cpu_lookup[] = {
     /* These key value are as per MBV field in PVR0 */
-    {"5.00.a", 0x01},
-    {"5.00.b", 0x02},
-    {"5.00.c", 0x03},
-    {"6.00.a", 0x04},
-    {"6.00.b", 0x06},
-    {"7.00.a", 0x05},
-    {"7.00.b", 0x07},
-    {"7.10.a", 0x08},
-    {"7.10.b", 0x09},
-    {"7.10.c", 0x0a},
-    {"7.10.d", 0x0b},
-    {"7.20.a", 0x0c},
-    {"7.20.b", 0x0d},
-    {"7.20.c", 0x0e},
-    {"7.20.d", 0x0f},
-    {"7.30.a", 0x10},
-    {"7.30.b", 0x11},
-    {"8.00.a", 0x12},
-    {"8.00.b", 0x13},
-    {"8.10.a", 0x14},
-    {"8.20.a", 0x15},
-    {"8.20.b", 0x16},
-    {"8.30.a", 0x17},
-    {"8.40.a", 0x18},
-    {"8.40.b", 0x19},
-    {"8.50.a", 0x1A},
-    {"9.0", 0x1B},
-    {"9.1", 0x1D},
-    {"9.2", 0x1F},
-    {"9.3", 0x20},
-    {"9.4", 0x21},
-    {"9.5", 0x22},
-    {"9.6", 0x23},
-    {"10.0", 0x24},
-    {NULL, 0},
+    { "5.00.a", 0x01 }, { "5.00.b", 0x02 }, { "5.00.c", 0x03 },
+    { "6.00.a", 0x04 }, { "6.00.b", 0x06 }, { "7.00.a", 0x05 },
+    { "7.00.b", 0x07 }, { "7.10.a", 0x08 }, { "7.10.b", 0x09 },
+    { "7.10.c", 0x0a }, { "7.10.d", 0x0b }, { "7.20.a", 0x0c },
+    { "7.20.b", 0x0d }, { "7.20.c", 0x0e }, { "7.20.d", 0x0f },
+    { "7.30.a", 0x10 }, { "7.30.b", 0x11 }, { "8.00.a", 0x12 },
+    { "8.00.b", 0x13 }, { "8.10.a", 0x14 }, { "8.20.a", 0x15 },
+    { "8.20.b", 0x16 }, { "8.30.a", 0x17 }, { "8.40.a", 0x18 },
+    { "8.40.b", 0x19 }, { "8.50.a", 0x1A }, { "9.0", 0x1B },
+    { "9.1", 0x1D },    { "9.2", 0x1F },    { "9.3", 0x20 },
+    { "9.4", 0x21 },    { "9.5", 0x22 },    { "9.6", 0x23 },
+    { "10.0", 0x24 },   { NULL, 0 },
 };
 
 /* If no specific version gets selected, default to the following.  */
@@ -93,8 +70,7 @@ static vaddr mb_cpu_get_pc(CPUState *cs)
     return cpu->env.pc;
 }
 
-static void mb_cpu_synchronize_from_tb(CPUState *cs,
-                                       const TranslationBlock *tb)
+static void mb_cpu_synchronize_from_tb(CPUState *cs, const TranslationBlock *tb)
 {
     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
 
@@ -103,8 +79,7 @@ static void mb_cpu_synchronize_from_tb(CPUState *cs,
     cpu->env.iflags = tb->flags & IFLAGS_TB_MASK;
 }
 
-static void mb_restore_state_to_opc(CPUState *cs,
-                                    const TranslationBlock *tb,
+static void mb_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                     const uint64_t *data)
 {
     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
@@ -236,9 +211,7 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
     }
 
     cpu->cfg.pvr_regs[0] =
-        (PVR0_USE_EXC_MASK |
-         PVR0_USE_ICACHE_MASK |
-         PVR0_USE_DCACHE_MASK |
+        (PVR0_USE_EXC_MASK | PVR0_USE_ICACHE_MASK | PVR0_USE_DCACHE_MASK |
          (cpu->cfg.stackprot ? PVR0_SPROT_MASK : 0) |
          (cpu->cfg.use_fpu ? PVR0_USE_FPU_MASK : 0) |
          (cpu->cfg.use_hw_mul ? PVR0_USE_HW_MUL_MASK : 0) |
@@ -253,12 +226,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
     cpu->cfg.pvr_regs[1] = cpu->cfg.pvr_user2;
 
     cpu->cfg.pvr_regs[2] =
-        (PVR2_D_OPB_MASK |
-         PVR2_D_LMB_MASK |
-         PVR2_I_OPB_MASK |
-         PVR2_I_LMB_MASK |
-         PVR2_FPU_EXC_MASK |
-         (cpu->cfg.use_fpu ? PVR2_USE_FPU_MASK : 0) |
+        (PVR2_D_OPB_MASK | PVR2_D_LMB_MASK | PVR2_I_OPB_MASK | PVR2_I_LMB_MASK |
+         PVR2_FPU_EXC_MASK | (cpu->cfg.use_fpu ? PVR2_USE_FPU_MASK : 0) |
          (cpu->cfg.use_fpu > 1 ? PVR2_USE_FPU2_MASK : 0) |
          (cpu->cfg.use_hw_mul ? PVR2_USE_HW_MUL_MASK : 0) |
          (cpu->cfg.use_hw_mul > 1 ? PVR2_USE_MUL64_MASK : 0) |
@@ -280,8 +249,7 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
         (0x0c000000 | /* Default to spartan 3a dsp family.  */
          (cpu->cfg.addr_size - 32) << PVR10_ASIZE_SHIFT);
 
-    cpu->cfg.pvr_regs[11] = ((cpu->cfg.use_mmu ? PVR11_USE_MMU : 0) |
-                             16 << 17);
+    cpu->cfg.pvr_regs[11] = ((cpu->cfg.use_mmu ? PVR11_USE_MMU : 0) | 16 << 17);
 
     cpu->cfg.mmu = 3;
     cpu->cfg.mmu_tlb_access = 3;
@@ -364,8 +332,8 @@ static Property mb_properties[] = {
                      cfg.div_zero_exception, false),
     DEFINE_PROP_BOOL("unaligned-exceptions", MicroBlazeCPU,
                      cfg.unaligned_exceptions, false),
-    DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU,
-                     cfg.opcode_0_illegal, false),
+    DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU, cfg.opcode_0_illegal,
+                     false),
     DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
     DEFINE_PROP_UINT8("pvr", MicroBlazeCPU, cfg.pvr, C_PVR_FULL),
     DEFINE_PROP_UINT8("pvr-user1", MicroBlazeCPU, cfg.pvr_user1, 0),
@@ -409,8 +377,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
     MicroBlazeCPUClass *mcc = MICROBLAZE_CPU_CLASS(oc);
     ResettableClass *rc = RESETTABLE_CLASS(oc);
 
-    device_class_set_parent_realize(dc, mb_cpu_realizefn,
-                                    &mcc->parent_realize);
+    device_class_set_parent_realize(dc, mb_cpu_realizefn, &mcc->parent_realize);
     resettable_class_set_parent_phases(rc, NULL, mb_cpu_reset_hold, NULL,
                                        &mcc->parent_phases);
 

@@ -85,8 +85,8 @@ static void accel_init_cpu_int_aux(ObjectClass *klass, void *opaque)
 static void accel_init_cpu_interfaces(AccelClass *ac)
 {
     const char *ac_name; /* AccelClass name */
-    char *acc_name;      /* AccelCPUClass name */
-    ObjectClass *acc;    /* AccelCPUClass */
+    char *acc_name; /* AccelCPUClass name */
+    ObjectClass *acc; /* AccelCPUClass */
 
     ac_name = object_class_get_name(OBJECT_CLASS(ac));
     g_assert(ac_name != NULL);
@@ -96,8 +96,8 @@ static void accel_init_cpu_interfaces(AccelClass *ac)
     g_free(acc_name);
 
     if (acc) {
-        object_class_foreach(accel_init_cpu_int_aux,
-                             CPU_RESOLVING_TYPE, false, acc);
+        object_class_foreach(accel_init_cpu_int_aux, CPU_RESOLVING_TYPE, false,
+                             acc);
     }
 }
 

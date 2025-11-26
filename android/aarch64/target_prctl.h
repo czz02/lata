@@ -24,8 +24,8 @@ static abi_long do_prctl_sve_set_vl(CPUArchState *env, abi_long arg2)
      * Note the kernel definition of sve_vl_valid allows for VQ=512,
      * i.e. VL=8192, even though the current architectural maximum is VQ=16.
      */
-    if (cpu_isar_feature(aa64_sve, env_archcpu(env))
-        && arg2 >= 0 && arg2 <= 512 * 16 && !(arg2 & 15)) {
+    if (cpu_isar_feature(aa64_sve, env_archcpu(env)) && arg2 >= 0 &&
+        arg2 <= 512 * 16 && !(arg2 & 15)) {
         uint32_t vq, old_vq;
 
         /* PSTATE.SM is always unset on syscall entry. */
@@ -68,8 +68,8 @@ static abi_long do_prctl_sme_set_vl(CPUArchState *env, abi_long arg2)
      * Note the kernel definition of sve_vl_valid allows for VQ=512,
      * i.e. VL=8192, even though the architectural maximum is VQ=16.
      */
-    if (cpu_isar_feature(aa64_sme, env_archcpu(env))
-        && arg2 >= 0 && arg2 <= 512 * 16 && !(arg2 & 15)) {
+    if (cpu_isar_feature(aa64_sme, env_archcpu(env)) && arg2 >= 0 &&
+        arg2 <= 512 * 16 && !(arg2 & 15)) {
         int vq, old_vq;
 
         old_vq = sme_vq(env);
@@ -108,8 +108,8 @@ static abi_long do_prctl_reset_keys(CPUArchState *env, abi_long arg2)
     ARMCPU *cpu = env_archcpu(env);
 
     if (cpu_isar_feature(aa64_pauth, cpu)) {
-        int all = (PR_PAC_APIAKEY | PR_PAC_APIBKEY |
-                   PR_PAC_APDAKEY | PR_PAC_APDBKEY | PR_PAC_APGAKEY);
+        int all = (PR_PAC_APIAKEY | PR_PAC_APIBKEY | PR_PAC_APDAKEY |
+                   PR_PAC_APDBKEY | PR_PAC_APGAKEY);
         int ret = 0;
         Error *err = NULL;
 
@@ -119,24 +119,24 @@ static abi_long do_prctl_reset_keys(CPUArchState *env, abi_long arg2)
             return -TARGET_EINVAL;
         }
         if (arg2 & PR_PAC_APIAKEY) {
-            ret |= qemu_guest_getrandom(&env->keys.apia,
-                                        sizeof(ARMPACKey), &err);
+            ret |=
+                qemu_guest_getrandom(&env->keys.apia, sizeof(ARMPACKey), &err);
         }
         if (arg2 & PR_PAC_APIBKEY) {
-            ret |= qemu_guest_getrandom(&env->keys.apib,
-                                        sizeof(ARMPACKey), &err);
+            ret |=
+                qemu_guest_getrandom(&env->keys.apib, sizeof(ARMPACKey), &err);
         }
         if (arg2 & PR_PAC_APDAKEY) {
-            ret |= qemu_guest_getrandom(&env->keys.apda,
-                                        sizeof(ARMPACKey), &err);
+            ret |=
+                qemu_guest_getrandom(&env->keys.apda, sizeof(ARMPACKey), &err);
         }
         if (arg2 & PR_PAC_APDBKEY) {
-            ret |= qemu_guest_getrandom(&env->keys.apdb,
-                                        sizeof(ARMPACKey), &err);
+            ret |=
+                qemu_guest_getrandom(&env->keys.apdb, sizeof(ARMPACKey), &err);
         }
         if (arg2 & PR_PAC_APGAKEY) {
-            ret |= qemu_guest_getrandom(&env->keys.apga,
-                                        sizeof(ARMPACKey), &err);
+            ret |=
+                qemu_guest_getrandom(&env->keys.apga, sizeof(ARMPACKey), &err);
         }
         if (ret != 0) {
             /*

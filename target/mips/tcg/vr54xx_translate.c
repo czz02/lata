@@ -35,7 +35,8 @@
  */
 
 static bool trans_mult_acc(DisasContext *ctx, arg_r *a,
-                           void (*gen_helper_mult_acc)(TCGv, TCGv_ptr, TCGv, TCGv))
+                           void (*gen_helper_mult_acc)(TCGv, TCGv_ptr, TCGv,
+                                                       TCGv))
 {
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -49,17 +50,17 @@ static bool trans_mult_acc(DisasContext *ctx, arg_r *a,
     return true;
 }
 
-TRANS(MACC,     trans_mult_acc, gen_helper_macc);
-TRANS(MACCHI,   trans_mult_acc, gen_helper_macchi);
-TRANS(MACCHIU,  trans_mult_acc, gen_helper_macchiu);
-TRANS(MACCU,    trans_mult_acc, gen_helper_maccu);
-TRANS(MSAC,     trans_mult_acc, gen_helper_msac);
-TRANS(MSACHI,   trans_mult_acc, gen_helper_msachi);
-TRANS(MSACHIU,  trans_mult_acc, gen_helper_msachiu);
-TRANS(MSACU,    trans_mult_acc, gen_helper_msacu);
-TRANS(MULHI,    trans_mult_acc, gen_helper_mulhi);
-TRANS(MULHIU,   trans_mult_acc, gen_helper_mulhiu);
-TRANS(MULS,     trans_mult_acc, gen_helper_muls);
-TRANS(MULSHI,   trans_mult_acc, gen_helper_mulshi);
-TRANS(MULSHIU,  trans_mult_acc, gen_helper_mulshiu);
-TRANS(MULSU,    trans_mult_acc, gen_helper_mulsu);
+TRANS(MACC, trans_mult_acc, gen_helper_macc);
+TRANS(MACCHI, trans_mult_acc, gen_helper_macchi);
+TRANS(MACCHIU, trans_mult_acc, gen_helper_macchiu);
+TRANS(MACCU, trans_mult_acc, gen_helper_maccu);
+TRANS(MSAC, trans_mult_acc, gen_helper_msac);
+TRANS(MSACHI, trans_mult_acc, gen_helper_msachi);
+TRANS(MSACHIU, trans_mult_acc, gen_helper_msachiu);
+TRANS(MSACU, trans_mult_acc, gen_helper_msacu);
+TRANS(MULHI, trans_mult_acc, gen_helper_mulhi);
+TRANS(MULHIU, trans_mult_acc, gen_helper_mulhiu);
+TRANS(MULS, trans_mult_acc, gen_helper_muls);
+TRANS(MULSHI, trans_mult_acc, gen_helper_mulshi);
+TRANS(MULSHIU, trans_mult_acc, gen_helper_mulshiu);
+TRANS(MULSU, trans_mult_acc, gen_helper_mulsu);

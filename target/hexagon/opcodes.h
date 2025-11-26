@@ -38,14 +38,14 @@ typedef enum {
     XX_LAST_ENC_CLASS
 } EncClass;
 
-extern const char * const opcode_names[];
+extern const char *const opcode_names[];
 
-extern const char * const opcode_reginfo[];
-extern const char * const opcode_rregs[];
-extern const char * const opcode_wregs[];
+extern const char *const opcode_reginfo[];
+extern const char *const opcode_rregs[];
+extern const char *const opcode_wregs[];
 
 typedef struct {
-    const char * const encoding;
+    const char *const encoding;
     const EncClass enc_class;
 } OpcodeEncoding;
 

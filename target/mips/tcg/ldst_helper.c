@@ -29,21 +29,23 @@
 
 #ifndef CONFIG_USER_ONLY
 
-#define HELPER_LD_ATOMIC(name, insn, almask, do_cast)                         \
-target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_idx)  \
-{                                                                             \
-    if (arg & almask) {                                                       \
-        if (!(env->hflags & MIPS_HFLAG_DM)) {                                 \
-            env->CP0_BadVAddr = arg;                                          \
-        }                                                                     \
-        do_raise_exception(env, EXCP_AdEL, GETPC());                          \
-    }                                                                         \
-    env->CP0_LLAddr = cpu_mips_translate_address(env, arg, MMU_DATA_LOAD,     \
-                                                 GETPC());                    \
-    env->lladdr = arg;                                                        \
-    env->llval = do_cast cpu_##insn##_mmuidx_ra(env, arg, mem_idx, GETPC());  \
-    return env->llval;                                                        \
-}
+#define HELPER_LD_ATOMIC(name, insn, almask, do_cast)                     \
+    target_ulong helper_##name(CPUMIPSState *env, target_ulong arg,       \
+                               int mem_idx)                               \
+    {                                                                     \
+        if (arg & almask) {                                               \
+            if (!(env->hflags & MIPS_HFLAG_DM)) {                         \
+                env->CP0_BadVAddr = arg;                                  \
+            }                                                             \
+            do_raise_exception(env, EXCP_AdEL, GETPC());                  \
+        }                                                                 \
+        env->CP0_LLAddr =                                                 \
+            cpu_mips_translate_address(env, arg, MMU_DATA_LOAD, GETPC()); \
+        env->lladdr = arg;                                                \
+        env->llval =                                                      \
+            do_cast cpu_##insn##_mmuidx_ra(env, arg, mem_idx, GETPC());   \
+        return env->llval;                                                \
+    }
 HELPER_LD_ATOMIC(ll, ldl, 0x3, (target_long)(int32_t))
 #ifdef TARGET_MIPS64
 HELPER_LD_ATOMIC(lld, ldq, 0x7, (target_ulong))
@@ -57,8 +59,8 @@ static inline bool cpu_is_bigendian(CPUMIPSState *env)
     return extract32(env->CP0_Config0, CP0C0_BE, 1);
 }
 
-static inline target_ulong get_lmask(CPUMIPSState *env,
-                                     target_ulong value, unsigned bits)
+static inline target_ulong get_lmask(CPUMIPSState *env, target_ulong value,
+                                     unsigned bits)
 {
     unsigned mask = (bits / BITS_PER_BYTE) - 1;
 
@@ -80,18 +82,17 @@ void helper_swl(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
     cpu_stb_mmuidx_ra(env, arg2, (uint8_t)(arg1 >> 24), mem_idx, GETPC());
 
     if (lmask <= 2) {
-        cpu_stb_mmuidx_ra(env, arg2 + 1 * dir, (uint8_t)(arg1 >> 16),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 1 * dir, (uint8_t)(arg1 >> 16), mem_idx,
+                          GETPC());
     }
 
     if (lmask <= 1) {
-        cpu_stb_mmuidx_ra(env, arg2 + 2 * dir, (uint8_t)(arg1 >> 8),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 2 * dir, (uint8_t)(arg1 >> 8), mem_idx,
+                          GETPC());
     }
 
     if (lmask == 0) {
-        cpu_stb_mmuidx_ra(env, arg2 + 3 * dir, (uint8_t)arg1,
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 3 * dir, (uint8_t)arg1, mem_idx, GETPC());
     }
 }
 
@@ -104,18 +105,18 @@ void helper_swr(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
     cpu_stb_mmuidx_ra(env, arg2, (uint8_t)arg1, mem_idx, GETPC());
 
     if (lmask >= 1) {
-        cpu_stb_mmuidx_ra(env, arg2 - 1 * dir, (uint8_t)(arg1 >> 8),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 1 * dir, (uint8_t)(arg1 >> 8), mem_idx,
+                          GETPC());
     }
 
     if (lmask >= 2) {
-        cpu_stb_mmuidx_ra(env, arg2 - 2 * dir, (uint8_t)(arg1 >> 16),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 2 * dir, (uint8_t)(arg1 >> 16), mem_idx,
+                          GETPC());
     }
 
     if (lmask == 3) {
-        cpu_stb_mmuidx_ra(env, arg2 - 3 * dir, (uint8_t)(arg1 >> 24),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 3 * dir, (uint8_t)(arg1 >> 24), mem_idx,
+                          GETPC());
     }
 }
 
@@ -134,38 +135,37 @@ void helper_sdl(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
     cpu_stb_mmuidx_ra(env, arg2, (uint8_t)(arg1 >> 56), mem_idx, GETPC());
 
     if (lmask <= 6) {
-        cpu_stb_mmuidx_ra(env, arg2 + 1 * dir, (uint8_t)(arg1 >> 48),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 1 * dir, (uint8_t)(arg1 >> 48), mem_idx,
+                          GETPC());
     }
 
     if (lmask <= 5) {
-        cpu_stb_mmuidx_ra(env, arg2 + 2 * dir, (uint8_t)(arg1 >> 40),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 2 * dir, (uint8_t)(arg1 >> 40), mem_idx,
+                          GETPC());
     }
 
     if (lmask <= 4) {
-        cpu_stb_mmuidx_ra(env, arg2 + 3 * dir, (uint8_t)(arg1 >> 32),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 3 * dir, (uint8_t)(arg1 >> 32), mem_idx,
+                          GETPC());
     }
 
     if (lmask <= 3) {
-        cpu_stb_mmuidx_ra(env, arg2 + 4 * dir, (uint8_t)(arg1 >> 24),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 4 * dir, (uint8_t)(arg1 >> 24), mem_idx,
+                          GETPC());
     }
 
     if (lmask <= 2) {
-        cpu_stb_mmuidx_ra(env, arg2 + 5 * dir, (uint8_t)(arg1 >> 16),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 5 * dir, (uint8_t)(arg1 >> 16), mem_idx,
+                          GETPC());
     }
 
     if (lmask <= 1) {
-        cpu_stb_mmuidx_ra(env, arg2 + 6 * dir, (uint8_t)(arg1 >> 8),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 6 * dir, (uint8_t)(arg1 >> 8), mem_idx,
+                          GETPC());
     }
 
     if (lmask <= 0) {
-        cpu_stb_mmuidx_ra(env, arg2 + 7 * dir, (uint8_t)arg1,
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 + 7 * dir, (uint8_t)arg1, mem_idx, GETPC());
     }
 }
 
@@ -178,38 +178,38 @@ void helper_sdr(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
     cpu_stb_mmuidx_ra(env, arg2, (uint8_t)arg1, mem_idx, GETPC());
 
     if (lmask >= 1) {
-        cpu_stb_mmuidx_ra(env, arg2 - 1 * dir, (uint8_t)(arg1 >> 8),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 1 * dir, (uint8_t)(arg1 >> 8), mem_idx,
+                          GETPC());
     }
 
     if (lmask >= 2) {
-        cpu_stb_mmuidx_ra(env, arg2 - 2 * dir, (uint8_t)(arg1 >> 16),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 2 * dir, (uint8_t)(arg1 >> 16), mem_idx,
+                          GETPC());
     }
 
     if (lmask >= 3) {
-        cpu_stb_mmuidx_ra(env, arg2 - 3 * dir, (uint8_t)(arg1 >> 24),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 3 * dir, (uint8_t)(arg1 >> 24), mem_idx,
+                          GETPC());
     }
 
     if (lmask >= 4) {
-        cpu_stb_mmuidx_ra(env, arg2 - 4 * dir, (uint8_t)(arg1 >> 32),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 4 * dir, (uint8_t)(arg1 >> 32), mem_idx,
+                          GETPC());
     }
 
     if (lmask >= 5) {
-        cpu_stb_mmuidx_ra(env, arg2 - 5 * dir, (uint8_t)(arg1 >> 40),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 5 * dir, (uint8_t)(arg1 >> 40), mem_idx,
+                          GETPC());
     }
 
     if (lmask >= 6) {
-        cpu_stb_mmuidx_ra(env, arg2 - 6 * dir, (uint8_t)(arg1 >> 48),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 6 * dir, (uint8_t)(arg1 >> 48), mem_idx,
+                          GETPC());
     }
 
     if (lmask == 7) {
-        cpu_stb_mmuidx_ra(env, arg2 - 7 * dir, (uint8_t)(arg1 >> 56),
-                          mem_idx, GETPC());
+        cpu_stb_mmuidx_ra(env, arg2 - 7 * dir, (uint8_t)(arg1 >> 56), mem_idx,
+                          GETPC());
     }
 }
 #endif /* TARGET_MIPS64 */
@@ -277,8 +277,7 @@ void helper_ldm(CPUMIPSState *env, target_ulong addr, target_ulong reglist,
     }
 
     if (do_r31) {
-        env->active_tc.gpr[31] =
-            cpu_ldq_mmuidx_ra(env, addr, mem_idx, GETPC());
+        env->active_tc.gpr[31] = cpu_ldq_mmuidx_ra(env, addr, mem_idx, GETPC());
     }
 }
 

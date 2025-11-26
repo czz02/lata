@@ -32,7 +32,8 @@ typedef enum X86OpType {
     X86_TYPE_H, /* For AVX, VEX.vvvv selects an XMM/YMM register */
     X86_TYPE_I, /* Immediate */
     X86_TYPE_J, /* Relative offset for a jump */
-    X86_TYPE_L, /* The upper 4 bits of the immediate select a 128-bit register */
+    X86_TYPE_L, /* The upper 4 bits of the immediate select a 128-bit register
+                 */
     X86_TYPE_M, /* modrm byte selects a memory operand */
     X86_TYPE_N, /* R/M in the modrm byte selects an MMX register */
     X86_TYPE_O, /* Absolute address encoded in the instruction */
@@ -69,25 +70,25 @@ typedef enum X86OpType {
 typedef enum X86OpSize {
     X86_SIZE_None,
 
-    X86_SIZE_a,  /* BOUND operand */
-    X86_SIZE_b,  /* byte */
-    X86_SIZE_d,  /* 32-bit */
+    X86_SIZE_a, /* BOUND operand */
+    X86_SIZE_b, /* byte */
+    X86_SIZE_d, /* 32-bit */
     X86_SIZE_dq, /* SSE/AVX 128-bit */
-    X86_SIZE_p,  /* Far pointer */
+    X86_SIZE_p, /* Far pointer */
     X86_SIZE_pd, /* SSE/AVX packed double precision */
     X86_SIZE_pi, /* MMX */
     X86_SIZE_ps, /* SSE/AVX packed single precision */
-    X86_SIZE_q,  /* 64-bit */
+    X86_SIZE_q, /* 64-bit */
     X86_SIZE_qq, /* AVX 256-bit */
-    X86_SIZE_s,  /* Descriptor */
+    X86_SIZE_s, /* Descriptor */
     X86_SIZE_sd, /* SSE/AVX scalar double precision */
     X86_SIZE_ss, /* SSE/AVX scalar single precision */
     X86_SIZE_si, /* 32-bit GPR */
-    X86_SIZE_v,  /* 16/32/64-bit, based on operand size */
-    X86_SIZE_w,  /* 16-bit */
-    X86_SIZE_x,  /* 128/256-bit, based on operand size */
-    X86_SIZE_y,  /* 32/64-bit, based on operand size */
-    X86_SIZE_z,  /* 16-bit for 16-bit operand size, else 32-bit */
+    X86_SIZE_v, /* 16/32/64-bit, based on operand size */
+    X86_SIZE_w, /* 16-bit */
+    X86_SIZE_x, /* 128/256-bit, based on operand size */
+    X86_SIZE_y, /* 32/64-bit, based on operand size */
+    X86_SIZE_z, /* 16-bit for 16-bit operand size, else 32-bit */
 
     /* Custom */
     X86_SIZE_d64,
@@ -120,14 +121,14 @@ typedef enum X86CPUIDFeature {
 /* Execution flags */
 
 typedef enum X86OpUnit {
-    X86_OP_SKIP,    /* not valid or managed by emission function */
-    X86_OP_SEG,     /* segment selector */
-    X86_OP_CR,      /* control register */
-    X86_OP_DR,      /* debug register */
-    X86_OP_INT,     /* loaded into/stored from s->T0/T1 */
-    X86_OP_IMM,     /* immediate */
-    X86_OP_SSE,     /* address in either s->ptrX or s->A0 depending on has_ea */
-    X86_OP_MMX,     /* address in either s->ptrX or s->A0 depending on has_ea */
+    X86_OP_SKIP, /* not valid or managed by emission function */
+    X86_OP_SEG, /* segment selector */
+    X86_OP_CR, /* control register */
+    X86_OP_DR, /* debug register */
+    X86_OP_INT, /* loaded into/stored from s->T0/T1 */
+    X86_OP_IMM, /* immediate */
+    X86_OP_SSE, /* address in either s->ptrX or s->A0 depending on has_ea */
+    X86_OP_MMX, /* address in either s->ptrX or s->A0 depending on has_ea */
 } X86OpUnit;
 
 typedef enum X86InsnSpecial {
@@ -153,8 +154,8 @@ typedef enum X86InsnSpecial {
     X86_SPECIAL_AVXExtMov,
 
     /*
-     * MMX instruction exists with no prefix; if there is no prefix, V/H/W/U operands
-     * become P/P/Q/N, and size "x" becomes "q".
+     * MMX instruction exists with no prefix; if there is no prefix, V/H/W/U
+     * operands become P/P/Q/N, and size "x" becomes "q".
      */
     X86_SPECIAL_MMX,
 
@@ -193,14 +194,16 @@ typedef enum X86VEXSpecial {
 } X86VEXSpecial;
 
 
-typedef struct X86OpEntry  X86OpEntry;
+typedef struct X86OpEntry X86OpEntry;
 typedef struct X86DecodedInsn X86DecodedInsn;
 
 /* Decode function for multibyte opcodes.  */
-typedef void (*X86DecodeFunc)(DisasContext *s, CPUX86State *env, X86OpEntry *entry, uint8_t *b);
+typedef void (*X86DecodeFunc)(DisasContext *s, CPUX86State *env,
+                              X86OpEntry *entry, uint8_t *b);
 
 /* Code generation function.  */
-typedef void (*X86GenFunc)(DisasContext *s, CPUX86State *env, X86DecodedInsn *decode);
+typedef void (*X86GenFunc)(DisasContext *s, CPUX86State *env,
+                           X86DecodedInsn *decode);
 
 struct X86OpEntry {
     /* Based on the is_decode flags.  */
@@ -209,30 +212,30 @@ struct X86OpEntry {
         X86DecodeFunc decode;
     };
     /* op0 is always written, op1 and op2 are always read.  */
-    X86OpType    op0:8;
-    X86OpSize    s0:8;
-    X86OpType    op1:8;
-    X86OpSize    s1:8;
-    X86OpType    op2:8;
-    X86OpSize    s2:8;
+    X86OpType op0 : 8;
+    X86OpSize s0 : 8;
+    X86OpType op1 : 8;
+    X86OpSize s1 : 8;
+    X86OpType op2 : 8;
+    X86OpSize s2 : 8;
     /* Must be I and b respectively if present.  */
-    X86OpType    op3:8;
-    X86OpSize    s3:8;
+    X86OpType op3 : 8;
+    X86OpSize s3 : 8;
 
-    X86InsnSpecial special:8;
-    X86CPUIDFeature cpuid:8;
-    unsigned     vex_class:8;
-    X86VEXSpecial vex_special:8;
-    uint16_t     valid_prefix:16;
-    bool         is_decode:1;
+    X86InsnSpecial special : 8;
+    X86CPUIDFeature cpuid : 8;
+    unsigned vex_class : 8;
+    X86VEXSpecial vex_special : 8;
+    uint16_t valid_prefix : 16;
+    bool is_decode : 1;
 };
 
 typedef struct X86DecodedOp {
     int8_t n;
-    MemOp ot;     /* For b/c/d/p/s/q/v/w/y/z */
+    MemOp ot; /* For b/c/d/p/s/q/v/w/y/z */
     X86OpUnit unit;
     bool has_ea;
-    int offset;   /* For MMX and SSE */
+    int offset; /* For MMX and SSE */
 
     /*
      * This field is used internally by macros OP0_PTR/OP1_PTR/OP2_PTR,
@@ -249,4 +252,3 @@ struct X86DecodedInsn {
 
     uint8_t b;
 };
-

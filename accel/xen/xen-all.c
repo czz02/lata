@@ -34,7 +34,7 @@ static void xenstore_record_dm_state(const char *state)
 {
     char path[50];
 
-    snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
+    snprintf(path, sizeof(path), "device-model/%u/state", xen_domid);
     if (!qemu_xen_xs_write(xenstore, XBT_NULL, path, state, strlen(state))) {
         error_report("error recording dm state");
         exit(1);
@@ -42,8 +42,7 @@ static void xenstore_record_dm_state(const char *state)
 }
 
 
-static void xen_change_state_handler(void *opaque, bool running,
-                                     RunState state)
+static void xen_change_state_handler(void *opaque, bool running, RunState state)
 {
     if (running) {
         /* record state running */
@@ -131,10 +130,10 @@ static void xen_accel_class_init(ObjectClass *oc, void *data)
 
     compat_props_add(ac->compat_props, compat, G_N_ELEMENTS(compat));
 
-    object_class_property_add_bool(oc, "igd-passthru",
-        xen_get_igd_gfx_passthru, xen_set_igd_gfx_passthru);
-    object_class_property_set_description(oc, "igd-passthru",
-        "Set on/off to enable/disable igd passthrou");
+    object_class_property_add_bool(oc, "igd-passthru", xen_get_igd_gfx_passthru,
+                                   xen_set_igd_gfx_passthru);
+    object_class_property_set_description(
+        oc, "igd-passthru", "Set on/off to enable/disable igd passthrou");
 }
 
 #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")

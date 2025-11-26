@@ -30,7 +30,7 @@
 #include "hw/boards.h"
 
 /* Fetch/store bits in the translation exception code: */
-#define FS_READ  0x800
+#define FS_READ 0x800
 #define FS_WRITE 0x400
 
 static void trigger_access_exception(CPUS390XState *env, uint32_t type,
@@ -87,9 +87,9 @@ static bool lowprot_enabled(const CPUS390XState *env, uint64_t asc)
 target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr)
 {
     if (raddr < 0x2000) {
-        return raddr + env->psa;    /* Map the lowcore. */
+        return raddr + env->psa; /* Map the lowcore. */
     } else if (raddr >= env->psa && raddr < env->psa + 0x2000) {
-        return raddr - env->psa;    /* Map the 0 page. */
+        return raddr - env->psa; /* Map the 0 page. */
     }
     return raddr;
 }
@@ -97,9 +97,8 @@ target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr)
 bool mmu_absolute_addr_valid(target_ulong addr, bool is_write)
 {
     return address_space_access_valid(&address_space_memory,
-                                      addr & TARGET_PAGE_MASK,
-                                      TARGET_PAGE_SIZE, is_write,
-                                      MEMTXATTRS_UNSPECIFIED);
+                                      addr & TARGET_PAGE_MASK, TARGET_PAGE_SIZE,
+                                      is_write, MEMTXATTRS_UNSPECIFIED);
 }
 
 static inline bool read_table_entry(CPUS390XState *env, hwaddr gaddr,
@@ -115,8 +114,7 @@ static inline bool read_table_entry(CPUS390XState *env, hwaddr gaddr,
      * We treat them as absolute addresses and don't wrap them.
      */
     if (unlikely(address_space_read(cs->as, gaddr, MEMTXATTRS_UNSPECIFIED,
-                                    entry, sizeof(*entry)) !=
-                 MEMTX_OK)) {
+                                    entry, sizeof(*entry)) != MEMTX_OK)) {
         return false;
     }
     *entry = be64_to_cpu(*entry);
@@ -127,8 +125,8 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
                               uint64_t asc, uint64_t asce, target_ulong *raddr,
                               int *flags)
 {
-    const bool edat1 = (env->cregs[0] & CR0_EDAT) &&
-                       s390_has_feat(S390_FEAT_EDAT);
+    const bool edat1 =
+        (env->cregs[0] & CR0_EDAT) && s390_has_feat(S390_FEAT_EDAT);
     const bool edat2 = edat1 && s390_has_feat(S390_FEAT_EDAT_2);
     const bool iep = (env->cregs[0] & CR0_IEP) &&
                      s390_has_feat(S390_FEAT_INSTRUCTION_EXEC_PROT);
@@ -239,8 +237,8 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
             if (iep && (entry & REGION3_ENTRY_IEP)) {
                 *flags &= ~PAGE_EXEC;
             }
-            *raddr = (entry & REGION3_ENTRY_RFAA) |
-                     (vaddr & ~REGION3_ENTRY_RFAA);
+            *raddr =
+                (entry & REGION3_ENTRY_RFAA) | (vaddr & ~REGION3_ENTRY_RFAA);
             return 0;
         }
         if (VADDR_SEGMENT_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
@@ -269,8 +267,8 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
             if (iep && (entry & SEGMENT_ENTRY_IEP)) {
                 *flags &= ~PAGE_EXEC;
             }
-            *raddr = (entry & SEGMENT_ENTRY_SFAA) |
-                     (vaddr & ~SEGMENT_ENTRY_SFAA);
+            *raddr =
+                (entry & SEGMENT_ENTRY_SFAA) | (vaddr & ~SEGMENT_ENTRY_SFAA);
             return 0;
         }
         gaddr = (entry & SEGMENT_ENTRY_ORIGIN) + VADDR_PAGE_TX(vaddr) * 8;
@@ -395,7 +393,7 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
     int r;
 
     *tec = (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
-            (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ);
+           (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ);
     *flags = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
 
     if (is_low_address(vaddr & TARGET_PAGE_MASK) && lowprot_enabled(env, asc)) {
@@ -540,8 +538,8 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
         }
     }
 
-    nr_pages = (((laddr & ~TARGET_PAGE_MASK) + len - 1) >> TARGET_PAGE_BITS)
-               + 1;
+    nr_pages =
+        (((laddr & ~TARGET_PAGE_MASK) + len - 1) >> TARGET_PAGE_BITS) + 1;
     pages = g_malloc(nr_pages * sizeof(*pages));
 
     ret = translate_pages(cpu, laddr, nr_pages, pages, is_write, &tec);

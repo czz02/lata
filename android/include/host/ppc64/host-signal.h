@@ -34,8 +34,8 @@ static inline void *host_signal_mask(host_sigcontext *uc)
 
 static inline bool host_signal_write(siginfo_t *info, host_sigcontext *uc)
 {
-    return uc->uc_mcontext.gp_regs[PT_TRAP] != 0x400
-        && (uc->uc_mcontext.gp_regs[PT_DSISR] & 0x02000000);
+    return uc->uc_mcontext.gp_regs[PT_TRAP] != 0x400 &&
+           (uc->uc_mcontext.gp_regs[PT_DSISR] & 0x02000000);
 }
 
 #endif

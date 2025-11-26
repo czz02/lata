@@ -20,7 +20,7 @@ static void gen_io_start(void)
 {
     tcg_gen_st_i32(tcg_constant_i32(1), cpu_env,
                    offsetof(ArchCPU, parent_obj.can_do_io) -
-                   offsetof(ArchCPU, env));
+                       offsetof(ArchCPU, env));
 }
 
 bool translator_io_start(DisasContextBase *db)
@@ -54,7 +54,7 @@ static TCGOp *gen_tb_start(uint32_t cflags)
 
     tcg_gen_ld_i32(count, cpu_env,
                    offsetof(ArchCPU, neg.icount_decr.u32) -
-                   offsetof(ArchCPU, env));
+                       offsetof(ArchCPU, env));
 
     if (cflags & CF_USE_ICOUNT) {
         /*
@@ -83,7 +83,7 @@ static TCGOp *gen_tb_start(uint32_t cflags)
     if (cflags & CF_USE_ICOUNT) {
         tcg_gen_st16_i32(count, cpu_env,
                          offsetof(ArchCPU, neg.icount_decr.u16.low) -
-                         offsetof(ArchCPU, env));
+                             offsetof(ArchCPU, env));
         /*
          * cpu->can_do_io is cleared automatically here at the beginning of
          * each translation block.  The cost is minimal and only paid for
@@ -93,7 +93,7 @@ static TCGOp *gen_tb_start(uint32_t cflags)
          */
         tcg_gen_st_i32(tcg_constant_i32(0), cpu_env,
                        offsetof(ArchCPU, parent_obj.can_do_io) -
-                       offsetof(ArchCPU, env));
+                           offsetof(ArchCPU, env));
     }
 
     return icount_start_insn;
@@ -147,18 +147,18 @@ void translator_loop(CPUState *cpu, TranslationBlock *tb, int *max_insns,
     db->host_addr[1] = NULL;
 
     ops->init_disas_context(db, cpu);
-    tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
+    tcg_debug_assert(db->is_jmp == DISAS_NEXT); /* no early exit */
 
     /* Start translating.  */
     ops->tb_start(db, cpu);
-    tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
+    tcg_debug_assert(db->is_jmp == DISAS_NEXT); /* no early exit */
 
     plugin_enabled = plugin_gen_tb_start(cpu, db, cflags & CF_MEMI_ONLY);
 
     while (true) {
         *max_insns = ++db->num_insns;
         ops->insn_start(db, cpu);
-        tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
+        tcg_debug_assert(db->is_jmp == DISAS_NEXT); /* no early exit */
 
         if (plugin_enabled) {
             plugin_gen_insn_start(cpu, db);
@@ -215,8 +215,8 @@ void translator_loop(CPUState *cpu, TranslationBlock *tb, int *max_insns,
     tb->size = db->pc_next - db->pc_first;
     tb->icount = db->num_insns;
 
-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-        && qemu_log_in_addr_range(db->pc_first)) {
+    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM) &&
+        qemu_log_in_addr_range(db->pc_first)) {
         FILE *logfile = qemu_log_trylock();
         if (logfile) {
             fprintf(logfile, "----------------\n");

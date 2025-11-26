@@ -31,27 +31,16 @@
  * Sparc V8 Reference MMU (SRMMU)
  */
 static const int access_table[8][8] = {
-    { 0, 0, 0, 0, 8, 0, 12, 12 },
-    { 0, 0, 0, 0, 8, 0, 0, 0 },
-    { 8, 8, 0, 0, 0, 8, 12, 12 },
-    { 8, 8, 0, 0, 0, 8, 0, 0 },
-    { 8, 0, 8, 0, 8, 8, 12, 12 },
-    { 8, 0, 8, 0, 8, 0, 8, 0 },
-    { 8, 8, 8, 0, 8, 8, 12, 12 },
-    { 8, 8, 8, 0, 8, 8, 8, 0 }
+    { 0, 0, 0, 0, 8, 0, 12, 12 }, { 0, 0, 0, 0, 8, 0, 0, 0 },
+    { 8, 8, 0, 0, 0, 8, 12, 12 }, { 8, 8, 0, 0, 0, 8, 0, 0 },
+    { 8, 0, 8, 0, 8, 8, 12, 12 }, { 8, 0, 8, 0, 8, 0, 8, 0 },
+    { 8, 8, 8, 0, 8, 8, 12, 12 }, { 8, 8, 8, 0, 8, 8, 8, 0 }
 };
 
 static const int perm_table[2][8] = {
-    {
-        PAGE_READ,
-        PAGE_READ | PAGE_WRITE,
-        PAGE_READ | PAGE_EXEC,
-        PAGE_READ | PAGE_WRITE | PAGE_EXEC,
-        PAGE_EXEC,
-        PAGE_READ | PAGE_WRITE,
-        PAGE_READ | PAGE_EXEC,
-        PAGE_READ | PAGE_WRITE | PAGE_EXEC
-    },
+    { PAGE_READ, PAGE_READ | PAGE_WRITE, PAGE_READ | PAGE_EXEC,
+      PAGE_READ | PAGE_WRITE | PAGE_EXEC, PAGE_EXEC, PAGE_READ | PAGE_WRITE,
+      PAGE_READ | PAGE_EXEC, PAGE_READ | PAGE_WRITE | PAGE_EXEC },
     {
         PAGE_READ,
         PAGE_READ | PAGE_WRITE,
@@ -65,8 +54,8 @@ static const int perm_table[2][8] = {
 };
 
 static int get_physical_address(CPUSPARCState *env, CPUTLBEntryFull *full,
-                                int *access_index, target_ulong address,
-                                int rw, int mmu_idx)
+                                int *access_index, target_ulong address, int rw,
+                                int mmu_idx)
 {
     int access_perms = 0;
     hwaddr pde_ptr;
@@ -112,8 +101,8 @@ static int get_physical_address(CPUSPARCState *env, CPUTLBEntryFull *full,
         return 4 << 2;
     case 1: /* L0 PDE */
         pde_ptr = ((address >> 22) & ~3) + ((pde & ~3) << 4);
-        pde = address_space_ldl(cs->as, pde_ptr,
-                                MEMTXATTRS_UNSPECIFIED, &result);
+        pde =
+            address_space_ldl(cs->as, pde_ptr, MEMTXATTRS_UNSPECIFIED, &result);
         if (result != MEMTX_OK) {
             return (1 << 8) | (4 << 2); /* Translation fault, L = 1 */
         }
@@ -126,8 +115,8 @@ static int get_physical_address(CPUSPARCState *env, CPUTLBEntryFull *full,
             return (1 << 8) | (4 << 2);
         case 1: /* L1 PDE */
             pde_ptr = ((address & 0xfc0000) >> 16) + ((pde & ~3) << 4);
-            pde = address_space_ldl(cs->as, pde_ptr,
-                                    MEMTXATTRS_UNSPECIFIED, &result);
+            pde = address_space_ldl(cs->as, pde_ptr, MEMTXATTRS_UNSPECIFIED,
+                                    &result);
             if (result != MEMTX_OK) {
                 return (2 << 8) | (4 << 2); /* Translation fault, L = 2 */
             }
@@ -140,8 +129,8 @@ static int get_physical_address(CPUSPARCState *env, CPUTLBEntryFull *full,
                 return (2 << 8) | (4 << 2);
             case 1: /* L2 PDE */
                 pde_ptr = ((address & 0x3f000) >> 10) + ((pde & ~3) << 4);
-                pde = address_space_ldl(cs->as, pde_ptr,
-                                        MEMTXATTRS_UNSPECIFIED, &result);
+                pde = address_space_ldl(cs->as, pde_ptr, MEMTXATTRS_UNSPECIFIED,
+                                        &result);
                 if (result != MEMTX_OK) {
                     return (3 << 8) | (4 << 2); /* Translation fault, L = 3 */
                 }
@@ -203,8 +192,8 @@ static int get_physical_address(CPUSPARCState *env, CPUTLBEntryFull *full,
 
 /* Perform address translation */
 bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                        MMUAccessType access_type, int mmu_idx,
-                        bool probe, uintptr_t retaddr)
+                        MMUAccessType access_type, int mmu_idx, bool probe,
+                        uintptr_t retaddr)
 {
     SPARCCPU *cpu = SPARC_CPU(cs);
     CPUSPARCState *env = &cpu->env;
@@ -221,13 +210,13 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
     assert(!probe);
 
     address &= TARGET_PAGE_MASK;
-    error_code = get_physical_address(env, &full, &access_index,
-                                      address, access_type, mmu_idx);
+    error_code = get_physical_address(env, &full, &access_index, address,
+                                      access_type, mmu_idx);
     vaddr = address;
     if (likely(error_code == 0)) {
         qemu_log_mask(CPU_LOG_MMU,
-                      "Translate at %" VADDR_PRIx " -> "
-                      HWADDR_FMT_plx ", vaddr " TARGET_FMT_lx "\n",
+                      "Translate at %" VADDR_PRIx " -> " HWADDR_FMT_plx
+                      ", vaddr " TARGET_FMT_lx "\n",
                       address, full.phys_addr, vaddr);
         tlb_set_page_full(cs, mmu_idx, vaddr, &full);
         return true;
@@ -239,7 +228,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
     env->mmuregs[3] |= (access_index << 5) | error_code | 2;
     env->mmuregs[4] = address; /* Fault address register */
 
-    if ((env->mmuregs[0] & MMU_NF) || env->psret == 0)  {
+    if ((env->mmuregs[0] & MMU_NF) || env->psret == 0) {
         /* No fault mode: if a mapping is available, just override
            permissions. If no mapping is available, redirect accesses to
            neverland. Fake/overridden mappings will be flushed when
@@ -270,8 +259,7 @@ target_ulong mmu_probe(CPUSPARCState *env, target_ulong address, int mmulev)
      */
 
     /* Context base + context number */
-    pde_ptr = (hwaddr)(env->mmuregs[1] << 4) +
-        (env->mmuregs[2] << 2);
+    pde_ptr = (hwaddr)(env->mmuregs[1] << 4) + (env->mmuregs[2] << 2);
     pde = address_space_ldl(cs->as, pde_ptr, MEMTXATTRS_UNSPECIFIED, &result);
     if (result != MEMTX_OK) {
         return 0;
@@ -288,8 +276,8 @@ target_ulong mmu_probe(CPUSPARCState *env, target_ulong address, int mmulev)
             return pde;
         }
         pde_ptr = ((address >> 22) & ~3) + ((pde & ~3) << 4);
-        pde = address_space_ldl(cs->as, pde_ptr,
-                                MEMTXATTRS_UNSPECIFIED, &result);
+        pde =
+            address_space_ldl(cs->as, pde_ptr, MEMTXATTRS_UNSPECIFIED, &result);
         if (result != MEMTX_OK) {
             return 0;
         }
@@ -306,8 +294,8 @@ target_ulong mmu_probe(CPUSPARCState *env, target_ulong address, int mmulev)
                 return pde;
             }
             pde_ptr = ((address & 0xfc0000) >> 16) + ((pde & ~3) << 4);
-            pde = address_space_ldl(cs->as, pde_ptr,
-                                    MEMTXATTRS_UNSPECIFIED, &result);
+            pde = address_space_ldl(cs->as, pde_ptr, MEMTXATTRS_UNSPECIFIED,
+                                    &result);
             if (result != MEMTX_OK) {
                 return 0;
             }
@@ -324,8 +312,8 @@ target_ulong mmu_probe(CPUSPARCState *env, target_ulong address, int mmulev)
                     return pde;
                 }
                 pde_ptr = ((address & 0x3f000) >> 10) + ((pde & ~3) << 4);
-                pde = address_space_ldl(cs->as, pde_ptr,
-                                        MEMTXATTRS_UNSPECIFIED, &result);
+                pde = address_space_ldl(cs->as, pde_ptr, MEMTXATTRS_UNSPECIFIED,
+                                        &result);
                 if (result != MEMTX_OK) {
                     return 0;
                 }
@@ -360,21 +348,22 @@ void dump_mmu(CPUSPARCState *env)
         if (pde) {
             pa = cpu_get_phys_page_debug(cs, va);
             qemu_printf("VA: " TARGET_FMT_lx ", PA: " HWADDR_FMT_plx
-                        " PDE: " TARGET_FMT_lx "\n", va, pa, pde);
+                        " PDE: " TARGET_FMT_lx "\n",
+                        va, pa, pde);
             for (m = 0, va1 = va; m < 64; m++, va1 += 256 * 1024) {
                 pde = mmu_probe(env, va1, 1);
                 if (pde) {
                     pa = cpu_get_phys_page_debug(cs, va1);
-                    qemu_printf(" VA: " TARGET_FMT_lx ", PA: "
-                                HWADDR_FMT_plx " PDE: " TARGET_FMT_lx "\n",
+                    qemu_printf(" VA: " TARGET_FMT_lx ", PA: " HWADDR_FMT_plx
+                                " PDE: " TARGET_FMT_lx "\n",
                                 va1, pa, pde);
                     for (o = 0, va2 = va1; o < 64; o++, va2 += 4 * 1024) {
                         pde = mmu_probe(env, va2, 0);
                         if (pde) {
                             pa = cpu_get_phys_page_debug(cs, va2);
-                            qemu_printf("  VA: " TARGET_FMT_lx ", PA: "
-                                        HWADDR_FMT_plx " PTE: "
-                                        TARGET_FMT_lx "\n",
+                            qemu_printf("  VA: " TARGET_FMT_lx
+                                        ", PA: " HWADDR_FMT_plx
+                                        " PTE: " TARGET_FMT_lx "\n",
                                         va2, pa, pde);
                         }
                     }
@@ -388,8 +377,8 @@ void dump_mmu(CPUSPARCState *env)
  * reads (and only reads) in stack frames as if windows were flushed. We assume
  * that the sparc ABI is followed.
  */
-int sparc_cpu_memory_rw_debug(CPUState *cs, vaddr address,
-                              uint8_t *buf, int len, bool is_write)
+int sparc_cpu_memory_rw_debug(CPUState *cs, vaddr address, uint8_t *buf,
+                              int len, bool is_write)
 {
     SPARCCPU *cpu = SPARC_CPU(cs);
     CPUSPARCState *env = &cpu->env;
@@ -482,16 +471,15 @@ static inline hwaddr ultrasparc_truncate_physical(uint64_t x)
 /* Returns true if TTE tag is valid and matches virtual address value
    in context requires virtual address mask value calculated from TTE
    entry size */
-static inline int ultrasparc_tag_match(SparcTLBEntry *tlb,
-                                       uint64_t address, uint64_t context,
-                                       hwaddr *physical)
+static inline int ultrasparc_tag_match(SparcTLBEntry *tlb, uint64_t address,
+                                       uint64_t context, hwaddr *physical)
 {
     uint64_t mask = -(8192ULL << 3 * TTE_PGSIZE(tlb->tte));
 
     /* valid, context match, virtual address match? */
     if (TTE_IS_VALID(tlb->tte) &&
-        (TTE_IS_GLOBAL(tlb->tte) || tlb_compare_context(tlb, context))
-        && compare_masked(address, tlb->tag, mask)) {
+        (TTE_IS_GLOBAL(tlb->tte) || tlb_compare_context(tlb, context)) &&
+        compare_masked(address, tlb->tag, mask)) {
         /* decode physical address */
         *physical = ((tlb->tte & mask) | (address & ~mask)) & 0x1ffffffe000ULL;
         return 1;
@@ -676,8 +664,8 @@ static int get_physical_address_code(CPUSPARCState *env, CPUTLBEntryFull *full,
 
     for (i = 0; i < 64; i++) {
         /* ctx match, vaddr match, valid? */
-        if (ultrasparc_tag_match(&env->itlb[i],
-                                 address, context, &full->phys_addr)) {
+        if (ultrasparc_tag_match(&env->itlb[i], address, context,
+                                 &full->phys_addr)) {
             /* access ok? */
             if (TTE_IS_PRIV(env->itlb[i].tte) && is_user) {
                 /* Fault status register */
@@ -719,8 +707,8 @@ static int get_physical_address_code(CPUSPARCState *env, CPUTLBEntryFull *full,
 }
 
 static int get_physical_address(CPUSPARCState *env, CPUTLBEntryFull *full,
-                                int *access_index, target_ulong address,
-                                int rw, int mmu_idx)
+                                int *access_index, target_ulong address, int rw,
+                                int mmu_idx)
 {
     /* ??? We treat everything as a small page, then explicitly flush
        everything when an entry is evicted.  */
@@ -729,15 +717,13 @@ static int get_physical_address(CPUSPARCState *env, CPUTLBEntryFull *full,
     /* safety net to catch wrong softmmu index use from dynamic code */
     if (env->tl > 0 && mmu_idx != MMU_NUCLEUS_IDX) {
         if (rw == 2) {
-            trace_mmu_helper_get_phys_addr_code(env->tl, mmu_idx,
-                                                env->dmmu.mmu_primary_context,
-                                                env->dmmu.mmu_secondary_context,
-                                                address);
+            trace_mmu_helper_get_phys_addr_code(
+                env->tl, mmu_idx, env->dmmu.mmu_primary_context,
+                env->dmmu.mmu_secondary_context, address);
         } else {
-            trace_mmu_helper_get_phys_addr_data(env->tl, mmu_idx,
-                                                env->dmmu.mmu_primary_context,
-                                                env->dmmu.mmu_secondary_context,
-                                                address);
+            trace_mmu_helper_get_phys_addr_data(
+                env->tl, mmu_idx, env->dmmu.mmu_primary_context,
+                env->dmmu.mmu_secondary_context, address);
         }
     }
 
@@ -756,8 +742,8 @@ static int get_physical_address(CPUSPARCState *env, CPUTLBEntryFull *full,
 
 /* Perform address translation */
 bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                        MMUAccessType access_type, int mmu_idx,
-                        bool probe, uintptr_t retaddr)
+                        MMUAccessType access_type, int mmu_idx, bool probe,
+                        uintptr_t retaddr)
 {
     SPARCCPU *cpu = SPARC_CPU(cs);
     CPUSPARCState *env = &cpu->env;
@@ -765,8 +751,8 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
     int error_code = 0, access_index;
 
     address &= TARGET_PAGE_MASK;
-    error_code = get_physical_address(env, &full, &access_index,
-                                      address, access_type, mmu_idx);
+    error_code = get_physical_address(env, &full, &access_index, address,
+                                      access_type, mmu_idx);
     if (likely(error_code == 0)) {
         trace_mmu_helper_mmu_fault(address, full.phys_addr, mmu_idx, env->tl,
                                    env->dmmu.mmu_primary_context,
@@ -785,12 +771,10 @@ void dump_mmu(CPUSPARCState *env)
     unsigned int i;
     const char *mask;
 
-    qemu_printf("MMU contexts: Primary: %" PRId64 ", Secondary: %"
-                PRId64 "\n",
-                env->dmmu.mmu_primary_context,
-                env->dmmu.mmu_secondary_context);
-    qemu_printf("DMMU Tag Access: %" PRIx64 ", TSB Tag Target: %" PRIx64
-                "\n", env->dmmu.tag_access, env->dmmu.tsb_tag_target);
+    qemu_printf("MMU contexts: Primary: %" PRId64 ", Secondary: %" PRId64 "\n",
+                env->dmmu.mmu_primary_context, env->dmmu.mmu_secondary_context);
+    qemu_printf("DMMU Tag Access: %" PRIx64 ", TSB Tag Target: %" PRIx64 "\n",
+                env->dmmu.tag_access, env->dmmu.tsb_tag_target);
     if ((env->lsu & DMMU_E) == 0) {
         qemu_printf("DMMU disabled\n");
     } else {
@@ -812,21 +796,17 @@ void dump_mmu(CPUSPARCState *env)
                 break;
             }
             if (TTE_IS_VALID(env->dtlb[i].tte)) {
-                qemu_printf("[%02u] VA: %" PRIx64 ", PA: %llx"
-                            ", %s, %s, %s, %s, ie %s, ctx %" PRId64 " %s\n",
-                            i,
-                            env->dtlb[i].tag & (uint64_t)~0x1fffULL,
-                            TTE_PA(env->dtlb[i].tte),
-                            mask,
-                            TTE_IS_PRIV(env->dtlb[i].tte) ? "priv" : "user",
-                            TTE_IS_W_OK(env->dtlb[i].tte) ? "RW" : "RO",
-                            TTE_IS_LOCKED(env->dtlb[i].tte) ?
-                            "locked" : "unlocked",
-                            TTE_IS_IE(env->dtlb[i].tte) ?
-                            "yes" : "no",
-                            env->dtlb[i].tag & (uint64_t)0x1fffULL,
-                            TTE_IS_GLOBAL(env->dtlb[i].tte) ?
-                            "global" : "local");
+                qemu_printf(
+                    "[%02u] VA: %" PRIx64 ", PA: %llx"
+                    ", %s, %s, %s, %s, ie %s, ctx %" PRId64 " %s\n",
+                    i, env->dtlb[i].tag & (uint64_t)~0x1fffULL,
+                    TTE_PA(env->dtlb[i].tte), mask,
+                    TTE_IS_PRIV(env->dtlb[i].tte) ? "priv" : "user",
+                    TTE_IS_W_OK(env->dtlb[i].tte) ? "RW" : "RO",
+                    TTE_IS_LOCKED(env->dtlb[i].tte) ? "locked" : "unlocked",
+                    TTE_IS_IE(env->dtlb[i].tte) ? "yes" : "no",
+                    env->dtlb[i].tag & (uint64_t)0x1fffULL,
+                    TTE_IS_GLOBAL(env->dtlb[i].tte) ? "global" : "local");
             }
         }
     }
@@ -851,18 +831,15 @@ void dump_mmu(CPUSPARCState *env)
                 break;
             }
             if (TTE_IS_VALID(env->itlb[i].tte)) {
-                qemu_printf("[%02u] VA: %" PRIx64 ", PA: %llx"
-                            ", %s, %s, %s, ctx %" PRId64 " %s\n",
-                            i,
-                            env->itlb[i].tag & (uint64_t)~0x1fffULL,
-                            TTE_PA(env->itlb[i].tte),
-                            mask,
-                            TTE_IS_PRIV(env->itlb[i].tte) ? "priv" : "user",
-                            TTE_IS_LOCKED(env->itlb[i].tte) ?
-                            "locked" : "unlocked",
-                            env->itlb[i].tag & (uint64_t)0x1fffULL,
-                            TTE_IS_GLOBAL(env->itlb[i].tte) ?
-                            "global" : "local");
+                qemu_printf(
+                    "[%02u] VA: %" PRIx64 ", PA: %llx"
+                    ", %s, %s, %s, ctx %" PRId64 " %s\n",
+                    i, env->itlb[i].tag & (uint64_t)~0x1fffULL,
+                    TTE_PA(env->itlb[i].tte), mask,
+                    TTE_IS_PRIV(env->itlb[i].tte) ? "priv" : "user",
+                    TTE_IS_LOCKED(env->itlb[i].tte) ? "locked" : "unlocked",
+                    env->itlb[i].tag & (uint64_t)0x1fffULL,
+                    TTE_IS_GLOBAL(env->itlb[i].tte) ? "global" : "local");
             }
         }
     }
@@ -885,7 +862,7 @@ static int cpu_sparc_get_phys_page(CPUSPARCState *env, hwaddr *phys,
 
 #if defined(TARGET_SPARC64)
 hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
-                                           int mmu_idx)
+                                 int mmu_idx)
 {
     hwaddr phys_addr;
 
@@ -913,8 +890,7 @@ hwaddr sparc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
 
 G_NORETURN void sparc_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
                                               MMUAccessType access_type,
-                                              int mmu_idx,
-                                              uintptr_t retaddr)
+                                              int mmu_idx, uintptr_t retaddr)
 {
     SPARCCPU *cpu = SPARC_CPU(cs);
     CPUSPARCState *env = &cpu->env;

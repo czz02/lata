@@ -18,102 +18,102 @@
 #endif
 #include "cpu-csr.h"
 
-#define IOCSRF_TEMP             0
-#define IOCSRF_NODECNT          1
-#define IOCSRF_MSI              2
-#define IOCSRF_EXTIOI           3
-#define IOCSRF_CSRIPI           4
-#define IOCSRF_FREQCSR          5
-#define IOCSRF_FREQSCALE        6
-#define IOCSRF_DVFSV1           7
-#define IOCSRF_GMOD             9
-#define IOCSRF_VM               11
+#define IOCSRF_TEMP 0
+#define IOCSRF_NODECNT 1
+#define IOCSRF_MSI 2
+#define IOCSRF_EXTIOI 3
+#define IOCSRF_CSRIPI 4
+#define IOCSRF_FREQCSR 5
+#define IOCSRF_FREQSCALE 6
+#define IOCSRF_DVFSV1 7
+#define IOCSRF_GMOD 9
+#define IOCSRF_VM 11
 
-#define VERSION_REG             0x0
-#define FEATURE_REG             0x8
-#define VENDOR_REG              0x10
-#define CPUNAME_REG             0x20
-#define MISC_FUNC_REG           0x420
-#define IOCSRM_EXTIOI_EN        48
+#define VERSION_REG 0x0
+#define FEATURE_REG 0x8
+#define VENDOR_REG 0x10
+#define CPUNAME_REG 0x20
+#define MISC_FUNC_REG 0x420
+#define IOCSRM_EXTIOI_EN 48
 
-#define IOCSR_MEM_SIZE          0x428
+#define IOCSR_MEM_SIZE 0x428
 
 #define TCG_GUEST_DEFAULT_MO (0)
 
-#define FCSR0_M1    0x1f         /* FCSR1 mask, Enables */
-#define FCSR0_M2    0x1f1f0000   /* FCSR2 mask, Cause and Flags */
-#define FCSR0_M3    0x300        /* FCSR3 mask, Round Mode */
-#define FCSR0_RM    8            /* Round Mode bit num on fcsr0 */
+#define FCSR0_M1 0x1f /* FCSR1 mask, Enables */
+#define FCSR0_M2 0x1f1f0000 /* FCSR2 mask, Cause and Flags */
+#define FCSR0_M3 0x300 /* FCSR3 mask, Round Mode */
+#define FCSR0_RM 8 /* Round Mode bit num on fcsr0 */
 
 FIELD(FCSR0, ENABLES, 0, 5)
 FIELD(FCSR0, RM, 8, 2)
 FIELD(FCSR0, FLAGS, 16, 5)
 FIELD(FCSR0, CAUSE, 24, 5)
 
-#define GET_FP_CAUSE(REG)      FIELD_EX32(REG, FCSR0, CAUSE)
-#define SET_FP_CAUSE(REG, V) \
-    do { \
+#define GET_FP_CAUSE(REG) FIELD_EX32(REG, FCSR0, CAUSE)
+#define SET_FP_CAUSE(REG, V)                      \
+    do {                                          \
         (REG) = FIELD_DP32(REG, FCSR0, CAUSE, V); \
     } while (0)
-#define UPDATE_FP_CAUSE(REG, V) \
-    do { \
+#define UPDATE_FP_CAUSE(REG, V)                  \
+    do {                                         \
         (REG) |= FIELD_DP32(0, FCSR0, CAUSE, V); \
     } while (0)
 
-#define GET_FP_ENABLES(REG)    FIELD_EX32(REG, FCSR0, ENABLES)
-#define SET_FP_ENABLES(REG, V) \
-    do { \
+#define GET_FP_ENABLES(REG) FIELD_EX32(REG, FCSR0, ENABLES)
+#define SET_FP_ENABLES(REG, V)                      \
+    do {                                            \
         (REG) = FIELD_DP32(REG, FCSR0, ENABLES, V); \
     } while (0)
 
-#define GET_FP_FLAGS(REG)      FIELD_EX32(REG, FCSR0, FLAGS)
-#define SET_FP_FLAGS(REG, V) \
-    do { \
+#define GET_FP_FLAGS(REG) FIELD_EX32(REG, FCSR0, FLAGS)
+#define SET_FP_FLAGS(REG, V)                      \
+    do {                                          \
         (REG) = FIELD_DP32(REG, FCSR0, FLAGS, V); \
     } while (0)
 
-#define UPDATE_FP_FLAGS(REG, V) \
-    do { \
+#define UPDATE_FP_FLAGS(REG, V)                  \
+    do {                                         \
         (REG) |= FIELD_DP32(0, FCSR0, FLAGS, V); \
     } while (0)
 
-#define FP_INEXACT        1
-#define FP_UNDERFLOW      2
-#define FP_OVERFLOW       4
-#define FP_DIV0           8
-#define FP_INVALID        16
+#define FP_INEXACT 1
+#define FP_UNDERFLOW 2
+#define FP_OVERFLOW 4
+#define FP_DIV0 8
+#define FP_INVALID 16
 
-#define EXCODE(code, subcode) ( ((subcode) << 6) | (code) )
-#define EXCODE_MCODE(code)    ( (code) & 0x3f )
-#define EXCODE_SUBCODE(code)  ( (code) >> 6 )
+#define EXCODE(code, subcode) (((subcode) << 6) | (code))
+#define EXCODE_MCODE(code) ((code) & 0x3f)
+#define EXCODE_SUBCODE(code) ((code) >> 6)
 
-#define  EXCCODE_EXTERNAL_INT        64   /* plus external interrupt number */
-#define  EXCCODE_INT                 EXCODE(0, 0)
-#define  EXCCODE_PIL                 EXCODE(1, 0)
-#define  EXCCODE_PIS                 EXCODE(2, 0)
-#define  EXCCODE_PIF                 EXCODE(3, 0)
-#define  EXCCODE_PME                 EXCODE(4, 0)
-#define  EXCCODE_PNR                 EXCODE(5, 0)
-#define  EXCCODE_PNX                 EXCODE(6, 0)
-#define  EXCCODE_PPI                 EXCODE(7, 0)
-#define  EXCCODE_ADEF                EXCODE(8, 0) /* Different exception subcode */
-#define  EXCCODE_ADEM                EXCODE(8, 1)
-#define  EXCCODE_ALE                 EXCODE(9, 0)
-#define  EXCCODE_BCE                 EXCODE(10, 0)
-#define  EXCCODE_SYS                 EXCODE(11, 0)
-#define  EXCCODE_BRK                 EXCODE(12, 0)
-#define  EXCCODE_INE                 EXCODE(13, 0)
-#define  EXCCODE_IPE                 EXCODE(14, 0)
-#define  EXCCODE_FPD                 EXCODE(15, 0)
-#define  EXCCODE_SXD                 EXCODE(16, 0)
-#define  EXCCODE_ASXD                EXCODE(17, 0)
-#define  EXCCODE_FPE                 EXCODE(18, 0) /* Different exception subcode */
-#define  EXCCODE_VFPE                EXCODE(18, 1)
-#define  EXCCODE_WPEF                EXCODE(19, 0) /* Different exception subcode */
-#define  EXCCODE_WPEM                EXCODE(19, 1)
-#define  EXCCODE_BTD                 EXCODE(20, 0)
-#define  EXCCODE_BTE                 EXCODE(21, 0)
-#define  EXCCODE_DBP                 EXCODE(26, 0) /* Reserved subcode used for debug */
+#define EXCCODE_EXTERNAL_INT 64 /* plus external interrupt number */
+#define EXCCODE_INT EXCODE(0, 0)
+#define EXCCODE_PIL EXCODE(1, 0)
+#define EXCCODE_PIS EXCODE(2, 0)
+#define EXCCODE_PIF EXCODE(3, 0)
+#define EXCCODE_PME EXCODE(4, 0)
+#define EXCCODE_PNR EXCODE(5, 0)
+#define EXCCODE_PNX EXCODE(6, 0)
+#define EXCCODE_PPI EXCODE(7, 0)
+#define EXCCODE_ADEF EXCODE(8, 0) /* Different exception subcode */
+#define EXCCODE_ADEM EXCODE(8, 1)
+#define EXCCODE_ALE EXCODE(9, 0)
+#define EXCCODE_BCE EXCODE(10, 0)
+#define EXCCODE_SYS EXCODE(11, 0)
+#define EXCCODE_BRK EXCODE(12, 0)
+#define EXCCODE_INE EXCODE(13, 0)
+#define EXCCODE_IPE EXCODE(14, 0)
+#define EXCCODE_FPD EXCODE(15, 0)
+#define EXCCODE_SXD EXCODE(16, 0)
+#define EXCCODE_ASXD EXCODE(17, 0)
+#define EXCCODE_FPE EXCODE(18, 0) /* Different exception subcode */
+#define EXCCODE_VFPE EXCODE(18, 1)
+#define EXCCODE_WPEF EXCODE(19, 0) /* Different exception subcode */
+#define EXCCODE_WPEM EXCODE(19, 1)
+#define EXCCODE_BTD EXCODE(20, 0)
+#define EXCCODE_BTE EXCODE(21, 0)
+#define EXCCODE_DBP EXCODE(26, 0) /* Reserved subcode used for debug */
 
 /* cpucfg[0] bits */
 FIELD(CPUCFG0, PRID, 0, 32)
@@ -227,16 +227,16 @@ FIELD(CSR_CRMD, DATF, 5, 2)
 FIELD(CSR_CRMD, DATM, 7, 2)
 FIELD(CSR_CRMD, WE, 9, 1)
 
-extern const char * const regnames[32];
-extern const char * const fregnames[32];
+extern const char *const regnames[32];
+extern const char *const fregnames[32];
 
-#define N_IRQS      13
-#define IRQ_TIMER   11
-#define IRQ_IPI     12
+#define N_IRQS 13
+#define IRQ_TIMER 11
+#define IRQ_IPI 12
 
-#define LOONGARCH_STLB         2048 /* 2048 STLB */
-#define LOONGARCH_MTLB         64   /* 64 MTLB */
-#define LOONGARCH_TLB_MAX      (LOONGARCH_STLB + LOONGARCH_MTLB)
+#define LOONGARCH_STLB 2048 /* 2048 STLB */
+#define LOONGARCH_MTLB 64 /* 64 MTLB */
+#define LOONGARCH_TLB_MAX (LOONGARCH_STLB + LOONGARCH_MTLB)
 
 /*
  * define the ASID PS E VPPN field of TLB
@@ -246,22 +246,22 @@ FIELD(TLB_MISC, ASID, 1, 10)
 FIELD(TLB_MISC, VPPN, 13, 35)
 FIELD(TLB_MISC, PS, 48, 6)
 
-#define LSX_LEN   (128)
+#define LSX_LEN (128)
 typedef union VReg {
-    int8_t   B[LSX_LEN / 8];
-    int16_t  H[LSX_LEN / 16];
-    int32_t  W[LSX_LEN / 32];
-    int64_t  D[LSX_LEN / 64];
-    uint8_t  UB[LSX_LEN / 8];
+    int8_t B[LSX_LEN / 8];
+    int16_t H[LSX_LEN / 16];
+    int32_t W[LSX_LEN / 32];
+    int64_t D[LSX_LEN / 64];
+    uint8_t UB[LSX_LEN / 8];
     uint16_t UH[LSX_LEN / 16];
     uint32_t UW[LSX_LEN / 32];
     uint64_t UD[LSX_LEN / 64];
-    Int128   Q[LSX_LEN / 128];
-}VReg;
+    Int128 Q[LSX_LEN / 128];
+} VReg;
 
 typedef union fpr_t fpr_t;
 union fpr_t {
-    VReg  vreg;
+    VReg vreg;
 };
 
 struct LoongArchTLB {
@@ -345,7 +345,7 @@ typedef struct CPUArchState {
     uint64_t CSR_CPUID;
 
 #ifndef CONFIG_USER_ONLY
-    LoongArchTLB  tlb[LOONGARCH_TLB_MAX];
+    LoongArchTLB tlb[LOONGARCH_TLB_MAX];
 
     AddressSpace address_space_iocsr;
     MemoryRegion system_iocsr;
@@ -378,8 +378,7 @@ struct ArchCPU {
 
 #define TYPE_LOONGARCH_CPU "loongarch-cpu"
 
-OBJECT_DECLARE_CPU_TYPE(LoongArchCPU, LoongArchCPUClass,
-                        LOONGARCH_CPU)
+OBJECT_DECLARE_CPU_TYPE(LoongArchCPU, LoongArchCPUClass, LOONGARCH_CPU)
 
 /**
  * LoongArchCPUClass:
@@ -402,11 +401,11 @@ struct LoongArchCPUClass {
  * 0 for kernel mode, 3 for user mode.
  * Define an extra index for DA(direct addressing) mode.
  */
-#define MMU_PLV_KERNEL   0
-#define MMU_PLV_USER     3
-#define MMU_IDX_KERNEL   MMU_PLV_KERNEL
-#define MMU_IDX_USER     MMU_PLV_USER
-#define MMU_IDX_DA       4
+#define MMU_PLV_KERNEL 0
+#define MMU_PLV_USER 3
+#define MMU_IDX_KERNEL MMU_PLV_KERNEL
+#define MMU_IDX_USER MMU_PLV_USER
+#define MMU_IDX_DA 4
 
 static inline int cpu_mmu_index(CPULoongArchState *env, bool ifetch)
 {
@@ -423,10 +422,10 @@ static inline int cpu_mmu_index(CPULoongArchState *env, bool ifetch)
 /*
  * LoongArch CPUs hardware flags.
  */
-#define HW_FLAGS_PLV_MASK   R_CSR_CRMD_PLV_MASK  /* 0x03 */
-#define HW_FLAGS_CRMD_PG    R_CSR_CRMD_PG_MASK   /* 0x10 */
-#define HW_FLAGS_EUEN_FPE   0x04
-#define HW_FLAGS_EUEN_SXE   0x08
+#define HW_FLAGS_PLV_MASK R_CSR_CRMD_PLV_MASK /* 0x03 */
+#define HW_FLAGS_CRMD_PG R_CSR_CRMD_PG_MASK /* 0x10 */
+#define HW_FLAGS_EUEN_FPE 0x04
+#define HW_FLAGS_EUEN_SXE 0x08
 
 static inline void cpu_get_tb_cpu_state(CPULoongArchState *env, vaddr *pc,
                                         uint64_t *cs_base, uint32_t *flags)

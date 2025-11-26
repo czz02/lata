@@ -27,26 +27,26 @@
 #include "helper-tcg.h"
 
 /* float macros */
-#define FT0    (env->ft0)
-#define ST0    (env->fpregs[env->fpstt].d)
-#define ST(n)  (env->fpregs[(env->fpstt + (n)) & 7].d)
-#define ST1    ST(1)
+#define FT0 (env->ft0)
+#define ST0 (env->fpregs[env->fpstt].d)
+#define ST(n) (env->fpregs[(env->fpstt + (n)) & 7].d)
+#define ST1 ST(1)
 
-#define FPU_RC_SHIFT        10
-#define FPU_RC_MASK         (3 << FPU_RC_SHIFT)
-#define FPU_RC_NEAR         0x000
-#define FPU_RC_DOWN         0x400
-#define FPU_RC_UP           0x800
-#define FPU_RC_CHOP         0xc00
+#define FPU_RC_SHIFT 10
+#define FPU_RC_MASK (3 << FPU_RC_SHIFT)
+#define FPU_RC_NEAR 0x000
+#define FPU_RC_DOWN 0x400
+#define FPU_RC_UP 0x800
+#define FPU_RC_CHOP 0xc00
 
 #define MAXTAN 9223372036854775808.0
 
 /* the following deal with x86 long double-precision numbers */
 #define MAXEXPD 0x7fff
 #define EXPBIAS 16383
-#define EXPD(fp)        (fp.l.upper & 0x7fff)
-#define SIGND(fp)       ((fp.l.upper) & 0x8000)
-#define MANTD(fp)       (fp.l.lower)
+#define EXPD(fp) (fp.l.upper & 0x7fff)
+#define SIGND(fp) ((fp.l.upper) & 0x8000)
+#define MANTD(fp) (fp.l.lower)
 #define BIASEXPONENT(fp) fp.l.upper = (fp.l.upper & ~(0x7fff)) | EXPBIAS
 
 #define FPUS_IE (1 << 0)
@@ -57,7 +57,7 @@
 #define FPUS_PE (1 << 5)
 #define FPUS_SF (1 << 6)
 #define FPUS_SE (1 << 7)
-#define FPUS_B  (1 << 15)
+#define FPUS_B (1 << 15)
 
 #define FPUC_EM 0x3f
 
@@ -452,7 +452,7 @@ void helper_fxchg_ST0_STN(CPUX86State *env, int st_index)
 
 /* FPU operations */
 
-static const int fcom_ccval[4] = {0x0100, 0x4000, 0x0000, 0x4500};
+static const int fcom_ccval[4] = { 0x0100, 0x4000, 0x0000, 0x4500 };
 
 void helper_fcom_ST0_FT0(CPUX86State *env)
 {
@@ -474,7 +474,7 @@ void helper_fucom_ST0_FT0(CPUX86State *env)
     merge_exception_flags(env, old_flags);
 }
 
-static const int fcomi_ccval[4] = {CC_C, CC_Z, 0, CC_Z | CC_P | CC_C};
+static const int fcomi_ccval[4] = { CC_C, CC_Z, 0, CC_Z | CC_P | CC_C };
 
 void helper_fcomi_ST0_FT0(CPUX86State *env)
 {
@@ -688,12 +688,10 @@ uint32_t helper_fnstcw(CPUX86State *env)
 
 static void set_x86_rounding_mode(unsigned mode, float_status *status)
 {
-    static FloatRoundMode x86_round_mode[4] = {
-        float_round_nearest_even,
-        float_round_down,
-        float_round_up,
-        float_round_to_zero
-    };
+    static FloatRoundMode x86_round_mode[4] = { float_round_nearest_even,
+                                                float_round_down,
+                                                float_round_up,
+                                                float_round_to_zero };
     assert(mode < ARRAY_SIZE(x86_round_mode));
     set_float_rounding_mode(x86_round_mode[mode], status);
 }
@@ -957,8 +955,7 @@ static const struct f2xm1_data f2xm1_table[65] = {
     { make_floatx80_init(0xbff9, 0xffffffffffff11feULL),
       make_floatx80_init(0x3ffe, 0xfa83b2db722a0846ULL),
       make_floatx80_init(0xbff9, 0xaf89a491babef740ULL) },
-    { floatx80_zero_init,
-      make_floatx80_init(0x3fff, 0x8000000000000000ULL),
+    { floatx80_zero_init, make_floatx80_init(0x3fff, 0x8000000000000000ULL),
       floatx80_zero_init },
     { make_floatx80_init(0x3ff9, 0xffffffffffff2680ULL),
       make_floatx80_init(0x3fff, 0x82cd8698ac2b9f6fULL),
@@ -1098,9 +1095,8 @@ void helper_f2xm1(CPUX86State *env)
                             &sig2);
             /* This result is inexact.  */
             sig1 |= 1;
-            ST0 = normalizeRoundAndPackFloatx80(floatx80_precision_x,
-                                                sign, exp, sig0, sig1,
-                                                &env->fp_status);
+            ST0 = normalizeRoundAndPackFloatx80(floatx80_precision_x, sign, exp,
+                                                sig0, sig1, &env->fp_status);
         }
     } else {
         floatx80 tmp, y, accum;
@@ -1157,8 +1153,8 @@ void helper_f2xm1(CPUX86State *env)
             aexp = extractFloatx80Exp(f2xm1_coeff_0);
             asign = extractFloatx80Sign(f2xm1_coeff_0);
             shift128RightJamming(extractFloatx80Frac(accum), 0,
-                                 aexp - extractFloatx80Exp(accum),
-                                 &asig0, &asig1);
+                                 aexp - extractFloatx80Exp(accum), &asig0,
+                                 &asig1);
             bsig0 = extractFloatx80Frac(f2xm1_coeff_0);
             bsig1 = 0;
             if (asign == extractFloatx80Sign(accum)) {
@@ -1167,8 +1163,8 @@ void helper_f2xm1(CPUX86State *env)
                 sub128(bsig0, bsig1, asig0, asig1, &asig0, &asig1);
             }
             /* And thus compute an approximation to 2^y - 1.  */
-            mul128By64To192(asig0, asig1, extractFloatx80Frac(y),
-                            &asig0, &asig1, &asig2);
+            mul128By64To192(asig0, asig1, extractFloatx80Frac(y), &asig0,
+                            &asig1, &asig2);
             aexp += extractFloatx80Exp(y) - 0x3ffe;
             asign ^= extractFloatx80Sign(y);
             if (n != 32) {
@@ -1184,21 +1180,19 @@ void helper_f2xm1(CPUX86State *env)
                 bsig0 = extractFloatx80Frac(f2xm1_table[n].exp2m1);
                 bsig1 = 0;
                 if (bexp < aexp) {
-                    shift128RightJamming(bsig0, bsig1, aexp - bexp,
-                                         &bsig0, &bsig1);
+                    shift128RightJamming(bsig0, bsig1, aexp - bexp, &bsig0,
+                                         &bsig1);
                 } else if (aexp < bexp) {
-                    shift128RightJamming(asig0, asig1, bexp - aexp,
-                                         &asig0, &asig1);
+                    shift128RightJamming(asig0, asig1, bexp - aexp, &asig0,
+                                         &asig1);
                     aexp = bexp;
                 }
                 /* The sign of 2^t - 1 is always that of the result.  */
                 bsign = extractFloatx80Sign(f2xm1_table[n].exp2m1);
                 if (asign == bsign) {
                     /* Avoid possible carry out of the addition.  */
-                    shift128RightJamming(asig0, asig1, 1,
-                                         &asig0, &asig1);
-                    shift128RightJamming(bsig0, bsig1, 1,
-                                         &bsig0, &bsig1);
+                    shift128RightJamming(asig0, asig1, 1, &asig0, &asig1);
+                    shift128RightJamming(bsig0, bsig1, 1, &bsig0, &bsig1);
                     ++aexp;
                     add128(asig0, asig1, bsig0, bsig1, &asig0, &asig1);
                 } else {
@@ -1209,9 +1203,9 @@ void helper_f2xm1(CPUX86State *env)
             env->fp_status.float_rounding_mode = save_mode;
             /* This result is inexact.  */
             asig1 |= 1;
-            ST0 = normalizeRoundAndPackFloatx80(floatx80_precision_x,
-                                                asign, aexp, asig0, asig1,
-                                                &env->fp_status);
+            ST0 =
+                normalizeRoundAndPackFloatx80(floatx80_precision_x, asign, aexp,
+                                              asig0, asig1, &env->fp_status);
         }
 
         env->fp_status.floatx80_rounding_precision = save_prec;
@@ -1271,8 +1265,7 @@ struct fpatan_data {
 };
 
 static const struct fpatan_data fpatan_table[9] = {
-    { floatx80_zero_init,
-      floatx80_zero_init },
+    { floatx80_zero_init, floatx80_zero_init },
     { make_floatx80_init(0x3ffb, 0xfeadd4d5617b6e33ULL),
       make_floatx80_init(0xbfb9, 0xdda19d8305ddc420ULL) },
     { make_floatx80_init(0x3ffc, 0xfadbafc96406eb15ULL),
@@ -1318,7 +1311,7 @@ void helper_fpatan(CPUX86State *env)
     } else if (floatx80_is_zero(ST1) && !arg0_sign) {
         /* Pass this zero through.  */
     } else if (((floatx80_is_infinity(ST0) && !floatx80_is_infinity(ST1)) ||
-                 arg0_exp - arg1_exp >= 80) &&
+                arg0_exp - arg1_exp >= 80) &&
                !arg0_sign) {
         /*
          * Dividing ST1 by ST0 gives the correct result up to
@@ -1349,9 +1342,8 @@ void helper_fpatan(CPUX86State *env)
             if (exp == 0) {
                 normalizeFloatx80Subnormal(sig, &exp, &sig);
             }
-            ST1 = normalizeRoundAndPackFloatx80(floatx80_precision_x,
-                                                sign, exp, sig - 1,
-                                                -1, &env->fp_status);
+            ST1 = normalizeRoundAndPackFloatx80(floatx80_precision_x, sign, exp,
+                                                sig - 1, -1, &env->fp_status);
         }
     } else {
         /* The result is inexact.  */
@@ -1464,7 +1456,7 @@ void helper_fpatan(CPUX86State *env)
             xsig0 = estimateDiv128To64(remsig0, remsig1, den_sig);
             mul64To128(den_sig, xsig0, &msig0, &msig1);
             sub128(remsig0, remsig1, msig0, msig1, &remsig0, &remsig1);
-            while ((int64_t) remsig0 < 0) {
+            while ((int64_t)remsig0 < 0) {
                 --xsig0;
                 add128(remsig0, remsig1, 0, den_sig, &remsig0, &remsig1);
             }
@@ -1478,9 +1470,9 @@ void helper_fpatan(CPUX86State *env)
              * Split x as x = t + y, where t = n/8 is the nearest
              * multiple of 1/8 to x.
              */
-            x8 = normalizeRoundAndPackFloatx80(floatx80_precision_x,
-                                               false, xexp + 3, xsig0,
-                                               xsig1, &env->fp_status);
+            x8 = normalizeRoundAndPackFloatx80(floatx80_precision_x, false,
+                                               xexp + 3, xsig0, xsig1,
+                                               &env->fp_status);
             n = floatx80_to_int32(x8, &env->fp_status);
             if (n == 0) {
                 ysign = false;
@@ -1496,7 +1488,7 @@ void helper_fpatan(CPUX86State *env)
                 tsig <<= shift;
                 if (texp == xexp) {
                     sub128(xsig0, xsig1, tsig, 0, &ysig0, &ysig1);
-                    if ((int64_t) ysig0 >= 0) {
+                    if ((int64_t)ysig0 >= 0) {
                         ysign = false;
                         if (ysig0 == 0) {
                             if (ysig1 == 0) {
@@ -1504,8 +1496,8 @@ void helper_fpatan(CPUX86State *env)
                             } else {
                                 shift = clz64(ysig1) + 64;
                                 yexp = xexp - shift;
-                                shift128Left(ysig0, ysig1, shift,
-                                             &ysig0, &ysig1);
+                                shift128Left(ysig0, ysig1, shift, &ysig0,
+                                             &ysig1);
                             }
                         } else {
                             shift = clz64(ysig0);
@@ -1532,8 +1524,8 @@ void helper_fpatan(CPUX86State *env)
                      * 1/8.
                      */
                     uint64_t usig0, usig1;
-                    shift128RightJamming(xsig0, xsig1, texp - xexp,
-                                         &usig0, &usig1);
+                    shift128RightJamming(xsig0, xsig1, texp - xexp, &usig0,
+                                         &usig1);
                     ysign = true;
                     sub128(tsig, 0, usig0, usig1, &ysig0, &ysig1);
                     if (ysig0 == 0) {
@@ -1566,8 +1558,8 @@ void helper_fpatan(CPUX86State *env)
                  * dexp <= 0x3fff (and if equal, dsig0 has a leading 0
                  * bit).  Add 1 to produce the denominator 1+tx.
                  */
-                shift128RightJamming(dsig0, dsig1, 0x3fff - dexp,
-                                     &dsig0, &dsig1);
+                shift128RightJamming(dsig0, dsig1, 0x3fff - dexp, &dsig0,
+                                     &dsig1);
                 dsig0 |= 0x8000000000000000ULL;
                 zexp = yexp - 1;
                 remsig0 = ysig0;
@@ -1579,12 +1571,12 @@ void helper_fpatan(CPUX86State *env)
                 }
                 zsig0 = estimateDiv128To64(remsig0, remsig1, dsig0);
                 mul128By64To192(dsig0, dsig1, zsig0, &msig0, &msig1, &msig2);
-                sub192(remsig0, remsig1, remsig2, msig0, msig1, msig2,
-                       &remsig0, &remsig1, &remsig2);
-                while ((int64_t) remsig0 < 0) {
+                sub192(remsig0, remsig1, remsig2, msig0, msig1, msig2, &remsig0,
+                       &remsig1, &remsig2);
+                while ((int64_t)remsig0 < 0) {
                     --zsig0;
-                    add192(remsig0, remsig1, remsig2, 0, dsig0, dsig1,
-                           &remsig0, &remsig1, &remsig2);
+                    add192(remsig0, remsig1, remsig2, 0, dsig0, dsig1, &remsig0,
+                           &remsig1, &remsig2);
                 }
                 zsig1 = estimateDiv128To64(remsig1, remsig2, dsig0);
                 /* No need to correct any estimation error in zsig1.  */
@@ -1598,12 +1590,11 @@ void helper_fpatan(CPUX86State *env)
                 floatx80 z2, accum;
                 uint64_t z2sig0, z2sig1, z2sig2, z2sig3;
                 /* Compute z^2.  */
-                mul128To256(zsig0, zsig1, zsig0, zsig1,
-                            &z2sig0, &z2sig1, &z2sig2, &z2sig3);
+                mul128To256(zsig0, zsig1, zsig0, zsig1, &z2sig0, &z2sig1,
+                            &z2sig2, &z2sig3);
                 z2 = normalizeRoundAndPackFloatx80(floatx80_precision_x, false,
-                                                   zexp + zexp - 0x3ffe,
-                                                   z2sig0, z2sig1,
-                                                   &env->fp_status);
+                                                   zexp + zexp - 0x3ffe, z2sig0,
+                                                   z2sig1, &env->fp_status);
 
                 /* Compute the lower parts of the polynomial expansion.  */
                 accum = floatx80_mul(fpatan_coeff_6, z2, &env->fp_status);
@@ -1624,8 +1615,8 @@ void helper_fpatan(CPUX86State *env)
                  */
                 aexp = extractFloatx80Exp(fpatan_coeff_0);
                 shift128RightJamming(extractFloatx80Frac(accum), 0,
-                                     aexp - extractFloatx80Exp(accum),
-                                     &asig0, &asig1);
+                                     aexp - extractFloatx80Exp(accum), &asig0,
+                                     &asig1);
                 sub128(extractFloatx80Frac(fpatan_coeff_0), 0, asig0, asig1,
                        &asig0, &asig1);
                 /* Multiply by z to compute arctan(z).  */
@@ -1652,31 +1643,27 @@ void helper_fpatan(CPUX86State *env)
                 shift128RightJamming(low_sig0, low_sig1, axexp - low_exp,
                                      &low_sig0, &low_sig1);
                 if (low_sign) {
-                    sub128(axsig0, axsig1, low_sig0, low_sig1,
-                           &axsig0, &axsig1);
+                    sub128(axsig0, axsig1, low_sig0, low_sig1, &axsig0,
+                           &axsig1);
                 } else {
-                    add128(axsig0, axsig1, low_sig0, low_sig1,
-                           &axsig0, &axsig1);
+                    add128(axsig0, axsig1, low_sig0, low_sig1, &axsig0,
+                           &axsig1);
                 }
                 if (azexp >= axexp) {
                     shift128RightJamming(axsig0, axsig1, azexp - axexp + 1,
                                          &axsig0, &axsig1);
                     axexp = azexp + 1;
-                    shift128RightJamming(azsig0, azsig1, 1,
-                                         &azsig0, &azsig1);
+                    shift128RightJamming(azsig0, azsig1, 1, &azsig0, &azsig1);
                 } else {
-                    shift128RightJamming(axsig0, axsig1, 1,
-                                         &axsig0, &axsig1);
+                    shift128RightJamming(axsig0, axsig1, 1, &axsig0, &axsig1);
                     shift128RightJamming(azsig0, azsig1, axexp - azexp + 1,
                                          &azsig0, &azsig1);
                     ++axexp;
                 }
                 if (zsign) {
-                    sub128(axsig0, axsig1, azsig0, azsig1,
-                           &axsig0, &axsig1);
+                    sub128(axsig0, axsig1, azsig0, azsig1, &axsig0, &axsig1);
                 } else {
-                    add128(axsig0, axsig1, azsig0, azsig1,
-                           &axsig0, &axsig1);
+                    add128(axsig0, axsig1, azsig0, azsig1, &axsig0, &axsig1);
                 }
             }
 
@@ -1696,22 +1683,19 @@ void helper_fpatan(CPUX86State *env)
                     shift128RightJamming(axsig0, axsig1, adj_exp - axexp + 1,
                                          &axsig0, &axsig1);
                     rexp = adj_exp + 1;
-                    shift128RightJamming(adj_sig0, adj_sig1, 1,
-                                         &adj_sig0, &adj_sig1);
+                    shift128RightJamming(adj_sig0, adj_sig1, 1, &adj_sig0,
+                                         &adj_sig1);
                 } else {
-                    shift128RightJamming(axsig0, axsig1, 1,
-                                         &axsig0, &axsig1);
+                    shift128RightJamming(axsig0, axsig1, 1, &axsig0, &axsig1);
                     shift128RightJamming(adj_sig0, adj_sig1,
-                                         axexp - adj_exp + 1,
-                                         &adj_sig0, &adj_sig1);
+                                         axexp - adj_exp + 1, &adj_sig0,
+                                         &adj_sig1);
                     rexp = axexp + 1;
                 }
                 if (adj_sub) {
-                    sub128(adj_sig0, adj_sig1, axsig0, axsig1,
-                           &rsig0, &rsig1);
+                    sub128(adj_sig0, adj_sig1, axsig0, axsig1, &rsig0, &rsig1);
                 } else {
-                    add128(adj_sig0, adj_sig1, axsig0, axsig1,
-                           &rsig0, &rsig1);
+                    add128(adj_sig0, adj_sig1, axsig0, axsig1, &rsig0, &rsig1);
                 }
             }
 
@@ -1790,9 +1774,9 @@ static void helper_fprem_common(CPUX86State *env, bool mod)
     exp1 = EXPD(temp1);
 
     env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
-    if (floatx80_is_zero(ST0) || floatx80_is_zero(ST1) ||
-        exp0 == 0x7fff || exp1 == 0x7fff ||
-        floatx80_invalid_encoding(ST0) || floatx80_invalid_encoding(ST1)) {
+    if (floatx80_is_zero(ST0) || floatx80_is_zero(ST1) || exp0 == 0x7fff ||
+        exp1 == 0x7fff || floatx80_invalid_encoding(ST0) ||
+        floatx80_invalid_encoding(ST1)) {
         ST0 = floatx80_modrem(ST0, ST1, mod, &quotient, &env->fp_status);
     } else {
         if (exp0 == 0) {
@@ -1804,9 +1788,9 @@ static void helper_fprem_common(CPUX86State *env, bool mod)
         expdiff = exp0 - exp1;
         if (expdiff < 64) {
             ST0 = floatx80_modrem(ST0, ST1, mod, &quotient, &env->fp_status);
-            env->fpus |= (quotient & 0x4) << (8 - 2);  /* (C0) <-- q2 */
+            env->fpus |= (quotient & 0x4) << (8 - 2); /* (C0) <-- q2 */
             env->fpus |= (quotient & 0x2) << (14 - 1); /* (C3) <-- q1 */
-            env->fpus |= (quotient & 0x1) << (9 - 0);  /* (C1) <-- q0 */
+            env->fpus |= (quotient & 0x1) << (9 - 0); /* (C1) <-- q0 */
         } else {
             /*
              * Partial remainder.  This choice of how many bits to
@@ -1821,7 +1805,7 @@ static void helper_fprem_common(CPUX86State *env, bool mod)
             int n = 32 + (expdiff % 32);
             temp1.d = floatx80_scalbn(temp1.d, expdiff - n, &env->fp_status);
             ST0 = floatx80_mod(ST0, temp1.d, &env->fp_status);
-            env->fpus |= 0x400;  /* C2 <-- 1 */
+            env->fpus |= 0x400; /* C2 <-- 1 */
         }
     }
     merge_exception_flags(env, old_flags);
@@ -1906,12 +1890,10 @@ static void helper_fyl2x_common(CPUX86State *env, floatx80 arg, int32_t *exp,
     }
     tsig0 = estimateDiv128To64(rsig0, rsig1, dsig0);
     mul128By64To192(dsig0, dsig1, tsig0, &msig0, &msig1, &msig2);
-    sub192(rsig0, rsig1, rsig2, msig0, msig1, msig2,
-           &rsig0, &rsig1, &rsig2);
-    while ((int64_t) rsig0 < 0) {
+    sub192(rsig0, rsig1, rsig2, msig0, msig1, msig2, &rsig0, &rsig1, &rsig2);
+    while ((int64_t)rsig0 < 0) {
         --tsig0;
-        add192(rsig0, rsig1, rsig2, 0, dsig0, dsig1,
-               &rsig0, &rsig1, &rsig2);
+        add192(rsig0, rsig1, rsig2, 0, dsig0, dsig1, &rsig0, &rsig1, &rsig2);
     }
     tsig1 = estimateDiv128To64(rsig1, rsig2, dsig0);
     /*
@@ -1919,11 +1901,10 @@ static void helper_fyl2x_common(CPUX86State *env, floatx80 arg, int32_t *exp,
      * such error, it is accurate enough.  Now compute the square of
      * that approximation.
      */
-    mul128To256(tsig0, tsig1, tsig0, tsig1,
-                &t2sig0, &t2sig1, &t2sig2, &t2sig3);
+    mul128To256(tsig0, tsig1, tsig0, tsig1, &t2sig0, &t2sig1, &t2sig2, &t2sig3);
     t2 = normalizeRoundAndPackFloatx80(floatx80_precision_x, false,
-                                       texp + texp - 0x3ffe,
-                                       t2sig0, t2sig1, &env->fp_status);
+                                       texp + texp - 0x3ffe, t2sig0, t2sig1,
+                                       &env->fp_status);
 
     /* Compute the lower parts of the polynomial expansion.  */
     accum = floatx80_mul(fyl2x_coeff_9, t2, &env->fp_status);
@@ -1954,8 +1935,7 @@ static void helper_fyl2x_common(CPUX86State *env, floatx80 arg, int32_t *exp,
     aexp = extractFloatx80Exp(fyl2x_coeff_0);
     asign = extractFloatx80Sign(fyl2x_coeff_0);
     shift128RightJamming(extractFloatx80Frac(accum), 0,
-                         aexp - extractFloatx80Exp(accum),
-                         &asig0, &asig1);
+                         aexp - extractFloatx80Exp(accum), &asig0, &asig1);
     bsig0 = extractFloatx80Frac(fyl2x_coeff_0);
     bsig1 = 0;
     if (asign == extractFloatx80Sign(accum)) {
@@ -1964,8 +1944,7 @@ static void helper_fyl2x_common(CPUX86State *env, floatx80 arg, int32_t *exp,
         sub128(bsig0, bsig1, asig0, asig1, &asig0, &asig1);
     }
     /* Multiply by t to compute the required result.  */
-    mul128To256(asig0, asig1, tsig0, tsig1,
-                &asig0, &asig1, &asig2, &asig3);
+    mul128To256(asig0, asig1, tsig0, tsig1, &asig0, &asig1, &asig2, &asig3);
     aexp += texp - 0x3ffe;
     *exp = aexp;
     *sig0 = asig0;
@@ -1997,9 +1976,9 @@ void helper_fyl2xp1(CPUX86State *env)
     } else if (floatx80_is_any_nan(ST1)) {
         /* Pass this NaN through.  */
     } else if (arg0_exp > 0x3ffd ||
-               (arg0_exp == 0x3ffd && arg0_sig > (arg0_sign ?
-                                                  0x95f619980c4336f7ULL :
-                                                  0xd413cccfe7799211ULL))) {
+               (arg0_exp == 0x3ffd &&
+                arg0_sig > (arg0_sign ? 0x95f619980c4336f7ULL :
+                                        0xd413cccfe7799211ULL))) {
         /*
          * Out of range for the instruction (ST0 must have absolute
          * value less than 1 - sqrt(2)/2 = 0.292..., according to
@@ -2029,16 +2008,16 @@ void helper_fyl2xp1(CPUX86State *env)
         if (arg1_exp == 0) {
             normalizeFloatx80Subnormal(arg1_sig, &arg1_exp, &arg1_sig);
         }
-        mul128By64To192(log2_e_sig_high, log2_e_sig_low, arg0_sig,
-                        &sig0, &sig1, &sig2);
+        mul128By64To192(log2_e_sig_high, log2_e_sig_low, arg0_sig, &sig0, &sig1,
+                        &sig2);
         exp = arg0_exp + 1;
         mul128By64To192(sig0, sig1, arg1_sig, &sig0, &sig1, &sig2);
         exp += arg1_exp - 0x3ffe;
         /* This result is inexact.  */
         sig1 |= 1;
         ST1 = normalizeRoundAndPackFloatx80(floatx80_precision_x,
-                                            arg0_sign ^ arg1_sign, exp,
-                                            sig0, sig1, &env->fp_status);
+                                            arg0_sign ^ arg1_sign, exp, sig0,
+                                            sig1, &env->fp_status);
     } else {
         int32_t aexp;
         uint64_t asig0, asig1, asig2;
@@ -2062,8 +2041,8 @@ void helper_fyl2xp1(CPUX86State *env)
         asig1 |= 1;
         env->fp_status.float_rounding_mode = save_mode;
         ST1 = normalizeRoundAndPackFloatx80(floatx80_precision_x,
-                                            arg0_sign ^ arg1_sign, aexp,
-                                            asig0, asig1, &env->fp_status);
+                                            arg0_sign ^ arg1_sign, aexp, asig0,
+                                            asig1, &env->fp_status);
         env->fp_status.floatx80_rounding_precision = save_prec;
     }
     fpop(env);
@@ -2098,8 +2077,8 @@ void helper_fyl2x(CPUX86State *env)
         float_raise(float_flag_invalid, &env->fp_status);
         ST1 = floatx80_default_nan(&env->fp_status);
     } else if (floatx80_is_infinity(ST1)) {
-        FloatRelation cmp = floatx80_compare(ST0, floatx80_one,
-                                             &env->fp_status);
+        FloatRelation cmp =
+            floatx80_compare(ST0, floatx80_one, &env->fp_status);
         switch (cmp) {
         case float_relation_less:
             ST1 = floatx80_chs(ST1);
@@ -2161,14 +2140,13 @@ void helper_fyl2x(CPUX86State *env)
         if (arg0_sig > 0xb504f333f9de6484ULL) {
             ++int_exp;
         }
-        arg0_m1 = floatx80_sub(floatx80_scalbn(ST0, -int_exp,
-                                               &env->fp_status),
+        arg0_m1 = floatx80_sub(floatx80_scalbn(ST0, -int_exp, &env->fp_status),
                                floatx80_one, &env->fp_status);
         if (floatx80_is_zero(arg0_m1)) {
             /* Exact power of 2; multiply by ST1.  */
             env->fp_status.float_rounding_mode = save_mode;
-            ST1 = floatx80_mul(int32_to_floatx80(int_exp, &env->fp_status),
-                               ST1, &env->fp_status);
+            ST1 = floatx80_mul(int32_to_floatx80(int_exp, &env->fp_status), ST1,
+                               &env->fp_status);
         } else {
             bool asign = extractFloatx80Sign(arg0_m1);
             int32_t aexp;
@@ -2184,8 +2162,7 @@ void helper_fyl2x(CPUX86State *env)
                 isig = int_exp;
                 isig <<= shift;
                 iexp = 0x403e - shift;
-                shift128RightJamming(asig0, asig1, iexp - aexp,
-                                     &asig0, &asig1);
+                shift128RightJamming(asig0, asig1, iexp - aexp, &asig0, &asig1);
                 if (asign == isign) {
                     add128(isig, 0, asig0, asig1, &asig0, &asig1);
                 } else {
@@ -2207,8 +2184,8 @@ void helper_fyl2x(CPUX86State *env)
             asig1 |= 1;
             env->fp_status.float_rounding_mode = save_mode;
             ST1 = normalizeRoundAndPackFloatx80(floatx80_precision_x,
-                                                asign ^ arg1_sign, aexp,
-                                                asig0, asig1, &env->fp_status);
+                                                asign ^ arg1_sign, aexp, asig0,
+                                                asig1, &env->fp_status);
         }
 
         env->fp_status.floatx80_rounding_precision = save_prec;
@@ -2221,7 +2198,7 @@ void helper_fsqrt(CPUX86State *env)
 {
     uint8_t old_flags = save_exception_flags(env);
     if (floatx80_is_neg(ST0)) {
-        env->fpus &= ~0x4700;  /* (C3,C2,C1,C0) <-- 0000 */
+        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
         env->fpus |= 0x400;
     }
     ST0 = floatx80_sqrt(ST0, &env->fp_status);
@@ -2238,7 +2215,7 @@ void helper_fsincos(CPUX86State *env)
         ST0 = double_to_floatx80(env, sin(fptemp));
         fpush(env);
         ST0 = double_to_floatx80(env, cos(fptemp));
-        env->fpus &= ~0x400;  /* C2 <-- 0 */
+        env->fpus &= ~0x400; /* C2 <-- 0 */
         /* the above code is for |arg| < 2**63 only */
     }
 }
@@ -2265,26 +2242,23 @@ void helper_fscale(CPUX86State *env)
             float_raise(float_flag_invalid, &env->fp_status);
             ST0 = floatx80_silence_nan(ST0, &env->fp_status);
         }
-    } else if (floatx80_is_infinity(ST1) &&
-               !floatx80_invalid_encoding(ST0) &&
+    } else if (floatx80_is_infinity(ST1) && !floatx80_invalid_encoding(ST0) &&
                !floatx80_is_any_nan(ST0)) {
         if (floatx80_is_neg(ST1)) {
             if (floatx80_is_infinity(ST0)) {
                 float_raise(float_flag_invalid, &env->fp_status);
                 ST0 = floatx80_default_nan(&env->fp_status);
             } else {
-                ST0 = (floatx80_is_neg(ST0) ?
-                       floatx80_chs(floatx80_zero) :
-                       floatx80_zero);
+                ST0 = (floatx80_is_neg(ST0) ? floatx80_chs(floatx80_zero) :
+                                              floatx80_zero);
             }
         } else {
             if (floatx80_is_zero(ST0)) {
                 float_raise(float_flag_invalid, &env->fp_status);
                 ST0 = floatx80_default_nan(&env->fp_status);
             } else {
-                ST0 = (floatx80_is_neg(ST0) ?
-                       floatx80_chs(floatx80_infinity) :
-                       floatx80_infinity);
+                ST0 = (floatx80_is_neg(ST0) ? floatx80_chs(floatx80_infinity) :
+                                              floatx80_infinity);
             }
         }
     } else {
@@ -2309,7 +2283,7 @@ void helper_fsin(CPUX86State *env)
         env->fpus |= 0x400;
     } else {
         ST0 = double_to_floatx80(env, sin(fptemp));
-        env->fpus &= ~0x400;  /* C2 <-- 0 */
+        env->fpus &= ~0x400; /* C2 <-- 0 */
         /* the above code is for |arg| < 2**53 only */
     }
 }
@@ -2322,7 +2296,7 @@ void helper_fcos(CPUX86State *env)
         env->fpus |= 0x400;
     } else {
         ST0 = double_to_floatx80(env, cos(fptemp));
-        env->fpus &= ~0x400;  /* C2 <-- 0 */
+        env->fpus &= ~0x400; /* C2 <-- 0 */
         /* the above code is for |arg| < 2**63 only */
     }
 }
@@ -2353,7 +2327,7 @@ void helper_fxam_ST0(CPUX86State *env)
         }
     } else if (expdif == 0) {
         if (MANTD(temp) == 0) {
-            env->fpus |=  0x4000; /* Zero */
+            env->fpus |= 0x4000; /* Zero */
         } else {
             env->fpus |= 0x4400; /* Denormal */
         }
@@ -2382,8 +2356,8 @@ static void do_fstenv(CPUX86State *env, target_ulong ptr, int data32,
             if (exp == 0 && mant == 0) {
                 /* zero */
                 fptag |= 1;
-            } else if (exp == 0 || exp == MAXEXPD
-                       || (mant & (1LL << 63)) == 0) {
+            } else if (exp == 0 || exp == MAXEXPD ||
+                       (mant & (1LL << 63)) == 0) {
                 /* NaNs, infinity, denormal */
                 fptag |= 2;
             }
@@ -2423,8 +2397,8 @@ static void cpu_set_fpus(CPUX86State *env, uint16_t fpus)
 #if !defined(CONFIG_USER_ONLY)
     if (!(env->fpus & FPUS_SE)) {
         /*
-         * Here the processor deasserts FERR#; in response, the chipset deasserts
-         * IGNNE#.
+         * Here the processor deasserts FERR#; in response, the chipset
+         * deasserts IGNNE#.
          */
         cpu_clear_ignne();
     }
@@ -2501,7 +2475,7 @@ void helper_frstor(CPUX86State *env, target_ulong ptr, int data32)
     do_frstor(env, ptr, data32, GETPC());
 }
 
-#define XO(X)  offsetof(X86XSaveArea, X)
+#define XO(X) offsetof(X86XSaveArea, X)
 
 static void do_xsave_fpu(CPUX86State *env, target_ulong ptr, uintptr_t ra)
 {
@@ -2610,9 +2584,8 @@ static void do_fxsave(CPUX86State *env, target_ulong ptr, uintptr_t ra)
     if (env->cr[4] & CR4_OSFXSR_MASK) {
         do_xsave_mxcsr(env, ptr, ra);
         /* Fast FXSAVE leaves out the XMM registers */
-        if (!(env->efer & MSR_EFER_FFXSR)
-            || (env->hflags & HF_CPL_MASK)
-            || !(env->hflags & HF_LMA_MASK)) {
+        if (!(env->efer & MSR_EFER_FFXSR) || (env->hflags & HF_CPL_MASK) ||
+            !(env->hflags & HF_LMA_MASK)) {
             do_xsave_sse(env, ptr, ra);
         }
     }
@@ -2632,7 +2605,7 @@ static uint64_t get_xinuse(CPUX86State *env)
        indicate in use.  That said, the state of BNDREGS is important
        enough to track in HFLAGS, so we might as well use that here.  */
     if ((env->hflags & HF_MPX_IU_MASK) == 0) {
-       inuse &= ~XSTATE_BNDREGS_MASK;
+        inuse &= ~XSTATE_BNDREGS_MASK;
     }
     return inuse;
 }
@@ -2805,10 +2778,10 @@ static void do_xrstor_bndregs(CPUX86State *env, target_ulong ptr, uintptr_t ra)
 static void do_xrstor_bndcsr(CPUX86State *env, target_ulong ptr, uintptr_t ra)
 {
     /* FIXME: Extend highest implemented bit of linear address.  */
-    env->bndcs_regs.cfgu
-        = cpu_ldq_data_ra(env, ptr + offsetof(XSaveBNDCSR, bndcsr.cfgu), ra);
-    env->bndcs_regs.sts
-        = cpu_ldq_data_ra(env, ptr + offsetof(XSaveBNDCSR, bndcsr.sts), ra);
+    env->bndcs_regs.cfgu =
+        cpu_ldq_data_ra(env, ptr + offsetof(XSaveBNDCSR, bndcsr.cfgu), ra);
+    env->bndcs_regs.sts =
+        cpu_ldq_data_ra(env, ptr + offsetof(XSaveBNDCSR, bndcsr.sts), ra);
 }
 
 static void do_xrstor_pkru(CPUX86State *env, target_ulong ptr, uintptr_t ra)
@@ -2828,9 +2801,8 @@ static void do_fxrstor(CPUX86State *env, target_ulong ptr, uintptr_t ra)
     if (env->cr[4] & CR4_OSFXSR_MASK) {
         do_xrstor_mxcsr(env, ptr, ra);
         /* Fast FXRSTOR leaves out the XMM registers */
-        if (!(env->efer & MSR_EFER_FFXSR)
-            || (env->hflags & HF_CPL_MASK)
-            || !(env->hflags & HF_LMA_MASK)) {
+        if (!(env->efer & MSR_EFER_FFXSR) || (env->hflags & HF_CPL_MASK) ||
+            !(env->hflags & HF_LMA_MASK)) {
             do_xrstor_sse(env, ptr, ra);
         }
     }
@@ -2841,7 +2813,8 @@ void helper_fxrstor(CPUX86State *env, target_ulong ptr)
     do_fxrstor(env, ptr, GETPC());
 }
 
-static void do_xrstor(CPUX86State *env, target_ulong ptr, uint64_t rfbm, uintptr_t ra)
+static void do_xrstor(CPUX86State *env, target_ulong ptr, uint64_t rfbm,
+                      uintptr_t ra)
 {
     uint64_t xstate_bv, xcomp_bv, reserve0;
 
@@ -3019,8 +2992,8 @@ void helper_xsetbv(CPUX86State *env, uint32_t ecx, uint64_t mask)
     }
 
     /* Disallow enabling only half of MPX.  */
-    if ((mask ^ (mask * (XSTATE_BNDCSR_MASK / XSTATE_BNDREGS_MASK)))
-        & XSTATE_BNDCSR_MASK) {
+    if ((mask ^ (mask * (XSTATE_BNDCSR_MASK / XSTATE_BNDREGS_MASK))) &
+        XSTATE_BNDCSR_MASK) {
         goto do_gpf;
     }
 
@@ -3029,17 +3002,17 @@ void helper_xsetbv(CPUX86State *env, uint32_t ecx, uint64_t mask)
     cpu_sync_avx_hflag(env);
     return;
 
- do_gpf:
+do_gpf:
     raise_exception_ra(env, EXCP0D_GPF, GETPC());
 }
 
 /* MMX/SSE */
 /* XXX: optimize by storing fptt and fptags in the static cpu state */
 
-#define SSE_DAZ             0x0040
-#define SSE_RC_SHIFT        13
-#define SSE_RC_MASK         (3 << SSE_RC_SHIFT)
-#define SSE_FZ              0x8000
+#define SSE_DAZ 0x0040
+#define SSE_RC_SHIFT 13
+#define SSE_RC_MASK (3 << SSE_RC_SHIFT)
+#define SSE_FZ 0x8000
 
 void update_mxcsr_status(CPUX86State *env)
 {
@@ -3052,10 +3025,10 @@ void update_mxcsr_status(CPUX86State *env)
 
     /* Set exception flags.  */
     set_float_exception_flags((mxcsr & FPUS_IE ? float_flag_invalid : 0) |
-                              (mxcsr & FPUS_ZE ? float_flag_divbyzero : 0) |
-                              (mxcsr & FPUS_OE ? float_flag_overflow : 0) |
-                              (mxcsr & FPUS_UE ? float_flag_underflow : 0) |
-                              (mxcsr & FPUS_PE ? float_flag_inexact : 0),
+                                  (mxcsr & FPUS_ZE ? float_flag_divbyzero : 0) |
+                                  (mxcsr & FPUS_OE ? float_flag_overflow : 0) |
+                                  (mxcsr & FPUS_UE ? float_flag_underflow : 0) |
+                                  (mxcsr & FPUS_PE ? float_flag_inexact : 0),
                               &env->sse_status);
 
     /* set denormals are zero */
@@ -3075,13 +3048,13 @@ void update_mxcsr_from_sse_status(CPUX86State *env)
      * only when not flushing them to zero), so is not converted
      * here.
      */
-    env->mxcsr |= ((flags & float_flag_invalid ? FPUS_IE : 0) |
-                   (flags & float_flag_divbyzero ? FPUS_ZE : 0) |
-                   (flags & float_flag_overflow ? FPUS_OE : 0) |
-                   (flags & float_flag_underflow ? FPUS_UE : 0) |
-                   (flags & float_flag_inexact ? FPUS_PE : 0) |
-                   (flags & float_flag_output_denormal ? FPUS_UE | FPUS_PE :
-                    0));
+    env->mxcsr |=
+        ((flags & float_flag_invalid ? FPUS_IE : 0) |
+         (flags & float_flag_divbyzero ? FPUS_ZE : 0) |
+         (flags & float_flag_overflow ? FPUS_OE : 0) |
+         (flags & float_flag_underflow ? FPUS_UE : 0) |
+         (flags & float_flag_inexact ? FPUS_PE : 0) |
+         (flags & float_flag_output_denormal ? FPUS_UE | FPUS_PE : 0));
 }
 
 void helper_update_mxcsr(CPUX86State *env)

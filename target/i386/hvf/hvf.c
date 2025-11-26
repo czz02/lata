@@ -85,8 +85,8 @@ void vmx_update_tpr(CPUState *cpu)
     if (irr == -1) {
         wvmcs(cpu->accel->fd, VMCS_TPR_THRESHOLD, 0);
     } else {
-        wvmcs(cpu->accel->fd, VMCS_TPR_THRESHOLD, (irr > tpr) ? tpr >> 4 :
-              irr >> 4);
+        wvmcs(cpu->accel->fd, VMCS_TPR_THRESHOLD,
+              (irr > tpr) ? tpr >> 4 : irr >> 4);
     }
 }
 
@@ -97,18 +97,17 @@ static void update_apic_tpr(CPUState *cpu)
     cpu_set_apic_tpr(x86_cpu->apic_state, tpr);
 }
 
-#define VECTORING_INFO_VECTOR_MASK     0xff
+#define VECTORING_INFO_VECTOR_MASK 0xff
 
 void hvf_handle_io(CPUArchState *env, uint16_t port, void *buffer,
-                  int direction, int size, int count)
+                   int direction, int size, int count)
 {
     int i;
     uint8_t *ptr = buffer;
 
     for (i = 0; i < count; i++) {
-        address_space_rw(&address_space_io, port, MEMTXATTRS_UNSPECIFIED,
-                         ptr, size,
-                         direction);
+        address_space_rw(&address_space_io, port, MEMTXATTRS_UNSPECIFIED, ptr,
+                         size, direction);
         ptr += size;
     }
 }
@@ -178,7 +177,7 @@ static void init_tsc_freq(CPUX86State *env)
     if (sysctlbyname("machdep.tsc.frequency", &tsc_freq, &length, NULL, 0)) {
         return;
     }
-    env->tsc_khz = tsc_freq / 1000;  /* Hz to KHz */
+    env->tsc_khz = tsc_freq / 1000; /* Hz to KHz */
 }
 
 static void init_apic_bus_freq(CPUX86State *env)
@@ -239,35 +238,34 @@ int hvf_arch_init_vcpu(CPUState *cpu)
     }
 
     if (hv_vmx_read_capability(HV_VMX_CAP_PINBASED,
-        &hvf_state->hvf_caps->vmx_cap_pinbased)) {
+                               &hvf_state->hvf_caps->vmx_cap_pinbased)) {
         abort();
     }
     if (hv_vmx_read_capability(HV_VMX_CAP_PROCBASED,
-        &hvf_state->hvf_caps->vmx_cap_procbased)) {
+                               &hvf_state->hvf_caps->vmx_cap_procbased)) {
         abort();
     }
     if (hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2,
-        &hvf_state->hvf_caps->vmx_cap_procbased2)) {
+                               &hvf_state->hvf_caps->vmx_cap_procbased2)) {
         abort();
     }
     if (hv_vmx_read_capability(HV_VMX_CAP_ENTRY,
-        &hvf_state->hvf_caps->vmx_cap_entry)) {
+                               &hvf_state->hvf_caps->vmx_cap_entry)) {
         abort();
     }
 
     /* set VMCS control fields */
     wvmcs(cpu->accel->fd, VMCS_PIN_BASED_CTLS,
           cap2ctrl(hvf_state->hvf_caps->vmx_cap_pinbased,
-                   VMCS_PIN_BASED_CTLS_EXTINT |
-                   VMCS_PIN_BASED_CTLS_NMI |
-                   VMCS_PIN_BASED_CTLS_VNMI));
+                   VMCS_PIN_BASED_CTLS_EXTINT | VMCS_PIN_BASED_CTLS_NMI |
+                       VMCS_PIN_BASED_CTLS_VNMI));
     wvmcs(cpu->accel->fd, VMCS_PRI_PROC_BASED_CTLS,
           cap2ctrl(hvf_state->hvf_caps->vmx_cap_procbased,
                    VMCS_PRI_PROC_BASED_CTLS_HLT |
-                   VMCS_PRI_PROC_BASED_CTLS_MWAIT |
-                   VMCS_PRI_PROC_BASED_CTLS_TSC_OFFSET |
-                   VMCS_PRI_PROC_BASED_CTLS_TPR_SHADOW) |
-          VMCS_PRI_PROC_BASED_CTLS_SEC_CONTROL);
+                       VMCS_PRI_PROC_BASED_CTLS_MWAIT |
+                       VMCS_PRI_PROC_BASED_CTLS_TSC_OFFSET |
+                       VMCS_PRI_PROC_BASED_CTLS_TPR_SHADOW) |
+              VMCS_PRI_PROC_BASED_CTLS_SEC_CONTROL);
 
     reqCap = VMCS_PRI_PROC_BASED2_CTLS_APIC_ACCESSES;
 
@@ -311,7 +309,8 @@ int hvf_arch_init_vcpu(CPUState *cpu)
     return 0;
 }
 
-static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_info)
+static void hvf_store_events(CPUState *cpu, uint32_t ins_len,
+                             uint64_t idtvec_info)
 {
     X86CPU *x86_cpu = X86_CPU(cpu);
     CPUX86State *env = &x86_cpu->env;
@@ -351,13 +350,13 @@ static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_in
         }
     }
     if ((rvmcs(cpu->accel->fd, VMCS_GUEST_INTERRUPTIBILITY) &
-        VMCS_INTERRUPTIBILITY_NMI_BLOCKING)) {
+         VMCS_INTERRUPTIBILITY_NMI_BLOCKING)) {
         env->hflags2 |= HF2_NMI_MASK;
     } else {
         env->hflags2 &= ~HF2_NMI_MASK;
     }
     if (rvmcs(cpu->accel->fd, VMCS_GUEST_INTERRUPTIBILITY) &
-         (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
+        (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
          VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING)) {
         env->hflags |= HF_INHIBIT_IRQ_MASK;
     } else {
@@ -366,8 +365,8 @@ static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_in
 }
 
 static void hvf_cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                              uint32_t *eax, uint32_t *ebx,
-                              uint32_t *ecx, uint32_t *edx)
+                              uint32_t *eax, uint32_t *ebx, uint32_t *ecx,
+                              uint32_t *edx)
 {
     /*
      * A wrapper extends cpu_x86_cpuid with 0x40000000 and 0x40000010 leafs,
@@ -378,17 +377,16 @@ static void hvf_cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
      * leaving hypervisor signature empty
      */
 
-    if (index < 0x40000000 || index > 0x40000010 ||
-        !tsc_is_known(env) || !apic_bus_freq_is_known(env)) {
-
+    if (index < 0x40000000 || index > 0x40000010 || !tsc_is_known(env) ||
+        !apic_bus_freq_is_known(env)) {
         cpu_x86_cpuid(env, index, count, eax, ebx, ecx, edx);
         return;
     }
 
     switch (index) {
     case 0x40000000:
-        *eax = 0x40000010;    /* Max available cpuid leaf */
-        *ebx = 0;             /* Leave signature empty */
+        *eax = 0x40000010; /* Max available cpuid leaf */
+        *ebx = 0; /* Leave signature empty */
         *ecx = 0;
         *edx = 0;
         break;
@@ -435,14 +433,14 @@ int hvf_vcpu_exec(CPUState *cpu)
             return EXCP_HLT;
         }
 
-        hv_return_t r  = hv_vcpu_run(cpu->accel->fd);
+        hv_return_t r = hv_vcpu_run(cpu->accel->fd);
         assert_hvf_ok(r);
 
         /* handle VMEXIT */
         uint64_t exit_reason = rvmcs(cpu->accel->fd, VMCS_EXIT_REASON);
         uint64_t exit_qual = rvmcs(cpu->accel->fd, VMCS_EXIT_QUALIFICATION);
-        uint32_t ins_len = (uint32_t)rvmcs(cpu->accel->fd,
-                                           VMCS_EXIT_INSTRUCTION_LENGTH);
+        uint32_t ins_len =
+            (uint32_t)rvmcs(cpu->accel->fd, VMCS_EXIT_INSTRUCTION_LENGTH);
 
         uint64_t idtvec_info = rvmcs(cpu->accel->fd, VMCS_IDT_VECTORING_INFO);
 
@@ -460,8 +458,8 @@ int hvf_vcpu_exec(CPUState *cpu)
         case EXIT_REASON_HLT: {
             macvm_set_rip(cpu, rip + ins_len);
             if (!((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-                (env->eflags & IF_MASK))
-                && !(cpu->interrupt_request & CPU_INTERRUPT_NMI) &&
+                  (env->eflags & IF_MASK)) &&
+                !(cpu->interrupt_request & CPU_INTERRUPT_NMI) &&
                 !(idtvec_info & VMCS_IDT_VEC_VALID)) {
                 cpu->halted = 1;
                 ret = EXCP_HLT;
@@ -475,8 +473,7 @@ int hvf_vcpu_exec(CPUState *cpu)
             break;
         }
         /* Need to check if MMIO or unmapped fault */
-        case EXIT_REASON_EPT_FAULT:
-        {
+        case EXIT_REASON_EPT_FAULT: {
             hvf_slot *slot;
             uint64_t gpa = rvmcs(cpu->accel->fd, VMCS_GUEST_PHYSICAL_ADDRESS);
 
@@ -498,12 +495,11 @@ int hvf_vcpu_exec(CPUState *cpu)
             }
             break;
         }
-        case EXIT_REASON_INOUT:
-        {
+        case EXIT_REASON_INOUT: {
             uint32_t in = (exit_qual & 8) != 0;
-            uint32_t size =  (exit_qual & 7) + 1;
-            uint32_t string =  (exit_qual & 16) != 0;
-            uint32_t port =  exit_qual >> 16;
+            uint32_t size = (exit_qual & 7) + 1;
+            uint32_t string = (exit_qual & 16) != 0;
+            uint32_t port = exit_qual >> 16;
             /*uint32_t rep = (exit_qual & 0x20) != 0;*/
 
             if (!string && in) {
@@ -587,8 +583,7 @@ int hvf_vcpu_exec(CPUState *cpu)
             ret = EXCP_INTERRUPT;
             break;
         case EXIT_REASON_RDMSR:
-        case EXIT_REASON_WRMSR:
-        {
+        case EXIT_REASON_WRMSR: {
             load_regs(cpu);
             if (exit_reason == EXIT_REASON_RDMSR) {
                 simulate_rdmsr(cpu);
@@ -650,10 +645,10 @@ int hvf_vcpu_exec(CPUState *cpu)
         }
         case EXIT_REASON_TASK_SWITCH: {
             uint64_t vinfo = rvmcs(cpu->accel->fd, VMCS_IDT_VECTORING_INFO);
-            x68_segment_selector sel = {.sel = exit_qual & 0xffff};
-            vmx_handle_task_switch(cpu, sel, (exit_qual >> 30) & 0x3,
-             vinfo & VMCS_INTR_VALID, vinfo & VECTORING_INFO_VECTOR_MASK, vinfo
-             & VMCS_INTR_T_MASK);
+            x68_segment_selector sel = { .sel = exit_qual & 0xffff };
+            vmx_handle_task_switch(
+                cpu, sel, (exit_qual >> 30) & 0x3, vinfo & VMCS_INTR_VALID,
+                vinfo & VECTORING_INFO_VECTOR_MASK, vinfo & VMCS_INTR_T_MASK);
             break;
         }
         case EXIT_REASON_TRIPLE_FAULT: {

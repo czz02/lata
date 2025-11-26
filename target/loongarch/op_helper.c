@@ -69,7 +69,7 @@ target_ulong helper_crc32(target_ulong val, target_ulong m, uint64_t sz)
 
     m &= mask;
     stq_le_p(buf, m);
-    return (int32_t) (crc32(val ^ 0xffffffff, buf, sz) ^ 0xffffffff);
+    return (int32_t)(crc32(val ^ 0xffffffff, buf, sz) ^ 0xffffffff);
 }
 
 target_ulong helper_crc32c(target_ulong val, target_ulong m, uint64_t sz)
@@ -78,7 +78,7 @@ target_ulong helper_crc32c(target_ulong val, target_ulong m, uint64_t sz)
     target_ulong mask = ((sz * 8) == 64) ? -1ULL : ((1ULL << (sz * 8)) - 1);
     m &= mask;
     stq_le_p(buf, m);
-    return (int32_t) (crc32c(val, buf, sz) ^ 0xffffffff);
+    return (int32_t)(crc32c(val, buf, sz) ^ 0xffffffff);
 }
 
 target_ulong helper_cpucfg(CPULoongArchState *env, target_ulong rj)
@@ -115,15 +115,15 @@ void helper_ertn(CPULoongArchState *env)
         env->CSR_CRMD = FIELD_DP64(env->CSR_CRMD, CSR_CRMD, DA, 0);
         env->CSR_CRMD = FIELD_DP64(env->CSR_CRMD, CSR_CRMD, PG, 1);
         env->pc = env->CSR_TLBRERA;
-        qemu_log_mask(CPU_LOG_INT, "%s: TLBRERA " TARGET_FMT_lx "\n",
-                      __func__, env->CSR_TLBRERA);
+        qemu_log_mask(CPU_LOG_INT, "%s: TLBRERA " TARGET_FMT_lx "\n", __func__,
+                      env->CSR_TLBRERA);
     } else {
         csr_pplv = FIELD_EX64(env->CSR_PRMD, CSR_PRMD, PPLV);
         csr_pie = FIELD_EX64(env->CSR_PRMD, CSR_PRMD, PIE);
 
         env->pc = env->CSR_ERA;
-        qemu_log_mask(CPU_LOG_INT, "%s: ERA " TARGET_FMT_lx "\n",
-                      __func__, env->CSR_ERA);
+        qemu_log_mask(CPU_LOG_INT, "%s: ERA " TARGET_FMT_lx "\n", __func__,
+                      env->CSR_ERA);
     }
     env->CSR_CRMD = FIELD_DP64(env->CSR_CRMD, CSR_CRMD, PLV, csr_pplv);
     env->CSR_CRMD = FIELD_DP64(env->CSR_CRMD, CSR_CRMD, IE, csr_pie);

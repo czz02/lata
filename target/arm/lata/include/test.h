@@ -10,15 +10,16 @@
 
 #define android_assert assert
 
-#define assert(condition)                                                 \
-    do {                                                                          \
-        if (!(condition)) {                                                       \
-            __android_log_print(                                                  \
-                ANDROID_LOG_FATAL, LOG_TAG,                                       \
-                "Assertion failed: '%s', in file %s, line %d, function: %s, insn: %x",      \
-                #condition, __FILE__, __LINE__, __func__, curr_insn);             \
-            abort();                                                              \
-        }                                                                         \
+#define assert(condition)                                                   \
+    do {                                                                    \
+        if (!(condition)) {                                                 \
+            __android_log_print(ANDROID_LOG_FATAL, LOG_TAG,                 \
+                                "Assertion failed: '%s', in file %s, line " \
+                                "%d, function: %s, insn: %x",               \
+                                #condition, __FILE__, __LINE__, __func__,   \
+                                curr_insn);                                 \
+            abort();                                                        \
+        }                                                                   \
     } while (0)
 
 #endif
@@ -45,6 +46,6 @@
     } while (0)
 
 #else
-#define lsassert(cond)          ((void)0)
-#define lsassertm(cond, ...)    ((void)0)
+#define lsassert(cond) ((void)0)
+#define lsassertm(cond, ...) ((void)0)
 #endif

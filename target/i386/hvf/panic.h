@@ -18,28 +18,32 @@
 #ifndef HVF_PANIC_H
 #define HVF_PANIC_H
 
-#define VM_PANIC(x) {\
-    printf("%s\n", x); \
-    abort(); \
-}
+#define VM_PANIC(x)        \
+    {                      \
+        printf("%s\n", x); \
+        abort();           \
+    }
 
-#define VM_PANIC_ON(x) {\
-    if (x) { \
-        printf("%s\n", #x); \
-        abort(); \
-    } \
-}
+#define VM_PANIC_ON(x)          \
+    {                           \
+        if (x) {                \
+            printf("%s\n", #x); \
+            abort();            \
+        }                       \
+    }
 
-#define VM_PANIC_EX(...) {\
-    printf(__VA_ARGS__); \
-    abort(); \
-}
-
-#define VM_PANIC_ON_EX(x, ...) {\
-    if (x) { \
+#define VM_PANIC_EX(...)     \
+    {                        \
         printf(__VA_ARGS__); \
-        abort(); \
-    } \
-}
+        abort();             \
+    }
+
+#define VM_PANIC_ON_EX(x, ...)   \
+    {                            \
+        if (x) {                 \
+            printf(__VA_ARGS__); \
+            abort();             \
+        }                        \
+    }
 
 #endif

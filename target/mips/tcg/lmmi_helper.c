@@ -27,31 +27,31 @@
  * does matter, we generally ignore dumping to memory.
  */
 typedef union {
-    uint8_t  ub[8];
-    int8_t   sb[8];
+    uint8_t ub[8];
+    int8_t sb[8];
     uint16_t uh[4];
-    int16_t  sh[4];
+    int16_t sh[4];
     uint32_t uw[2];
-    int32_t  sw[2];
+    int32_t sw[2];
     uint64_t d;
 } LMIValue;
 
 /* Some byte ordering issues can be mitigated by XORing in the following.  */
 #if HOST_BIG_ENDIAN
-# define BYTE_ORDER_XOR(N) N
+#define BYTE_ORDER_XOR(N) N
 #else
-# define BYTE_ORDER_XOR(N) 0
+#define BYTE_ORDER_XOR(N) 0
 #endif
 
-#define SATSB(x)  (x < -0x80 ? -0x80 : x > 0x7f ? 0x7f : x)
-#define SATUB(x)  (x > 0xff ? 0xff : x)
+#define SATSB(x) (x < -0x80 ? -0x80 : x > 0x7f ? 0x7f : x)
+#define SATUB(x) (x > 0xff ? 0xff : x)
 
-#define SATSH(x)  (x < -0x8000 ? -0x8000 : x > 0x7fff ? 0x7fff : x)
-#define SATUH(x)  (x > 0xffff ? 0xffff : x)
+#define SATSH(x) (x < -0x8000 ? -0x8000 : x > 0x7fff ? 0x7fff : x)
+#define SATUH(x) (x > 0xffff ? 0xffff : x)
 
 #define SATSW(x) \
     (x < -0x80000000ll ? -0x80000000ll : x > 0x7fffffff ? 0x7fffffff : x)
-#define SATUW(x)  (x > 0xffffffffull ? 0xffffffffull : x)
+#define SATUW(x) (x > 0xffffffffull ? 0xffffffffull : x)
 
 uint64_t helper_paddsb(uint64_t fs, uint64_t ft)
 {
@@ -698,9 +698,9 @@ uint64_t helper_pmaddhw(uint64_t fs, uint64_t ft)
 
     vs.d = fs;
     vt.d = ft;
-    p0  = vs.sh[0 ^ host] * vt.sh[0 ^ host];
+    p0 = vs.sh[0 ^ host] * vt.sh[0 ^ host];
     p0 += vs.sh[1 ^ host] * vt.sh[1 ^ host];
-    p1  = vs.sh[2 ^ host] * vt.sh[2 ^ host];
+    p1 = vs.sh[2 ^ host] * vt.sh[2 ^ host];
     p1 += vs.sh[3 ^ host] * vt.sh[3 ^ host];
 
     return ((uint64_t)p1 << 32) | p0;
@@ -734,7 +734,7 @@ uint64_t helper_pmovmskb(uint64_t fs)
 {
     unsigned fd = 0;
 
-    fd |= ((fs >>  7) & 1) << 0;
+    fd |= ((fs >> 7) & 1) << 0;
     fd |= ((fs >> 15) & 1) << 1;
     fd |= ((fs >> 23) & 1) << 2;
     fd |= ((fs >> 31) & 1) << 3;

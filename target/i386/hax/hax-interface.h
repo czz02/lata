@@ -46,12 +46,12 @@ struct fx_layout {
     uint8_t mmx_1[8][16];
     uint8_t mmx_2[8][16];
     uint8_t pad[96];
-} __attribute__ ((aligned(8)));
+} __attribute__((aligned(8)));
 
 struct vmx_msr {
     uint64_t entry;
     uint64_t value;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 /*
  * Fixed array is not good, but it makes Mac support a bit easier by avoiding
@@ -63,16 +63,16 @@ struct hax_msr_data {
     uint16_t done;
     uint16_t pad[2];
     struct vmx_msr entries[HAX_MAX_MSR_ARRAY];
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 union interruptibility_state_t {
     uint32_t raw;
     struct {
-        uint32_t sti_blocking:1;
-        uint32_t movss_blocking:1;
-        uint32_t smi_blocking:1;
-        uint32_t nmi_blocking:1;
-        uint32_t reserved:28;
+        uint32_t sti_blocking : 1;
+        uint32_t movss_blocking : 1;
+        uint32_t smi_blocking : 1;
+        uint32_t nmi_blocking : 1;
+        uint32_t reserved : 28;
     };
     uint64_t pad;
 };
@@ -87,17 +87,17 @@ struct segment_desc_t {
     uint64_t base;
     union {
         struct {
-            uint32_t type:4;
-            uint32_t desc:1;
-            uint32_t dpl:2;
-            uint32_t present:1;
-            uint32_t:4;
-            uint32_t available:1;
-            uint32_t long_mode:1;
-            uint32_t operand_size:1;
-            uint32_t granularity:1;
-            uint32_t null:1;
-            uint32_t:15;
+            uint32_t type : 4;
+            uint32_t desc : 1;
+            uint32_t dpl : 2;
+            uint32_t present : 1;
+            uint32_t : 4;
+            uint32_t available : 1;
+            uint32_t long_mode : 1;
+            uint32_t operand_size : 1;
+            uint32_t granularity : 1;
+            uint32_t null : 1;
+            uint32_t : 15;
         };
         uint32_t ar;
     };
@@ -261,7 +261,7 @@ struct hax_tunnel {
     union {
         struct {
             /* 0: read, 1: write */
-#define HAX_EXIT_IO_IN  1
+#define HAX_EXIT_IO_IN 1
 #define HAX_EXIT_IO_OUT 0
             uint8_t _direction;
             uint8_t _df;
@@ -280,12 +280,12 @@ struct hax_tunnel {
         struct {
         } state;
     };
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 struct hax_module_version {
     uint32_t compat_version;
     uint32_t cur_version;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 /* This interface is support only after API version 2 */
 struct hax_qemu_version {
@@ -293,7 +293,7 @@ struct hax_qemu_version {
     uint32_t cur_version;
     /* The minimum API version supported by QEMU */
     uint32_t min_version;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 /* The mac specfic interface to qemu, mostly is ioctl related */
 struct hax_tunnel_info {
@@ -301,21 +301,21 @@ struct hax_tunnel_info {
     uint64_t io_va;
     uint16_t size;
     uint16_t pad[3];
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 struct hax_alloc_ram_info {
     uint32_t size;
     uint32_t pad;
     uint64_t va;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 struct hax_ramblock_info {
     uint64_t start_va;
     uint64_t size;
     uint64_t reserved;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
-#define HAX_RAM_INFO_ROM     0x01 /* Read-Only */
+#define HAX_RAM_INFO_ROM 0x01 /* Read-Only */
 #define HAX_RAM_INFO_INVALID 0x80 /* Unmapped, usually used for MMIO */
 struct hax_set_ram_info {
     uint64_t pa_start;
@@ -323,18 +323,18 @@ struct hax_set_ram_info {
     uint8_t flags;
     uint8_t pad[3];
     uint64_t va;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
-#define HAX_CAP_STATUS_WORKING     0x1
-#define HAX_CAP_STATUS_NOTWORKING  0x0
-#define HAX_CAP_WORKSTATUS_MASK    0x1
+#define HAX_CAP_STATUS_WORKING 0x1
+#define HAX_CAP_STATUS_NOTWORKING 0x0
+#define HAX_CAP_WORKSTATUS_MASK 0x1
 
-#define HAX_CAP_FAILREASON_VT      0x1
-#define HAX_CAP_FAILREASON_NX      0x2
+#define HAX_CAP_FAILREASON_VT 0x1
+#define HAX_CAP_FAILREASON_NX 0x2
 
-#define HAX_CAP_MEMQUOTA           0x2
-#define HAX_CAP_UG                 0x4
-#define HAX_CAP_64BIT_RAMBLOCK     0x8
+#define HAX_CAP_MEMQUOTA 0x2
+#define HAX_CAP_UG 0x4
+#define HAX_CAP_64BIT_RAMBLOCK 0x8
 
 struct hax_capabilityinfo {
     /* bit 0: 1 - working
@@ -349,13 +349,13 @@ struct hax_capabilityinfo {
     uint16_t winfo;
     uint32_t pad;
     uint64_t mem_quota;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 struct hax_fastmmio {
     uint64_t gpa;
     union {
         uint64_t value;
-        uint64_t gpa2;  /* since HAX API v4 */
+        uint64_t gpa2; /* since HAX API v4 */
     };
     uint8_t size;
     uint8_t direction;
@@ -365,5 +365,5 @@ struct hax_fastmmio {
     uint64_t _cr2;
     uint64_t _cr3;
     uint64_t _cr4;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 #endif

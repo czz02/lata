@@ -26,36 +26,50 @@
 #include "exec/cpu_ldst.h"
 #include "asi.h"
 
-//#define DEBUG_MMU
-//#define DEBUG_MXCC
-//#define DEBUG_UNASSIGNED
-//#define DEBUG_ASI
-//#define DEBUG_CACHE_CONTROL
+// #define DEBUG_MMU
+// #define DEBUG_MXCC
+// #define DEBUG_UNASSIGNED
+// #define DEBUG_ASI
+// #define DEBUG_CACHE_CONTROL
 
 #ifdef DEBUG_MMU
-#define DPRINTF_MMU(fmt, ...)                                   \
-    do { printf("MMU: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF_MMU(fmt, ...)               \
+    do {                                    \
+        printf("MMU: " fmt, ##__VA_ARGS__); \
+    } while (0)
 #else
-#define DPRINTF_MMU(fmt, ...) do {} while (0)
+#define DPRINTF_MMU(fmt, ...) \
+    do {                      \
+    } while (0)
 #endif
 
 #ifdef DEBUG_MXCC
-#define DPRINTF_MXCC(fmt, ...)                                  \
-    do { printf("MXCC: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF_MXCC(fmt, ...)               \
+    do {                                     \
+        printf("MXCC: " fmt, ##__VA_ARGS__); \
+    } while (0)
 #else
-#define DPRINTF_MXCC(fmt, ...) do {} while (0)
+#define DPRINTF_MXCC(fmt, ...) \
+    do {                       \
+    } while (0)
 #endif
 
 #ifdef DEBUG_ASI
-#define DPRINTF_ASI(fmt, ...)                                   \
-    do { printf("ASI: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF_ASI(fmt, ...)               \
+    do {                                    \
+        printf("ASI: " fmt, ##__VA_ARGS__); \
+    } while (0)
 #endif
 
 #ifdef DEBUG_CACHE_CONTROL
-#define DPRINTF_CACHE_CONTROL(fmt, ...)                                 \
-    do { printf("CACHE_CONTROL: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF_CACHE_CONTROL(fmt, ...)               \
+    do {                                              \
+        printf("CACHE_CONTROL: " fmt, ##__VA_ARGS__); \
+    } while (0)
 #else
-#define DPRINTF_CACHE_CONTROL(fmt, ...) do {} while (0)
+#define DPRINTF_CACHE_CONTROL(fmt, ...) \
+    do {                                \
+    } while (0)
 #endif
 
 #ifdef TARGET_SPARC64
@@ -92,7 +106,7 @@ static uint64_t ultrasparc_tsb_pointer(CPUSPARCState *env,
         tsb_register = mmu->tsb;
     }
     int tsb_split = (tsb_register & 0x1000ULL) ? 1 : 0;
-    int tsb_size  = tsb_register & 0xf;
+    int tsb_size = tsb_register & 0xf;
 
     uint64_t tsb_base_mask = (~0x1fffULL) << tsb_size;
 
@@ -120,9 +134,8 @@ static uint64_t ultrasparc_tag_target(uint64_t tag_access_register)
     return ((tag_access_register & 0x1fff) << 48) | (tag_access_register >> 22);
 }
 
-static void replace_tlb_entry(SparcTLBEntry *tlb,
-                              uint64_t tlb_tag, uint64_t tlb_tte,
-                              CPUSPARCState *env)
+static void replace_tlb_entry(SparcTLBEntry *tlb, uint64_t tlb_tag,
+                              uint64_t tlb_tte, CPUSPARCState *env)
 {
     target_ulong mask, size, va, offset;
 
@@ -171,7 +184,6 @@ static void demap_tlb(SparcTLBEntry *tlb, target_ulong demap_addr,
 
     for (i = 0; i < 64; i++) {
         if (TTE_IS_VALID(tlb[i].tte)) {
-
             if (is_demap_context) {
                 /* will remove non-global entries matching context value */
                 if (TTE_IS_GLOBAL(tlb[i].tte) ||
@@ -217,17 +229,16 @@ static uint64_t sun4v_tte_to_sun4u(CPUSPARCState *env, uint64_t tag,
     sun4u_tte |= CONVERT_BIT(sun4v_tte, TTE_NFO_BIT_UA2005, TTE_NFO_BIT);
     sun4u_tte |= CONVERT_BIT(sun4v_tte, TTE_USED_BIT_UA2005, TTE_USED_BIT);
     sun4u_tte |= CONVERT_BIT(sun4v_tte, TTE_W_OK_BIT_UA2005, TTE_W_OK_BIT);
-    sun4u_tte |= CONVERT_BIT(sun4v_tte, TTE_SIDEEFFECT_BIT_UA2005,
-                             TTE_SIDEEFFECT_BIT);
+    sun4u_tte |=
+        CONVERT_BIT(sun4v_tte, TTE_SIDEEFFECT_BIT_UA2005, TTE_SIDEEFFECT_BIT);
     sun4u_tte |= CONVERT_BIT(sun4v_tte, TTE_PRIV_BIT_UA2005, TTE_PRIV_BIT);
     sun4u_tte |= CONVERT_BIT(sun4v_tte, TTE_LOCKED_BIT_UA2005, TTE_LOCKED_BIT);
     return sun4u_tte;
 }
 
-static void replace_tlb_1bit_lru(SparcTLBEntry *tlb,
-                                 uint64_t tlb_tag, uint64_t tlb_tte,
-                                 const char *strmmu, CPUSPARCState *env1,
-                                 uint64_t addr)
+static void replace_tlb_1bit_lru(SparcTLBEntry *tlb, uint64_t tlb_tag,
+                                 uint64_t tlb_tte, const char *strmmu,
+                                 CPUSPARCState *env1, uint64_t addr)
 {
     unsigned int i, replace_used;
 
@@ -242,16 +253,14 @@ static void replace_tlb_1bit_lru(SparcTLBEntry *tlb,
             if (new_ctx == ctx) {
                 uint64_t vaddr = tlb[i].tag & ~0x1fffULL;
                 uint64_t size = 8192ULL << 3 * TTE_PGSIZE(tlb[i].tte);
-                if (new_vaddr == vaddr
-                    || (new_vaddr < vaddr + size
-                        && vaddr < new_vaddr + new_size)) {
+                if (new_vaddr == vaddr || (new_vaddr < vaddr + size &&
+                                           vaddr < new_vaddr + new_size)) {
                     DPRINTF_MMU("auto demap entry [%d] %lx->%lx\n", i, vaddr,
                                 new_vaddr);
                     replace_tlb_entry(&tlb[i], tlb_tag, tlb_tte, env1);
                     return;
                 }
             }
-
         }
     }
     /* Try replacing invalid entry */
@@ -269,16 +278,14 @@ static void replace_tlb_1bit_lru(SparcTLBEntry *tlb,
     /* All entries are valid, try replacing unlocked entry */
 
     for (replace_used = 0; replace_used < 2; ++replace_used) {
-
         /* Used entries are not replaced on first pass */
 
         for (i = 0; i < 64; i++) {
             if (!TTE_IS_LOCKED(tlb[i].tte) && !TTE_IS_USED(tlb[i].tte)) {
-
                 replace_tlb_entry(&tlb[i], tlb_tag, tlb_tte, env1);
 #ifdef DEBUG_MMU
-                DPRINTF_MMU("%s lru replaced unlocked %s entry [%i]\n",
-                            strmmu, (replace_used ? "used" : "unused"), i);
+                DPRINTF_MMU("%s lru replaced unlocked %s entry [%i]\n", strmmu,
+                            (replace_used ? "used" : "unused"), i);
                 dump_mmu(env1);
 #endif
                 return;
@@ -294,7 +301,8 @@ static void replace_tlb_1bit_lru(SparcTLBEntry *tlb,
 
 #ifdef DEBUG_MMU
     DPRINTF_MMU("%s lru replacement: no free entries available, "
-                "replacing the last one\n", strmmu);
+                "replacing the last one\n",
+                strmmu);
 #endif
     /* corner case: the last entry is replaced anyway */
     replace_tlb_entry(&tlb[63], tlb_tag, tlb_tte, env1);
@@ -334,8 +342,8 @@ static inline target_ulong address_mask(CPUSPARCState *env1, target_ulong addr)
     return addr;
 }
 
-static inline target_ulong asi_address_mask(CPUSPARCState *env,
-                                            int asi, target_ulong addr)
+static inline target_ulong asi_address_mask(CPUSPARCState *env, int asi,
+                                            target_ulong addr)
 {
     if (is_translating_asi(asi)) {
         addr = address_mask(env, addr);
@@ -350,10 +358,9 @@ static inline void do_check_asi(CPUSPARCState *env, int asi, uintptr_t ra)
      * ASIs >= 0x30 are hyper mode (or super if hyper is not available).
      * ASIs <= 0x2f are super mode.
      */
-    if (asi < 0x80
-        && !cpu_hypervisor_mode(env)
-        && (!cpu_supervisor_mode(env)
-            || (asi >= 0x30 && cpu_has_hypervisor(env)))) {
+    if (asi < 0x80 && !cpu_hypervisor_mode(env) &&
+        (!cpu_supervisor_mode(env) ||
+         (asi >= 0x30 && cpu_has_hypervisor(env)))) {
         cpu_raise_exception_ra(env, TT_PRIV_ACT, ra);
     }
 }
@@ -373,45 +380,44 @@ void helper_check_align(CPUSPARCState *env, target_ulong addr, uint32_t align)
     do_check_align(env, addr, align, GETPC());
 }
 
-#if !defined(TARGET_SPARC64) && !defined(CONFIG_USER_ONLY) &&   \
+#if !defined(TARGET_SPARC64) && !defined(CONFIG_USER_ONLY) && \
     defined(DEBUG_MXCC)
 static void dump_mxcc(CPUSPARCState *env)
 {
     printf("mxccdata: %016" PRIx64 " %016" PRIx64 " %016" PRIx64 " %016" PRIx64
            "\n",
-           env->mxccdata[0], env->mxccdata[1],
-           env->mxccdata[2], env->mxccdata[3]);
+           env->mxccdata[0], env->mxccdata[1], env->mxccdata[2],
+           env->mxccdata[3]);
     printf("mxccregs: %016" PRIx64 " %016" PRIx64 " %016" PRIx64 " %016" PRIx64
            "\n"
            "          %016" PRIx64 " %016" PRIx64 " %016" PRIx64 " %016" PRIx64
            "\n",
-           env->mxccregs[0], env->mxccregs[1],
-           env->mxccregs[2], env->mxccregs[3],
-           env->mxccregs[4], env->mxccregs[5],
+           env->mxccregs[0], env->mxccregs[1], env->mxccregs[2],
+           env->mxccregs[3], env->mxccregs[4], env->mxccregs[5],
            env->mxccregs[6], env->mxccregs[7]);
 }
 #endif
 
-#if (defined(TARGET_SPARC64) || !defined(CONFIG_USER_ONLY))     \
-    && defined(DEBUG_ASI)
+#if (defined(TARGET_SPARC64) || !defined(CONFIG_USER_ONLY)) && \
+    defined(DEBUG_ASI)
 static void dump_asi(const char *txt, target_ulong addr, int asi, int size,
                      uint64_t r1)
 {
     switch (size) {
     case 1:
-        DPRINTF_ASI("%s "TARGET_FMT_lx " asi 0x%02x = %02" PRIx64 "\n", txt,
+        DPRINTF_ASI("%s " TARGET_FMT_lx " asi 0x%02x = %02" PRIx64 "\n", txt,
                     addr, asi, r1 & 0xff);
         break;
     case 2:
-        DPRINTF_ASI("%s "TARGET_FMT_lx " asi 0x%02x = %04" PRIx64 "\n", txt,
+        DPRINTF_ASI("%s " TARGET_FMT_lx " asi 0x%02x = %04" PRIx64 "\n", txt,
                     addr, asi, r1 & 0xffff);
         break;
     case 4:
-        DPRINTF_ASI("%s "TARGET_FMT_lx " asi 0x%02x = %08" PRIx64 "\n", txt,
+        DPRINTF_ASI("%s " TARGET_FMT_lx " asi 0x%02x = %08" PRIx64 "\n", txt,
                     addr, asi, r1 & 0xffffffff);
         break;
     case 8:
-        DPRINTF_ASI("%s "TARGET_FMT_lx " asi 0x%02x = %016" PRIx64 "\n", txt,
+        DPRINTF_ASI("%s " TARGET_FMT_lx " asi 0x%02x = %016" PRIx64 "\n", txt,
                     addr, asi, r1);
         break;
     }
@@ -420,9 +426,9 @@ static void dump_asi(const char *txt, target_ulong addr, int asi, int size,
 
 #ifndef CONFIG_USER_ONLY
 #ifndef TARGET_SPARC64
-static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
-                                  bool is_write, bool is_exec, int is_asi,
-                                  unsigned size, uintptr_t retaddr)
+static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr, bool is_write,
+                                  bool is_exec, int is_asi, unsigned size,
+                                  uintptr_t retaddr)
 {
     SPARCCPU *cpu = SPARC_CPU(cs);
     CPUSPARCState *env = &cpu->env;
@@ -432,13 +438,17 @@ static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
     if (is_asi) {
         printf("Unassigned mem %s access of %d byte%s to " HWADDR_FMT_plx
                " asi 0x%02x from " TARGET_FMT_lx "\n",
-               is_exec ? "exec" : is_write ? "write" : "read", size,
-               size == 1 ? "" : "s", addr, is_asi, env->pc);
+               is_exec  ? "exec" :
+               is_write ? "write" :
+                          "read",
+               size, size == 1 ? "" : "s", addr, is_asi, env->pc);
     } else {
         printf("Unassigned mem %s access of %d byte%s to " HWADDR_FMT_plx
                " from " TARGET_FMT_lx "\n",
-               is_exec ? "exec" : is_write ? "write" : "read", size,
-               size == 1 ? "" : "s", addr, env->pc);
+               is_exec  ? "exec" :
+               is_write ? "write" :
+                          "read",
+               size, size == 1 ? "" : "s", addr, env->pc);
     }
 #endif
     /* Don't overwrite translation and access faults */
@@ -482,16 +492,17 @@ static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
     }
 }
 #else
-static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
-                                  bool is_write, bool is_exec, int is_asi,
-                                  unsigned size, uintptr_t retaddr)
+static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr, bool is_write,
+                                  bool is_exec, int is_asi, unsigned size,
+                                  uintptr_t retaddr)
 {
     SPARCCPU *cpu = SPARC_CPU(cs);
     CPUSPARCState *env = &cpu->env;
 
 #ifdef DEBUG_UNASSIGNED
     printf("Unassigned mem access to " HWADDR_FMT_plx " from " TARGET_FMT_lx
-           "\n", addr, env->pc);
+           "\n",
+           addr, env->pc);
 #endif
 
     if (is_exec) { /* XXX has_hypervisor */
@@ -520,8 +531,8 @@ static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
 static void leon3_cache_control_st(CPUSPARCState *env, target_ulong addr,
                                    uint64_t val, int size)
 {
-    DPRINTF_CACHE_CONTROL("st addr:%08x, val:%" PRIx64 ", size:%d\n",
-                          addr, val, size);
+    DPRINTF_CACHE_CONTROL("st addr:%08x, val:%" PRIx64 ", size:%d\n", addr, val,
+                          size);
 
     if (size != 4) {
         DPRINTF_CACHE_CONTROL("32bits only\n");
@@ -529,7 +540,7 @@ static void leon3_cache_control_st(CPUSPARCState *env, target_ulong addr,
     }
 
     switch (addr) {
-    case 0x00:              /* Cache control */
+    case 0x00: /* Cache control */
 
         /* These values must always be read as zeros */
         val &= ~CACHE_CTRL_FD;
@@ -540,8 +551,8 @@ static void leon3_cache_control_st(CPUSPARCState *env, target_ulong addr,
 
         env->cache_control = val;
         break;
-    case 0x04:              /* Instruction cache configuration */
-    case 0x08:              /* Data cache configuration */
+    case 0x04: /* Instruction cache configuration */
+    case 0x08: /* Data cache configuration */
         /* Read Only */
         break;
     default:
@@ -561,30 +572,30 @@ static uint64_t leon3_cache_control_ld(CPUSPARCState *env, target_ulong addr,
     }
 
     switch (addr) {
-    case 0x00:              /* Cache control */
+    case 0x00: /* Cache control */
         ret = env->cache_control;
         break;
 
         /* Configuration registers are read and only always keep those
            predefined values */
 
-    case 0x04:              /* Instruction cache configuration */
+    case 0x04: /* Instruction cache configuration */
         ret = 0x10220000;
         break;
-    case 0x08:              /* Data cache configuration */
+    case 0x08: /* Data cache configuration */
         ret = 0x18220000;
         break;
     default:
         DPRINTF_CACHE_CONTROL("read unknown register %08x\n", addr);
         break;
     };
-    DPRINTF_CACHE_CONTROL("ld addr:%08x, ret:0x%" PRIx64 ", size:%d\n",
-                          addr, ret, size);
+    DPRINTF_CACHE_CONTROL("ld addr:%08x, ret:0x%" PRIx64 ", size:%d\n", addr,
+                          ret, size);
     return ret;
 }
 
-uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-                       int asi, uint32_t memop)
+uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr, int asi,
+                       uint32_t memop)
 {
     int size = 1 << (memop & MO_SIZE);
     int sign = memop & MO_SIGN;
@@ -598,11 +609,11 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
     do_check_align(env, addr, size - 1, GETPC());
     switch (asi) {
     case ASI_M_MXCC: /* SuperSparc MXCC registers, or... */
-    /* case ASI_LEON_CACHEREGS:  Leon3 cache control */
+        /* case ASI_LEON_CACHEREGS:  Leon3 cache control */
         switch (addr) {
-        case 0x00:          /* Leon3 Cache Control */
-        case 0x08:          /* Leon3 Instruction Cache config */
-        case 0x0C:          /* Leon3 Date Cache config */
+        case 0x00: /* Leon3 Cache Control */
+        case 0x08: /* Leon3 Instruction Cache config */
+        case 0x0C: /* Leon3 Date Cache config */
             if (env->def.features & CPU_FEATURE_CACHE_CTRL) {
                 ret = leon3_cache_control_ld(env, addr, size);
             }
@@ -645,52 +656,50 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
             }
             break;
         default:
-            qemu_log_mask(LOG_UNIMP,
-                          "%08x: unimplemented address, size: %d\n", addr,
-                          size);
+            qemu_log_mask(LOG_UNIMP, "%08x: unimplemented address, size: %d\n",
+                          addr, size);
             break;
         }
         DPRINTF_MXCC("asi = %d, size = %d, sign = %d, "
                      "addr = %08x -> ret = %" PRIx64 ","
-                     "addr = %08x\n", asi, size, sign, last_addr, ret, addr);
+                     "addr = %08x\n",
+                     asi, size, sign, last_addr, ret, addr);
 #ifdef DEBUG_MXCC
         dump_mxcc(env);
 #endif
         break;
     case ASI_M_FLUSH_PROBE: /* SuperSparc MMU probe */
     case ASI_LEON_MMUFLUSH: /* LEON3 MMU probe */
-        {
-            int mmulev;
+    {
+        int mmulev;
 
-            mmulev = (addr >> 8) & 15;
-            if (mmulev > 4) {
-                ret = 0;
-            } else {
-                ret = mmu_probe(env, addr, mmulev);
-            }
-            DPRINTF_MMU("mmu_probe: 0x%08x (lev %d) -> 0x%08" PRIx64 "\n",
-                        addr, mmulev, ret);
+        mmulev = (addr >> 8) & 15;
+        if (mmulev > 4) {
+            ret = 0;
+        } else {
+            ret = mmu_probe(env, addr, mmulev);
         }
-        break;
+        DPRINTF_MMU("mmu_probe: 0x%08x (lev %d) -> 0x%08" PRIx64 "\n", addr,
+                    mmulev, ret);
+    } break;
     case ASI_M_MMUREGS: /* SuperSparc MMU regs */
     case ASI_LEON_MMUREGS: /* LEON3 MMU regs */
-        {
-            int reg = (addr >> 8) & 0x1f;
+    {
+        int reg = (addr >> 8) & 0x1f;
 
-            ret = env->mmuregs[reg];
-            if (reg == 3) { /* Fault status cleared on read */
-                env->mmuregs[3] = 0;
-            } else if (reg == 0x13) { /* Fault status read */
-                ret = env->mmuregs[3];
-            } else if (reg == 0x14) { /* Fault address read */
-                ret = env->mmuregs[4];
-            }
-            DPRINTF_MMU("mmu_read: reg[%d] = 0x%08" PRIx64 "\n", reg, ret);
+        ret = env->mmuregs[reg];
+        if (reg == 3) { /* Fault status cleared on read */
+            env->mmuregs[3] = 0;
+        } else if (reg == 0x13) { /* Fault status read */
+            ret = env->mmuregs[3];
+        } else if (reg == 0x14) { /* Fault address read */
+            ret = env->mmuregs[4];
         }
-        break;
+        DPRINTF_MMU("mmu_read: reg[%d] = 0x%08" PRIx64 "\n", reg, ret);
+    } break;
     case ASI_M_TLBDIAG: /* Turbosparc ITLB Diagnostic */
-    case ASI_M_DIAGS:   /* Turbosparc DTLB Diagnostic */
-    case ASI_M_IODIAG:  /* Turbosparc IOTLB Diagnostic */
+    case ASI_M_DIAGS: /* Turbosparc DTLB Diagnostic */
+    case ASI_M_IODIAG: /* Turbosparc IOTLB Diagnostic */
         break;
     case ASI_KERNELTXT: /* Supervisor code access */
         oi = make_memop_idx(memop, cpu_mmu_index(env, true));
@@ -710,9 +719,9 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
             break;
         }
         break;
-    case ASI_M_TXTC_TAG:   /* SparcStation 5 I-cache tag */
-    case ASI_M_TXTC_DATA:  /* SparcStation 5 I-cache data */
-    case ASI_M_DATAC_TAG:  /* SparcStation 5 D-cache tag */
+    case ASI_M_TXTC_TAG: /* SparcStation 5 I-cache tag */
+    case ASI_M_TXTC_DATA: /* SparcStation 5 I-cache data */
+    case ASI_M_DATAC_TAG: /* SparcStation 5 D-cache tag */
     case ASI_M_DATAC_DATA: /* SparcStation 5 D-cache data */
         break;
     case 0x21 ... 0x2f: /* MMU passthrough, 0x100000000 to 0xfffffffff */
@@ -731,18 +740,18 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
             break;
         default:
         case 4:
-            ret = address_space_ldl(cs->as, access_addr,
-                                    MEMTXATTRS_UNSPECIFIED, &result);
+            ret = address_space_ldl(cs->as, access_addr, MEMTXATTRS_UNSPECIFIED,
+                                    &result);
             break;
         case 8:
-            ret = address_space_ldq(cs->as, access_addr,
-                                    MEMTXATTRS_UNSPECIFIED, &result);
+            ret = address_space_ldq(cs->as, access_addr, MEMTXATTRS_UNSPECIFIED,
+                                    &result);
             break;
         }
 
         if (result != MEMTX_OK) {
-            sparc_raise_mmu_fault(cs, access_addr, false, false, false,
-                                  size, GETPC());
+            sparc_raise_mmu_fault(cs, access_addr, false, false, false, size,
+                                  GETPC());
         }
         break;
     }
@@ -753,28 +762,26 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
         ret = 0;
         break;
     case 0x38: /* SuperSPARC MMU Breakpoint Control Registers */
-        {
-            int reg = (addr >> 8) & 3;
+    {
+        int reg = (addr >> 8) & 3;
 
-            switch (reg) {
-            case 0: /* Breakpoint Value (Addr) */
-                ret = env->mmubpregs[reg];
-                break;
-            case 1: /* Breakpoint Mask */
-                ret = env->mmubpregs[reg];
-                break;
-            case 2: /* Breakpoint Control */
-                ret = env->mmubpregs[reg];
-                break;
-            case 3: /* Breakpoint Status */
-                ret = env->mmubpregs[reg];
-                env->mmubpregs[reg] = 0ULL;
-                break;
-            }
-            DPRINTF_MMU("read breakpoint reg[%d] 0x%016" PRIx64 "\n", reg,
-                        ret);
+        switch (reg) {
+        case 0: /* Breakpoint Value (Addr) */
+            ret = env->mmubpregs[reg];
+            break;
+        case 1: /* Breakpoint Mask */
+            ret = env->mmubpregs[reg];
+            break;
+        case 2: /* Breakpoint Control */
+            ret = env->mmubpregs[reg];
+            break;
+        case 3: /* Breakpoint Status */
+            ret = env->mmubpregs[reg];
+            env->mmubpregs[reg] = 0ULL;
+            break;
         }
-        break;
+        DPRINTF_MMU("read breakpoint reg[%d] 0x%016" PRIx64 "\n", reg, ret);
+    } break;
     case 0x49: /* SuperSPARC MMU Counter Breakpoint Value */
         ret = env->mmubpctrv;
         break;
@@ -796,7 +803,7 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
     case ASI_USERDATA: /* User data access */
     case ASI_KERNELDATA: /* Supervisor data access */
     case ASI_P: /* Implicit primary context data access (v9 only?) */
-    case ASI_M_BYPASS:    /* MMU passthrough */
+    case ASI_M_BYPASS: /* MMU passthrough */
     case ASI_LEON_BYPASS: /* LEON MMU passthrough */
         /* These are always handled inline.  */
         g_assert_not_reached();
@@ -804,13 +811,13 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
     if (sign) {
         switch (size) {
         case 1:
-            ret = (int8_t) ret;
+            ret = (int8_t)ret;
             break;
         case 2:
-            ret = (int16_t) ret;
+            ret = (int16_t)ret;
             break;
         case 4:
-            ret = (int32_t) ret;
+            ret = (int32_t)ret;
             break;
         default:
             break;
@@ -822,8 +829,8 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
     return ret;
 }
 
-void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
-                   int asi, uint32_t memop)
+void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val, int asi,
+                   uint32_t memop)
 {
     int size = 1 << (memop & MO_SIZE);
     CPUState *cs = env_cpu(env);
@@ -831,11 +838,11 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
     do_check_align(env, addr, size - 1, GETPC());
     switch (asi) {
     case ASI_M_MXCC: /* SuperSparc MXCC registers, or... */
-    /* case ASI_LEON_CACHEREGS:  Leon3 cache control */
+        /* case ASI_LEON_CACHEREGS:  Leon3 cache control */
         switch (addr) {
-        case 0x00:          /* Leon3 Cache Control */
-        case 0x08:          /* Leon3 Instruction Cache config */
-        case 0x0C:          /* Leon3 Date Cache config */
+        case 0x00: /* Leon3 Cache Control */
+        case 0x08: /* Leon3 Instruction Cache config */
+        case 0x0C: /* Leon3 Date Cache config */
             if (env->def.features & CPU_FEATURE_CACHE_CTRL) {
                 leon3_cache_control_st(env, addr, val, size);
             }
@@ -893,14 +900,12 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
                 MemTxResult result;
                 hwaddr access_addr = (env->mxccregs[0] & 0xffffffffULL) + 8 * i;
 
-                env->mxccdata[i] = address_space_ldq(cs->as,
-                                                     access_addr,
-                                                     MEMTXATTRS_UNSPECIFIED,
-                                                     &result);
+                env->mxccdata[i] = address_space_ldq(
+                    cs->as, access_addr, MEMTXATTRS_UNSPECIFIED, &result);
                 if (result != MEMTX_OK) {
                     /* TODO: investigate whether this is the right behaviour */
-                    sparc_raise_mmu_fault(cs, access_addr, false, false,
-                                          false, size, GETPC());
+                    sparc_raise_mmu_fault(cs, access_addr, false, false, false,
+                                          size, GETPC());
                 }
             }
             break;
@@ -926,8 +931,8 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
 
                 if (result != MEMTX_OK) {
                     /* TODO: investigate whether this is the right behaviour */
-                    sparc_raise_mmu_fault(cs, access_addr, true, false,
-                                          false, size, GETPC());
+                    sparc_raise_mmu_fault(cs, access_addr, true, false, false,
+                                          size, GETPC());
                 }
             }
             break;
@@ -943,8 +948,8 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
             break;
         case 0x01c00a04: /* MXCC control register */
             if (size == 4) {
-                env->mxccregs[3] = (env->mxccregs[3] & 0xffffffff00000000ULL)
-                    | val;
+                env->mxccregs[3] =
+                    (env->mxccregs[3] & 0xffffffff00000000ULL) | val;
             } else {
                 qemu_log_mask(LOG_UNIMP,
                               "%08x: unimplemented access size: %d\n", addr,
@@ -971,9 +976,8 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
             }
             break;
         default:
-            qemu_log_mask(LOG_UNIMP,
-                          "%08x: unimplemented address, size: %d\n", addr,
-                          size);
+            qemu_log_mask(LOG_UNIMP, "%08x: unimplemented address, size: %d\n",
+                          addr, size);
             break;
         }
         DPRINTF_MXCC("asi = %d, size = %d, addr = %08x, val = %" PRIx64 "\n",
@@ -984,128 +988,124 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
         break;
     case ASI_M_FLUSH_PROBE: /* SuperSparc MMU flush */
     case ASI_LEON_MMUFLUSH: /* LEON3 MMU flush */
-        {
-            int mmulev;
+    {
+        int mmulev;
 
-            mmulev = (addr >> 8) & 15;
-            DPRINTF_MMU("mmu flush level %d\n", mmulev);
-            switch (mmulev) {
-            case 0: /* flush page */
-                tlb_flush_page(cs, addr & 0xfffff000);
-                break;
-            case 1: /* flush segment (256k) */
-            case 2: /* flush region (16M) */
-            case 3: /* flush context (4G) */
-            case 4: /* flush entire */
-                tlb_flush(cs);
-                break;
-            default:
-                break;
-            }
-#ifdef DEBUG_MMU
-            dump_mmu(env);
-#endif
+        mmulev = (addr >> 8) & 15;
+        DPRINTF_MMU("mmu flush level %d\n", mmulev);
+        switch (mmulev) {
+        case 0: /* flush page */
+            tlb_flush_page(cs, addr & 0xfffff000);
+            break;
+        case 1: /* flush segment (256k) */
+        case 2: /* flush region (16M) */
+        case 3: /* flush context (4G) */
+        case 4: /* flush entire */
+            tlb_flush(cs);
+            break;
+        default:
+            break;
         }
-        break;
+#ifdef DEBUG_MMU
+        dump_mmu(env);
+#endif
+    } break;
     case ASI_M_MMUREGS: /* write MMU regs */
     case ASI_LEON_MMUREGS: /* LEON3 write MMU regs */
-        {
-            int reg = (addr >> 8) & 0x1f;
-            uint32_t oldreg;
+    {
+        int reg = (addr >> 8) & 0x1f;
+        uint32_t oldreg;
 
-            oldreg = env->mmuregs[reg];
-            switch (reg) {
-            case 0: /* Control Register */
-                env->mmuregs[reg] = (env->mmuregs[reg] & 0xff000000) |
-                    (val & 0x00ffffff);
-                /* Mappings generated during no-fault mode
-                   are invalid in normal mode.  */
-                if ((oldreg ^ env->mmuregs[reg])
-                    & (MMU_NF | env->def.mmu_bm)) {
-                    tlb_flush(cs);
-                }
-                break;
-            case 1: /* Context Table Pointer Register */
-                env->mmuregs[reg] = val & env->def.mmu_ctpr_mask;
-                break;
-            case 2: /* Context Register */
-                env->mmuregs[reg] = val & env->def.mmu_cxr_mask;
-                if (oldreg != env->mmuregs[reg]) {
-                    /* we flush when the MMU context changes because
-                       QEMU has no MMU context support */
-                    tlb_flush(cs);
-                }
-                break;
-            case 3: /* Synchronous Fault Status Register with Clear */
-            case 4: /* Synchronous Fault Address Register */
-                break;
-            case 0x10: /* TLB Replacement Control Register */
-                env->mmuregs[reg] = val & env->def.mmu_trcr_mask;
-                break;
-            case 0x13: /* Synchronous Fault Status Register with Read
-                          and Clear */
-                env->mmuregs[3] = val & env->def.mmu_sfsr_mask;
-                break;
-            case 0x14: /* Synchronous Fault Address Register */
-                env->mmuregs[4] = val;
-                break;
-            default:
-                env->mmuregs[reg] = val;
-                break;
+        oldreg = env->mmuregs[reg];
+        switch (reg) {
+        case 0: /* Control Register */
+            env->mmuregs[reg] =
+                (env->mmuregs[reg] & 0xff000000) | (val & 0x00ffffff);
+            /* Mappings generated during no-fault mode
+               are invalid in normal mode.  */
+            if ((oldreg ^ env->mmuregs[reg]) & (MMU_NF | env->def.mmu_bm)) {
+                tlb_flush(cs);
             }
+            break;
+        case 1: /* Context Table Pointer Register */
+            env->mmuregs[reg] = val & env->def.mmu_ctpr_mask;
+            break;
+        case 2: /* Context Register */
+            env->mmuregs[reg] = val & env->def.mmu_cxr_mask;
             if (oldreg != env->mmuregs[reg]) {
-                DPRINTF_MMU("mmu change reg[%d]: 0x%08x -> 0x%08x\n",
-                            reg, oldreg, env->mmuregs[reg]);
+                /* we flush when the MMU context changes because
+                   QEMU has no MMU context support */
+                tlb_flush(cs);
             }
-#ifdef DEBUG_MMU
-            dump_mmu(env);
-#endif
+            break;
+        case 3: /* Synchronous Fault Status Register with Clear */
+        case 4: /* Synchronous Fault Address Register */
+            break;
+        case 0x10: /* TLB Replacement Control Register */
+            env->mmuregs[reg] = val & env->def.mmu_trcr_mask;
+            break;
+        case 0x13: /* Synchronous Fault Status Register with Read
+                      and Clear */
+            env->mmuregs[3] = val & env->def.mmu_sfsr_mask;
+            break;
+        case 0x14: /* Synchronous Fault Address Register */
+            env->mmuregs[4] = val;
+            break;
+        default:
+            env->mmuregs[reg] = val;
+            break;
         }
-        break;
+        if (oldreg != env->mmuregs[reg]) {
+            DPRINTF_MMU("mmu change reg[%d]: 0x%08x -> 0x%08x\n", reg, oldreg,
+                        env->mmuregs[reg]);
+        }
+#ifdef DEBUG_MMU
+        dump_mmu(env);
+#endif
+    } break;
     case ASI_M_TLBDIAG: /* Turbosparc ITLB Diagnostic */
-    case ASI_M_DIAGS:   /* Turbosparc DTLB Diagnostic */
-    case ASI_M_IODIAG:  /* Turbosparc IOTLB Diagnostic */
+    case ASI_M_DIAGS: /* Turbosparc DTLB Diagnostic */
+    case ASI_M_IODIAG: /* Turbosparc IOTLB Diagnostic */
         break;
-    case ASI_M_TXTC_TAG:   /* I-cache tag */
-    case ASI_M_TXTC_DATA:  /* I-cache data */
-    case ASI_M_DATAC_TAG:  /* D-cache tag */
+    case ASI_M_TXTC_TAG: /* I-cache tag */
+    case ASI_M_TXTC_DATA: /* I-cache data */
+    case ASI_M_DATAC_TAG: /* D-cache tag */
     case ASI_M_DATAC_DATA: /* D-cache data */
-    case ASI_M_FLUSH_PAGE:   /* I/D-cache flush page */
-    case ASI_M_FLUSH_SEG:    /* I/D-cache flush segment */
+    case ASI_M_FLUSH_PAGE: /* I/D-cache flush page */
+    case ASI_M_FLUSH_SEG: /* I/D-cache flush segment */
     case ASI_M_FLUSH_REGION: /* I/D-cache flush region */
-    case ASI_M_FLUSH_CTX:    /* I/D-cache flush context */
-    case ASI_M_FLUSH_USER:   /* I/D-cache flush user */
+    case ASI_M_FLUSH_CTX: /* I/D-cache flush context */
+    case ASI_M_FLUSH_USER: /* I/D-cache flush user */
         break;
     case 0x21 ... 0x2f: /* MMU passthrough, 0x100000000 to 0xfffffffff */
-        {
-            MemTxResult result;
-            hwaddr access_addr = (hwaddr)addr | ((hwaddr)(asi & 0xf) << 32);
+    {
+        MemTxResult result;
+        hwaddr access_addr = (hwaddr)addr | ((hwaddr)(asi & 0xf) << 32);
 
-            switch (size) {
-            case 1:
-                address_space_stb(cs->as, access_addr, val,
-                                  MEMTXATTRS_UNSPECIFIED, &result);
-                break;
-            case 2:
-                address_space_stw(cs->as, access_addr, val,
-                                  MEMTXATTRS_UNSPECIFIED, &result);
-                break;
-            case 4:
-            default:
-                address_space_stl(cs->as, access_addr, val,
-                                  MEMTXATTRS_UNSPECIFIED, &result);
-                break;
-            case 8:
-                address_space_stq(cs->as, access_addr, val,
-                                  MEMTXATTRS_UNSPECIFIED, &result);
-                break;
-            }
-            if (result != MEMTX_OK) {
-                sparc_raise_mmu_fault(cs, access_addr, true, false, false,
-                                      size, GETPC());
-            }
+        switch (size) {
+        case 1:
+            address_space_stb(cs->as, access_addr, val, MEMTXATTRS_UNSPECIFIED,
+                              &result);
+            break;
+        case 2:
+            address_space_stw(cs->as, access_addr, val, MEMTXATTRS_UNSPECIFIED,
+                              &result);
+            break;
+        case 4:
+        default:
+            address_space_stl(cs->as, access_addr, val, MEMTXATTRS_UNSPECIFIED,
+                              &result);
+            break;
+        case 8:
+            address_space_stq(cs->as, access_addr, val, MEMTXATTRS_UNSPECIFIED,
+                              &result);
+            break;
         }
-        break;
+        if (result != MEMTX_OK) {
+            sparc_raise_mmu_fault(cs, access_addr, true, false, false, size,
+                                  GETPC());
+        }
+    } break;
     case 0x30: /* store buffer tags or Turbosparc secondary cache diagnostic */
     case 0x31: /* store buffer data, Ross RT620 I-cache flush or
                   Turbosparc snoop RAM */
@@ -1115,27 +1115,26 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
     case 0x37: /* D-cache flash clear */
         break;
     case 0x38: /* SuperSPARC MMU Breakpoint Control Registers*/
-        {
-            int reg = (addr >> 8) & 3;
+    {
+        int reg = (addr >> 8) & 3;
 
-            switch (reg) {
-            case 0: /* Breakpoint Value (Addr) */
-                env->mmubpregs[reg] = (val & 0xfffffffffULL);
-                break;
-            case 1: /* Breakpoint Mask */
-                env->mmubpregs[reg] = (val & 0xfffffffffULL);
-                break;
-            case 2: /* Breakpoint Control */
-                env->mmubpregs[reg] = (val & 0x7fULL);
-                break;
-            case 3: /* Breakpoint Status */
-                env->mmubpregs[reg] = (val & 0xfULL);
-                break;
-            }
-            DPRINTF_MMU("write breakpoint reg[%d] 0x%016x\n", reg,
-                        env->mmuregs[reg]);
+        switch (reg) {
+        case 0: /* Breakpoint Value (Addr) */
+            env->mmubpregs[reg] = (val & 0xfffffffffULL);
+            break;
+        case 1: /* Breakpoint Mask */
+            env->mmubpregs[reg] = (val & 0xfffffffffULL);
+            break;
+        case 2: /* Breakpoint Control */
+            env->mmubpregs[reg] = (val & 0x7fULL);
+            break;
+        case 3: /* Breakpoint Status */
+            env->mmubpregs[reg] = (val & 0xfULL);
+            break;
         }
-        break;
+        DPRINTF_MMU("write breakpoint reg[%d] 0x%016x\n", reg,
+                    env->mmuregs[reg]);
+    } break;
     case 0x49: /* SuperSPARC MMU Counter Breakpoint Value */
         env->mmubpctrv = val & 0xffffffff;
         break;
@@ -1157,7 +1156,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
     case ASI_USERDATA: /* User data access */
     case ASI_KERNELDATA: /* Supervisor data access */
     case ASI_P:
-    case ASI_M_BYPASS:    /* MMU passthrough */
+    case ASI_M_BYPASS: /* MMU passthrough */
     case ASI_LEON_BYPASS: /* LEON MMU passthrough */
     case ASI_M_BCOPY: /* Block copy, sta access */
     case ASI_M_BFILL: /* Block fill, stda access */
@@ -1173,8 +1172,8 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
 #else /* TARGET_SPARC64 */
 
 #ifdef CONFIG_USER_ONLY
-uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-                       int asi, uint32_t memop)
+uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr, int asi,
+                       uint32_t memop)
 {
     int size = 1 << (memop & MO_SIZE);
     int sign = memop & MO_SIGN;
@@ -1187,9 +1186,9 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
     addr = asi_address_mask(env, asi, addr);
 
     switch (asi) {
-    case ASI_PNF:  /* Primary no-fault */
+    case ASI_PNF: /* Primary no-fault */
     case ASI_PNFL: /* Primary no-fault LE */
-    case ASI_SNF:  /* Secondary no-fault */
+    case ASI_SNF: /* Secondary no-fault */
     case ASI_SNFL: /* Secondary no-fault LE */
         if (!page_check_range(addr, size, PAGE_READ)) {
             ret = 0;
@@ -1216,7 +1215,7 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
 
     case ASI_P: /* Primary */
     case ASI_PL: /* Primary LE */
-    case ASI_S:  /* Secondary */
+    case ASI_S: /* Secondary */
     case ASI_SL: /* Secondary LE */
         /* These are always handled inline.  */
         g_assert_not_reached();
@@ -1246,13 +1245,13 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
     if (sign) {
         switch (size) {
         case 1:
-            ret = (int8_t) ret;
+            ret = (int8_t)ret;
             break;
         case 2:
-            ret = (int16_t) ret;
+            ret = (int16_t)ret;
             break;
         case 4:
-            ret = (int32_t) ret;
+            ret = (int32_t)ret;
             break;
         }
     }
@@ -1275,15 +1274,15 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
     do_check_align(env, addr, size - 1, GETPC());
 
     switch (asi) {
-    case ASI_P:  /* Primary */
+    case ASI_P: /* Primary */
     case ASI_PL: /* Primary LE */
-    case ASI_S:  /* Secondary */
+    case ASI_S: /* Secondary */
     case ASI_SL: /* Secondary LE */
         /* These are always handled inline.  */
         g_assert_not_reached();
 
-    case ASI_PNF:  /* Primary no-fault, RO */
-    case ASI_SNF:  /* Secondary no-fault, RO */
+    case ASI_PNF: /* Primary no-fault, RO */
+    case ASI_SNF: /* Secondary no-fault, RO */
     case ASI_PNFL: /* Primary no-fault LE, RO */
     case ASI_SNFL: /* Secondary no-fault LE, RO */
     default:
@@ -1293,8 +1292,8 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
 
 #else /* CONFIG_USER_ONLY */
 
-uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
-                       int asi, uint32_t memop)
+uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr, int asi,
+                       uint32_t memop)
 {
     int size = 1 << (memop & MO_SIZE);
     int sign = memop & MO_SIGN;
@@ -1314,68 +1313,66 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
     case ASI_PNF:
     case ASI_PNFL:
     case ASI_SNF:
-    case ASI_SNFL:
-        {
-            MemOpIdx oi;
-            int idx = (env->pstate & PS_PRIV
-                       ? (asi & 1 ? MMU_KERNEL_SECONDARY_IDX : MMU_KERNEL_IDX)
-                       : (asi & 1 ? MMU_USER_SECONDARY_IDX : MMU_USER_IDX));
+    case ASI_SNFL: {
+        MemOpIdx oi;
+        int idx = (env->pstate & PS_PRIV ?
+                       (asi & 1 ? MMU_KERNEL_SECONDARY_IDX : MMU_KERNEL_IDX) :
+                       (asi & 1 ? MMU_USER_SECONDARY_IDX : MMU_USER_IDX));
 
-            if (cpu_get_phys_page_nofault(env, addr, idx) == -1ULL) {
+        if (cpu_get_phys_page_nofault(env, addr, idx) == -1ULL) {
 #ifdef DEBUG_ASI
-                dump_asi("read ", last_addr, asi, size, ret);
+            dump_asi("read ", last_addr, asi, size, ret);
 #endif
-                /* exception_index is set in get_physical_address_data. */
-                cpu_raise_exception_ra(env, cs->exception_index, GETPC());
-            }
-            oi = make_memop_idx(memop, idx);
-            switch (size) {
-            case 1:
-                ret = cpu_ldb_mmu(env, addr, oi, GETPC());
-                break;
-            case 2:
-                ret = cpu_ldw_mmu(env, addr, oi, GETPC());
-                break;
-            case 4:
-                ret = cpu_ldl_mmu(env, addr, oi, GETPC());
-                break;
-            case 8:
-                ret = cpu_ldq_mmu(env, addr, oi, GETPC());
-                break;
-            default:
-                g_assert_not_reached();
-            }
+            /* exception_index is set in get_physical_address_data. */
+            cpu_raise_exception_ra(env, cs->exception_index, GETPC());
         }
-        break;
+        oi = make_memop_idx(memop, idx);
+        switch (size) {
+        case 1:
+            ret = cpu_ldb_mmu(env, addr, oi, GETPC());
+            break;
+        case 2:
+            ret = cpu_ldw_mmu(env, addr, oi, GETPC());
+            break;
+        case 4:
+            ret = cpu_ldl_mmu(env, addr, oi, GETPC());
+            break;
+        case 8:
+            ret = cpu_ldq_mmu(env, addr, oi, GETPC());
+            break;
+        default:
+            g_assert_not_reached();
+        }
+    } break;
 
-    case ASI_AIUP:  /* As if user primary */
-    case ASI_AIUS:  /* As if user secondary */
+    case ASI_AIUP: /* As if user primary */
+    case ASI_AIUS: /* As if user secondary */
     case ASI_AIUPL: /* As if user primary LE */
     case ASI_AIUSL: /* As if user secondary LE */
-    case ASI_P:  /* Primary */
-    case ASI_S:  /* Secondary */
+    case ASI_P: /* Primary */
+    case ASI_S: /* Secondary */
     case ASI_PL: /* Primary LE */
     case ASI_SL: /* Secondary LE */
-    case ASI_REAL:      /* Bypass */
-    case ASI_REAL_IO:   /* Bypass, non-cacheable */
-    case ASI_REAL_L:    /* Bypass LE */
+    case ASI_REAL: /* Bypass */
+    case ASI_REAL_IO: /* Bypass, non-cacheable */
+    case ASI_REAL_L: /* Bypass LE */
     case ASI_REAL_IO_L: /* Bypass, non-cacheable LE */
-    case ASI_N:  /* Nucleus */
+    case ASI_N: /* Nucleus */
     case ASI_NL: /* Nucleus Little Endian (LE) */
-    case ASI_NUCLEUS_QUAD_LDD:   /* Nucleus quad LDD 128 bit atomic */
+    case ASI_NUCLEUS_QUAD_LDD: /* Nucleus quad LDD 128 bit atomic */
     case ASI_NUCLEUS_QUAD_LDD_L: /* Nucleus quad LDD 128 bit atomic LE */
-    case ASI_TWINX_AIUP:   /* As if user primary, twinx */
-    case ASI_TWINX_AIUS:   /* As if user secondary, twinx */
-    case ASI_TWINX_REAL:   /* Real address, twinx */
+    case ASI_TWINX_AIUP: /* As if user primary, twinx */
+    case ASI_TWINX_AIUS: /* As if user secondary, twinx */
+    case ASI_TWINX_REAL: /* Real address, twinx */
     case ASI_TWINX_AIUP_L: /* As if user primary, twinx, LE */
     case ASI_TWINX_AIUS_L: /* As if user secondary, twinx, LE */
     case ASI_TWINX_REAL_L: /* Real address, twinx, LE */
-    case ASI_TWINX_N:  /* Nucleus, twinx */
+    case ASI_TWINX_N: /* Nucleus, twinx */
     case ASI_TWINX_NL: /* Nucleus, twinx, LE */
     /* ??? From the UA2011 document; overlaps BLK_INIT_QUAD_LDD_* */
-    case ASI_TWINX_P:  /* Primary, twinx */
+    case ASI_TWINX_P: /* Primary, twinx */
     case ASI_TWINX_PL: /* Primary, twinx, LE */
-    case ASI_TWINX_S:  /* Secondary, twinx */
+    case ASI_TWINX_S: /* Secondary, twinx */
     case ASI_TWINX_SL: /* Secondary, twinx, LE */
         /* These are always handled inline.  */
         g_assert_not_reached();
@@ -1387,136 +1384,136 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
         ret = env->lsu;
         break;
     case ASI_IMMU: /* I-MMU regs */
-        {
-            int reg = (addr >> 3) & 0xf;
-            switch (reg) {
-            case 0:
-                /* 0x00 I-TSB Tag Target register */
-                ret = ultrasparc_tag_target(env->immu.tag_access);
-                break;
-            case 3: /* SFSR */
-                ret = env->immu.sfsr;
-                break;
-            case 5: /* TSB access */
-                ret = env->immu.tsb;
-                break;
-            case 6:
-                /* 0x30 I-TSB Tag Access register */
-                ret = env->immu.tag_access;
-                break;
-            default:
-                sparc_raise_mmu_fault(cs, addr, false, false, 1, size, GETPC());
-                ret = 0;
-            }
+    {
+        int reg = (addr >> 3) & 0xf;
+        switch (reg) {
+        case 0:
+            /* 0x00 I-TSB Tag Target register */
+            ret = ultrasparc_tag_target(env->immu.tag_access);
             break;
+        case 3: /* SFSR */
+            ret = env->immu.sfsr;
+            break;
+        case 5: /* TSB access */
+            ret = env->immu.tsb;
+            break;
+        case 6:
+            /* 0x30 I-TSB Tag Access register */
+            ret = env->immu.tag_access;
+            break;
+        default:
+            sparc_raise_mmu_fault(cs, addr, false, false, 1, size, GETPC());
+            ret = 0;
         }
+        break;
+    }
     case ASI_IMMU_TSB_8KB_PTR: /* I-MMU 8k TSB pointer */
-        {
-            /* env->immuregs[5] holds I-MMU TSB register value
-               env->immuregs[6] holds I-MMU Tag Access register value */
-            ret = ultrasparc_tsb_pointer(env, &env->immu, 0);
-            break;
-        }
+    {
+        /* env->immuregs[5] holds I-MMU TSB register value
+           env->immuregs[6] holds I-MMU Tag Access register value */
+        ret = ultrasparc_tsb_pointer(env, &env->immu, 0);
+        break;
+    }
     case ASI_IMMU_TSB_64KB_PTR: /* I-MMU 64k TSB pointer */
-        {
-            /* env->immuregs[5] holds I-MMU TSB register value
-               env->immuregs[6] holds I-MMU Tag Access register value */
-            ret = ultrasparc_tsb_pointer(env, &env->immu, 1);
-            break;
-        }
+    {
+        /* env->immuregs[5] holds I-MMU TSB register value
+           env->immuregs[6] holds I-MMU Tag Access register value */
+        ret = ultrasparc_tsb_pointer(env, &env->immu, 1);
+        break;
+    }
     case ASI_ITLB_DATA_ACCESS: /* I-MMU data access */
-        {
-            int reg = (addr >> 3) & 0x3f;
+    {
+        int reg = (addr >> 3) & 0x3f;
 
-            ret = env->itlb[reg].tte;
-            break;
-        }
+        ret = env->itlb[reg].tte;
+        break;
+    }
     case ASI_ITLB_TAG_READ: /* I-MMU tag read */
-        {
-            int reg = (addr >> 3) & 0x3f;
+    {
+        int reg = (addr >> 3) & 0x3f;
 
-            ret = env->itlb[reg].tag;
-            break;
-        }
+        ret = env->itlb[reg].tag;
+        break;
+    }
     case ASI_DMMU: /* D-MMU regs */
-        {
-            int reg = (addr >> 3) & 0xf;
-            switch (reg) {
-            case 0:
-                /* 0x00 D-TSB Tag Target register */
-                ret = ultrasparc_tag_target(env->dmmu.tag_access);
-                break;
-            case 1: /* 0x08 Primary Context */
-                ret = env->dmmu.mmu_primary_context;
-                break;
-            case 2: /* 0x10 Secondary Context */
-                ret = env->dmmu.mmu_secondary_context;
-                break;
-            case 3: /* SFSR */
-                ret = env->dmmu.sfsr;
-                break;
-            case 4: /* 0x20 SFAR */
-                ret = env->dmmu.sfar;
-                break;
-            case 5: /* 0x28 TSB access */
-                ret = env->dmmu.tsb;
-                break;
-            case 6: /* 0x30 D-TSB Tag Access register */
-                ret = env->dmmu.tag_access;
-                break;
-            case 7:
-                ret = env->dmmu.virtual_watchpoint;
-                break;
-            case 8:
-                ret = env->dmmu.physical_watchpoint;
-                break;
-            default:
-                sparc_raise_mmu_fault(cs, addr, false, false, 1, size, GETPC());
-                ret = 0;
-            }
+    {
+        int reg = (addr >> 3) & 0xf;
+        switch (reg) {
+        case 0:
+            /* 0x00 D-TSB Tag Target register */
+            ret = ultrasparc_tag_target(env->dmmu.tag_access);
             break;
+        case 1: /* 0x08 Primary Context */
+            ret = env->dmmu.mmu_primary_context;
+            break;
+        case 2: /* 0x10 Secondary Context */
+            ret = env->dmmu.mmu_secondary_context;
+            break;
+        case 3: /* SFSR */
+            ret = env->dmmu.sfsr;
+            break;
+        case 4: /* 0x20 SFAR */
+            ret = env->dmmu.sfar;
+            break;
+        case 5: /* 0x28 TSB access */
+            ret = env->dmmu.tsb;
+            break;
+        case 6: /* 0x30 D-TSB Tag Access register */
+            ret = env->dmmu.tag_access;
+            break;
+        case 7:
+            ret = env->dmmu.virtual_watchpoint;
+            break;
+        case 8:
+            ret = env->dmmu.physical_watchpoint;
+            break;
+        default:
+            sparc_raise_mmu_fault(cs, addr, false, false, 1, size, GETPC());
+            ret = 0;
         }
+        break;
+    }
     case ASI_DMMU_TSB_8KB_PTR: /* D-MMU 8k TSB pointer */
-        {
-            /* env->dmmuregs[5] holds D-MMU TSB register value
-               env->dmmuregs[6] holds D-MMU Tag Access register value */
-            ret = ultrasparc_tsb_pointer(env, &env->dmmu, 0);
-            break;
-        }
+    {
+        /* env->dmmuregs[5] holds D-MMU TSB register value
+           env->dmmuregs[6] holds D-MMU Tag Access register value */
+        ret = ultrasparc_tsb_pointer(env, &env->dmmu, 0);
+        break;
+    }
     case ASI_DMMU_TSB_64KB_PTR: /* D-MMU 64k TSB pointer */
-        {
-            /* env->dmmuregs[5] holds D-MMU TSB register value
-               env->dmmuregs[6] holds D-MMU Tag Access register value */
-            ret = ultrasparc_tsb_pointer(env, &env->dmmu, 1);
-            break;
-        }
+    {
+        /* env->dmmuregs[5] holds D-MMU TSB register value
+           env->dmmuregs[6] holds D-MMU Tag Access register value */
+        ret = ultrasparc_tsb_pointer(env, &env->dmmu, 1);
+        break;
+    }
     case ASI_DTLB_DATA_ACCESS: /* D-MMU data access */
-        {
-            int reg = (addr >> 3) & 0x3f;
+    {
+        int reg = (addr >> 3) & 0x3f;
 
-            ret = env->dtlb[reg].tte;
-            break;
-        }
+        ret = env->dtlb[reg].tte;
+        break;
+    }
     case ASI_DTLB_TAG_READ: /* D-MMU tag read */
-        {
-            int reg = (addr >> 3) & 0x3f;
+    {
+        int reg = (addr >> 3) & 0x3f;
 
-            ret = env->dtlb[reg].tag;
-            break;
-        }
+        ret = env->dtlb[reg].tag;
+        break;
+    }
     case ASI_INTR_DISPATCH_STAT: /* Interrupt dispatch, RO */
         break;
     case ASI_INTR_RECEIVE: /* Interrupt data receive */
         ret = env->ivec_status;
         break;
     case ASI_INTR_R: /* Incoming interrupt vector, RO */
-        {
-            int reg = (addr >> 4) & 0x3;
-            if (reg < 3) {
-                ret = env->ivec_data[reg];
-            }
-            break;
+    {
+        int reg = (addr >> 4) & 0x3;
+        if (reg < 3) {
+            ret = env->ivec_data[reg];
         }
+        break;
+    }
     case ASI_SCRATCHPAD: /* UA2005 privileged scratchpad */
         if (unlikely((addr >= 0x20) && (addr < 0x30))) {
             /* Hyperprivileged access only */
@@ -1524,11 +1521,11 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
         }
         /* fall through */
     case ASI_HYP_SCRATCHPAD: /* UA2005 hyperprivileged scratchpad */
-        {
-            unsigned int i = (addr >> 3) & 0x7;
-            ret = env->scratch[i];
-            break;
-        }
+    {
+        unsigned int i = (addr >> 3) & 0x7;
+        ret = env->scratch[i];
+        break;
+    }
     case ASI_MMU: /* UA2005 Context ID registers */
         switch ((addr >> 3) & 0x3) {
         case 1:
@@ -1538,28 +1535,28 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
             ret = env->dmmu.mmu_secondary_context;
             break;
         default:
-          sparc_raise_mmu_fault(cs, addr, true, false, 1, size, GETPC());
+            sparc_raise_mmu_fault(cs, addr, true, false, 1, size, GETPC());
         }
         break;
-    case ASI_DCACHE_DATA:     /* D-cache data */
-    case ASI_DCACHE_TAG:      /* D-cache tag access */
+    case ASI_DCACHE_DATA: /* D-cache data */
+    case ASI_DCACHE_TAG: /* D-cache tag access */
     case ASI_ESTATE_ERROR_EN: /* E-cache error enable */
-    case ASI_AFSR:            /* E-cache asynchronous fault status */
-    case ASI_AFAR:            /* E-cache asynchronous fault address */
-    case ASI_EC_TAG_DATA:     /* E-cache tag data */
-    case ASI_IC_INSTR:        /* I-cache instruction access */
-    case ASI_IC_TAG:          /* I-cache tag access */
-    case ASI_IC_PRE_DECODE:   /* I-cache predecode */
-    case ASI_IC_NEXT_FIELD:   /* I-cache LRU etc. */
-    case ASI_EC_W:            /* E-cache tag */
-    case ASI_EC_R:            /* E-cache tag */
+    case ASI_AFSR: /* E-cache asynchronous fault status */
+    case ASI_AFAR: /* E-cache asynchronous fault address */
+    case ASI_EC_TAG_DATA: /* E-cache tag data */
+    case ASI_IC_INSTR: /* I-cache instruction access */
+    case ASI_IC_TAG: /* I-cache tag access */
+    case ASI_IC_PRE_DECODE: /* I-cache predecode */
+    case ASI_IC_NEXT_FIELD: /* I-cache LRU etc. */
+    case ASI_EC_W: /* E-cache tag */
+    case ASI_EC_R: /* E-cache tag */
         break;
     case ASI_DMMU_TSB_DIRECT_PTR: /* D-MMU data pointer */
-    case ASI_ITLB_DATA_IN:        /* I-MMU data in, WO */
-    case ASI_IMMU_DEMAP:          /* I-MMU demap, WO */
-    case ASI_DTLB_DATA_IN:        /* D-MMU data in, WO */
-    case ASI_DMMU_DEMAP:          /* D-MMU demap, WO */
-    case ASI_INTR_W:              /* Interrupt vector, WO */
+    case ASI_ITLB_DATA_IN: /* I-MMU data in, WO */
+    case ASI_IMMU_DEMAP: /* I-MMU demap, WO */
+    case ASI_DTLB_DATA_IN: /* D-MMU data in, WO */
+    case ASI_DMMU_DEMAP: /* D-MMU demap, WO */
+    case ASI_INTR_W: /* Interrupt vector, WO */
     default:
         sparc_raise_mmu_fault(cs, addr, false, false, 1, size, GETPC());
         ret = 0;
@@ -1570,13 +1567,13 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
     if (sign) {
         switch (size) {
         case 1:
-            ret = (int8_t) ret;
+            ret = (int8_t)ret;
             break;
         case 2:
-            ret = (int16_t) ret;
+            ret = (int16_t)ret;
             break;
         case 4:
-            ret = (int32_t) ret;
+            ret = (int32_t)ret;
             break;
         default:
             break;
@@ -1605,34 +1602,34 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
     addr = asi_address_mask(env, asi, addr);
 
     switch (asi) {
-    case ASI_AIUP:  /* As if user primary */
-    case ASI_AIUS:  /* As if user secondary */
+    case ASI_AIUP: /* As if user primary */
+    case ASI_AIUS: /* As if user secondary */
     case ASI_AIUPL: /* As if user primary LE */
     case ASI_AIUSL: /* As if user secondary LE */
-    case ASI_P:  /* Primary */
-    case ASI_S:  /* Secondary */
+    case ASI_P: /* Primary */
+    case ASI_S: /* Secondary */
     case ASI_PL: /* Primary LE */
     case ASI_SL: /* Secondary LE */
-    case ASI_REAL:      /* Bypass */
-    case ASI_REAL_IO:   /* Bypass, non-cacheable */
-    case ASI_REAL_L:    /* Bypass LE */
+    case ASI_REAL: /* Bypass */
+    case ASI_REAL_IO: /* Bypass, non-cacheable */
+    case ASI_REAL_L: /* Bypass LE */
     case ASI_REAL_IO_L: /* Bypass, non-cacheable LE */
-    case ASI_N:  /* Nucleus */
+    case ASI_N: /* Nucleus */
     case ASI_NL: /* Nucleus Little Endian (LE) */
-    case ASI_NUCLEUS_QUAD_LDD:   /* Nucleus quad LDD 128 bit atomic */
+    case ASI_NUCLEUS_QUAD_LDD: /* Nucleus quad LDD 128 bit atomic */
     case ASI_NUCLEUS_QUAD_LDD_L: /* Nucleus quad LDD 128 bit atomic LE */
-    case ASI_TWINX_AIUP:   /* As if user primary, twinx */
-    case ASI_TWINX_AIUS:   /* As if user secondary, twinx */
-    case ASI_TWINX_REAL:   /* Real address, twinx */
+    case ASI_TWINX_AIUP: /* As if user primary, twinx */
+    case ASI_TWINX_AIUS: /* As if user secondary, twinx */
+    case ASI_TWINX_REAL: /* Real address, twinx */
     case ASI_TWINX_AIUP_L: /* As if user primary, twinx, LE */
     case ASI_TWINX_AIUS_L: /* As if user secondary, twinx, LE */
     case ASI_TWINX_REAL_L: /* Real address, twinx, LE */
-    case ASI_TWINX_N:  /* Nucleus, twinx */
+    case ASI_TWINX_N: /* Nucleus, twinx */
     case ASI_TWINX_NL: /* Nucleus, twinx, LE */
     /* ??? From the UA2011 document; overlaps BLK_INIT_QUAD_LDD_* */
-    case ASI_TWINX_P:  /* Primary, twinx */
+    case ASI_TWINX_P: /* Primary, twinx */
     case ASI_TWINX_PL: /* Primary, twinx, LE */
-    case ASI_TWINX_S:  /* Secondary, twinx */
+    case ASI_TWINX_S: /* Secondary, twinx */
     case ASI_TWINX_SL: /* Secondary, twinx, LE */
         /* These are always handled inline.  */
         g_assert_not_reached();
@@ -1684,7 +1681,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
         } else {
             helper_raise_exception(env, TT_ILL_INSN);
         }
-      break;
+        break;
     case 0x37:
     case 0x3f:
         if (cpu_has_hypervisor(env)) {
@@ -1694,7 +1691,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
              */
             env->immu.sun4v_ctx_config[(asi & 8) >> 3] = val;
         } else {
-          helper_raise_exception(env, TT_ILL_INSN);
+            helper_raise_exception(env, TT_ILL_INSN);
         }
         break;
     case ASI_UPA_CONFIG: /* UPA config */
@@ -1704,156 +1701,160 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
         env->lsu = val & (DMMU_E | IMMU_E);
         return;
     case ASI_IMMU: /* I-MMU regs */
-        {
-            int reg = (addr >> 3) & 0xf;
-            uint64_t oldreg;
+    {
+        int reg = (addr >> 3) & 0xf;
+        uint64_t oldreg;
 
-            oldreg = env->immu.mmuregs[reg];
-            switch (reg) {
-            case 0: /* RO */
-                return;
-            case 1: /* Not in I-MMU */
-            case 2:
-                return;
-            case 3: /* SFSR */
-                if ((val & 1) == 0) {
-                    val = 0; /* Clear SFSR */
-                }
-                env->immu.sfsr = val;
-                break;
-            case 4: /* RO */
-                return;
-            case 5: /* TSB access */
-                DPRINTF_MMU("immu TSB write: 0x%016" PRIx64 " -> 0x%016"
-                            PRIx64 "\n", env->immu.tsb, val);
-                env->immu.tsb = val;
-                break;
-            case 6: /* Tag access */
-                env->immu.tag_access = val;
-                break;
-            case 7:
-            case 8:
-                return;
-            default:
-                sparc_raise_mmu_fault(cs, addr, true, false, 1, size, GETPC());
-                break;
-            }
-
-            if (oldreg != env->immu.mmuregs[reg]) {
-                DPRINTF_MMU("immu change reg[%d]: 0x%016" PRIx64 " -> 0x%016"
-                            PRIx64 "\n", reg, oldreg, env->immuregs[reg]);
-            }
-#ifdef DEBUG_MMU
-            dump_mmu(env);
-#endif
+        oldreg = env->immu.mmuregs[reg];
+        switch (reg) {
+        case 0: /* RO */
             return;
+        case 1: /* Not in I-MMU */
+        case 2:
+            return;
+        case 3: /* SFSR */
+            if ((val & 1) == 0) {
+                val = 0; /* Clear SFSR */
+            }
+            env->immu.sfsr = val;
+            break;
+        case 4: /* RO */
+            return;
+        case 5: /* TSB access */
+            DPRINTF_MMU("immu TSB write: 0x%016" PRIx64 " -> 0x%016" PRIx64
+                        "\n",
+                        env->immu.tsb, val);
+            env->immu.tsb = val;
+            break;
+        case 6: /* Tag access */
+            env->immu.tag_access = val;
+            break;
+        case 7:
+        case 8:
+            return;
+        default:
+            sparc_raise_mmu_fault(cs, addr, true, false, 1, size, GETPC());
+            break;
         }
+
+        if (oldreg != env->immu.mmuregs[reg]) {
+            DPRINTF_MMU("immu change reg[%d]: 0x%016" PRIx64 " -> 0x%016" PRIx64
+                        "\n",
+                        reg, oldreg, env->immuregs[reg]);
+        }
+#ifdef DEBUG_MMU
+        dump_mmu(env);
+#endif
+        return;
+    }
     case ASI_ITLB_DATA_IN: /* I-MMU data in */
         /* ignore real translation entries */
         if (!(addr & TLB_UST1_IS_REAL_BIT)) {
-            replace_tlb_1bit_lru(env->itlb, env->immu.tag_access,
-                                 val, "immu", env, addr);
+            replace_tlb_1bit_lru(env->itlb, env->immu.tag_access, val, "immu",
+                                 env, addr);
         }
         return;
     case ASI_ITLB_DATA_ACCESS: /* I-MMU data access */
-        {
-            /* TODO: auto demap */
+    {
+        /* TODO: auto demap */
 
-            unsigned int i = (addr >> 3) & 0x3f;
+        unsigned int i = (addr >> 3) & 0x3f;
 
-            /* ignore real translation entries */
-            if (!(addr & TLB_UST1_IS_REAL_BIT)) {
-                replace_tlb_entry(&env->itlb[i], env->immu.tag_access,
-                                  sun4v_tte_to_sun4u(env, addr, val), env);
-            }
-#ifdef DEBUG_MMU
-            DPRINTF_MMU("immu data access replaced entry [%i]\n", i);
-            dump_mmu(env);
-#endif
-            return;
+        /* ignore real translation entries */
+        if (!(addr & TLB_UST1_IS_REAL_BIT)) {
+            replace_tlb_entry(&env->itlb[i], env->immu.tag_access,
+                              sun4v_tte_to_sun4u(env, addr, val), env);
         }
+#ifdef DEBUG_MMU
+        DPRINTF_MMU("immu data access replaced entry [%i]\n", i);
+        dump_mmu(env);
+#endif
+        return;
+    }
     case ASI_IMMU_DEMAP: /* I-MMU demap */
         demap_tlb(env->itlb, addr, "immu", env);
         return;
     case ASI_DMMU: /* D-MMU regs */
-        {
-            int reg = (addr >> 3) & 0xf;
-            uint64_t oldreg;
+    {
+        int reg = (addr >> 3) & 0xf;
+        uint64_t oldreg;
 
-            oldreg = env->dmmu.mmuregs[reg];
-            switch (reg) {
-            case 0: /* RO */
-            case 4:
-                return;
-            case 3: /* SFSR */
-                if ((val & 1) == 0) {
-                    val = 0; /* Clear SFSR, Fault address */
-                    env->dmmu.sfar = 0;
-                }
-                env->dmmu.sfsr = val;
-                break;
-            case 1: /* Primary context */
-                env->dmmu.mmu_primary_context = val;
-                /* can be optimized to only flush MMU_USER_IDX
-                   and MMU_KERNEL_IDX entries */
-                tlb_flush(cs);
-                break;
-            case 2: /* Secondary context */
-                env->dmmu.mmu_secondary_context = val;
-                /* can be optimized to only flush MMU_USER_SECONDARY_IDX
-                   and MMU_KERNEL_SECONDARY_IDX entries */
-                tlb_flush(cs);
-                break;
-            case 5: /* TSB access */
-                DPRINTF_MMU("dmmu TSB write: 0x%016" PRIx64 " -> 0x%016"
-                            PRIx64 "\n", env->dmmu.tsb, val);
-                env->dmmu.tsb = val;
-                break;
-            case 6: /* Tag access */
-                env->dmmu.tag_access = val;
-                break;
-            case 7: /* Virtual Watchpoint */
-                env->dmmu.virtual_watchpoint = val;
-                break;
-            case 8: /* Physical Watchpoint */
-                env->dmmu.physical_watchpoint = val;
-                break;
-            default:
-                sparc_raise_mmu_fault(cs, addr, true, false, 1, size, GETPC());
-                break;
-            }
-
-            if (oldreg != env->dmmu.mmuregs[reg]) {
-                DPRINTF_MMU("dmmu change reg[%d]: 0x%016" PRIx64 " -> 0x%016"
-                            PRIx64 "\n", reg, oldreg, env->dmmuregs[reg]);
-            }
-#ifdef DEBUG_MMU
-            dump_mmu(env);
-#endif
+        oldreg = env->dmmu.mmuregs[reg];
+        switch (reg) {
+        case 0: /* RO */
+        case 4:
             return;
+        case 3: /* SFSR */
+            if ((val & 1) == 0) {
+                val = 0; /* Clear SFSR, Fault address */
+                env->dmmu.sfar = 0;
+            }
+            env->dmmu.sfsr = val;
+            break;
+        case 1: /* Primary context */
+            env->dmmu.mmu_primary_context = val;
+            /* can be optimized to only flush MMU_USER_IDX
+               and MMU_KERNEL_IDX entries */
+            tlb_flush(cs);
+            break;
+        case 2: /* Secondary context */
+            env->dmmu.mmu_secondary_context = val;
+            /* can be optimized to only flush MMU_USER_SECONDARY_IDX
+               and MMU_KERNEL_SECONDARY_IDX entries */
+            tlb_flush(cs);
+            break;
+        case 5: /* TSB access */
+            DPRINTF_MMU("dmmu TSB write: 0x%016" PRIx64 " -> 0x%016" PRIx64
+                        "\n",
+                        env->dmmu.tsb, val);
+            env->dmmu.tsb = val;
+            break;
+        case 6: /* Tag access */
+            env->dmmu.tag_access = val;
+            break;
+        case 7: /* Virtual Watchpoint */
+            env->dmmu.virtual_watchpoint = val;
+            break;
+        case 8: /* Physical Watchpoint */
+            env->dmmu.physical_watchpoint = val;
+            break;
+        default:
+            sparc_raise_mmu_fault(cs, addr, true, false, 1, size, GETPC());
+            break;
         }
+
+        if (oldreg != env->dmmu.mmuregs[reg]) {
+            DPRINTF_MMU("dmmu change reg[%d]: 0x%016" PRIx64 " -> 0x%016" PRIx64
+                        "\n",
+                        reg, oldreg, env->dmmuregs[reg]);
+        }
+#ifdef DEBUG_MMU
+        dump_mmu(env);
+#endif
+        return;
+    }
     case ASI_DTLB_DATA_IN: /* D-MMU data in */
-      /* ignore real translation entries */
-      if (!(addr & TLB_UST1_IS_REAL_BIT)) {
-          replace_tlb_1bit_lru(env->dtlb, env->dmmu.tag_access,
-                               val, "dmmu", env, addr);
-      }
-      return;
-    case ASI_DTLB_DATA_ACCESS: /* D-MMU data access */
-        {
-            unsigned int i = (addr >> 3) & 0x3f;
-
-            /* ignore real translation entries */
-            if (!(addr & TLB_UST1_IS_REAL_BIT)) {
-                replace_tlb_entry(&env->dtlb[i], env->dmmu.tag_access,
-                                  sun4v_tte_to_sun4u(env, addr, val), env);
-            }
-#ifdef DEBUG_MMU
-            DPRINTF_MMU("dmmu data access replaced entry [%i]\n", i);
-            dump_mmu(env);
-#endif
-            return;
+        /* ignore real translation entries */
+        if (!(addr & TLB_UST1_IS_REAL_BIT)) {
+            replace_tlb_1bit_lru(env->dtlb, env->dmmu.tag_access, val, "dmmu",
+                                 env, addr);
         }
+        return;
+    case ASI_DTLB_DATA_ACCESS: /* D-MMU data access */
+    {
+        unsigned int i = (addr >> 3) & 0x3f;
+
+        /* ignore real translation entries */
+        if (!(addr & TLB_UST1_IS_REAL_BIT)) {
+            replace_tlb_entry(&env->dtlb[i], env->dmmu.tag_access,
+                              sun4v_tte_to_sun4u(env, addr, val), env);
+        }
+#ifdef DEBUG_MMU
+        DPRINTF_MMU("dmmu data access replaced entry [%i]\n", i);
+        dump_mmu(env);
+#endif
+        return;
+    }
     case ASI_DMMU_DEMAP: /* D-MMU demap */
         demap_tlb(env->dtlb, addr, "dmmu", env);
         return;
@@ -1867,31 +1868,30 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
         }
         /* fall through */
     case ASI_HYP_SCRATCHPAD: /* UA2005 hyperprivileged scratchpad */
-        {
-            unsigned int i = (addr >> 3) & 0x7;
-            env->scratch[i] = val;
-            return;
-        }
+    {
+        unsigned int i = (addr >> 3) & 0x7;
+        env->scratch[i] = val;
+        return;
+    }
     case ASI_MMU: /* UA2005 Context ID registers */
-        {
-          switch ((addr >> 3) & 0x3) {
-          case 1:
-              env->dmmu.mmu_primary_context = val;
-              env->immu.mmu_primary_context = val;
-              tlb_flush_by_mmuidx(cs,
-                                  (1 << MMU_USER_IDX) | (1 << MMU_KERNEL_IDX));
-              break;
-          case 2:
-              env->dmmu.mmu_secondary_context = val;
-              env->immu.mmu_secondary_context = val;
-              tlb_flush_by_mmuidx(cs,
-                                  (1 << MMU_USER_SECONDARY_IDX) |
-                                  (1 << MMU_KERNEL_SECONDARY_IDX));
-              break;
-          default:
-              sparc_raise_mmu_fault(cs, addr, true, false, 1, size, GETPC());
-          }
+    {
+        switch ((addr >> 3) & 0x3) {
+        case 1:
+            env->dmmu.mmu_primary_context = val;
+            env->immu.mmu_primary_context = val;
+            tlb_flush_by_mmuidx(cs,
+                                (1 << MMU_USER_IDX) | (1 << MMU_KERNEL_IDX));
+            break;
+        case 2:
+            env->dmmu.mmu_secondary_context = val;
+            env->immu.mmu_secondary_context = val;
+            tlb_flush_by_mmuidx(cs, (1 << MMU_USER_SECONDARY_IDX) |
+                                        (1 << MMU_KERNEL_SECONDARY_IDX));
+            break;
+        default:
+            sparc_raise_mmu_fault(cs, addr, true, false, 1, size, GETPC());
         }
+    }
         return;
     case ASI_QUEUE: /* UA2005 CPU mondo queue */
     case ASI_DCACHE_DATA: /* D-cache data */
@@ -1930,9 +1930,8 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
 
 #if !defined(CONFIG_USER_ONLY)
 
-void sparc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                     vaddr addr, unsigned size,
-                                     MMUAccessType access_type,
+void sparc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                     unsigned size, MMUAccessType access_type,
                                      int mmu_idx, MemTxAttrs attrs,
                                      MemTxResult response, uintptr_t retaddr)
 {
@@ -1940,7 +1939,7 @@ void sparc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
     bool is_exec = access_type == MMU_INST_FETCH;
     bool is_asi = false;
 
-    sparc_raise_mmu_fault(cs, physaddr, is_write, is_exec,
-                          is_asi, size, retaddr);
+    sparc_raise_mmu_fault(cs, physaddr, is_write, is_exec, is_asi, size,
+                          retaddr);
 }
 #endif

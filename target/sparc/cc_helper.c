@@ -112,8 +112,7 @@ static inline uint32_t get_C_addx_icc(uint32_t dst, uint32_t src1,
     return ret;
 }
 
-static inline uint32_t get_V_add_icc(uint32_t dst, uint32_t src1,
-                                     uint32_t src2)
+static inline uint32_t get_V_add_icc(uint32_t dst, uint32_t src1, uint32_t src2)
 {
     uint32_t ret = 0;
 
@@ -270,8 +269,7 @@ static inline uint32_t get_C_subx_icc(uint32_t dst, uint32_t src1,
     return ret;
 }
 
-static inline uint32_t get_V_sub_icc(uint32_t dst, uint32_t src1,
-                                     uint32_t src2)
+static inline uint32_t get_V_sub_icc(uint32_t dst, uint32_t src1, uint32_t src2)
 {
     uint32_t ret = 0;
 
@@ -417,7 +415,7 @@ static uint32_t compute_all_logic_xcc(CPUSPARCState *env)
 
 typedef struct CCTable {
     uint32_t (*compute_all)(CPUSPARCState *env); /* return all the flags */
-    uint32_t (*compute_c)(CPUSPARCState *env);  /* return the C flag */
+    uint32_t (*compute_c)(CPUSPARCState *env); /* return the C flag */
 } CCTable;
 
 static const CCTable icc_table[CC_OP_NB] = {

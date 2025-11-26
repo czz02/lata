@@ -20,26 +20,25 @@
 
 #include "hw/registerfields.h"
 
-#define FUNC_MASK(name, ret_type, size, max_val)                  \
-static inline ret_type name(uint##size##_t start,                 \
-                              uint##size##_t end)                 \
-{                                                                 \
-    ret_type ret, max_bit = size - 1;                             \
-                                                                  \
-    if (likely(start == 0)) {                                     \
-        ret = max_val << (max_bit - end);                         \
-    } else if (likely(end == max_bit)) {                          \
-        ret = max_val >> start;                                   \
-    } else {                                                      \
-        ret = (((uint##size##_t)(-1ULL)) >> (start)) ^            \
-            (((uint##size##_t)(-1ULL) >> (end)) >> 1);            \
-        if (unlikely(start > end)) {                              \
-            return ~ret;                                          \
-        }                                                         \
-    }                                                             \
-                                                                  \
-    return ret;                                                   \
-}
+#define FUNC_MASK(name, ret_type, size, max_val)                          \
+    static inline ret_type name(uint##size##_t start, uint##size##_t end) \
+    {                                                                     \
+        ret_type ret, max_bit = size - 1;                                 \
+                                                                          \
+        if (likely(start == 0)) {                                         \
+            ret = max_val << (max_bit - end);                             \
+        } else if (likely(end == max_bit)) {                              \
+            ret = max_val >> start;                                       \
+        } else {                                                          \
+            ret = (((uint##size##_t)(-1ULL)) >> (start)) ^                \
+                  (((uint##size##_t)(-1ULL) >> (end)) >> 1);              \
+            if (unlikely(start > end)) {                                  \
+                return ~ret;                                              \
+            }                                                             \
+        }                                                                 \
+                                                                          \
+        return ret;                                                       \
+    }
 
 #if defined(TARGET_PPC64)
 FUNC_MASK(MASK, target_ulong, 64, UINT64_MAX);
@@ -51,36 +50,37 @@ FUNC_MASK(mask_u64, uint64_t, 64, UINT64_MAX);
 
 /*****************************************************************************/
 /***                           Instruction decoding                        ***/
-#define EXTRACT_HELPER(name, shift, nb)                                       \
-static inline uint32_t name(uint32_t opcode)                                  \
-{                                                                             \
-    return extract32(opcode, shift, nb);                                      \
-}
+#define EXTRACT_HELPER(name, shift, nb)          \
+    static inline uint32_t name(uint32_t opcode) \
+    {                                            \
+        return extract32(opcode, shift, nb);     \
+    }
 
-#define EXTRACT_SHELPER(name, shift, nb)                                      \
-static inline int32_t name(uint32_t opcode)                                   \
-{                                                                             \
-    return sextract32(opcode, shift, nb);                                     \
-}
+#define EXTRACT_SHELPER(name, shift, nb)        \
+    static inline int32_t name(uint32_t opcode) \
+    {                                           \
+        return sextract32(opcode, shift, nb);   \
+    }
 
-#define EXTRACT_HELPER_SPLIT(name, shift1, nb1, shift2, nb2)                  \
-static inline uint32_t name(uint32_t opcode)                                  \
-{                                                                             \
-    return extract32(opcode, shift1, nb1) << nb2 |                            \
-               extract32(opcode, shift2, nb2);                                \
-}
+#define EXTRACT_HELPER_SPLIT(name, shift1, nb1, shift2, nb2) \
+    static inline uint32_t name(uint32_t opcode)             \
+    {                                                        \
+        return extract32(opcode, shift1, nb1) << nb2 |       \
+               extract32(opcode, shift2, nb2);               \
+    }
 
-#define EXTRACT_HELPER_SPLIT_3(name,                                          \
-                              d0_bits, shift_op_d0, shift_d0,                 \
-                              d1_bits, shift_op_d1, shift_d1,                 \
-                              d2_bits, shift_op_d2, shift_d2)                 \
-static inline int16_t name(uint32_t opcode)                                   \
-{                                                                             \
-    return                                                                    \
-        (((opcode >> (shift_op_d0)) & ((1 << (d0_bits)) - 1)) << (shift_d0)) | \
-        (((opcode >> (shift_op_d1)) & ((1 << (d1_bits)) - 1)) << (shift_d1)) | \
-        (((opcode >> (shift_op_d2)) & ((1 << (d2_bits)) - 1)) << (shift_d2));  \
-}
+#define EXTRACT_HELPER_SPLIT_3(name, d0_bits, shift_op_d0, shift_d0, d1_bits, \
+                               shift_op_d1, shift_d1, d2_bits, shift_op_d2,   \
+                               shift_d2)                                      \
+    static inline int16_t name(uint32_t opcode)                               \
+    {                                                                         \
+        return (((opcode >> (shift_op_d0)) & ((1 << (d0_bits)) - 1))          \
+                << (shift_d0)) |                                              \
+               (((opcode >> (shift_op_d1)) & ((1 << (d1_bits)) - 1))          \
+                << (shift_d1)) |                                              \
+               (((opcode >> (shift_op_d2)) & ((1 << (d2_bits)) - 1))          \
+                << (shift_d2));                                               \
+    }
 
 
 /* Opcode part 1 */
@@ -200,7 +200,7 @@ EXTRACT_HELPER_SPLIT(xT, 0, 1, 21, 5);
 EXTRACT_HELPER_SPLIT(xS, 0, 1, 21, 5);
 EXTRACT_HELPER_SPLIT(xA, 2, 1, 16, 5);
 EXTRACT_HELPER_SPLIT(xB, 1, 1, 11, 5);
-EXTRACT_HELPER_SPLIT(xC, 3, 1,  6, 5);
+EXTRACT_HELPER_SPLIT(xC, 3, 1, 6, 5);
 EXTRACT_HELPER(DM, 8, 2);
 EXTRACT_HELPER(UIM, 16, 2);
 EXTRACT_HELPER(SHW, 8, 2);
@@ -249,24 +249,23 @@ static inline int prot_for_access_type(MMUAccessType access_type)
 typedef struct mmu_ctx_t mmu_ctx_t;
 
 bool ppc_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
-                      hwaddr *raddrp, int *psizep, int *protp,
-                      int mmu_idx, bool guest_visible);
+               hwaddr *raddrp, int *psizep, int *protp, int mmu_idx,
+               bool guest_visible);
 int get_physical_address_wtlb(CPUPPCState *env, mmu_ctx_t *ctx,
-                                     target_ulong eaddr,
-                                     MMUAccessType access_type, int type,
-                                     int mmu_idx);
+                              target_ulong eaddr, MMUAccessType access_type,
+                              int type, int mmu_idx);
 /* Software driven TLB helpers */
-int ppc6xx_tlb_getnum(CPUPPCState *env, target_ulong eaddr,
-                                    int way, int is_code);
+int ppc6xx_tlb_getnum(CPUPPCState *env, target_ulong eaddr, int way,
+                      int is_code);
 /* Context used internally during MMU translations */
 struct mmu_ctx_t {
-    hwaddr raddr;      /* Real address              */
-    hwaddr eaddr;      /* Effective address         */
-    int prot;                      /* Protection bits           */
-    hwaddr hash[2];    /* Pagetable hash values     */
-    target_ulong ptem;             /* Virtual segment ID | API  */
-    int key;                       /* Access key                */
-    int nx;                        /* Non-execute area          */
+    hwaddr raddr; /* Real address              */
+    hwaddr eaddr; /* Effective address         */
+    int prot; /* Protection bits           */
+    hwaddr hash[2]; /* Pagetable hash values     */
+    target_ulong ptem; /* Virtual segment ID | API  */
+    int key; /* Access key                */
+    int nx; /* Non-execute area          */
 };
 
 #endif /* !CONFIG_USER_ONLY */
@@ -286,19 +285,17 @@ static inline void pte_invalidate(target_ulong *pte0)
 #define PTE_CHECK_MASK (TARGET_PAGE_MASK | 0x7B)
 
 #ifdef CONFIG_USER_ONLY
-void ppc_cpu_record_sigsegv(CPUState *cs, vaddr addr,
-                            MMUAccessType access_type,
+void ppc_cpu_record_sigsegv(CPUState *cs, vaddr addr, MMUAccessType access_type,
                             bool maperr, uintptr_t ra);
 #else
 bool ppc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                      MMUAccessType access_type, int mmu_idx,
-                      bool probe, uintptr_t retaddr);
+                      MMUAccessType access_type, int mmu_idx, bool probe,
+                      uintptr_t retaddr);
 G_NORETURN void ppc_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                            MMUAccessType access_type, int mmu_idx,
-                                            uintptr_t retaddr);
-void ppc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                   vaddr addr, unsigned size,
-                                   MMUAccessType access_type,
+                                            MMUAccessType access_type,
+                                            int mmu_idx, uintptr_t retaddr);
+void ppc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                   unsigned size, MMUAccessType access_type,
                                    int mmu_idx, MemTxAttrs attrs,
                                    MemTxResult response, uintptr_t retaddr);
 #endif

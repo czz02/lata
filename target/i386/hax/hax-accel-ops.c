@@ -67,10 +67,9 @@ static void hax_start_vcpu_thread(CPUState *cpu)
     cpu->halt_cond = g_new0(QemuCond, 1);
     qemu_cond_init(cpu->halt_cond);
 
-    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HAX",
-             cpu->cpu_index);
-    qemu_thread_create(cpu->thread, thread_name, hax_cpu_thread_fn,
-                       cpu, QEMU_THREAD_JOINABLE);
+    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HAX", cpu->cpu_index);
+    qemu_thread_create(cpu->thread, thread_name, hax_cpu_thread_fn, cpu,
+                       QEMU_THREAD_JOINABLE);
     assert(cpu->accel);
 #ifdef _WIN32
     cpu->accel->hThread = qemu_thread_get_handle(cpu->thread);

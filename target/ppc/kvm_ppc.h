@@ -39,14 +39,13 @@ int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
 int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
 int kvmppc_set_tcr(PowerPCCPU *cpu);
 int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
-target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
-                                     bool radix, bool gtse,
+target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu, bool radix, bool gtse,
                                      uint64_t proc_tbl);
 bool kvmppc_spapr_use_multitce(void);
 int kvmppc_spapr_enable_inkernel_multitce(void);
 void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
-                              uint64_t bus_offset, uint32_t nb_table,
-                              int *pfd, bool need_vfio);
+                              uint64_t bus_offset, uint32_t nb_table, int *pfd,
+                              bool need_vfio);
 int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
 int kvmppc_reset_htab(int shift_hint);
 uint64_t kvmppc_vrma_limit(unsigned int hash_shift);
@@ -89,11 +88,11 @@ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, int64_t tb_offset);
 
 int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
 
-#define kvmppc_eieio() \
+#define kvmppc_eieio()                            \
     do {                                          \
-        if (kvm_enabled()) {                          \
+        if (kvm_enabled()) {                      \
             asm volatile("eieio" : : : "memory"); \
-        } \
+        }                                         \
     } while (0)
 
 /* Store data cache blocks back to memory */
@@ -153,8 +152,8 @@ static inline int kvmppc_get_hasidle(CPUPPCState *env)
     return 0;
 }
 
-static inline int kvmppc_get_hypercall(CPUPPCState *env,
-                                       uint8_t *buf, int buf_len)
+static inline int kvmppc_get_hypercall(CPUPPCState *env, uint8_t *buf,
+                                       int buf_len)
 {
     return -1;
 }
@@ -243,9 +242,8 @@ static inline int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu)
     return -1;
 }
 
-static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
-                                     bool radix, bool gtse,
-                                     uint64_t proc_tbl)
+static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu, bool radix,
+                                                   bool gtse, uint64_t proc_tbl)
 {
     return 0;
 }
@@ -272,8 +270,8 @@ static inline int kvmppc_spapr_enable_inkernel_multitce(void)
 
 static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
                                             uint64_t bus_offset,
-                                            uint32_t nb_table,
-                                            int *pfd, bool need_vfio)
+                                            uint32_t nb_table, int *pfd,
+                                            bool need_vfio)
 {
     return NULL;
 }
@@ -308,8 +306,8 @@ static inline bool kvmppc_has_cap_spapr_vfio(void)
     return false;
 }
 
-static inline void kvmppc_read_hptes(ppc_hash_pte64_t *hptes,
-                                     hwaddr ptex, int n)
+static inline void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex,
+                                     int n)
 {
     abort();
 }
@@ -443,14 +441,14 @@ static inline void kvmppc_check_papr_resize_hpt(Error **errp)
     return;
 }
 
-static inline int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu,
-                                            target_ulong flags, int shift)
+static inline int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags,
+                                            int shift)
 {
     return -ENOSYS;
 }
 
-static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
-                                           target_ulong flags, int shift)
+static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags,
+                                           int shift)
 {
     return -ENOSYS;
 }
@@ -460,7 +458,9 @@ static inline bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
     return false;
 }
 
-#define kvmppc_eieio() do { } while (0)
+#define kvmppc_eieio() \
+    do {               \
+    } while (0)
 
 static inline void kvmppc_dcbst_range(PowerPCCPU *cpu, uint8_t *addr, int len)
 {
@@ -470,6 +470,6 @@ static inline void kvmppc_icbi_range(PowerPCCPU *cpu, uint8_t *addr, int len)
 {
 }
 
-#endif  /* CONFIG_KVM */
+#endif /* CONFIG_KVM */
 
 #endif /* KVM_PPC_H */

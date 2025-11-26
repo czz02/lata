@@ -29,11 +29,11 @@
 static inline target_ulong bitswap(target_ulong v)
 {
     v = ((v >> 1) & (target_ulong)0x5555555555555555ULL) |
-              ((v & (target_ulong)0x5555555555555555ULL) << 1);
+        ((v & (target_ulong)0x5555555555555555ULL) << 1);
     v = ((v >> 2) & (target_ulong)0x3333333333333333ULL) |
-              ((v & (target_ulong)0x3333333333333333ULL) << 2);
+        ((v & (target_ulong)0x3333333333333333ULL) << 2);
     v = ((v >> 4) & (target_ulong)0x0F0F0F0F0F0F0F0FULL) |
-              ((v & (target_ulong)0x0F0F0F0F0F0F0F0FULL) << 4);
+        ((v & (target_ulong)0x0F0F0F0F0F0F0F0FULL) << 4);
     return v;
 }
 
@@ -50,7 +50,7 @@ target_ulong helper_bitswap(target_ulong rt)
 }
 
 target_ulong helper_rotx(target_ulong rs, uint32_t shift, uint32_t shiftx,
-                        uint32_t stripe)
+                         uint32_t stripe)
 {
     int i;
     uint64_t tmp0 = ((uint64_t)rs) << 32 | ((uint64_t)rs & 0xffffffff);
@@ -248,12 +248,10 @@ void helper_pmon(CPUMIPSState *env, int function)
         break;
     case 17:
         break;
-    case 158:
-        {
-            unsigned char *fmt = (void *)(uintptr_t)env->active_tc.gpr[4];
-            printf("%s", fmt);
-        }
-        break;
+    case 158: {
+        unsigned char *fmt = (void *)(uintptr_t)env->active_tc.gpr[4];
+        printf("%s", fmt);
+    } break;
     }
 }
 
@@ -276,8 +274,8 @@ target_ulong helper_lcsr_cpucfg(CPUMIPSState *env, target_ulong rs)
 #if !defined(CONFIG_USER_ONLY)
 
 void mips_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                  MMUAccessType access_type,
-                                  int mmu_idx, uintptr_t retaddr)
+                                  MMUAccessType access_type, int mmu_idx,
+                                  uintptr_t retaddr)
 {
     MIPSCPU *cpu = MIPS_CPU(cs);
     CPUMIPSState *env = &cpu->env;
@@ -300,9 +298,8 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
     do_raise_exception_err(env, excp, error_code, retaddr);
 }
 
-void mips_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                    vaddr addr, unsigned size,
-                                    MMUAccessType access_type,
+void mips_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                    unsigned size, MMUAccessType access_type,
                                     int mmu_idx, MemTxAttrs attrs,
                                     MemTxResult response, uintptr_t retaddr)
 {

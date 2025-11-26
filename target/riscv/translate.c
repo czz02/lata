@@ -35,7 +35,7 @@
 
 #define HELPER_H "helper.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
 /* global register indices */
 static TCGv cpu_gpr[32], cpu_gprh[32], cpu_pc, cpu_vl, cpu_vstart;
@@ -123,19 +123,19 @@ static inline bool has_ext(DisasContext *ctx, uint32_t ext)
 }
 
 #ifdef TARGET_RISCV32
-#define get_xl(ctx)    MXL_RV32
+#define get_xl(ctx) MXL_RV32
 #elif defined(CONFIG_USER_ONLY)
-#define get_xl(ctx)    MXL_RV64
+#define get_xl(ctx) MXL_RV64
 #else
-#define get_xl(ctx)    ((ctx)->xl)
+#define get_xl(ctx) ((ctx)->xl)
 #endif
 
 #ifdef TARGET_RISCV32
-#define get_address_xl(ctx)    MXL_RV32
+#define get_address_xl(ctx) MXL_RV32
 #elif defined(CONFIG_USER_ONLY)
-#define get_address_xl(ctx)    MXL_RV64
+#define get_address_xl(ctx) MXL_RV64
 #else
-#define get_address_xl(ctx)    ((ctx)->address_xl)
+#define get_address_xl(ctx) ((ctx)->address_xl)
 #endif
 
 /* The word size for this machine mode. */
@@ -146,9 +146,9 @@ static inline int __attribute__((unused)) get_xlen(DisasContext *ctx)
 
 /* The operation length, as opposed to the xlen. */
 #ifdef TARGET_RISCV32
-#define get_ol(ctx)    MXL_RV32
+#define get_ol(ctx) MXL_RV32
 #else
-#define get_ol(ctx)    ((ctx)->ol)
+#define get_ol(ctx) ((ctx)->ol)
 #endif
 
 static inline int get_olen(DisasContext *ctx)
@@ -158,9 +158,9 @@ static inline int get_olen(DisasContext *ctx)
 
 /* The maximum register length */
 #ifdef TARGET_RISCV32
-#define get_xl_max(ctx)    MXL_RV32
+#define get_xl_max(ctx) MXL_RV32
 #else
-#define get_xl_max(ctx)    ((ctx)->misa_mxl_max)
+#define get_xl_max(ctx) ((ctx)->misa_mxl_max)
 #endif
 
 /*
@@ -210,8 +210,7 @@ static void decode_save_opc(DisasContext *ctx)
     ctx->insn_start = NULL;
 }
 
-static void gen_pc_plus_diff(TCGv target, DisasContext *ctx,
-                             target_long diff)
+static void gen_pc_plus_diff(TCGv target, DisasContext *ctx, target_long diff)
 {
     target_ulong dest = ctx->base.pc_next + diff;
 
@@ -283,10 +282,10 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_long diff)
 {
     target_ulong dest = ctx->base.pc_next + diff;
 
-     /*
-      * Under itrigger, instruction executes one by one like singlestep,
-      * direct block chain benefits will be small.
-      */
+    /*
+     * Under itrigger, instruction executes one by one like singlestep,
+     * direct block chain benefits will be small.
+     */
     if (translator_use_goto_tb(&ctx->base, dest) && !ctx->itrigger) {
         /*
          * For pcrel, the pc must always be up-to-date on entry to
@@ -465,8 +464,7 @@ static TCGv_i64 get_fpr_d(DisasContext *ctx, int reg_num)
         return tcg_constant_i64(0);
     }
     switch (get_xl(ctx)) {
-    case MXL_RV32:
-    {
+    case MXL_RV32: {
         TCGv_i64 t = tcg_temp_new_i64();
         tcg_gen_concat_tl_i64(t, cpu_gpr[reg_num], cpu_gpr[reg_num + 1]);
         return t;
@@ -642,7 +640,9 @@ static void mark_fs_dirty(DisasContext *ctx)
     }
 }
 #else
-static inline void mark_fs_dirty(DisasContext *ctx) { }
+static inline void mark_fs_dirty(DisasContext *ctx)
+{
+}
 #endif
 
 #ifndef CONFIG_USER_ONLY
@@ -671,7 +671,9 @@ static void mark_vs_dirty(DisasContext *ctx)
     }
 }
 #else
-static inline void mark_vs_dirty(DisasContext *ctx) { }
+static inline void mark_vs_dirty(DisasContext *ctx)
+{
+}
 #endif
 
 static void gen_set_rm(DisasContext *ctx, int rm)
@@ -709,10 +711,10 @@ static int ex_plus_1(DisasContext *ctx, int nf)
     return nf + 1;
 }
 
-#define EX_SH(amount) \
+#define EX_SH(amount)                                        \
     static int ex_shift_##amount(DisasContext *ctx, int imm) \
-    {                                         \
-        return imm << amount;                 \
+    {                                                        \
+        return imm << amount;                                \
     }
 EX_SH(1)
 EX_SH(2)
@@ -720,42 +722,47 @@ EX_SH(3)
 EX_SH(4)
 EX_SH(12)
 
-#define REQUIRE_EXT(ctx, ext) do { \
-    if (!has_ext(ctx, ext)) {      \
-        return false;              \
-    }                              \
-} while (0)
+#define REQUIRE_EXT(ctx, ext)     \
+    do {                          \
+        if (!has_ext(ctx, ext)) { \
+            return false;         \
+        }                         \
+    } while (0)
 
-#define REQUIRE_32BIT(ctx) do {    \
-    if (get_xl(ctx) != MXL_RV32) { \
-        return false;              \
-    }                              \
-} while (0)
+#define REQUIRE_32BIT(ctx)             \
+    do {                               \
+        if (get_xl(ctx) != MXL_RV32) { \
+            return false;              \
+        }                              \
+    } while (0)
 
-#define REQUIRE_64BIT(ctx) do {     \
-    if (get_xl(ctx) != MXL_RV64) {  \
-        return false;               \
-    }                               \
-} while (0)
+#define REQUIRE_64BIT(ctx)             \
+    do {                               \
+        if (get_xl(ctx) != MXL_RV64) { \
+            return false;              \
+        }                              \
+    } while (0)
 
-#define REQUIRE_128BIT(ctx) do {    \
-    if (get_xl(ctx) != MXL_RV128) { \
-        return false;               \
-    }                               \
-} while (0)
+#define REQUIRE_128BIT(ctx)             \
+    do {                                \
+        if (get_xl(ctx) != MXL_RV128) { \
+            return false;               \
+        }                               \
+    } while (0)
 
-#define REQUIRE_64_OR_128BIT(ctx) do { \
-    if (get_xl(ctx) == MXL_RV32) {     \
-        return false;                  \
-    }                                  \
-} while (0)
+#define REQUIRE_64_OR_128BIT(ctx)      \
+    do {                               \
+        if (get_xl(ctx) == MXL_RV32) { \
+            return false;              \
+        }                              \
+    } while (0)
 
-#define REQUIRE_EITHER_EXT(ctx, A, B) do {       \
-    if (!ctx->cfg_ptr->ext_##A &&                \
-        !ctx->cfg_ptr->ext_##B) {                \
-        return false;                            \
-    }                                            \
-} while (0)
+#define REQUIRE_EITHER_EXT(ctx, A, B)                           \
+    do {                                                        \
+        if (!ctx->cfg_ptr->ext_##A && !ctx->cfg_ptr->ext_##B) { \
+            return false;                                       \
+        }                                                       \
+    } while (0)
 
 static int ex_rvc_register(DisasContext *ctx, int reg)
 {
@@ -959,12 +966,11 @@ static bool gen_shift_imm_fn(DisasContext *ctx, arg_shift *a, DisasExtend ext,
     return true;
 }
 
-static bool gen_shift_imm_fn_per_ol(DisasContext *ctx, arg_shift *a,
-                                    DisasExtend ext,
-                                    void (*f_tl)(TCGv, TCGv, target_long),
-                                    void (*f_32)(TCGv, TCGv, target_long),
-                                    void (*f_128)(TCGv, TCGv, TCGv, TCGv,
-                                                  target_long))
+static bool
+gen_shift_imm_fn_per_ol(DisasContext *ctx, arg_shift *a, DisasExtend ext,
+                        void (*f_tl)(TCGv, TCGv, target_long),
+                        void (*f_32)(TCGv, TCGv, target_long),
+                        void (*f_128)(TCGv, TCGv, TCGv, TCGv, target_long))
 {
     int olen = get_olen(ctx);
     if (olen != TARGET_LONG_BITS) {
@@ -1055,8 +1061,7 @@ static bool gen_unary(DisasContext *ctx, arg_r2 *a, DisasExtend ext,
 }
 
 static bool gen_unary_per_ol(DisasContext *ctx, arg_r2 *a, DisasExtend ext,
-                             void (*f_tl)(TCGv, TCGv),
-                             void (*f_32)(TCGv, TCGv))
+                             void (*f_tl)(TCGv, TCGv), void (*f_32)(TCGv, TCGv))
 {
     int olen = get_olen(ctx);
 
@@ -1109,7 +1114,7 @@ static uint32_t opcode_at(DisasContextBase *dcbase, target_ulong pc)
 #include "decode-XVentanaCondOps.c.inc"
 
 /* The specification allows for longer insns, but not supported by qemu. */
-#define MAX_INSN_LEN  4
+#define MAX_INSN_LEN 4
 
 static inline int insn_len(uint16_t first_word)
 {
@@ -1126,9 +1131,9 @@ static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
         bool (*guard_func)(const RISCVCPUConfig *);
         bool (*decode_func)(DisasContext *, uint32_t);
     } decoders[] = {
-        { always_true_p,  decode_insn32 },
+        { always_true_p, decode_insn32 },
         { has_xthead_p, decode_xthead },
-        { has_XVentanaCondOps_p,  decode_XVentanaCodeOps },
+        { has_XVentanaCondOps_p, decode_XVentanaCodeOps },
     };
 
     ctx->virt_inst_excp = false;
@@ -1146,9 +1151,9 @@ static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
         }
     } else {
         uint32_t opcode32 = opcode;
-        opcode32 = deposit32(opcode32, 16, 16,
-                             translator_lduw(env, &ctx->base,
-                                             ctx->base.pc_next + 2));
+        opcode32 =
+            deposit32(opcode32, 16, 16,
+                      translator_lduw(env, &ctx->base, ctx->base.pc_next + 2));
         ctx->opcode = opcode32;
 
         for (size_t i = 0; i < ARRAY_SIZE(decoders); ++i) {
@@ -1177,7 +1182,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
     ctx->priv_ver = env->priv_ver;
     ctx->virt_enabled = FIELD_EX32(tb_flags, TB_FLAGS, VIRT_ENABLED);
     ctx->misa_ext = env->misa_ext;
-    ctx->frm = -1;  /* unknown rounding mode */
+    ctx->frm = -1; /* unknown rounding mode */
     ctx->cfg_ptr = &(cpu->cfg);
     ctx->vill = FIELD_EX32(tb_flags, TB_FLAGS, VILL);
     ctx->sew = FIELD_EX32(tb_flags, TB_FLAGS, SEW);
@@ -1259,8 +1264,8 @@ static void riscv_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
     }
 }
 
-static void riscv_tr_disas_log(const DisasContextBase *dcbase,
-                               CPUState *cpu, FILE *logfile)
+static void riscv_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu,
+                               FILE *logfile)
 {
 #ifndef CONFIG_USER_ONLY
     RISCVCPU *rvcpu = RISCV_CPU(cpu);
@@ -1269,19 +1274,19 @@ static void riscv_tr_disas_log(const DisasContextBase *dcbase,
 
     fprintf(logfile, "IN: %s\n", lookup_symbol(dcbase->pc_first));
 #ifndef CONFIG_USER_ONLY
-    fprintf(logfile, "Priv: "TARGET_FMT_ld"; Virt: %d\n",
-            env->priv, env->virt_enabled);
+    fprintf(logfile, "Priv: " TARGET_FMT_ld "; Virt: %d\n", env->priv,
+            env->virt_enabled);
 #endif
     target_disas(logfile, cpu, dcbase->pc_first, dcbase->tb->size);
 }
 
 static const TranslatorOps riscv_tr_ops = {
     .init_disas_context = riscv_tr_init_disas_context,
-    .tb_start           = riscv_tr_tb_start,
-    .insn_start         = riscv_tr_insn_start,
-    .translate_insn     = riscv_tr_translate_insn,
-    .tb_stop            = riscv_tr_tb_stop,
-    .disas_log          = riscv_tr_disas_log,
+    .tb_start = riscv_tr_tb_start,
+    .insn_start = riscv_tr_insn_start,
+    .translate_insn = riscv_tr_translate_insn,
+    .tb_stop = riscv_tr_tb_stop,
+    .disas_log = riscv_tr_disas_log,
 };
 
 void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
@@ -1305,25 +1310,25 @@ void riscv_translate_init(void)
     cpu_gprh[0] = NULL;
 
     for (i = 1; i < 32; i++) {
-        cpu_gpr[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPURISCVState, gpr[i]), riscv_int_regnames[i]);
-        cpu_gprh[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPURISCVState, gprh[i]), riscv_int_regnamesh[i]);
+        cpu_gpr[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPURISCVState, gpr[i]), riscv_int_regnames[i]);
+        cpu_gprh[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPURISCVState, gprh[i]), riscv_int_regnamesh[i]);
     }
 
     for (i = 0; i < 32; i++) {
-        cpu_fpr[i] = tcg_global_mem_new_i64(cpu_env,
-            offsetof(CPURISCVState, fpr[i]), riscv_fpr_regnames[i]);
+        cpu_fpr[i] = tcg_global_mem_new_i64(
+            cpu_env, offsetof(CPURISCVState, fpr[i]), riscv_fpr_regnames[i]);
     }
 
     cpu_pc = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, pc), "pc");
     cpu_vl = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, vl), "vl");
-    cpu_vstart = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, vstart),
-                            "vstart");
+    cpu_vstart =
+        tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, vstart), "vstart");
     load_res = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, load_res),
-                             "load_res");
+                                  "load_res");
     load_val = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, load_val),
-                             "load_val");
+                                  "load_val");
     /* Assign PM CSRs to tcg globals */
     pm_mask = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, cur_pmmask),
                                  "pmmask");

@@ -203,10 +203,10 @@ static void cf_interrupt_all(CPUM68KState *env, int is_hw)
             cf_rte(env);
             return;
         case EXCP_HALT_INSN:
-            if (semihosting_enabled((env->sr & SR_S) == 0)
-                    && (env->pc & 3) == 0
-                    && cpu_lduw_code(env, env->pc - 4) == 0x4e71
-                    && cpu_ldl_code(env, env->pc) == 0x4e7bf000) {
+            if (semihosting_enabled((env->sr & SR_S) == 0) &&
+                (env->pc & 3) == 0 &&
+                cpu_lduw_code(env, env->pc - 4) == 0x4e71 &&
+                cpu_ldl_code(env, env->pc) == 0x4e7bf000) {
                 env->pc += 4;
                 do_m68k_semihosting(env, env->dregs[0]);
                 return;
@@ -223,9 +223,9 @@ static void cf_interrupt_all(CPUM68KState *env, int is_hw)
     sr = env->sr | cpu_m68k_get_ccr(env);
     if (qemu_loglevel_mask(CPU_LOG_INT)) {
         static int count;
-        qemu_log("INT %6d: %s(%#x) pc=%08x sp=%08x sr=%04x\n",
-                 ++count, m68k_exception_name(cs->exception_index),
-                 vector, env->pc, env->aregs[7], sr);
+        qemu_log("INT %6d: %s(%#x) pc=%08x sp=%08x sr=%04x\n", ++count,
+                 m68k_exception_name(cs->exception_index), vector, env->pc,
+                 env->aregs[7], sr);
     }
 
     fmt |= 0x40000000;
@@ -253,8 +253,8 @@ static void cf_interrupt_all(CPUM68KState *env, int is_hw)
 }
 
 static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
-                                  uint16_t format, uint16_t sr,
-                                  uint32_t addr, uint32_t retaddr)
+                                  uint16_t format, uint16_t sr, uint32_t addr,
+                                  uint32_t retaddr)
 {
     if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
         /*  all except 68000 */
@@ -303,9 +303,9 @@ static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
     sr = env->sr | cpu_m68k_get_ccr(env);
     if (qemu_loglevel_mask(CPU_LOG_INT)) {
         static int count;
-        qemu_log("INT %6d: %s(%#x) pc=%08x sp=%08x sr=%04x\n",
-                 ++count, m68k_exception_name(cs->exception_index),
-                 vector, env->pc, env->aregs[7], sr);
+        qemu_log("INT %6d: %s(%#x) pc=%08x sp=%08x sr=%04x\n", ++count,
+                 m68k_exception_name(cs->exception_index), vector, env->pc,
+                 env->aregs[7], sr);
     }
 
     /*
@@ -514,8 +514,8 @@ bool m68k_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
     M68kCPU *cpu = M68K_CPU(cs);
     CPUM68KState *env = &cpu->env;
 
-    if (interrupt_request & CPU_INTERRUPT_HARD
-        && ((env->sr & SR_I) >> SR_I_SHIFT) < env->pending_level) {
+    if (interrupt_request & CPU_INTERRUPT_HARD &&
+        ((env->sr & SR_I) >> SR_I_SHIFT) < env->pending_level) {
         /*
          * Real hardware gets the interrupt vector via an IACK cycle
          * at this point.  Current emulated hardware doesn't rely on
@@ -531,8 +531,8 @@ bool m68k_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 
 #endif /* !CONFIG_USER_ONLY */
 
-G_NORETURN static void
-raise_exception_ra(CPUM68KState *env, int tt, uintptr_t raddr)
+G_NORETURN static void raise_exception_ra(CPUM68KState *env, int tt,
+                                          uintptr_t raddr)
 {
     CPUState *cs = env_cpu(env);
 
@@ -550,8 +550,8 @@ void HELPER(raise_exception)(CPUM68KState *env, uint32_t tt)
     raise_exception(env, tt);
 }
 
-G_NORETURN static void
-raise_exception_format2(CPUM68KState *env, int tt, int ilen, uintptr_t raddr)
+G_NORETURN static void raise_exception_format2(CPUM68KState *env, int tt,
+                                               int ilen, uintptr_t raddr)
 {
     CPUState *cs = env_cpu(env);
 
@@ -630,8 +630,8 @@ void HELPER(divsw)(CPUM68KState *env, int destr, int32_t den, int ilen)
     env->cc_v = 0;
 }
 
-void HELPER(divul)(CPUM68KState *env, int numr, int regr,
-                   uint32_t den, int ilen)
+void HELPER(divul)(CPUM68KState *env, int numr, int regr, uint32_t den,
+                   int ilen)
 {
     uint32_t num = env->dregs[numr];
     uint32_t quot, rem;
@@ -660,8 +660,7 @@ void HELPER(divul)(CPUM68KState *env, int numr, int regr,
     }
 }
 
-void HELPER(divsl)(CPUM68KState *env, int numr, int regr,
-                   int32_t den, int ilen)
+void HELPER(divsl)(CPUM68KState *env, int numr, int regr, int32_t den, int ilen)
 {
     int32_t num = env->dregs[numr];
     int32_t quot, rem;
@@ -690,8 +689,8 @@ void HELPER(divsl)(CPUM68KState *env, int numr, int regr,
     }
 }
 
-void HELPER(divull)(CPUM68KState *env, int numr, int regr,
-                    uint32_t den, int ilen)
+void HELPER(divull)(CPUM68KState *env, int numr, int regr, uint32_t den,
+                    int ilen)
 {
     uint64_t num = deposit64(env->dregs[numr], 32, 32, env->dregs[regr]);
     uint64_t quot;
@@ -727,8 +726,8 @@ void HELPER(divull)(CPUM68KState *env, int numr, int regr,
     env->dregs[numr] = quot;
 }
 
-void HELPER(divsll)(CPUM68KState *env, int numr, int regr,
-                    int32_t den, int ilen)
+void HELPER(divsll)(CPUM68KState *env, int numr, int regr, int32_t den,
+                    int ilen)
 {
     int64_t num = deposit64(env->dregs[numr], 32, 32, env->dregs[regr]);
     int64_t quot;
@@ -956,8 +955,8 @@ static uint64_t bf_load(CPUM68KState *env, uint32_t addr, int blen,
     }
 }
 
-static void bf_store(CPUM68KState *env, uint32_t addr, int blen,
-                     uint64_t data, uintptr_t ra)
+static void bf_store(CPUM68KState *env, uint32_t addr, int blen, uint64_t data,
+                     uintptr_t ra)
 {
     switch (blen) {
     case 0:
@@ -978,8 +977,8 @@ static void bf_store(CPUM68KState *env, uint32_t addr, int blen,
     }
 }
 
-uint32_t HELPER(bfexts_mem)(CPUM68KState *env, uint32_t addr,
-                            int32_t ofs, uint32_t len)
+uint32_t HELPER(bfexts_mem)(CPUM68KState *env, uint32_t addr, int32_t ofs,
+                            uint32_t len)
 {
     uintptr_t ra = GETPC();
     struct bf_data d = bf_prep(addr, ofs, len);
@@ -988,8 +987,8 @@ uint32_t HELPER(bfexts_mem)(CPUM68KState *env, uint32_t addr,
     return (int64_t)(data << d.bofs) >> (64 - d.len);
 }
 
-uint64_t HELPER(bfextu_mem)(CPUM68KState *env, uint32_t addr,
-                            int32_t ofs, uint32_t len)
+uint64_t HELPER(bfextu_mem)(CPUM68KState *env, uint32_t addr, int32_t ofs,
+                            uint32_t len)
 {
     uintptr_t ra = GETPC();
     struct bf_data d = bf_prep(addr, ofs, len);
@@ -1022,8 +1021,8 @@ uint32_t HELPER(bfins_mem)(CPUM68KState *env, uint32_t addr, uint32_t val,
     return val << (32 - d.len);
 }
 
-uint32_t HELPER(bfchg_mem)(CPUM68KState *env, uint32_t addr,
-                           int32_t ofs, uint32_t len)
+uint32_t HELPER(bfchg_mem)(CPUM68KState *env, uint32_t addr, int32_t ofs,
+                           uint32_t len)
 {
     uintptr_t ra = GETPC();
     struct bf_data d = bf_prep(addr, ofs, len);
@@ -1035,8 +1034,8 @@ uint32_t HELPER(bfchg_mem)(CPUM68KState *env, uint32_t addr,
     return ((data & mask) << d.bofs) >> 32;
 }
 
-uint32_t HELPER(bfclr_mem)(CPUM68KState *env, uint32_t addr,
-                           int32_t ofs, uint32_t len)
+uint32_t HELPER(bfclr_mem)(CPUM68KState *env, uint32_t addr, int32_t ofs,
+                           uint32_t len)
 {
     uintptr_t ra = GETPC();
     struct bf_data d = bf_prep(addr, ofs, len);
@@ -1048,8 +1047,8 @@ uint32_t HELPER(bfclr_mem)(CPUM68KState *env, uint32_t addr,
     return ((data & mask) << d.bofs) >> 32;
 }
 
-uint32_t HELPER(bfset_mem)(CPUM68KState *env, uint32_t addr,
-                           int32_t ofs, uint32_t len)
+uint32_t HELPER(bfset_mem)(CPUM68KState *env, uint32_t addr, int32_t ofs,
+                           uint32_t len)
 {
     uintptr_t ra = GETPC();
     struct bf_data d = bf_prep(addr, ofs, len);
@@ -1066,8 +1065,8 @@ uint32_t HELPER(bfffo_reg)(uint32_t n, uint32_t ofs, uint32_t len)
     return (n ? clz32(n) : len) + ofs;
 }
 
-uint64_t HELPER(bfffo_mem)(CPUM68KState *env, uint32_t addr,
-                           int32_t ofs, uint32_t len)
+uint64_t HELPER(bfffo_mem)(CPUM68KState *env, uint32_t addr, int32_t ofs,
+                           uint32_t len)
 {
     uintptr_t ra = GETPC();
     struct bf_data d = bf_prep(addr, ofs, len);

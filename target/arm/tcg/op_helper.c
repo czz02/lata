@@ -43,8 +43,8 @@ int exception_target_el(CPUARMState *env)
     return target_el;
 }
 
-void raise_exception(CPUARMState *env, uint32_t excp,
-                     uint32_t syndrome, uint32_t target_el)
+void raise_exception(CPUARMState *env, uint32_t excp, uint32_t syndrome,
+                     uint32_t target_el)
 {
     CPUState *cs = env_cpu(env);
 
@@ -82,8 +82,8 @@ void raise_exception_ra(CPUARMState *env, uint32_t excp, uint32_t syndrome,
     raise_exception(env, excp, syndrome, target_el);
 }
 
-uint64_t HELPER(neon_tbl)(CPUARMState *env, uint32_t desc,
-                          uint64_t ireg, uint64_t def)
+uint64_t HELPER(neon_tbl)(CPUARMState *env, uint32_t desc, uint64_t ireg,
+                          uint64_t def)
 {
     uint64_t tmp, val = 0;
     uint32_t maxindex = ((desc & 3) + 1) * 8;
@@ -455,8 +455,7 @@ uint32_t HELPER(get_user_reg)(CPUARMState *env, uint32_t regno)
         val = env->banked_r13[BANK_USRSYS];
     } else if (regno == 14) {
         val = env->banked_r14[BANK_USRSYS];
-    } else if (regno >= 8
-               && (env->uncached_cpsr & 0x1f) == ARM_CPU_MODE_FIQ) {
+    } else if (regno >= 8 && (env->uncached_cpsr & 0x1f) == ARM_CPU_MODE_FIQ) {
         val = env->usr_regs[regno - 8];
     } else {
         val = env->regs[regno];
@@ -470,8 +469,7 @@ void HELPER(set_user_reg)(CPUARMState *env, uint32_t regno, uint32_t val)
         env->banked_r13[BANK_USRSYS] = val;
     } else if (regno == 14) {
         env->banked_r14[BANK_USRSYS] = val;
-    } else if (regno >= 8
-               && (env->uncached_cpsr & 0x1f) == ARM_CPU_MODE_FIQ) {
+    } else if (regno >= 8 && (env->uncached_cpsr & 0x1f) == ARM_CPU_MODE_FIQ) {
         env->usr_regs[regno - 8] = val;
     } else {
         env->regs[regno] = val;
@@ -634,8 +632,8 @@ const void *HELPER(access_check_cp_reg)(CPUARMState *env, uint32_t key,
 
     assert(ri != NULL);
 
-    if (arm_feature(env, ARM_FEATURE_XSCALE) && ri->cp < 14
-        && extract32(env->cp15.c15_cpar, ri->cp, 1) == 0) {
+    if (arm_feature(env, ARM_FEATURE_XSCALE) && ri->cp < 14 &&
+        extract32(env->cp15.c15_cpar, ri->cp, 1) == 0) {
         res = CP_ACCESS_TRAP;
         goto fail;
     }
@@ -714,7 +712,7 @@ const void *HELPER(access_check_cp_reg)(CPUARMState *env, uint32_t key,
         return ri;
     }
 
- fail:
+fail:
     switch (res & ~CP_ACCESS_EL_MASK) {
     case CP_ACCESS_TRAP:
         break;
@@ -906,8 +904,8 @@ void HELPER(pre_smc)(CPUARMState *env, uint32_t syndrome)
      * doesn't exist, but we forbid the guest to set it to 1 in scr_write(),
      * so we need not special case this here.
      */
-    bool smd = arm_feature(env, ARM_FEATURE_AARCH64) ? smd_flag
-                                                     : smd_flag && !secure;
+    bool smd =
+        arm_feature(env, ARM_FEATURE_AARCH64) ? smd_flag : smd_flag && !secure;
 
     if (!arm_feature(env, ARM_FEATURE_EL3) &&
         cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
@@ -1010,8 +1008,7 @@ uint32_t HELPER(ror_cc)(CPUARMState *env, uint32_t x, uint32_t i)
 }
 
 void HELPER(probe_access)(CPUARMState *env, target_ulong ptr,
-                          uint32_t access_type, uint32_t mmu_idx,
-                          uint32_t size)
+                          uint32_t access_type, uint32_t mmu_idx, uint32_t size)
 {
     uint32_t in_page = -((uint32_t)ptr | TARGET_PAGE_SIZE);
     uintptr_t ra = GETPC();
@@ -1020,8 +1017,8 @@ void HELPER(probe_access)(CPUARMState *env, target_ulong ptr,
         probe_access(env, ptr, size, access_type, mmu_idx, ra);
     } else {
         probe_access(env, ptr, in_page, access_type, mmu_idx, ra);
-        probe_access(env, ptr + in_page, size - in_page,
-                     access_type, mmu_idx, ra);
+        probe_access(env, ptr + in_page, size - in_page, access_type, mmu_idx,
+                     ra);
     }
 }
 
@@ -1038,7 +1035,7 @@ void HELPER(vesb)(CPUARMState *env)
     uint64_t hcr = arm_hcr_el2_eff(env);
     bool enabled = !(hcr & HCR_TGE) && (hcr & HCR_AMO);
     bool pending = enabled && (hcr & HCR_VSE);
-    bool masked  = (env->daif & PSTATE_A);
+    bool masked = (env->daif & PSTATE_A);
 
     /* If VSE pending and masked, defer the exception.  */
     if (pending && masked) {

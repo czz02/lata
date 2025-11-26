@@ -21,8 +21,8 @@
 #define I386_CPU_INTERNAL_H
 
 typedef enum FeatureWordType {
-   CPUID_FEATURE_WORD,
-   MSR_FEATURE_WORD,
+    CPUID_FEATURE_WORD,
+    MSR_FEATURE_WORD,
 } FeatureWordType;
 
 typedef struct FeatureWordInfo {
@@ -36,10 +36,10 @@ typedef struct FeatureWordInfo {
     union {
         /* If type==CPUID_FEATURE_WORD */
         struct {
-            uint32_t eax;   /* Input EAX for CPUID */
+            uint32_t eax; /* Input EAX for CPUID */
             bool needs_ecx; /* CPUID instruction uses ECX as input */
-            uint32_t ecx;   /* Input ECX value for CPUID */
-            int reg;        /* output register (R_* constant) */
+            uint32_t ecx; /* Input ECX value for CPUID */
+            int reg; /* output register (R_* constant) */
         } cpuid;
         /* If type==MSR_FEATURE_WORD */
         struct {
@@ -59,8 +59,8 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp);
 
 #ifndef CONFIG_USER_ONLY
 GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs);
-void x86_cpu_get_crash_info_qom(Object *obj, Visitor *v,
-                                const char *name, void *opaque, Error **errp);
+void x86_cpu_get_crash_info_qom(Object *obj, Visitor *v, const char *name,
+                                void *opaque, Error **errp);
 
 void x86_cpu_apic_create(X86CPU *cpu, Error **errp);
 void x86_cpu_apic_realize(X86CPU *cpu, Error **errp);

@@ -49,20 +49,18 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
      * ST64BV, or ST64BV0 insns report syndrome info even for stage-1
      * faults and regardless of the target EL.
      */
-    if (!(template_syn & ARM_EL_ISV) || target_el != 2
-        || fi->s1ptw || !fi->stage2) {
-        syn = syn_data_abort_no_iss(same_el, 0,
-                                    fi->ea, 0, fi->s1ptw, is_write, fsc);
+    if (!(template_syn & ARM_EL_ISV) || target_el != 2 || fi->s1ptw ||
+        !fi->stage2) {
+        syn = syn_data_abort_no_iss(same_el, 0, fi->ea, 0, fi->s1ptw, is_write,
+                                    fsc);
     } else {
         /*
          * Fields: IL, ISV, SAS, SSE, SRT, SF and AR come from the template
          * syndrome created at translation time.
          * Now we create the runtime syndrome with the remaining fields.
          */
-        syn = syn_data_abort_with_iss(same_el,
-                                      0, 0, 0, 0, 0,
-                                      fi->ea, 0, fi->s1ptw, is_write, fsc,
-                                      true);
+        syn = syn_data_abort_with_iss(same_el, 0, 0, 0, 0, 0, fi->ea, 0,
+                                      fi->s1ptw, is_write, fsc, true);
         /* Merge the runtime syndrome with the template syndrome.  */
         syn |= template_syn;
     }
@@ -149,19 +147,18 @@ static unsigned encode_gpcsc(ARMMMUFaultInfo *fi)
 {
     static uint8_t const gpcsc[] = {
         [GPCF_AddressSize] = 0b000000,
-        [GPCF_Walk]        = 0b000100,
-        [GPCF_Fail]        = 0b001100,
-        [GPCF_EABT]        = 0b010100,
+        [GPCF_Walk] = 0b000100,
+        [GPCF_Fail] = 0b001100,
+        [GPCF_EABT] = 0b010100,
     };
 
     /* Note that we've validated fi->gpcf and fi->level above. */
     return gpcsc[fi->gpcf] | fi->level;
 }
 
-static G_NORETURN
-void arm_deliver_fault(ARMCPU *cpu, vaddr addr,
-                       MMUAccessType access_type,
-                       int mmu_idx, ARMMMUFaultInfo *fi)
+static G_NORETURN void arm_deliver_fault(ARMCPU *cpu, vaddr addr,
+                                         MMUAccessType access_type, int mmu_idx,
+                                         ARMMMUFaultInfo *fi)
 {
     CPUARMState *env = &cpu->env;
     int target_el = exception_target_el(env);
@@ -175,9 +172,8 @@ void arm_deliver_fault(ARMCPU *cpu, vaddr addr,
         fsr = compute_fsr_fsc(env, fi, target_el, mmu_idx, &fsc);
 
         syn = syn_gpc(fi->stage2 && fi->type == ARMFault_GPCFOnWalk,
-                      access_type == MMU_INST_FETCH,
-                      encode_gpcsc(fi), 0, fi->s1ptw,
-                      access_type == MMU_DATA_STORE, fsc);
+                      access_type == MMU_INST_FETCH, encode_gpcsc(fi), 0,
+                      fi->s1ptw, access_type == MMU_DATA_STORE, fsc);
 
         env->cp15.mfar_el3 = fi->paddr;
         switch (fi->paddr_space) {
@@ -223,16 +219,14 @@ void arm_deliver_fault(ARMCPU *cpu, vaddr addr,
         exc = EXCP_PREFETCH_ABORT;
     } else {
         syn = merge_syn_data_abort(env->exception.syndrome, fi, target_el,
-                                   same_el, access_type == MMU_DATA_STORE,
-                                   fsc);
-        if (access_type == MMU_DATA_STORE
-            && arm_feature(env, ARM_FEATURE_V6)) {
+                                   same_el, access_type == MMU_DATA_STORE, fsc);
+        if (access_type == MMU_DATA_STORE && arm_feature(env, ARM_FEATURE_V6)) {
             fsr |= (1 << 11);
         }
         exc = EXCP_DATA_ABORT;
     }
 
- do_raise:
+do_raise:
     env->exception.vaddress = addr;
     env->exception.fsr = fsr;
     raise_exception(env, exc, syn, target_el);
@@ -240,8 +234,8 @@ void arm_deliver_fault(ARMCPU *cpu, vaddr addr,
 
 /* Raise a data fault alignment exception for the specified virtual address */
 void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-                                 MMUAccessType access_type,
-                                 int mmu_idx, uintptr_t retaddr)
+                                 MMUAccessType access_type, int mmu_idx,
+                                 uintptr_t retaddr)
 {
     ARMCPU *cpu = ARM_CPU(cs);
     ARMMMUFaultInfo fi = {};
@@ -277,9 +271,8 @@ void helper_exception_pc_alignment(CPUARMState *env, target_ulong pc)
  * (eg "no device/memory present at address") by raising an external abort
  * exception
  */
-void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                   vaddr addr, unsigned size,
-                                   MMUAccessType access_type,
+void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                   unsigned size, MMUAccessType access_type,
                                    int mmu_idx, MemTxAttrs attrs,
                                    MemTxResult response, uintptr_t retaddr)
 {
@@ -295,8 +288,8 @@ void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
 }
 
 bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                      MMUAccessType access_type, int mmu_idx,
-                      bool probe, uintptr_t retaddr)
+                      MMUAccessType access_type, int mmu_idx, bool probe,
+                      uintptr_t retaddr)
 {
     ARMCPU *cpu = ARM_CPU(cs);
     GetPhysAddrResult res = {};
@@ -321,8 +314,7 @@ bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
      * register format, and signal the fault.
      */
     ret = get_phys_addr(&cpu->env, address, access_type,
-                        core_to_arm_mmu_idx(&cpu->env, mmu_idx),
-                        &res, fi);
+                        core_to_arm_mmu_idx(&cpu->env, mmu_idx), &res, fi);
     if (likely(!ret)) {
         /*
          * Map a single [sub]page. Regions smaller than our declared
@@ -348,8 +340,7 @@ bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
     }
 }
 #else
-void arm_cpu_record_sigsegv(CPUState *cs, vaddr addr,
-                            MMUAccessType access_type,
+void arm_cpu_record_sigsegv(CPUState *cs, vaddr addr, MMUAccessType access_type,
                             bool maperr, uintptr_t ra)
 {
     ARMMMUFaultInfo fi = {
@@ -366,8 +357,8 @@ void arm_cpu_record_sigsegv(CPUState *cs, vaddr addr,
     arm_deliver_fault(cpu, addr, access_type, MMU_USER_IDX, &fi);
 }
 
-void arm_cpu_record_sigbus(CPUState *cs, vaddr addr,
-                           MMUAccessType access_type, uintptr_t ra)
+void arm_cpu_record_sigbus(CPUState *cs, vaddr addr, MMUAccessType access_type,
+                           uintptr_t ra)
 {
     arm_cpu_do_unaligned_access(cs, addr, access_type, MMU_USER_IDX, ra);
 }

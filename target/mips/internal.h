@@ -19,11 +19,11 @@
  * CP0C0_MT field.
  */
 enum mips_mmu_types {
-    MMU_TYPE_NONE       = 0,
-    MMU_TYPE_R4000      = 1,    /* Standard TLB */
-    MMU_TYPE_BAT        = 2,    /* Block Address Translation */
-    MMU_TYPE_FMT        = 3,    /* Fixed Mapping */
-    MMU_TYPE_DVF        = 4,    /* Dual VTLB and FTLB */
+    MMU_TYPE_NONE = 0,
+    MMU_TYPE_R4000 = 1, /* Standard TLB */
+    MMU_TYPE_BAT = 2, /* Block Address Translation */
+    MMU_TYPE_FMT = 3, /* Fixed Mapping */
+    MMU_TYPE_DVF = 4, /* Dual VTLB and FTLB */
     MMU_TYPE_R3000,
     MMU_TYPE_R6000,
     MMU_TYPE_R8000
@@ -95,11 +95,11 @@ extern const int mips_defs_number;
 int mips_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
 int mips_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
 
-#define USEG_LIMIT      ((target_ulong)(int32_t)0x7FFFFFFFUL)
-#define KSEG0_BASE      ((target_ulong)(int32_t)0x80000000UL)
-#define KSEG1_BASE      ((target_ulong)(int32_t)0xA0000000UL)
-#define KSEG2_BASE      ((target_ulong)(int32_t)0xC0000000UL)
-#define KSEG3_BASE      ((target_ulong)(int32_t)0xE0000000UL)
+#define USEG_LIMIT ((target_ulong)(int32_t)0x7FFFFFFFUL)
+#define KSEG0_BASE ((target_ulong)(int32_t)0x80000000UL)
+#define KSEG1_BASE ((target_ulong)(int32_t)0xA0000000UL)
+#define KSEG2_BASE ((target_ulong)(int32_t)0xC0000000UL)
+#define KSEG3_BASE ((target_ulong)(int32_t)0xE0000000UL)
 
 #if !defined(CONFIG_USER_ONLY)
 
@@ -113,9 +113,9 @@ enum {
     TLBRET_MATCH = 0
 };
 
-int get_physical_address(CPUMIPSState *env, hwaddr *physical,
-                         int *prot, target_ulong real_address,
-                         MMUAccessType access_type, int mmu_idx);
+int get_physical_address(CPUMIPSState *env, hwaddr *physical, int *prot,
+                         target_ulong real_address, MMUAccessType access_type,
+                         int mmu_idx);
 hwaddr mips_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
 
 typedef struct r4k_tlb_t r4k_tlb_t;
@@ -124,18 +124,18 @@ struct r4k_tlb_t {
     uint32_t PageMask;
     uint16_t ASID;
     uint32_t MMID;
-    unsigned int G:1;
-    unsigned int C0:3;
-    unsigned int C1:3;
-    unsigned int V0:1;
-    unsigned int V1:1;
-    unsigned int D0:1;
-    unsigned int D1:1;
-    unsigned int XI0:1;
-    unsigned int XI1:1;
-    unsigned int RI0:1;
-    unsigned int RI1:1;
-    unsigned int EHINV:1;
+    unsigned int G : 1;
+    unsigned int C0 : 3;
+    unsigned int C1 : 3;
+    unsigned int V0 : 1;
+    unsigned int V1 : 1;
+    unsigned int D0 : 1;
+    unsigned int D1 : 1;
+    unsigned int XI0 : 1;
+    unsigned int XI1 : 1;
+    unsigned int RI0 : 1;
+    unsigned int RI1 : 1;
+    unsigned int EHINV : 1;
     uint64_t PFN[2];
 };
 
@@ -168,15 +168,15 @@ extern const VMStateDescription vmstate_mips_cpu;
 static inline bool cpu_mips_hw_interrupts_enabled(CPUMIPSState *env)
 {
     return (env->CP0_Status & (1 << CP0St_IE)) &&
-        !(env->CP0_Status & (1 << CP0St_EXL)) &&
-        !(env->CP0_Status & (1 << CP0St_ERL)) &&
-        !(env->hflags & MIPS_HFLAG_DM) &&
-        /*
-         * Note that the TCStatus IXMT field is initialized to zero,
-         * and only MT capable cores can set it to one. So we don't
-         * need to check for MT capabilities here.
-         */
-        !(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_IXMT));
+           !(env->CP0_Status & (1 << CP0St_EXL)) &&
+           !(env->CP0_Status & (1 << CP0St_ERL)) &&
+           !(env->hflags & MIPS_HFLAG_DM) &&
+           /*
+            * Note that the TCStatus IXMT field is initialized to zero,
+            * and only MT capable cores can set it to one. So we don't
+            * need to check for MT capabilities here.
+            */
+           !(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_IXMT));
 }
 
 /* Check if there is pending and not masked out interrupt */
@@ -278,7 +278,7 @@ static inline int mips_vp_active(CPUMIPSState *env)
     }
 
     /* Check if the virtual processor is disabled due to a DVP */
-    CPU_FOREACH(other_cs) {
+    CPU_FOREACH (other_cs) {
         MIPSCPU *other_cpu = MIPS_CPU(other_cs);
         if ((&other_cpu->env != env) &&
             ((other_cpu->env.CP0_VPControl >> CP0VPCtl_DIS) & 1)) {
@@ -290,19 +290,18 @@ static inline int mips_vp_active(CPUMIPSState *env)
 
 static inline void compute_hflags(CPUMIPSState *env)
 {
-    env->hflags &= ~(MIPS_HFLAG_COP1X | MIPS_HFLAG_64 | MIPS_HFLAG_CP0 |
-                     MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
-                     MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSP_R2 |
-                     MIPS_HFLAG_DSP_R3 | MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA |
-                     MIPS_HFLAG_FRE | MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
+    env->hflags &=
+        ~(MIPS_HFLAG_COP1X | MIPS_HFLAG_64 | MIPS_HFLAG_CP0 | MIPS_HFLAG_F64 |
+          MIPS_HFLAG_FPU | MIPS_HFLAG_KSU | MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP |
+          MIPS_HFLAG_DSP_R2 | MIPS_HFLAG_DSP_R3 | MIPS_HFLAG_SBRI |
+          MIPS_HFLAG_MSA | MIPS_HFLAG_FRE | MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
     if (env->CP0_Status & (1 << CP0St_ERL)) {
         env->hflags |= MIPS_HFLAG_ERL;
     }
     if (!(env->CP0_Status & (1 << CP0St_EXL)) &&
         !(env->CP0_Status & (1 << CP0St_ERL)) &&
         !(env->hflags & MIPS_HFLAG_DM)) {
-        env->hflags |= (env->CP0_Status >> CP0St_KSU) &
-                       MIPS_HFLAG_KSU;
+        env->hflags |= (env->CP0_Status >> CP0St_KSU) & MIPS_HFLAG_KSU;
     }
 #if defined(TARGET_MIPS64)
     if ((env->insn_flags & ISA_MIPS3) &&
@@ -348,8 +347,8 @@ static inline void compute_hflags(CPUMIPSState *env)
          * access to DSP R3 resources.
          */
         if (env->CP0_Status & (1 << CP0St_MX)) {
-            env->hflags |= MIPS_HFLAG_DSP | MIPS_HFLAG_DSP_R2 |
-                           MIPS_HFLAG_DSP_R3;
+            env->hflags |=
+                MIPS_HFLAG_DSP | MIPS_HFLAG_DSP_R2 | MIPS_HFLAG_DSP_R3;
         }
     } else if (env->insn_flags & ASE_DSP_R2) {
         /*
@@ -368,7 +367,6 @@ static inline void compute_hflags(CPUMIPSState *env)
         if (env->CP0_Status & (1 << CP0St_MX)) {
             env->hflags |= MIPS_HFLAG_DSP;
         }
-
     }
     if (env->insn_flags & ISA_MIPS_R2) {
         if (env->active_fpu.fcr0 & (1 << FCR0_F64)) {

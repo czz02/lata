@@ -27,22 +27,18 @@
 #include "qemu/guest-random.h"
 #include "helper-tcg.h"
 
-//#define DEBUG_MULDIV
+// #define DEBUG_MULDIV
 
 /* modulo 9 table */
 static const uint8_t rclb_table[32] = {
-    0, 1, 2, 3, 4, 5, 6, 7,
-    8, 0, 1, 2, 3, 4, 5, 6,
-    7, 8, 0, 1, 2, 3, 4, 5,
-    6, 7, 8, 0, 1, 2, 3, 4,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 1, 2, 3, 4, 5, 6,
+    7, 8, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 1, 2, 3, 4,
 };
 
 /* modulo 17 table */
 static const uint8_t rclw_table[32] = {
-    0, 1, 2, 3, 4, 5, 6, 7,
-    8, 9, 10, 11, 12, 13, 14, 15,
-    16, 0, 1, 2, 3, 4, 5, 6,
-    7, 8, 9, 10, 11, 12, 13, 14,
+    0,  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+    16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,  10, 11, 12, 13, 14,
 };
 
 /* division, flags are undefined */
@@ -126,7 +122,8 @@ void helper_divl_EAX(CPUX86State *env, target_ulong t0)
     unsigned int den, r;
     uint64_t num, q;
 
-    num = ((uint32_t)env->regs[R_EAX]) | ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
+    num = ((uint32_t)env->regs[R_EAX]) |
+          ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
     den = t0;
     if (den == 0) {
         raise_exception_ra(env, EXCP00_DIVZ, GETPC());
@@ -145,7 +142,8 @@ void helper_idivl_EAX(CPUX86State *env, target_ulong t0)
     int den, r;
     int64_t num, q;
 
-    num = ((uint32_t)env->regs[R_EAX]) | ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
+    num = ((uint32_t)env->regs[R_EAX]) |
+          ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
     den = t0;
     if (den == 0) {
         raise_exception_ra(env, EXCP00_DIVZ, GETPC());
@@ -414,11 +412,11 @@ void helper_idivq_EAX(CPUX86State *env, target_ulong t0)
 #endif
 
 #if TARGET_LONG_BITS == 32
-# define ctztl  ctz32
-# define clztl  clz32
+#define ctztl ctz32
+#define clztl clz32
 #else
-# define ctztl  ctz64
-# define clztl  clz64
+#define ctztl ctz64
+#define clztl clz64
 #endif
 
 target_ulong helper_pdep(target_ulong src, target_ulong mask)

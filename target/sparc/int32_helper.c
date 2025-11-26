@@ -25,7 +25,7 @@
 #include "sysemu/runstate.h"
 
 
-static const char * const excp_names[0x80] = {
+static const char *const excp_names[0x80] = {
     [TT_TFAULT] = "Instruction Access Fault",
     [TT_ILL_INSN] = "Illegal Instruction",
     [TT_PRIV_INSN] = "Privileged Instruction",
@@ -143,8 +143,9 @@ void sparc_cpu_do_interrupt(CPUState *cs)
             env->def.features & CPU_FEATURE_TA0_SHUTDOWN) {
             qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
         } else {
-            cpu_abort(cs, "Trap 0x%02x (%s) while interrupts disabled, "
-                          "Error state",
+            cpu_abort(cs,
+                      "Trap 0x%02x (%s) while interrupts disabled, "
+                      "Error state",
                       cs->exception_index, excp_name_str(cs->exception_index));
         }
         return;

@@ -34,8 +34,8 @@
 #include "hw/boards.h"
 #endif
 
-G_NORETURN void tcg_s390_program_interrupt(CPUS390XState *env,
-                                           uint32_t code, uintptr_t ra)
+G_NORETURN void tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+                                           uintptr_t ra)
 {
     CPUState *cs = env_cpu(env);
 
@@ -52,8 +52,8 @@ G_NORETURN void tcg_s390_data_exception(CPUS390XState *env, uint32_t dxc,
     g_assert(dxc <= 0xff);
 #if !defined(CONFIG_USER_ONLY)
     /* Store the DXC into the lowcore */
-    stl_phys(env_cpu(env)->as,
-             env->psa + offsetof(LowCore, data_exc_code), dxc);
+    stl_phys(env_cpu(env)->as, env->psa + offsetof(LowCore, data_exc_code),
+             dxc);
 #endif
 
     /* Store the DXC into the FPC if AFP is enabled */
@@ -69,8 +69,8 @@ G_NORETURN void tcg_s390_vector_exception(CPUS390XState *env, uint32_t vxc,
     g_assert(vxc <= 0xff);
 #if !defined(CONFIG_USER_ONLY)
     /* Always store the VXC into the lowcore, without AFP it is undefined */
-    stl_phys(env_cpu(env)->as,
-             env->psa + offsetof(LowCore, data_exc_code), vxc);
+    stl_phys(env_cpu(env)->as, env->psa + offsetof(LowCore, data_exc_code),
+             vxc);
 #endif
 
     /* Always store the VXC into the FPC, without AFP it is undefined */
@@ -88,8 +88,7 @@ void HELPER(data_exception)(CPUS390XState *env, uint32_t dxc)
  * this is only for the atomic and relative long operations, for which we want
  * to raise a specification exception.
  */
-static G_NORETURN
-void do_unaligned_access(CPUState *cs, uintptr_t retaddr)
+static G_NORETURN void do_unaligned_access(CPUState *cs, uintptr_t retaddr)
 {
     S390CPU *cpu = S390_CPU(cs);
     CPUS390XState *env = &cpu->env;
@@ -105,8 +104,8 @@ void s390_cpu_do_interrupt(CPUState *cs)
 }
 
 void s390_cpu_record_sigsegv(CPUState *cs, vaddr address,
-                             MMUAccessType access_type,
-                             bool maperr, uintptr_t retaddr)
+                             MMUAccessType access_type, bool maperr,
+                             uintptr_t retaddr)
 {
     S390CPU *cpu = S390_CPU(cs);
 
@@ -144,8 +143,8 @@ static inline uint64_t cpu_mmu_idx_to_asc(int mmu_idx)
 }
 
 bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                       MMUAccessType access_type, int mmu_idx,
-                       bool probe, uintptr_t retaddr)
+                       MMUAccessType access_type, int mmu_idx, bool probe,
+                       uintptr_t retaddr)
 {
     S390CPU *cpu = S390_CPU(cs);
     CPUS390XState *env = &cpu->env;
@@ -180,10 +179,10 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
 
     if (!excp) {
         qemu_log_mask(CPU_LOG_MMU,
-                      "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n",
-                      __func__, (uint64_t)vaddr, (uint64_t)raddr, prot);
-        tlb_set_page(cs, address & TARGET_PAGE_MASK, raddr, prot,
-                     mmu_idx, TARGET_PAGE_SIZE);
+                      "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n", __func__,
+                      (uint64_t)vaddr, (uint64_t)raddr, prot);
+        tlb_set_page(cs, address & TARGET_PAGE_MASK, raddr, prot, mmu_idx,
+                     TARGET_PAGE_SIZE);
         return true;
     }
     if (probe) {
@@ -209,8 +208,8 @@ static void do_program_interrupt(CPUS390XState *env)
     bool set_trans_exc_code = false;
     bool advance = false;
 
-    assert((env->int_pgm_code == PGM_SPECIFICATION && ilen == 0) ||
-           ilen == 2 || ilen == 4 || ilen == 6);
+    assert((env->int_pgm_code == PGM_SPECIFICATION && ilen == 0) || ilen == 2 ||
+           ilen == 4 || ilen == 6);
 
     switch (env->int_pgm_code) {
     case PGM_PER:
@@ -260,10 +259,9 @@ static void do_program_interrupt(CPUS390XState *env)
         env->psw.addr += ilen;
     }
 
-    qemu_log_mask(CPU_LOG_INT,
-                  "%s: code=0x%x ilen=%d psw: %" PRIx64 " %" PRIx64 "\n",
-                  __func__, env->int_pgm_code, ilen, env->psw.mask,
-                  env->psw.addr);
+    qemu_log_mask(
+        CPU_LOG_INT, "%s: code=0x%x ilen=%d psw: %" PRIx64 " %" PRIx64 "\n",
+        __func__, env->int_pgm_code, ilen, env->psw.mask, env->psw.addr);
 
     lowcore = cpu_map_lowcore(env);
 
@@ -414,8 +412,8 @@ static void do_io_interrupt(CPUS390XState *env)
 }
 
 typedef struct MchkExtSaveArea {
-    uint64_t    vregs[32][2];                     /* 0x0000 */
-    uint8_t     pad_0x0200[0x0400 - 0x0200];      /* 0x0200 */
+    uint64_t vregs[32][2]; /* 0x0000 */
+    uint8_t pad_0x0200[0x0400 - 0x0200]; /* 0x0200 */
 } MchkExtSaveArea;
 QEMU_BUILD_BUG_ON(sizeof(MchkExtSaveArea) != 1024);
 
@@ -632,22 +630,20 @@ void s390x_cpu_debug_excp_handler(CPUState *cs)
 }
 
 void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                   MMUAccessType access_type,
-                                   int mmu_idx, uintptr_t retaddr)
+                                   MMUAccessType access_type, int mmu_idx,
+                                   uintptr_t retaddr)
 {
     do_unaligned_access(cs, retaddr);
 }
 
-static G_NORETURN
-void monitor_event(CPUS390XState *env,
-                   uint64_t monitor_code,
-                   uint8_t monitor_class, uintptr_t ra)
+static G_NORETURN void monitor_event(CPUS390XState *env, uint64_t monitor_code,
+                                     uint8_t monitor_class, uintptr_t ra)
 {
     /* Store the Monitor Code and the Monitor Class Number into the lowcore */
-    stq_phys(env_cpu(env)->as,
-             env->psa + offsetof(LowCore, monitor_code), monitor_code);
-    stw_phys(env_cpu(env)->as,
-             env->psa + offsetof(LowCore, mon_class_num), monitor_class);
+    stq_phys(env_cpu(env)->as, env->psa + offsetof(LowCore, monitor_code),
+             monitor_code);
+    stw_phys(env_cpu(env)->as, env->psa + offsetof(LowCore, mon_class_num),
+             monitor_class);
 
     tcg_s390_program_interrupt(env, PGM_MONITOR, ra);
 }

@@ -25,14 +25,13 @@
 #include "crypto/aes-round.h"
 #include "crypto/sm4.h"
 
-#define AES_XTIME(a) \
-    ((a << 1) ^ ((a & 0x80) ? 0x1b : 0))
+#define AES_XTIME(a) ((a << 1) ^ ((a & 0x80) ? 0x1b : 0))
 
-#define AES_GFMUL(a, b) (( \
-    (((b) & 0x1) ? (a) : 0) ^ \
-    (((b) & 0x2) ? AES_XTIME(a) : 0) ^ \
-    (((b) & 0x4) ? AES_XTIME(AES_XTIME(a)) : 0) ^ \
-    (((b) & 0x8) ? AES_XTIME(AES_XTIME(AES_XTIME(a))) : 0)) & 0xFF)
+#define AES_GFMUL(a, b)                                            \
+    (((((b) & 0x1) ? (a) : 0) ^ (((b) & 0x2) ? AES_XTIME(a) : 0) ^ \
+      (((b) & 0x4) ? AES_XTIME(AES_XTIME(a)) : 0) ^                \
+      (((b) & 0x8) ? AES_XTIME(AES_XTIME(AES_XTIME(a))) : 0)) &    \
+     0xFF)
 
 static inline uint32_t aes_mixcolumn_byte(uint8_t x, bool fwd)
 {
@@ -50,9 +49,8 @@ static inline uint32_t aes_mixcolumn_byte(uint8_t x, bool fwd)
 
 #define sext32_xlen(x) (target_ulong)(int32_t)(x)
 
-static inline target_ulong aes32_operation(target_ulong shamt,
-                                           target_ulong rs1, target_ulong rs2,
-                                           bool enc, bool mix)
+static inline target_ulong aes32_operation(target_ulong shamt, target_ulong rs1,
+                                           target_ulong rs2, bool enc, bool mix)
 {
     uint8_t si = rs2 >> shamt;
     uint8_t so;
@@ -104,7 +102,7 @@ target_ulong HELPER(aes32dsi)(target_ulong rs1, target_ulong rs2,
     return aes32_operation(shamt, rs1, rs2, false, false);
 }
 
-static const AESState aes_zero = { };
+static const AESState aes_zero = {};
 
 target_ulong HELPER(aes64esm)(target_ulong rs1, target_ulong rs2)
 {
@@ -138,7 +136,7 @@ target_ulong HELPER(aes64ds)(target_ulong rs1, target_ulong rs2)
 
 target_ulong HELPER(aes64dsm)(target_ulong rs1, target_ulong rs2)
 {
-    AESState t, z = { };
+    AESState t, z = {};
 
     /*
      * This instruction does not include a round key,
@@ -168,9 +166,8 @@ target_ulong HELPER(aes64ks2)(target_ulong rs1, target_ulong rs2)
 target_ulong HELPER(aes64ks1i)(target_ulong rs1, target_ulong rnum)
 {
     uint64_t RS1 = rs1;
-    static const uint8_t round_consts[10] = {
-        0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36
-    };
+    static const uint8_t round_consts[10] = { 0x01, 0x02, 0x04, 0x08, 0x10,
+                                              0x20, 0x40, 0x80, 0x1b, 0x36 };
 
     uint8_t enc_rnum = rnum;
     uint32_t temp = (RS1 >> 32) & 0xFFFFFFFF;

@@ -109,9 +109,9 @@ static void print_delay(const SyncClocks *sc)
             (-sc->diff_clk / (float)1000000000LL <
              (threshold_delay - THRESHOLD_REDUCE))) {
             threshold_delay = (-sc->diff_clk / 1000000000LL) + 1;
-            qemu_printf("Warning: The guest is now late by %.1f to %.1f seconds\n",
-                        threshold_delay - 1,
-                        threshold_delay);
+            qemu_printf(
+                "Warning: The guest is now late by %.1f to %.1f seconds\n",
+                threshold_delay - 1, threshold_delay);
             nb_prints++;
             last_realtime_clock = sc->realtime_clock;
         }
@@ -125,8 +125,7 @@ static void init_delay_params(SyncClocks *sc, CPUState *cpu)
     }
     sc->realtime_clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
     sc->diff_clk = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - sc->realtime_clock;
-    sc->last_cpu_icount
-        = cpu->icount_extra + cpu_neg(cpu)->icount_decr.u16.low;
+    sc->last_cpu_icount = cpu->icount_extra + cpu_neg(cpu)->icount_decr.u16.low;
     if (sc->diff_clk < max_delay) {
         max_delay = sc->diff_clk;
     }
@@ -185,10 +184,8 @@ static bool tb_lookup_cmp(const void *p, const void *d)
     const struct tb_desc *desc = d;
 
     if ((tb_cflags(tb) & CF_PCREL || tb->pc == desc->pc) &&
-        tb_page_addr0(tb) == desc->page_addr0 &&
-        tb->cs_base == desc->cs_base &&
-        tb->flags == desc->flags &&
-        tb_cflags(tb) == desc->cflags) {
+        tb_page_addr0(tb) == desc->page_addr0 && tb->cs_base == desc->cs_base &&
+        tb->flags == desc->flags && tb_cflags(tb) == desc->cflags) {
         /* check next page if needed */
         tb_page_addr_t tb_phys_page1 = tb_page_addr1(tb);
         if (tb_phys_page1 == -1) {
@@ -216,9 +213,8 @@ static bool tb_lookup_cmp(const void *p, const void *d)
     return false;
 }
 
-TranslationBlock *tb_htable_lookup(CPUState *cpu, vaddr pc,
-                                          uint64_t cs_base, uint32_t flags,
-                                          uint32_t cflags)
+TranslationBlock *tb_htable_lookup(CPUState *cpu, vaddr pc, uint64_t cs_base,
+                                   uint32_t flags, uint32_t cflags)
 {
     tb_page_addr_t phys_pc;
     struct tb_desc desc;
@@ -234,8 +230,8 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, vaddr pc,
         return NULL;
     }
     desc.page_addr0 = phys_pc;
-    h = tb_hash_func(phys_pc, (cflags & CF_PCREL ? 0 : pc),
-                     flags, cs_base, cflags);
+    h = tb_hash_func(phys_pc, (cflags & CF_PCREL ? 0 : pc), flags, cs_base,
+                     cflags);
     return qht_lookup_custom(&tb_ctx.htable, &desc, h, tb_lookup_cmp);
 }
 
@@ -258,11 +254,8 @@ static inline TranslationBlock *tb_lookup(CPUState *cpu, vaddr pc,
         /* Use acquire to ensure current load of pc from jc. */
         tb = qatomic_load_acquire(&jc->array[hash].tb);
 
-        if (likely(tb &&
-                   jc->array[hash].pc == pc &&
-                   tb->cs_base == cs_base &&
-                   tb->flags == flags &&
-                   tb_cflags(tb) == cflags)) {
+        if (likely(tb && jc->array[hash].pc == pc && tb->cs_base == cs_base &&
+                   tb->flags == flags && tb_cflags(tb) == cflags)) {
             return tb;
         }
         tb = tb_htable_lookup(cpu, pc, cs_base, flags, cflags);
@@ -276,11 +269,8 @@ static inline TranslationBlock *tb_lookup(CPUState *cpu, vaddr pc,
         /* Use rcu_read to ensure current load of pc from *tb. */
         tb = qatomic_rcu_read(&jc->array[hash].tb);
 
-        if (likely(tb &&
-                   tb->pc == pc &&
-                   tb->cs_base == cs_base &&
-                   tb->flags == flags &&
-                   tb_cflags(tb) == cflags)) {
+        if (likely(tb && tb->pc == pc && tb->cs_base == cs_base &&
+                   tb->flags == flags && tb_cflags(tb) == cflags)) {
             return tb;
         }
         tb = tb_htable_lookup(cpu, pc, cs_base, flags, cflags);
@@ -294,15 +284,14 @@ static inline TranslationBlock *tb_lookup(CPUState *cpu, vaddr pc,
     return tb;
 }
 
-static void log_cpu_exec(vaddr pc, CPUState *cpu,
-                         const TranslationBlock *tb)
+static void log_cpu_exec(vaddr pc, CPUState *cpu, const TranslationBlock *tb)
 {
     if (qemu_log_in_addr_range(pc)) {
         qemu_log_mask(CPU_LOG_EXEC,
-                      "Trace %d: %p [%08" PRIx64
-                      "/%016" VADDR_PRIx "/%08x/%08x] %s\n",
-                      cpu->cpu_index, tb->tc.ptr, tb->cs_base, pc,
-                      tb->flags, tb->cflags, lookup_symbol(pc));
+                      "Trace %d: %p [%08" PRIx64 "/%016" VADDR_PRIx
+                      "/%08x/%08x] %s\n",
+                      cpu->cpu_index, tb->tc.ptr, tb->cs_base, pc, tb->flags,
+                      tb->cflags, lookup_symbol(pc));
 
         if (qemu_loglevel_mask(CPU_LOG_TB_CPU)) {
             FILE *logfile = qemu_log_trylock();
@@ -344,7 +333,7 @@ static bool check_for_breakpoints_slow(CPUState *cpu, vaddr pc,
         return false;
     }
 
-    QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
+    QTAILQ_FOREACH (bp, &cpu->breakpoints, entry) {
         /*
          * If we have an exact pc match, trigger the breakpoint.
          * Otherwise, note matches within the page.
@@ -395,7 +384,7 @@ static inline bool check_for_breakpoints(CPUState *cpu, vaddr pc,
                                          uint32_t *cflags)
 {
     return unlikely(!QTAILQ_EMPTY(&cpu->breakpoints)) &&
-        check_for_breakpoints_slow(cpu, pc, cflags);
+           check_for_breakpoints_slow(cpu, pc, cflags);
 }
 
 /**
@@ -443,14 +432,14 @@ const void *HELPER(lookup_tb_ptr)(CPUArchState *env)
  * TCG is not considered a security-sensitive part of QEMU so this does not
  * affect the impact of CFI in environment with high security requirements
  */
-static inline TranslationBlock * QEMU_DISABLE_CFI
+static inline TranslationBlock *QEMU_DISABLE_CFI
 cpu_tb_exec(CPUState *cpu, TranslationBlock *itb, int *tb_exit)
 {
     CPUArchState *env = cpu->env_ptr;
     uintptr_t ret;
     TranslationBlock *last_tb;
     const void *tb_ptr = itb->tc.ptr;
-  
+
     if (qemu_loglevel_mask(CPU_LOG_TB_CPU | CPU_LOG_EXEC)) {
         log_cpu_exec(log_pc(cpu, itb), cpu, itb);
     }
@@ -493,9 +482,10 @@ cpu_tb_exec(CPUState *cpu, TranslationBlock *itb, int *tb_exit)
         if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
             vaddr pc = log_pc(cpu, last_tb);
             if (qemu_log_in_addr_range(pc)) {
-                qemu_log("Stopped execution of TB chain before %p [%016"
-                         VADDR_PRIx "] %s\n",
-                         last_tb->tc.ptr, pc, lookup_symbol(pc));
+                qemu_log(
+                    "Stopped execution of TB chain before %p [%016" VADDR_PRIx
+                    "] %s\n",
+                    last_tb->tc.ptr, pc, lookup_symbol(pc));
             }
         }
     }
@@ -640,17 +630,18 @@ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
 
     tb->jmp_target_addr[n] = addr;
     tb_target_set_jmp_target(c_tb, n, jmp_rx, jmp_rw);
-// #endif
+    // #endif
 }
 
 #ifdef CONFIG_LATA_INSTS_PATTERN
-void tb_nzcv_jmp(TranslationBlock *tb, int n, bool isjmp){
+void tb_nzcv_jmp(TranslationBlock *tb, int n, bool isjmp)
+{
     uintptr_t offset = tb->nzcv_save[n];
     uintptr_t jmp_rx = (uintptr_t)tb->tc.ptr + offset;
     uintptr_t jmp_rw = jmp_rx - tcg_splitwx_diff;
     tcg_insn_unit insn = 0x50000400;
-    if(isjmp){
-        insn = 0x50001400; 
+    if (isjmp) {
+        insn = 0x50001400;
     }
 
     qatomic_set((tcg_insn_unit *)jmp_rw, insn);
@@ -672,16 +663,16 @@ static inline void tb_add_jump(TranslationBlock *tb, int n,
         goto out_unlock_next;
     }
     /* Atomically claim the jump destination slot only if it was NULL */
-    old = qatomic_cmpxchg(&tb->jmp_dest[n], (uintptr_t)NULL,
-                          (uintptr_t)tb_next);
+    old =
+        qatomic_cmpxchg(&tb->jmp_dest[n], (uintptr_t)NULL, (uintptr_t)tb_next);
     if (old) {
         goto out_unlock_next;
     }
 
 #ifdef CONFIG_LATA_INSTS_PATTERN
-    if(tb->nzcv_save[n]!= TB_JMP_OFFSET_INVALID && !tb_next->nzcv_use){
+    if (tb->nzcv_save[n] != TB_JMP_OFFSET_INVALID && !tb_next->nzcv_use) {
         // ignore nzcv calculate
-        tb_nzcv_jmp(tb, n ,true);
+        tb_nzcv_jmp(tb, n, true);
     }
 #endif
     /* patch the native jump address */
@@ -693,11 +684,11 @@ static inline void tb_add_jump(TranslationBlock *tb, int n,
 
     qemu_spin_unlock(&tb_next->jmp_lock);
 
-    qemu_log_mask(CPU_LOG_EXEC, "Linking TBs %p index %d -> %p\n",
-                  tb->tc.ptr, n, tb_next->tc.ptr);
+    qemu_log_mask(CPU_LOG_EXEC, "Linking TBs %p index %d -> %p\n", tb->tc.ptr,
+                  n, tb_next->tc.ptr);
     return;
 
- out_unlock_next:
+out_unlock_next:
     qemu_spin_unlock(&tb_next->jmp_lock);
     return;
 }
@@ -732,7 +723,7 @@ static inline void cpu_handle_debug_exception(CPUState *cpu)
     CPUWatchpoint *wp;
 
     if (!cpu->watchpoint_hit) {
-        QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+        QTAILQ_FOREACH (wp, &cpu->watchpoints, entry) {
             wp->flags &= ~BP_WATCHPOINT_HIT;
         }
     }
@@ -746,11 +737,11 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
 {
     if (cpu->exception_index < 0) {
 #ifndef CONFIG_USER_ONLY
-        if (replay_has_exception()
-            && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0) {
+        if (replay_has_exception() &&
+            cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0) {
             /* Execute just one insn to trigger exception pending in the log */
-            cpu->cflags_next_tb = (curr_cflags(cpu) & ~CF_USE_ICOUNT)
-                | CF_NOIRQ | 1;
+            cpu->cflags_next_tb =
+                (curr_cflags(cpu) & ~CF_USE_ICOUNT) | CF_NOIRQ | 1;
         }
 #endif
         return false;
@@ -925,10 +916,10 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
     }
 
     /* Finally, check if we need to exit to the main loop.  */
-    if (unlikely(qatomic_read(&cpu->exit_request))
-        || (icount_enabled()
-            && (cpu->cflags_next_tb == -1 || cpu->cflags_next_tb & CF_USE_ICOUNT)
-            && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0)) {
+    if (unlikely(qatomic_read(&cpu->exit_request)) ||
+        (icount_enabled() &&
+         (cpu->cflags_next_tb == -1 || cpu->cflags_next_tb & CF_USE_ICOUNT) &&
+         cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0)) {
         qatomic_set(&cpu->exit_request, 0);
         if (cpu->exception_index == -1) {
             cpu->exception_index = EXCP_INTERRUPT;
@@ -980,7 +971,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
      * execute we need to ensure we find/generate a TB with exactly
      * insns_left instructions in it.
      */
-    if (insns_left > 0 && insns_left < tb->icount)  {
+    if (insns_left > 0 && insns_left < tb->icount) {
         assert(insns_left <= CF_COUNT_MASK);
         assert(cpu->icount_extra == 0);
         cpu->cflags_next_tb = (tb->cflags & ~CF_COUNT_MASK) | insns_left;
@@ -996,9 +987,8 @@ static vaddr exit_pc;
 
 void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg)
 {
-
-    if(host_pc == -1){
-       exit_pc = guest_pc;
+    if (host_pc == -1) {
+        exit_pc = guest_pc;
     }
 
     pthread_mutex_lock(&tb_add_mutex);
@@ -1013,8 +1003,8 @@ void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg)
 
 /* main execution loop */
 
-static int __attribute__((noinline))
-cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
+static int __attribute__((noinline)) cpu_exec_loop(CPUState *cpu,
+                                                   SyncClocks *sc)
 {
     int ret;
 
@@ -1036,7 +1026,7 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
             cpu_get_tb_cpu_state(cpu->env_ptr, &pc, &cs_base, &flags);
 
 #ifdef CONFIG_ANDROID
-            if (unlikely((uint64_t)pc == exit_pc)){
+            if (unlikely((uint64_t)pc == exit_pc)) {
                 return -1;
             }
 #endif
@@ -1069,7 +1059,8 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
 #else
                 tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
 #ifdef CONFIG_LATA_INDIRECT_JMP
-                lata_fast_jmp_cache_add(cpu->env_ptr, pc, (uint64_t)(tb->tc.ptr));
+                lata_fast_jmp_cache_add(cpu->env_ptr, pc,
+                                        (uint64_t)(tb->tc.ptr));
 #endif
 #endif
                 mmap_unlock();
@@ -1088,7 +1079,6 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
                     /* Use the pc value already stored in tb->pc. */
                     qatomic_set(&jc->array[h].tb, tb);
                 }
-
             }
 
 #ifndef CONFIG_USER_ONLY

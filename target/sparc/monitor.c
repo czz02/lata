@@ -93,7 +93,11 @@ const MonitorDef monitor_defs[] = {
     { "npc", offsetof(CPUSPARCState, npc) },
     { "y", offsetof(CPUSPARCState, y) },
 #ifndef TARGET_SPARC64
-    { "psr", 0, &monitor_get_psr, },
+    {
+        "psr",
+        0,
+        &monitor_get_psr,
+    },
     { "wim", offsetof(CPUSPARCState, wim) },
 #endif
     { "tbr", offsetof(CPUSPARCState, tbr) },

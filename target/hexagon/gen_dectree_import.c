@@ -25,9 +25,9 @@
 #include <string.h>
 #include "opcodes.h"
 
-#define STRINGIZE(X)    #X
+#define STRINGIZE(X) #X
 
-const char * const opcode_names[] = {
+const char *const opcode_names[] = {
 #define OPCODE(IID) STRINGIZE(IID)
 #include "opcodes_def_generated.h.inc"
     NULL
@@ -46,28 +46,26 @@ const char * const opcode_names[] = {
  *         "Insert Word Scalar into Vector",
  *         VxV.uw[0] = RtV;)
  */
-const char * const opcode_syntax[XX_LAST_OPCODE] = {
-#define Q6INSN(TAG, BEH, ATTRIBS, DESCR, SEM) \
-   [TAG] = BEH,
-#define EXTINSN(TAG, BEH, ATTRIBS, DESCR, SEM) \
-   [TAG] = BEH,
+const char *const opcode_syntax[XX_LAST_OPCODE] = {
+#define Q6INSN(TAG, BEH, ATTRIBS, DESCR, SEM) [TAG] = BEH,
+#define EXTINSN(TAG, BEH, ATTRIBS, DESCR, SEM) [TAG] = BEH,
 #include "imported/allidefs.def"
 #undef Q6INSN
 #undef EXTINSN
 };
 
-const char * const opcode_rregs[] = {
+const char *const opcode_rregs[] = {
 #define REGINFO(TAG, REGINFO, RREGS, WREGS) RREGS,
-#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2)  /* nothing */
+#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2) /* nothing */
 #include "op_regs_generated.h.inc"
     NULL
 #undef REGINFO
 #undef IMMINFO
 };
 
-const char * const opcode_wregs[] = {
+const char *const opcode_wregs[] = {
 #define REGINFO(TAG, REGINFO, RREGS, WREGS) WREGS,
-#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2)  /* nothing */
+#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2) /* nothing */
 #include "op_regs_generated.h.inc"
     NULL
 #undef REGINFO
@@ -75,8 +73,7 @@ const char * const opcode_wregs[] = {
 };
 
 const OpcodeEncoding opcode_encodings[] = {
-#define DEF_ENC32(TAG, ENCSTR) \
-    [TAG] = { .encoding = ENCSTR },
+#define DEF_ENC32(TAG, ENCSTR) [TAG] = { .encoding = ENCSTR },
 #define DEF_ENC_SUBINSN(TAG, CLASS, ENCSTR) \
     [TAG] = { .encoding = ENCSTR, .enc_class = CLASS },
 #define DEF_EXT_ENC(TAG, CLASS, ENCSTR) \
@@ -87,16 +84,9 @@ const OpcodeEncoding opcode_encodings[] = {
 #undef DEF_EXT_ENC
 };
 
-static const char * const opcode_enc_class_names[XX_LAST_ENC_CLASS] = {
-    "NORMAL",
-    "16BIT",
-    "SUBINSN_A",
-    "SUBINSN_L1",
-    "SUBINSN_L2",
-    "SUBINSN_S1",
-    "SUBINSN_S2",
-    "EXT_noext",
-    "EXT_mmvec",
+static const char *const opcode_enc_class_names[XX_LAST_ENC_CLASS] = {
+    "NORMAL",     "16BIT",      "SUBINSN_A", "SUBINSN_L1", "SUBINSN_L2",
+    "SUBINSN_S1", "SUBINSN_S2", "EXT_noext", "EXT_mmvec",
 };
 
 static const char *get_opcode_enc(int opcode)
@@ -112,7 +102,7 @@ static const char *get_opcode_enc_class(int opcode)
 {
     const char *tmp = opcode_encodings[opcode].encoding;
     if (tmp == NULL) {
-        const char *test = "V6_";        /* HVX */
+        const char *test = "V6_"; /* HVX */
         const char *name = opcode_names[opcode];
         if (strncmp(name, test, strlen(test)) == 0) {
             return "EXT_mmvec";
@@ -163,14 +153,14 @@ static void gen_enc_ext_spaces_table(FILE *out)
 static void gen_subinsn_groupings_table(FILE *out)
 {
     fprintf(out, "subinsn_groupings = {\n");
-#define DEF_PACKED32(TAG, TYPEA, TYPEB, ENCSTR) \
-    do { \
-        fprintf(out, "\t\'%s\' : {\n", #TAG); \
-        fprintf(out, "\t\t\'name\' : \'%s\',\n", #TAG); \
+#define DEF_PACKED32(TAG, TYPEA, TYPEB, ENCSTR)              \
+    do {                                                     \
+        fprintf(out, "\t\'%s\' : {\n", #TAG);                \
+        fprintf(out, "\t\t\'name\' : \'%s\',\n", #TAG);      \
         fprintf(out, "\t\t\'class_a\' : \'%s\',\n", #TYPEA); \
         fprintf(out, "\t\t\'class_b\' : \'%s\',\n", #TYPEB); \
-        fprintf(out, "\t\t\'enc\' : \'%s\',\n", ENCSTR); \
-        fprintf(out, "\t},\n"); \
+        fprintf(out, "\t\t\'enc\' : \'%s\',\n", ENCSTR);     \
+        fprintf(out, "\t},\n");                              \
     } while (0);
 #include "imported/encode.def"
 #undef DEF_PACKED32

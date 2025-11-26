@@ -15,7 +15,7 @@
 typedef char int8;
 typedef short int16;
 typedef int int32;
-//#if __WORDSIZE == 64
+// #if __WORDSIZE == 64
 typedef long int64;
 // #else
 // typedef long long int64;
@@ -24,7 +24,7 @@ typedef long int64;
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
-//#if __WORDSIZE == 64
+// #if __WORDSIZE == 64
 typedef unsigned long uint64;
 // #else
 // typedef unsigned long long uint64;
@@ -65,6 +65,4 @@ typedef uint32 ADDRX;
 #endif
 
 
-
 #endif
-

@@ -12,38 +12,35 @@
 
 static const AArch64PatternTable bcond_table[] = {
     /* pattern  ,  mask     ,  dt_aarch64_insn*/
-    {0X54000000, 0xff00001f, B_EQ},
-    {0X54000001, 0xff00001f, B_NE},
-    {0X54000002, 0xff00001f, B_CS},
-    {0X54000003, 0xff00001f, B_CC},
-    {0X54000008, 0xff00001f, B_HI},
-    {0X54000009, 0xff00001f, B_LS},
-    {0X5400000a, 0xff00001f, B_GE},
-    {0X5400000b, 0xff00001f, B_LT},
-    {0X5400000c, 0xff00001f, B_GT},
-    {0X5400000d, 0xff00001f, B_LE},
-    {0X5400000e, 0xff00001f, B_AL},
-    {0X5400000f, 0xff00001f, B_NV},
-    {0x00000000, 0x00000000, INVALID}};
+    { 0X54000000, 0xff00001f, B_EQ },   { 0X54000001, 0xff00001f, B_NE },
+    { 0X54000002, 0xff00001f, B_CS },   { 0X54000003, 0xff00001f, B_CC },
+    { 0X54000008, 0xff00001f, B_HI },   { 0X54000009, 0xff00001f, B_LS },
+    { 0X5400000a, 0xff00001f, B_GE },   { 0X5400000b, 0xff00001f, B_LT },
+    { 0X5400000c, 0xff00001f, B_GT },   { 0X5400000d, 0xff00001f, B_LE },
+    { 0X5400000e, 0xff00001f, B_AL },   { 0X5400000f, 0xff00001f, B_NV },
+    { 0x00000000, 0x00000000, INVALID }
+};
 
 static const AArch64PatternTable cmp_table[] = {
     /* pattern  ,  mask     ,  dt_aarch64_insn*/
-    {0x7100001f, 0x7f80001f, CMP_IMM},
-    {0x6b20001f, 0x7fe0001f, CMP_EREG},
-    {0x6b00001f, 0x7f20001f, CMP_SREG},
-    {0x00000000, 0x00000000, INVALID}};
+    { 0x7100001f, 0x7f80001f, CMP_IMM },
+    { 0x6b20001f, 0x7fe0001f, CMP_EREG },
+    { 0x6b00001f, 0x7f20001f, CMP_SREG },
+    { 0x00000000, 0x00000000, INVALID }
+};
 
 static const AArch64PatternTable generate_nzcv_table[] = {
     /* pattern  ,  mask     ,  dt_aarch64_insn*/
-    {0X31000000, 0x3f800000, NZCV_GENERATE}, // ADDSI/SUBSI
-    {0X2b000000, 0x3f200000, NZCV_GENERATE}, // ADDS/SUBS
-    {0X2b200000, 0x3fe00000, NZCV_GENERATE}, // ADDSE/SUBSE
-    {0X3a000000, 0x3fe0fc00, NZCV_GENERATE}, // ADCS/SUBCS
-    {0X72000000, 0x7f800000, NZCV_GENERATE}, // ANDSI
-    {0X6a000000, 0x7f000000, NZCV_GENERATE}, // ANDS/BICS
-    {0X1e202000, 0x5f203c00, NZCV_GENERATE}, // Floating-point compare
-    {0X1e200400, 0x5f200c00, NZCV_GENERATE}, // Floating-point conditional compare
-    {0x00000000, 0x00000000, INVALID}
+    { 0X31000000, 0x3f800000, NZCV_GENERATE }, // ADDSI/SUBSI
+    { 0X2b000000, 0x3f200000, NZCV_GENERATE }, // ADDS/SUBS
+    { 0X2b200000, 0x3fe00000, NZCV_GENERATE }, // ADDSE/SUBSE
+    { 0X3a000000, 0x3fe0fc00, NZCV_GENERATE }, // ADCS/SUBCS
+    { 0X72000000, 0x7f800000, NZCV_GENERATE }, // ANDSI
+    { 0X6a000000, 0x7f000000, NZCV_GENERATE }, // ANDS/BICS
+    { 0X1e202000, 0x5f203c00, NZCV_GENERATE }, // Floating-point compare
+    { 0X1e200400, 0x5f200c00,
+      NZCV_GENERATE }, // Floating-point conditional compare
+    { 0x00000000, 0x00000000, INVALID }
 
     // {0X54000000, 0xff000010, NZCV_GENERATE}, // B.cond
     // {0X1a400000, 0x1fe00000, NZCV_GENERATE}, // cc
@@ -57,10 +54,8 @@ static inline dt_aarch64_insn lookup_pattern(const AArch64PatternTable *table,
 {
     const AArch64PatternTable *tptr = table;
 
-    while (tptr->mask)
-    {
-        if ((insn & tptr->mask) == tptr->pattern)
-        {
+    while (tptr->mask) {
+        if ((insn & tptr->mask) == tptr->pattern) {
             return tptr->aarch_pattern;
         }
         tptr++;
@@ -68,7 +63,8 @@ static inline dt_aarch64_insn lookup_pattern(const AArch64PatternTable *table,
     return INVALID;
 }
 
-static void nzcv_caculate(IR2_OPND temp_n, IR2_OPND temp, IR2_OPND reg_n, int sf, int n)
+static void nzcv_caculate(IR2_OPND temp_n, IR2_OPND temp, IR2_OPND reg_n,
+                          int sf, int n)
 {
     TranslationBlock *tb = lsenv->tr_data->curr_tb;
     IR2_OPND nzcv = ir2_opnd_new_type(IR2_OPND_LABEL);
@@ -79,14 +75,11 @@ static void nzcv_caculate(IR2_OPND temp_n, IR2_OPND temp, IR2_OPND reg_n, int sf
     la_b(ir2_opnd_addr); // nop
 
     la_lu12i_w(temp_n, 0x20000);
-    la_armmtflag(temp_n, 0x39);          // pstate.c = 1
+    la_armmtflag(temp_n, 0x39); // pstate.c = 1
     la_orn(temp_n, zero_ir2_opnd, temp); // NOT(*src2)
-    if (sf)
-    {
+    if (sf) {
         la_x86adc_d(reg_n, temp_n);
-    }
-    else
-    {
+    } else {
         la_x86adc_w(reg_n, temp_n);
     }
 }
@@ -105,12 +98,9 @@ static void pattern_goto_tb(DisasContext *s, int n, int64_t diff)
     li_d(a0_ir2_opnd, s->pc_curr + diff + 4);
     la_st_d(a0_ir2_opnd, env_ir2_opnd, env_offset_pc());
 
-    if (qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN))
-    {
+    if (qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
         li_d(a0_ir2_opnd, 0); // do not link
-    }
-    else
-    {
+    } else {
         uint32_t hi32 = ((uint64_t)tb | n) >> 32;
         uint32_t lo32 = ((uint64_t)tb | n) & 0xffffffff;
 
@@ -119,17 +109,18 @@ static void pattern_goto_tb(DisasContext *s, int n, int64_t diff)
         la_lu32i_d(a0_ir2_opnd, hi32 & 0xfffff);
     }
 
-    int64_t curr_ins_pos = (unsigned long)s->base->tb->tc.ptr + (lsenv->tr_data->real_ir2_inst_num << 2);
+    int64_t curr_ins_pos = (unsigned long)s->base->tb->tc.ptr +
+                           (lsenv->tr_data->real_ir2_inst_num << 2);
     int64_t exit_offset = context_switch_native_to_bt - curr_ins_pos;
 
     ir2_opnd_build(&ir2_opnd_addr, IR2_OPND_IMM, exit_offset >> 2);
     la_b(ir2_opnd_addr);
 }
 
-static void pattern_type(dt_aarch64_insn b_type, IR2_OPND *temp_n, IR2_OPND *temp_m, IR2_OPND *label)
+static void pattern_type(dt_aarch64_insn b_type, IR2_OPND *temp_n,
+                         IR2_OPND *temp_m, IR2_OPND *label)
 {
-    switch (b_type)
-    {
+    switch (b_type) {
     case B_EQ:
         la_beq(*temp_n, *temp_m, *label);
         break;
@@ -171,7 +162,8 @@ static void pattern_type(dt_aarch64_insn b_type, IR2_OPND *temp_n, IR2_OPND *tem
     }
 }
 
-static void trans_CMPI_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_type, int offset)
+static void trans_CMPI_BCOND(DisasContext *s, uint32_t insn,
+                             dt_aarch64_insn b_type, int offset)
 {
     int imm = extract32(insn, 10, 12);
     uint8_t shift = extract32(insn, 22, 1);
@@ -182,12 +174,11 @@ static void trans_CMPI_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
     IR2_OPND temp_n = ra_alloc_itemp();
     IR2_OPND label = ir2_opnd_new_type(IR2_OPND_LABEL);
 
-    if(clearGprHigh && sf && arm_la_map[rn] >= 0 && rn != 31){
+    if (clearGprHigh && sf && arm_la_map[rn] >= 0 && rn != 31) {
         clear_gpr_high(rn);
     }
 
-    switch (shift)
-    {
+    switch (shift) {
     case 0:
         la_ori(temp, zero_ir2_opnd, imm);
         break;
@@ -199,12 +190,9 @@ static void trans_CMPI_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
         break;
     }
 
-    if (sf)
-    {
+    if (sf) {
         pattern_type(b_type, &reg_n, &temp, &label);
-    }
-    else
-    {
+    } else {
         la_bstrpick_w(temp_n, reg_n, 31, 0);
         la_bstrpick_w(temp, temp, 31, 0);
         pattern_type(b_type, &temp_n, &temp, &label);
@@ -220,8 +208,8 @@ static void trans_CMPI_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
 
 #ifdef CONFIG_LATA_TU
     TranslationBlock *next_tb = s->base->tb->next_tb[0];
-    if(next_tb){
-        if(next_tb->nzcv_use)
+    if (next_tb) {
+        if (next_tb->nzcv_use)
             nzcv_caculate(temp_n, temp, reg_n, sf, 0);
     } else {
         nzcv_caculate(temp_n, temp, reg_n, sf, 0);
@@ -233,10 +221,10 @@ static void trans_CMPI_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
     la_label(label);
 #ifdef CONFIG_LATA_TU
     next_tb = s->base->tb->next_tb[1];
-    if(next_tb){
-        if(next_tb->nzcv_use)
+    if (next_tb) {
+        if (next_tb->nzcv_use)
             nzcv_caculate(temp_n, temp, reg_n, sf, 1);
-    }else{
+    } else {
         nzcv_caculate(temp_n, temp, reg_n, sf, 0);
     }
 #else
@@ -249,7 +237,8 @@ static void trans_CMPI_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
     free_alloc_gpr(temp_n);
 }
 
-static void trans_CMPE_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_type, int offset)
+static void trans_CMPE_BCOND(DisasContext *s, uint32_t insn,
+                             dt_aarch64_insn b_type, int offset)
 {
     int imm = extract32(insn, 10, 3);
     int extsize = extract32(insn, 13, 2);
@@ -270,10 +259,8 @@ static void trans_CMPE_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
         clear_gpr_high(rm);
     }
 
-    if (is_signed)
-    {
-        switch (extsize)
-        {
+    if (is_signed) {
+        switch (extsize) {
         case 0:
             la_ext_w_b(temp, reg_m);
             break;
@@ -287,11 +274,8 @@ static void trans_CMPE_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
             la_or(temp, reg_m, zero_ir2_opnd);
             break;
         }
-    }
-    else
-    {
-        switch (extsize)
-        {
+    } else {
+        switch (extsize) {
         case 0:
             la_bstrpick_d(temp, reg_m, 7, 0);
             break;
@@ -310,12 +294,9 @@ static void trans_CMPE_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
     if (imm)
         la_slli_d(temp, temp, imm);
 
-    if (sf)
-    {
+    if (sf) {
         pattern_type(b_type, &reg_n, &temp, &label);
-    }
-    else
-    {
+    } else {
         la_bstrpick_w(temp_n, reg_n, 31, 0);
         la_bstrpick_w(temp, temp, 31, 0);
         pattern_type(b_type, &reg_n, &temp, &label);
@@ -330,10 +311,10 @@ static void trans_CMPE_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
     }
 #ifdef CONFIG_LATA_TU
     TranslationBlock *next_tb = s->base->tb->next_tb[0];
-    if(next_tb){
-        if(next_tb->nzcv_use)
+    if (next_tb) {
+        if (next_tb->nzcv_use)
             nzcv_caculate(temp_n, temp, reg_n, sf, 0);
-    }else{
+    } else {
         nzcv_caculate(temp_n, temp, reg_n, sf, 0);
     }
 #else
@@ -343,10 +324,10 @@ static void trans_CMPE_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
     la_label(label);
 #ifdef CONFIG_LATA_TU
     next_tb = s->base->tb->next_tb[1];
-    if(next_tb){
-        if(next_tb->nzcv_use)
+    if (next_tb) {
+        if (next_tb->nzcv_use)
             nzcv_caculate(temp_n, temp, reg_n, sf, 1);
-    }else{
+    } else {
         nzcv_caculate(temp_n, temp, reg_n, sf, 0);
     }
 #else
@@ -360,7 +341,8 @@ static void trans_CMPE_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
     free_alloc_gpr(temp_n);
 }
 
-static void trans_CMPS_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_type, int offset)
+static void trans_CMPS_BCOND(DisasContext *s, uint32_t insn,
+                             dt_aarch64_insn b_type, int offset)
 {
     int imm = extract32(insn, 10, 6);
     int shift_type = extract32(insn, 22, 2);
@@ -380,41 +362,30 @@ static void trans_CMPS_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
         clear_gpr_high(rm);
     }
 
-    if (imm)
-    {
-        switch (shift_type)
-        {
+    if (imm) {
+        switch (shift_type) {
         case 0:
             la_slli_d(temp, reg_m, imm);
             break;
         case 1:
-            if (!sf)
-            {
+            if (!sf) {
                 la_srli_w(temp, reg_m, imm);
-            }
-            else
-            {
+            } else {
                 la_srli_d(temp, reg_m, imm);
             }
             break;
         case 2:
-            if (!sf)
-            {
+            if (!sf) {
                 la_srai_w(temp, reg_m, imm);
-            }
-            else
-            {
+            } else {
                 la_srai_d(temp, reg_m, imm);
             }
             break;
         case 3:
-            if (!sf)
-            {
+            if (!sf) {
                 assert(imm <= 31);
                 la_rotri_w(temp, reg_m, imm);
-            }
-            else
-            {
+            } else {
                 la_rotri_d(temp, reg_m, imm);
             }
             break;
@@ -423,29 +394,26 @@ static void trans_CMPS_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
             break;
         }
 
-        if (sf)
-        {
+        if (sf) {
             pattern_type(b_type, &reg_n, &temp, &label);
-        }
-        else
-        {
+        } else {
             la_bstrpick_w(temp_n, reg_n, 31, 0);
             la_bstrpick_w(temp, temp, 31, 0);
             pattern_type(b_type, &temp_n, &temp, &label);
         }
         if (clearGprHigh) {
-        for (int i = 0; i < 32; ++i) {
-            if (arm_la_map[i] >= 0) {
-                clear_gpr_high(i);
+            for (int i = 0; i < 32; ++i) {
+                if (arm_la_map[i] >= 0) {
+                    clear_gpr_high(i);
+                }
             }
         }
-    }
 #ifdef CONFIG_LATA_TU
         TranslationBlock *next_tb = s->base->tb->next_tb[0];
-        if(next_tb){
-            if(next_tb->nzcv_use)
+        if (next_tb) {
+            if (next_tb->nzcv_use)
                 nzcv_caculate(temp_n, temp, reg_n, sf, 0);
-        }else{
+        } else {
             nzcv_caculate(temp_n, temp, reg_n, sf, 0);
         }
 #else
@@ -455,24 +423,19 @@ static void trans_CMPS_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
         la_label(label);
 #ifdef CONFIG_LATA_TU
         next_tb = s->base->tb->next_tb[1];
-        if(next_tb){
-            if(next_tb->nzcv_use)
+        if (next_tb) {
+            if (next_tb->nzcv_use)
                 nzcv_caculate(temp_n, temp, reg_n, sf, 1);
-        }else{
+        } else {
             nzcv_caculate(temp_n, temp, reg_n, sf, 0);
         }
 #else
         nzcv_caculate(temp_n, temp, reg_n, sf, 1);
 #endif
-    }
-    else
-    {
-        if (sf)
-        {
+    } else {
+        if (sf) {
             pattern_type(b_type, &reg_n, &reg_m, &label);
-        }
-        else
-        {
+        } else {
             la_bstrpick_w(temp_n, reg_n, 31, 0);
             la_bstrpick_w(temp, reg_m, 31, 0);
             pattern_type(b_type, &temp_n, &temp, &label);
@@ -486,10 +449,10 @@ static void trans_CMPS_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
         }
 #ifdef CONFIG_LATA_TU
         TranslationBlock *next_tb = s->base->tb->next_tb[0];
-        if(next_tb){
-            if(next_tb->nzcv_use)
+        if (next_tb) {
+            if (next_tb->nzcv_use)
                 nzcv_caculate(temp_n, reg_m, reg_n, sf, 0);
-        }else{
+        } else {
             nzcv_caculate(temp_n, reg_m, reg_n, sf, 0);
         }
 #else
@@ -499,10 +462,10 @@ static void trans_CMPS_BCOND(DisasContext *s, uint32_t insn, dt_aarch64_insn b_t
         la_label(label);
 #ifdef CONFIG_LATA_TU
         next_tb = s->base->tb->next_tb[1];
-        if(next_tb){
-            if(next_tb->nzcv_use)
+        if (next_tb) {
+            if (next_tb->nzcv_use)
                 nzcv_caculate(temp_n, reg_m, reg_n, sf, 1);
-        }else{
+        } else {
             nzcv_caculate(temp_n, reg_m, reg_n, sf, 0);
         }
 #else
@@ -521,10 +484,8 @@ void nzcv_use(TranslationBlock *tb, uint32_t insn)
 {
     const AArch64PatternTable *tptr = generate_nzcv_table;
 
-    while (tptr->mask)
-    {
-        if ((insn & tptr->mask) == tptr->pattern)
-        {
+    while (tptr->mask) {
+        if ((insn & tptr->mask) == tptr->pattern) {
             tb->nzcv_use = false;
         }
         tptr++;
@@ -537,13 +498,11 @@ bool insts_pattern(DisasContext *s, DisasContext *s2)
     uint32_t insn = s->insn;
     dt_aarch64_insn cmp_type = lookup_pattern(&cmp_table[0], insn);
     dt_aarch64_insn b_type = lookup_pattern(&bcond_table[0], insn2);
-    
-    if (b_type && cmp_type)
-    {
+
+    if (b_type && cmp_type) {
         int offset = sextract32(insn2, 5, 19) << 2;
         // s->base->tb->nzcv_use = false;
-        switch (cmp_type)
-        {
+        switch (cmp_type) {
         case CMP_IMM:
             trans_CMPI_BCOND(s, insn, b_type, offset);
             break;

@@ -34,11 +34,11 @@ static uint64_t pac_cell_shuffle(uint64_t i)
     o |= extract64(i, 52, 4);
     o |= extract64(i, 24, 4) << 4;
     o |= extract64(i, 44, 4) << 8;
-    o |= extract64(i,  0, 4) << 12;
+    o |= extract64(i, 0, 4) << 12;
 
     o |= extract64(i, 28, 4) << 16;
     o |= extract64(i, 48, 4) << 20;
-    o |= extract64(i,  4, 4) << 24;
+    o |= extract64(i, 4, 4) << 24;
     o |= extract64(i, 40, 4) << 28;
 
     o |= extract64(i, 32, 4) << 32;
@@ -46,7 +46,7 @@ static uint64_t pac_cell_shuffle(uint64_t i)
     o |= extract64(i, 56, 4) << 40;
     o |= extract64(i, 20, 4) << 44;
 
-    o |= extract64(i,  8, 4) << 48;
+    o |= extract64(i, 8, 4) << 48;
     o |= extract64(i, 36, 4) << 52;
     o |= extract64(i, 16, 4) << 56;
     o |= extract64(i, 60, 4) << 60;
@@ -65,16 +65,16 @@ static uint64_t pac_cell_inv_shuffle(uint64_t i)
 
     o |= extract64(i, 56, 4) << 16;
     o |= extract64(i, 44, 4) << 20;
-    o |= extract64(i,  4, 4) << 24;
+    o |= extract64(i, 4, 4) << 24;
     o |= extract64(i, 16, 4) << 28;
 
     o |= i & MAKE_64BIT_MASK(32, 4);
     o |= extract64(i, 52, 4) << 36;
     o |= extract64(i, 28, 4) << 40;
-    o |= extract64(i,  8, 4) << 44;
+    o |= extract64(i, 8, 4) << 44;
 
     o |= extract64(i, 20, 4) << 48;
-    o |= extract64(i,  0, 4) << 52;
+    o |= extract64(i, 0, 4) << 52;
     o |= extract64(i, 40, 4) << 56;
     o |= i & MAKE_64BIT_MASK(60, 4);
 
@@ -159,7 +159,7 @@ static uint64_t tweak_shuffle(uint64_t i)
     o |= extract64(i, 28, 4) << 12;
 
     o |= tweak_cell_rot(extract64(i, 44, 4)) << 16;
-    o |= extract64(i,  8, 4) << 20;
+    o |= extract64(i, 8, 4) << 20;
     o |= extract64(i, 12, 4) << 24;
     o |= tweak_cell_rot(extract64(i, 32, 4)) << 28;
 
@@ -168,8 +168,8 @@ static uint64_t tweak_shuffle(uint64_t i)
     o |= extract64(i, 56, 4) << 40;
     o |= tweak_cell_rot(extract64(i, 60, 4)) << 44;
 
-    o |= tweak_cell_rot(extract64(i,  0, 4)) << 48;
-    o |= extract64(i,  4, 4) << 52;
+    o |= tweak_cell_rot(extract64(i, 0, 4)) << 48;
+    o |= extract64(i, 4, 4) << 52;
     o |= tweak_cell_rot(extract64(i, 40, 4)) << 56;
     o |= tweak_cell_rot(extract64(i, 36, 4)) << 60;
 
@@ -190,9 +190,9 @@ static uint64_t tweak_inv_shuffle(uint64_t i)
     o |= extract64(i, 20, 4) << 8;
     o |= extract64(i, 24, 4) << 12;
 
-    o |= extract64(i,  0, 4) << 16;
-    o |= extract64(i,  4, 4) << 20;
-    o |= tweak_cell_inv_rot(extract64(i,  8, 4)) << 24;
+    o |= extract64(i, 0, 4) << 16;
+    o |= extract64(i, 4, 4) << 20;
+    o |= tweak_cell_inv_rot(extract64(i, 8, 4)) << 24;
     o |= extract64(i, 12, 4) << 28;
 
     o |= tweak_cell_inv_rot(extract64(i, 28, 4)) << 32;
@@ -212,11 +212,8 @@ static uint64_t pauth_computepac_architected(uint64_t data, uint64_t modifier,
                                              ARMPACKey key)
 {
     static const uint64_t RC[5] = {
-        0x0000000000000000ull,
-        0x13198A2E03707344ull,
-        0xA4093822299F31D0ull,
-        0x082EFA98EC4E6C89ull,
-        0x452821E638D01377ull,
+        0x0000000000000000ull, 0x13198A2E03707344ull, 0xA4093822299F31D0ull,
+        0x082EFA98EC4E6C89ull, 0x452821E638D01377ull,
     };
     const uint64_t alpha = 0xC0AC29B7C97C50DDull;
     /*
@@ -384,8 +381,7 @@ static uint64_t pauth_strip(CPUARMState *env, uint64_t ptr, bool data)
     return pauth_original_ptr(ptr, param);
 }
 
-static G_NORETURN
-void pauth_trap(CPUARMState *env, int target_el, uintptr_t ra)
+static G_NORETURN void pauth_trap(CPUARMState *env, int target_el, uintptr_t ra)
 {
     raise_exception_ra(env, EXCP_UDEF, syn_pactrap(), target_el, ra);
 }

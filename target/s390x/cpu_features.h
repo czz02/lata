@@ -47,10 +47,10 @@ typedef enum {
 
 /* Definition of a CPU feature */
 typedef struct {
-    const char *name;       /* name exposed to the user */
-    const char *desc;       /* description exposed to the user */
-    S390FeatType type;      /* feature type (way of indication)*/
-    int bit;                /* bit within the feature type area (fixed) */
+    const char *name; /* name exposed to the user */
+    const char *desc; /* description exposed to the user */
+    S390FeatType type; /* feature type (way of indication)*/
+    int bit; /* bit within the feature type area (fixed) */
 } S390FeatDef;
 
 /* use ordinary bitmap operations to work with features */
@@ -65,16 +65,16 @@ void s390_init_feat_bitmap(const S390FeatInit init, S390FeatBitmap bitmap);
 void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
                           uint8_t *data);
 void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
-                          uint8_t *data);
+                              uint8_t *data);
 void s390_feat_bitmap_to_ascii(const S390FeatBitmap features, void *opaque,
                                void (*fn)(const char *name, void *opaque));
 
 /* Definition of a CPU feature group */
 typedef struct {
-    const char *name;       /* name exposed to the user */
-    const char *desc;       /* description exposed to the user */
-    S390FeatBitmap feat;    /* features contained in the group */
-    S390FeatInit init;      /* used to init feat from generated data */
+    const char *name; /* name exposed to the user */
+    const char *desc; /* description exposed to the user */
+    S390FeatBitmap feat; /* features contained in the group */
+    S390FeatInit init; /* used to init feat from generated data */
 } S390FeatGroupDef;
 
 const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group);

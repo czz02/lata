@@ -3,8 +3,7 @@
 
 #include "common.h"
 
-typedef enum dt_aarch64_insn
-{
+typedef enum dt_aarch64_insn {
     INVALID = 0,
     NZCV_GENERATE,
     CMP_IMM,
@@ -24,8 +23,7 @@ typedef enum dt_aarch64_insn
     B_NV,
 } dt_aarch64_insn;
 
-typedef struct AArch64PatternTable
-{
+typedef struct AArch64PatternTable {
     uint32_t pattern;
     uint32_t mask;
     dt_aarch64_insn aarch_pattern;

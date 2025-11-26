@@ -27,17 +27,17 @@ void tcg_flush_jmp_cache(CPUState *cpu)
 }
 
 int probe_access_flags(CPUArchState *env, vaddr addr, int size,
-                       MMUAccessType access_type, int mmu_idx,
-                       bool nonfault, void **phost, uintptr_t retaddr)
+                       MMUAccessType access_type, int mmu_idx, bool nonfault,
+                       void **phost, uintptr_t retaddr)
 {
-     g_assert_not_reached();
+    g_assert_not_reached();
 }
 
 void *probe_access(CPUArchState *env, vaddr addr, int size,
                    MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
 {
-     /* Handled by hardware accelerator. */
-     g_assert_not_reached();
+    /* Handled by hardware accelerator. */
+    g_assert_not_reached();
 }
 
 G_NORETURN void cpu_loop_exit(CPUState *cpu)

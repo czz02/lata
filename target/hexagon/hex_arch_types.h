@@ -25,18 +25,18 @@
  * These types are used by the code imported from the Hexagon
  * architecture library.
  */
-typedef uint8_t     size1u_t;
-typedef int8_t      size1s_t;
-typedef uint16_t    size2u_t;
-typedef int16_t     size2s_t;
-typedef uint32_t    size4u_t;
-typedef int32_t     size4s_t;
-typedef uint64_t    size8u_t;
-typedef int64_t     size8s_t;
-typedef Int128      size16s_t;
+typedef uint8_t size1u_t;
+typedef int8_t size1s_t;
+typedef uint16_t size2u_t;
+typedef int16_t size2s_t;
+typedef uint32_t size4u_t;
+typedef int32_t size4s_t;
+typedef uint64_t size8u_t;
+typedef int64_t size8s_t;
+typedef Int128 size16s_t;
 
-typedef MMVector          mmvector_t;
-typedef MMVectorPair      mmvector_pair_t;
-typedef MMQReg            mmqret_t;
+typedef MMVector mmvector_t;
+typedef MMVectorPair mmvector_pair_t;
+typedef MMQReg mmqret_t;
 
 #endif

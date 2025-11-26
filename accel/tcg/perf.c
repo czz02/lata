@@ -3,7 +3,8 @@
  *
  * The jitdump spec can be found at [1].
  *
- * [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/tools/perf/Documentation/jitdump-specification.txt
+ * [1]
+ * https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/tools/perf/Documentation/jitdump-specification.txt
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
@@ -78,7 +79,7 @@ static const char *pretty_symbol(const struct debuginfo_query *q, size_t *len)
     int tmp;
 
     if (!q->symbol) {
-        tmp = snprintf(buf, sizeof(buf), "guest-0x%"PRIx64, q->address);
+        tmp = snprintf(buf, sizeof(buf), "guest-0x%" PRIx64, q->address);
         if (len) {
             *len = MIN(tmp + 1, sizeof(buf));
         }
@@ -92,7 +93,7 @@ static const char *pretty_symbol(const struct debuginfo_query *q, size_t *len)
         return q->symbol;
     }
 
-    tmp = snprintf(buf, sizeof(buf), "%s+0x%"PRIx64, q->symbol, q->offset);
+    tmp = snprintf(buf, sizeof(buf), "%s+0x%" PRIx64, q->symbol, q->offset);
     if (len) {
         *len = MIN(tmp + 1, sizeof(buf));
     }
@@ -106,8 +107,8 @@ static void write_perfmap_entry(const void *start, size_t insn,
     uintptr_t host_pc;
 
     get_host_pc_size(&host_pc, &host_size, start, insn);
-    fprintf(perfmap, "%"PRIxPTR" %"PRIx16" %s\n",
-            host_pc, host_size, pretty_symbol(q, NULL));
+    fprintf(perfmap, "%" PRIxPTR " %" PRIx16 " %s\n", host_pc, host_size,
+            pretty_symbol(q, NULL));
 }
 
 static FILE *jitdump;
@@ -194,7 +195,8 @@ void perf_enable_jitdump(void)
     char jitdump_file[32];
 
     if (!use_rt_clock) {
-        warn_report("CLOCK_MONOTONIC is not available, proceeding without jitdump");
+        warn_report(
+            "CLOCK_MONOTONIC is not available, proceeding without jitdump");
         return;
     }
 
@@ -236,7 +238,7 @@ void perf_enable_jitdump(void)
 void perf_report_prologue(const void *start, size_t size)
 {
     if (perfmap) {
-        fprintf(perfmap, "%"PRIxPTR" %zx tcg-prologue-buffer\n",
+        fprintf(perfmap, "%" PRIxPTR " %zx tcg-prologue-buffer\n",
                 (uintptr_t)start, size);
     }
 }
@@ -358,8 +360,7 @@ void perf_report_code(uint64_t guest_pc, TranslationBlock *tb,
     if (jitdump) {
         flockfile(jitdump);
         write_jr_code_debug_info(start, q, tb->icount);
-        write_jr_code_load(start, tcg_ctx->gen_insn_end_off[tb->icount - 1],
-                           q);
+        write_jr_code_load(start, tcg_ctx->gen_insn_end_off[tb->icount - 1], q);
         funlockfile(jitdump);
     }
 

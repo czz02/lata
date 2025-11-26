@@ -56,26 +56,26 @@ DEF_HELPER_FLAGS_2(float_class_s, TCG_CALL_NO_RWG_SE, i32, env, i32)
 DEF_HELPER_FLAGS_2(float_class_d, TCG_CALL_NO_RWG_SE, i64, env, i64)
 
 #define FOP_PROTO(op)                                     \
-DEF_HELPER_4(float_ ## op ## _s, i32, env, i32, i32, i32) \
-DEF_HELPER_4(float_ ## op ## _d, i64, env, i64, i64, i64)
+    DEF_HELPER_4(float_##op##_s, i32, env, i32, i32, i32) \
+    DEF_HELPER_4(float_##op##_d, i64, env, i64, i64, i64)
 FOP_PROTO(maddf)
 FOP_PROTO(msubf)
 #undef FOP_PROTO
 
 #define FOP_PROTO(op)                                \
-DEF_HELPER_3(float_ ## op ## _s, i32, env, i32, i32) \
-DEF_HELPER_3(float_ ## op ## _d, i64, env, i64, i64)
+    DEF_HELPER_3(float_##op##_s, i32, env, i32, i32) \
+    DEF_HELPER_3(float_##op##_d, i64, env, i64, i64)
 FOP_PROTO(max)
 FOP_PROTO(maxa)
 FOP_PROTO(min)
 FOP_PROTO(mina)
 #undef FOP_PROTO
 
-#define FOP_PROTO(op)                            \
-DEF_HELPER_2(float_ ## op ## _l_s, i64, env, i32) \
-DEF_HELPER_2(float_ ## op ## _l_d, i64, env, i64) \
-DEF_HELPER_2(float_ ## op ## _w_s, i32, env, i32) \
-DEF_HELPER_2(float_ ## op ## _w_d, i32, env, i64)
+#define FOP_PROTO(op)                             \
+    DEF_HELPER_2(float_##op##_l_s, i64, env, i32) \
+    DEF_HELPER_2(float_##op##_l_d, i64, env, i64) \
+    DEF_HELPER_2(float_##op##_w_s, i32, env, i32) \
+    DEF_HELPER_2(float_##op##_w_d, i32, env, i64)
 FOP_PROTO(cvt)
 FOP_PROTO(round)
 FOP_PROTO(trunc)
@@ -88,35 +88,35 @@ FOP_PROTO(ceil_2008)
 FOP_PROTO(floor_2008)
 #undef FOP_PROTO
 
-#define FOP_PROTO(op)                            \
-DEF_HELPER_2(float_ ## op ## _s, i32, env, i32)  \
-DEF_HELPER_2(float_ ## op ## _d, i64, env, i64)
+#define FOP_PROTO(op)                           \
+    DEF_HELPER_2(float_##op##_s, i32, env, i32) \
+    DEF_HELPER_2(float_##op##_d, i64, env, i64)
 FOP_PROTO(sqrt)
 FOP_PROTO(rsqrt)
 FOP_PROTO(recip)
 FOP_PROTO(rint)
 #undef FOP_PROTO
 
-#define FOP_PROTO(op)                       \
-DEF_HELPER_1(float_ ## op ## _s, i32, i32)  \
-DEF_HELPER_1(float_ ## op ## _d, i64, i64)  \
-DEF_HELPER_1(float_ ## op ## _ps, i64, i64)
+#define FOP_PROTO(op)                      \
+    DEF_HELPER_1(float_##op##_s, i32, i32) \
+    DEF_HELPER_1(float_##op##_d, i64, i64) \
+    DEF_HELPER_1(float_##op##_ps, i64, i64)
 FOP_PROTO(abs)
 FOP_PROTO(chs)
 #undef FOP_PROTO
 
-#define FOP_PROTO(op)                            \
-DEF_HELPER_2(float_ ## op ## _s, i32, env, i32)  \
-DEF_HELPER_2(float_ ## op ## _d, i64, env, i64)  \
-DEF_HELPER_2(float_ ## op ## _ps, i64, env, i64)
+#define FOP_PROTO(op)                           \
+    DEF_HELPER_2(float_##op##_s, i32, env, i32) \
+    DEF_HELPER_2(float_##op##_d, i64, env, i64) \
+    DEF_HELPER_2(float_##op##_ps, i64, env, i64)
 FOP_PROTO(recip1)
 FOP_PROTO(rsqrt1)
 #undef FOP_PROTO
 
-#define FOP_PROTO(op)                                  \
-DEF_HELPER_3(float_ ## op ## _s, i32, env, i32, i32)   \
-DEF_HELPER_3(float_ ## op ## _d, i64, env, i64, i64)   \
-DEF_HELPER_3(float_ ## op ## _ps, i64, env, i64, i64)
+#define FOP_PROTO(op)                                \
+    DEF_HELPER_3(float_##op##_s, i32, env, i32, i32) \
+    DEF_HELPER_3(float_##op##_d, i64, env, i64, i64) \
+    DEF_HELPER_3(float_##op##_ps, i64, env, i64, i64)
 FOP_PROTO(add)
 FOP_PROTO(sub)
 FOP_PROTO(mul)
@@ -125,23 +125,23 @@ FOP_PROTO(recip2)
 FOP_PROTO(rsqrt2)
 #undef FOP_PROTO
 
-#define FOP_PROTO(op)                                      \
-DEF_HELPER_4(float_ ## op ## _s, i32, env, i32, i32, i32)  \
-DEF_HELPER_4(float_ ## op ## _d, i64, env, i64, i64, i64)  \
-DEF_HELPER_4(float_ ## op ## _ps, i64, env, i64, i64, i64)
+#define FOP_PROTO(op)                                     \
+    DEF_HELPER_4(float_##op##_s, i32, env, i32, i32, i32) \
+    DEF_HELPER_4(float_##op##_d, i64, env, i64, i64, i64) \
+    DEF_HELPER_4(float_##op##_ps, i64, env, i64, i64, i64)
 FOP_PROTO(madd)
 FOP_PROTO(msub)
 FOP_PROTO(nmadd)
 FOP_PROTO(nmsub)
 #undef FOP_PROTO
 
-#define FOP_PROTO(op)                                    \
-DEF_HELPER_4(cmp_d_ ## op, void, env, i64, i64, int)     \
-DEF_HELPER_4(cmpabs_d_ ## op, void, env, i64, i64, int)  \
-DEF_HELPER_4(cmp_s_ ## op, void, env, i32, i32, int)     \
-DEF_HELPER_4(cmpabs_s_ ## op, void, env, i32, i32, int)  \
-DEF_HELPER_4(cmp_ps_ ## op, void, env, i64, i64, int)    \
-DEF_HELPER_4(cmpabs_ps_ ## op, void, env, i64, i64, int)
+#define FOP_PROTO(op)                                     \
+    DEF_HELPER_4(cmp_d_##op, void, env, i64, i64, int)    \
+    DEF_HELPER_4(cmpabs_d_##op, void, env, i64, i64, int) \
+    DEF_HELPER_4(cmp_s_##op, void, env, i32, i32, int)    \
+    DEF_HELPER_4(cmpabs_s_##op, void, env, i32, i32, int) \
+    DEF_HELPER_4(cmp_ps_##op, void, env, i64, i64, int)   \
+    DEF_HELPER_4(cmpabs_ps_##op, void, env, i64, i64, int)
 FOP_PROTO(f)
 FOP_PROTO(un)
 FOP_PROTO(eq)
@@ -160,9 +160,9 @@ FOP_PROTO(le)
 FOP_PROTO(ngt)
 #undef FOP_PROTO
 
-#define FOP_PROTO(op) \
-DEF_HELPER_3(r6_cmp_d_ ## op, i64, env, i64, i64) \
-DEF_HELPER_3(r6_cmp_s_ ## op, i32, env, i32, i32)
+#define FOP_PROTO(op)                               \
+    DEF_HELPER_3(r6_cmp_d_##op, i64, env, i64, i64) \
+    DEF_HELPER_3(r6_cmp_s_##op, i32, env, i32, i32)
 FOP_PROTO(af)
 FOP_PROTO(un)
 FOP_PROTO(eq)
@@ -336,28 +336,22 @@ DEF_HELPER_FLAGS_2(absq_s_pw, 0, tl, tl, env)
 #endif
 DEF_HELPER_FLAGS_2(precr_qb_ph, TCG_CALL_NO_RWG_SE, tl, tl, tl)
 DEF_HELPER_FLAGS_2(precrq_qb_ph, TCG_CALL_NO_RWG_SE, tl, tl, tl)
-DEF_HELPER_FLAGS_3(precr_sra_ph_w, TCG_CALL_NO_RWG_SE,
-                   tl, i32, tl, tl)
-DEF_HELPER_FLAGS_3(precr_sra_r_ph_w, TCG_CALL_NO_RWG_SE,
-                   tl, i32, tl, tl)
+DEF_HELPER_FLAGS_3(precr_sra_ph_w, TCG_CALL_NO_RWG_SE, tl, i32, tl, tl)
+DEF_HELPER_FLAGS_3(precr_sra_r_ph_w, TCG_CALL_NO_RWG_SE, tl, i32, tl, tl)
 DEF_HELPER_FLAGS_2(precrq_ph_w, TCG_CALL_NO_RWG_SE, tl, tl, tl)
 DEF_HELPER_FLAGS_3(precrq_rs_ph_w, 0, tl, tl, tl, env)
 #if defined(TARGET_MIPS64)
 DEF_HELPER_FLAGS_2(precr_ob_qh, TCG_CALL_NO_RWG_SE, tl, tl, tl)
-DEF_HELPER_FLAGS_3(precr_sra_qh_pw,
-                   TCG_CALL_NO_RWG_SE, tl, tl, tl, i32)
-DEF_HELPER_FLAGS_3(precr_sra_r_qh_pw,
-                   TCG_CALL_NO_RWG_SE, tl, tl, tl, i32)
+DEF_HELPER_FLAGS_3(precr_sra_qh_pw, TCG_CALL_NO_RWG_SE, tl, tl, tl, i32)
+DEF_HELPER_FLAGS_3(precr_sra_r_qh_pw, TCG_CALL_NO_RWG_SE, tl, tl, tl, i32)
 DEF_HELPER_FLAGS_2(precrq_ob_qh, TCG_CALL_NO_RWG_SE, tl, tl, tl)
 DEF_HELPER_FLAGS_2(precrq_qh_pw, TCG_CALL_NO_RWG_SE, tl, tl, tl)
-DEF_HELPER_FLAGS_3(precrq_rs_qh_pw,
-                   TCG_CALL_NO_RWG_SE, tl, tl, tl, env)
+DEF_HELPER_FLAGS_3(precrq_rs_qh_pw, TCG_CALL_NO_RWG_SE, tl, tl, tl, env)
 DEF_HELPER_FLAGS_2(precrq_pw_l, TCG_CALL_NO_RWG_SE, tl, tl, tl)
 #endif
 DEF_HELPER_FLAGS_3(precrqu_s_qb_ph, 0, tl, tl, tl, env)
 #if defined(TARGET_MIPS64)
-DEF_HELPER_FLAGS_3(precrqu_s_ob_qh,
-                   TCG_CALL_NO_RWG_SE, tl, tl, tl, env)
+DEF_HELPER_FLAGS_3(precrqu_s_ob_qh, TCG_CALL_NO_RWG_SE, tl, tl, tl, env)
 
 DEF_HELPER_FLAGS_1(preceq_pw_qhl, TCG_CALL_NO_RWG_SE, tl, tl)
 DEF_HELPER_FLAGS_1(preceq_pw_qhr, TCG_CALL_NO_RWG_SE, tl, tl)

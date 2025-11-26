@@ -33,14 +33,14 @@
 
 #define HELPER_H "helper.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
 #define EXTRACT_FIELD(src, start, end) \
-            (((src) >> start) & ((1 << (end - start + 1)) - 1))
+    (((src) >> start) & ((1 << (end - start + 1)) - 1))
 
 /* is_jmp field values */
-#define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
-#define DISAS_EXIT    DISAS_TARGET_1 /* all cpu state modified dynamically */
+#define DISAS_JUMP DISAS_TARGET_0 /* only pc was modified dynamically */
+#define DISAS_EXIT DISAS_TARGET_1 /* all cpu state modified dynamically */
 
 /* cpu state besides pc was modified dynamically; update pc to next */
 #define DISAS_EXIT_NEXT DISAS_TARGET_2
@@ -141,8 +141,7 @@ static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
  */
 static bool trap_illegal(DisasContext *dc, bool cond)
 {
-    if (cond && (dc->tb_flags & MSR_EE)
-        && dc->cfg->illegal_opcode_exception) {
+    if (cond && (dc->tb_flags & MSR_EE) && dc->cfg->illegal_opcode_exception) {
         gen_raise_hw_excp(dc, ESR_EC_ILLEGAL_OP);
     }
     return cond;
@@ -170,8 +169,8 @@ static bool invalid_delay_slot(DisasContext *dc, const char *insn_type)
 {
     if (dc->tb_flags & D_FLAG) {
         qemu_log_mask(LOG_GUEST_ERROR,
-                      "Invalid insn in delay slot: %s at %08x\n",
-                      insn_type, (uint32_t)dc->base.pc_next);
+                      "Invalid insn in delay slot: %s at %08x\n", insn_type,
+                      (uint32_t)dc->base.pc_next);
         return true;
     }
     return false;
@@ -266,41 +265,59 @@ static bool do_typeb_val(DisasContext *dc, arg_typeb *arg, bool side_effects,
     return true;
 }
 
-#define DO_TYPEA(NAME, SE, FN) \
+#define DO_TYPEA(NAME, SE, FN)                               \
     static bool trans_##NAME(DisasContext *dc, arg_typea *a) \
-    { return do_typea(dc, a, SE, FN); }
+    {                                                        \
+        return do_typea(dc, a, SE, FN);                      \
+    }
 
-#define DO_TYPEA_CFG(NAME, CFG, SE, FN) \
+#define DO_TYPEA_CFG(NAME, CFG, SE, FN)                      \
     static bool trans_##NAME(DisasContext *dc, arg_typea *a) \
-    { return dc->cfg->CFG && do_typea(dc, a, SE, FN); }
+    {                                                        \
+        return dc->cfg->CFG && do_typea(dc, a, SE, FN);      \
+    }
 
-#define DO_TYPEA0(NAME, SE, FN) \
+#define DO_TYPEA0(NAME, SE, FN)                               \
     static bool trans_##NAME(DisasContext *dc, arg_typea0 *a) \
-    { return do_typea0(dc, a, SE, FN); }
+    {                                                         \
+        return do_typea0(dc, a, SE, FN);                      \
+    }
 
-#define DO_TYPEA0_CFG(NAME, CFG, SE, FN) \
+#define DO_TYPEA0_CFG(NAME, CFG, SE, FN)                      \
     static bool trans_##NAME(DisasContext *dc, arg_typea0 *a) \
-    { return dc->cfg->CFG && do_typea0(dc, a, SE, FN); }
+    {                                                         \
+        return dc->cfg->CFG && do_typea0(dc, a, SE, FN);      \
+    }
 
-#define DO_TYPEBI(NAME, SE, FNI) \
+#define DO_TYPEBI(NAME, SE, FNI)                             \
     static bool trans_##NAME(DisasContext *dc, arg_typeb *a) \
-    { return do_typeb_imm(dc, a, SE, FNI); }
+    {                                                        \
+        return do_typeb_imm(dc, a, SE, FNI);                 \
+    }
 
-#define DO_TYPEBI_CFG(NAME, CFG, SE, FNI) \
+#define DO_TYPEBI_CFG(NAME, CFG, SE, FNI)                    \
     static bool trans_##NAME(DisasContext *dc, arg_typeb *a) \
-    { return dc->cfg->CFG && do_typeb_imm(dc, a, SE, FNI); }
+    {                                                        \
+        return dc->cfg->CFG && do_typeb_imm(dc, a, SE, FNI); \
+    }
 
-#define DO_TYPEBV(NAME, SE, FN) \
+#define DO_TYPEBV(NAME, SE, FN)                              \
     static bool trans_##NAME(DisasContext *dc, arg_typeb *a) \
-    { return do_typeb_val(dc, a, SE, FN); }
+    {                                                        \
+        return do_typeb_val(dc, a, SE, FN);                  \
+    }
 
-#define ENV_WRAPPER2(NAME, HELPER) \
+#define ENV_WRAPPER2(NAME, HELPER)               \
     static void NAME(TCGv_i32 out, TCGv_i32 ina) \
-    { HELPER(out, cpu_env, ina); }
+    {                                            \
+        HELPER(out, cpu_env, ina);               \
+    }
 
-#define ENV_WRAPPER3(NAME, HELPER) \
+#define ENV_WRAPPER3(NAME, HELPER)                             \
     static void NAME(TCGv_i32 out, TCGv_i32 ina, TCGv_i32 inb) \
-    { HELPER(out, cpu_env, ina, inb); }
+    {                                                          \
+        HELPER(out, cpu_env, ina, inb);                        \
+    }
 
 /* No input carry, but output carry. */
 static void gen_add(TCGv_i32 out, TCGv_i32 ina, TCGv_i32 inb)
@@ -376,8 +393,8 @@ static void gen_bsefi(TCGv_i32 out, TCGv_i32 ina, int32_t imm)
 
     if (imm_w + imm_s > 32 || imm_w == 0) {
         /* These inputs have an undefined behavior.  */
-        qemu_log_mask(LOG_GUEST_ERROR, "bsefi: Bad input w=%d s=%d\n",
-                      imm_w, imm_s);
+        qemu_log_mask(LOG_GUEST_ERROR, "bsefi: Bad input w=%d s=%d\n", imm_w,
+                      imm_s);
     } else {
         tcg_gen_extract_i32(out, ina, imm_s, imm_w);
     }
@@ -392,8 +409,8 @@ static void gen_bsifi(TCGv_i32 out, TCGv_i32 ina, int32_t imm)
 
     if (imm_w < imm_s) {
         /* These inputs have an undefined behavior.  */
-        qemu_log_mask(LOG_GUEST_ERROR, "bsifi: Bad input w=%d s=%d\n",
-                      imm_w, imm_s);
+        qemu_log_mask(LOG_GUEST_ERROR, "bsifi: Bad input w=%d s=%d\n", imm_w,
+                      imm_s);
     } else {
         tcg_gen_deposit_i32(out, out, ina, imm_s, width);
     }
@@ -697,8 +714,8 @@ static TCGv compute_ldst_addr_ea(DisasContext *dc, int ra, int rb)
 #endif
 
 #ifndef CONFIG_USER_ONLY
-static void record_unaligned_ess(DisasContext *dc, int rd,
-                                 MemOp size, bool store)
+static void record_unaligned_ess(DisasContext *dc, int rd, MemOp size,
+                                 bool store)
 {
     uint32_t iflags = tcg_get_insn_start_param(dc->insn_start, 1);
 
@@ -737,8 +754,7 @@ static bool do_load(DisasContext *dc, int rd, TCGv addr, MemOp mop,
      * any unaligned access, so emulate that by *not* setting MO_ALIGN.
      */
 #ifndef CONFIG_USER_ONLY
-    if (size > MO_8 &&
-        (dc->tb_flags & MSR_EE) &&
+    if (size > MO_8 && (dc->tb_flags & MSR_EE) &&
         dc->cfg->unaligned_exceptions) {
         record_unaligned_ess(dc, rd, size, false);
         mop |= MO_ALIGN;
@@ -887,8 +903,7 @@ static bool do_store(DisasContext *dc, int rd, TCGv addr, MemOp mop,
      * any unaligned access, so emulate that by *not* setting MO_ALIGN.
      */
 #ifndef CONFIG_USER_ONLY
-    if (size > MO_8 &&
-        (dc->tb_flags & MSR_EE) &&
+    if (size > MO_8 && (dc->tb_flags & MSR_EE) &&
         dc->cfg->unaligned_exceptions) {
         record_unaligned_ess(dc, rd, size, true);
         mop |= MO_ALIGN;
@@ -1017,8 +1032,8 @@ static bool trans_swx(DisasContext *dc, arg_typea *arg)
     tval = tcg_temp_new_i32();
 
     tcg_gen_atomic_cmpxchg_i32(tval, cpu_res_addr, cpu_res_val,
-                               reg_for_write(dc, arg->rd),
-                               dc->mem_index, MO_TEUL);
+                               reg_for_write(dc, arg->rd), dc->mem_index,
+                               MO_TEUL);
 
     tcg_gen_brcond_i32(TCG_COND_NE, cpu_res_val, tval, swx_fail);
 
@@ -1048,8 +1063,8 @@ static void setup_dslot(DisasContext *dc, bool type_b)
     }
 }
 
-static bool do_branch(DisasContext *dc, int dest_rb, int dest_imm,
-                      bool delay, bool abs, int link)
+static bool do_branch(DisasContext *dc, int dest_rb, int dest_imm, bool delay,
+                      bool abs, int link)
 {
     uint32_t add_pc;
 
@@ -1077,11 +1092,15 @@ static bool do_branch(DisasContext *dc, int dest_rb, int dest_imm,
     return true;
 }
 
-#define DO_BR(NAME, NAMEI, DELAY, ABS, LINK)                               \
-    static bool trans_##NAME(DisasContext *dc, arg_typea_br *arg)          \
-    { return do_branch(dc, arg->rb, 0, DELAY, ABS, LINK ? arg->rd : 0); }  \
-    static bool trans_##NAMEI(DisasContext *dc, arg_typeb_br *arg)         \
-    { return do_branch(dc, -1, arg->imm, DELAY, ABS, LINK ? arg->rd : 0); }
+#define DO_BR(NAME, NAMEI, DELAY, ABS, LINK)                                \
+    static bool trans_##NAME(DisasContext *dc, arg_typea_br *arg)           \
+    {                                                                       \
+        return do_branch(dc, arg->rb, 0, DELAY, ABS, LINK ? arg->rd : 0);   \
+    }                                                                       \
+    static bool trans_##NAMEI(DisasContext *dc, arg_typeb_br *arg)          \
+    {                                                                       \
+        return do_branch(dc, -1, arg->imm, DELAY, ABS, LINK ? arg->rd : 0); \
+    }
 
 DO_BR(br, bri, false, false, false)
 DO_BR(bra, brai, false, true, false)
@@ -1090,8 +1109,8 @@ DO_BR(brad, braid, true, true, false)
 DO_BR(brld, brlid, true, false, true)
 DO_BR(brald, bralid, true, true, true)
 
-static bool do_bcc(DisasContext *dc, int dest_rb, int dest_imm,
-                   TCGCond cond, int ra, bool delay)
+static bool do_bcc(DisasContext *dc, int dest_rb, int dest_imm, TCGCond cond,
+                   int ra, bool delay)
 {
     TCGv_i32 zero, next;
 
@@ -1119,22 +1138,29 @@ static bool do_bcc(DisasContext *dc, int dest_rb, int dest_imm,
     /* Compute the final destination into btarget.  */
     zero = tcg_constant_i32(0);
     next = tcg_constant_i32(dc->base.pc_next + (delay + 1) * 4);
-    tcg_gen_movcond_i32(dc->jmp_cond, cpu_btarget,
-                        reg_for_read(dc, ra), zero,
+    tcg_gen_movcond_i32(dc->jmp_cond, cpu_btarget, reg_for_read(dc, ra), zero,
                         cpu_btarget, next);
 
     return true;
 }
 
-#define DO_BCC(NAME, COND)                                              \
-    static bool trans_##NAME(DisasContext *dc, arg_typea_bc *arg)       \
-    { return do_bcc(dc, arg->rb, 0, COND, arg->ra, false); }            \
-    static bool trans_##NAME##d(DisasContext *dc, arg_typea_bc *arg)    \
-    { return do_bcc(dc, arg->rb, 0, COND, arg->ra, true); }             \
-    static bool trans_##NAME##i(DisasContext *dc, arg_typeb_bc *arg)    \
-    { return do_bcc(dc, -1, arg->imm, COND, arg->ra, false); }          \
-    static bool trans_##NAME##id(DisasContext *dc, arg_typeb_bc *arg)   \
-    { return do_bcc(dc, -1, arg->imm, COND, arg->ra, true); }
+#define DO_BCC(NAME, COND)                                            \
+    static bool trans_##NAME(DisasContext *dc, arg_typea_bc *arg)     \
+    {                                                                 \
+        return do_bcc(dc, arg->rb, 0, COND, arg->ra, false);          \
+    }                                                                 \
+    static bool trans_##NAME##d(DisasContext *dc, arg_typea_bc *arg)  \
+    {                                                                 \
+        return do_bcc(dc, arg->rb, 0, COND, arg->ra, true);           \
+    }                                                                 \
+    static bool trans_##NAME##i(DisasContext *dc, arg_typeb_bc *arg)  \
+    {                                                                 \
+        return do_bcc(dc, -1, arg->imm, COND, arg->ra, false);        \
+    }                                                                 \
+    static bool trans_##NAME##id(DisasContext *dc, arg_typeb_bc *arg) \
+    {                                                                 \
+        return do_bcc(dc, -1, arg->imm, COND, arg->ra, true);         \
+    }
 
 DO_BCC(beq, TCG_COND_EQ)
 DO_BCC(bge, TCG_COND_GE)
@@ -1182,13 +1208,13 @@ static bool trans_brki(DisasContext *dc, arg_typeb_br *arg)
 
 #ifdef CONFIG_USER_ONLY
     switch (imm) {
-    case 0x8:  /* syscall trap */
+    case 0x8: /* syscall trap */
         gen_raise_exception_sync(dc, EXCP_SYSCALL);
         break;
     case 0x18: /* debug trap */
         gen_raise_exception_sync(dc, EXCP_DEBUG);
         break;
-    default:   /* eliminated with trap_userspace check */
+    default: /* eliminated with trap_userspace check */
         g_assert_not_reached();
     }
 #else
@@ -1234,8 +1260,8 @@ static bool trans_mbar(DisasContext *dc, arg_mbar *arg)
         t_sync_flags(dc);
 
         tcg_gen_st_i32(tcg_constant_i32(1), cpu_env,
-                       -offsetof(MicroBlazeCPU, env)
-                       +offsetof(CPUState, halted));
+                       -offsetof(MicroBlazeCPU, env) +
+                           offsetof(CPUState, halted));
 
         tcg_gen_movi_i32(cpu_pc, dc->base.pc_next + 4);
 
@@ -1275,9 +1301,11 @@ static bool do_rts(DisasContext *dc, arg_typeb_bc *arg, int to_set)
     return true;
 }
 
-#define DO_RTS(NAME, IFLAG) \
+#define DO_RTS(NAME, IFLAG)                                       \
     static bool trans_##NAME(DisasContext *dc, arg_typeb_bc *arg) \
-    { return do_rts(dc, arg, IFLAG); }
+    {                                                             \
+        return do_rts(dc, arg, IFLAG);                            \
+    }
 
 DO_RTS(rtbd, DRTB_FLAG)
 DO_RTS(rtid, DRTI_FLAG)
@@ -1365,8 +1393,8 @@ static bool trans_mts(DisasContext *dc, arg_mts *arg)
     g_assert_not_reached();
 #else
     if (arg->e && arg->rs != 0x1003) {
-        qemu_log_mask(LOG_GUEST_ERROR,
-                      "Invalid extended mts reg 0x%x\n", arg->rs);
+        qemu_log_mask(LOG_GUEST_ERROR, "Invalid extended mts reg 0x%x\n",
+                      arg->rs);
         return true;
     }
 
@@ -1397,13 +1425,12 @@ static bool trans_mts(DisasContext *dc, arg_mts *arg)
     case 0x1003: /* TLBLO */
     case 0x1004: /* TLBHI */
     case 0x1005: /* TLBSX */
-        {
-            TCGv_i32 tmp_ext = tcg_constant_i32(arg->e);
-            TCGv_i32 tmp_reg = tcg_constant_i32(arg->rs & 7);
+    {
+        TCGv_i32 tmp_ext = tcg_constant_i32(arg->e);
+        TCGv_i32 tmp_reg = tcg_constant_i32(arg->rs & 7);
 
-            gen_helper_mmu_write(cpu_env, tmp_ext, tmp_reg, src);
-        }
-        break;
+        gen_helper_mmu_write(cpu_env, tmp_ext, tmp_reg, src);
+    } break;
 
     default:
         qemu_log_mask(LOG_GUEST_ERROR, "Invalid mts reg 0x%x\n", arg->rs);
@@ -1420,12 +1447,11 @@ static bool trans_mfs(DisasContext *dc, arg_mfs *arg)
 
     if (arg->e) {
         switch (arg->rs) {
-        case SR_EAR:
-            {
-                TCGv_i64 t64 = tcg_temp_new_i64();
-                tcg_gen_ld_i64(t64, cpu_env, offsetof(CPUMBState, ear));
-                tcg_gen_extrh_i64_i32(dest, t64);
-            }
+        case SR_EAR: {
+            TCGv_i64 t64 = tcg_temp_new_i64();
+            tcg_gen_ld_i64(t64, cpu_env, offsetof(CPUMBState, ear));
+            tcg_gen_extrh_i64_i32(dest, t64);
+        }
             return true;
 #ifndef CONFIG_USER_ONLY
         case 0x1003: /* TLBLO */
@@ -1437,8 +1463,8 @@ static bool trans_mfs(DisasContext *dc, arg_mfs *arg)
             tcg_gen_movi_i32(dest, 0);
             return true;
         default:
-            qemu_log_mask(LOG_GUEST_ERROR,
-                          "Invalid extended mfs reg 0x%x\n", arg->rs);
+            qemu_log_mask(LOG_GUEST_ERROR, "Invalid extended mfs reg 0x%x\n",
+                          arg->rs);
             return true;
         }
     }
@@ -1450,13 +1476,11 @@ static bool trans_mfs(DisasContext *dc, arg_mfs *arg)
     case SR_MSR:
         msr_read(dc, dest);
         break;
-    case SR_EAR:
-        {
-            TCGv_i64 t64 = tcg_temp_new_i64();
-            tcg_gen_ld_i64(t64, cpu_env, offsetof(CPUMBState, ear));
-            tcg_gen_extrl_i64_i32(dest, t64);
-        }
-        break;
+    case SR_EAR: {
+        TCGv_i64 t64 = tcg_temp_new_i64();
+        tcg_gen_ld_i64(t64, cpu_env, offsetof(CPUMBState, ear));
+        tcg_gen_extrl_i64_i32(dest, t64);
+    } break;
     case SR_ESR:
         tcg_gen_ld_i32(dest, cpu_env, offsetof(CPUMBState, esr));
         break;
@@ -1483,19 +1507,18 @@ static bool trans_mfs(DisasContext *dc, arg_mfs *arg)
     case 0x1003: /* TLBLO */
     case 0x1004: /* TLBHI */
     case 0x1005: /* TLBSX */
-        {
-            TCGv_i32 tmp_ext = tcg_constant_i32(arg->e);
-            TCGv_i32 tmp_reg = tcg_constant_i32(arg->rs & 7);
+    {
+        TCGv_i32 tmp_ext = tcg_constant_i32(arg->e);
+        TCGv_i32 tmp_reg = tcg_constant_i32(arg->rs & 7);
 
-            gen_helper_mmu_read(dest, cpu_env, tmp_ext, tmp_reg);
-        }
-        break;
+        gen_helper_mmu_read(dest, cpu_env, tmp_ext, tmp_reg);
+    } break;
 #endif
 
     case 0x2000 ... 0x200c:
         tcg_gen_ld_i32(dest, cpu_env,
-                       offsetof(MicroBlazeCPU, cfg.pvr_regs[arg->rs - 0x2000])
-                       - offsetof(MicroBlazeCPU, env));
+                       offsetof(MicroBlazeCPU, cfg.pvr_regs[arg->rs - 0x2000]) -
+                           offsetof(MicroBlazeCPU, env));
         break;
     default:
         qemu_log_mask(LOG_GUEST_ERROR, "Invalid mfs reg 0x%x\n", arg->rs);
@@ -1776,8 +1799,8 @@ static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
     }
 }
 
-static void mb_tr_disas_log(const DisasContextBase *dcb,
-                            CPUState *cs, FILE *logfile)
+static void mb_tr_disas_log(const DisasContextBase *dcb, CPUState *cs,
+                            FILE *logfile)
 {
     fprintf(logfile, "IN: %s\n", lookup_symbol(dcb->pc_first));
     target_disas(logfile, cs, dcb->pc_first, dcb->tb->size);
@@ -1785,11 +1808,11 @@ static void mb_tr_disas_log(const DisasContextBase *dcb,
 
 static const TranslatorOps mb_tr_ops = {
     .init_disas_context = mb_tr_init_disas_context,
-    .tb_start           = mb_tr_tb_start,
-    .insn_start         = mb_tr_insn_start,
-    .translate_insn     = mb_tr_translate_insn,
-    .tb_stop            = mb_tr_tb_stop,
-    .disas_log          = mb_tr_disas_log,
+    .tb_start = mb_tr_tb_start,
+    .insn_start = mb_tr_insn_start,
+    .translate_insn = mb_tr_translate_insn,
+    .tb_stop = mb_tr_tb_stop,
+    .disas_log = mb_tr_disas_log,
 };
 
 void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int *max_insns,
@@ -1807,11 +1830,9 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     int i;
 
     qemu_fprintf(f, "pc=0x%08x msr=0x%05x mode=%s(saved=%s) eip=%d ie=%d\n",
-                 env->pc, env->msr,
-                 (env->msr & MSR_UM) ? "user" : "kernel",
+                 env->pc, env->msr, (env->msr & MSR_UM) ? "user" : "kernel",
                  (env->msr & MSR_UMS) ? "user" : "kernel",
-                 (bool)(env->msr & MSR_EIP),
-                 (bool)(env->msr & MSR_IE));
+                 (bool)(env->msr & MSR_EIP), (bool)(env->msr & MSR_IE));
 
     iflags = env->iflags;
     qemu_fprintf(f, "iflags: 0x%08x", iflags);
@@ -1837,25 +1858,34 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
         qemu_fprintf(f, " ESR_ESS(0x%04x)", iflags & ESR_ESS_MASK);
     }
 
-    qemu_fprintf(f, "\nesr=0x%04x fsr=0x%02x btr=0x%08x edr=0x%x\n"
+    qemu_fprintf(f,
+                 "\nesr=0x%04x fsr=0x%02x btr=0x%08x edr=0x%x\n"
                  "ear=0x" TARGET_FMT_lx " slr=0x%x shr=0x%x\n",
-                 env->esr, env->fsr, env->btr, env->edr,
-                 env->ear, env->slr, env->shr);
+                 env->esr, env->fsr, env->btr, env->edr, env->ear, env->slr,
+                 env->shr);
 
     for (i = 0; i < 32; i++) {
-        qemu_fprintf(f, "r%2.2d=%08x%c",
-                     i, env->regs[i], i % 4 == 3 ? '\n' : ' ');
+        qemu_fprintf(f, "r%2.2d=%08x%c", i, env->regs[i],
+                     i % 4 == 3 ? '\n' : ' ');
     }
     qemu_fprintf(f, "\n");
 }
 
 void mb_tcg_init(void)
 {
-#define R(X)  { &cpu_R[X], offsetof(CPUMBState, regs[X]), "r" #X }
-#define SP(X) { &cpu_##X, offsetof(CPUMBState, X), #X }
+#define R(X)                                             \
+    {                                                    \
+        &cpu_R[X], offsetof(CPUMBState, regs[X]), "r" #X \
+    }
+#define SP(X)                                 \
+    {                                         \
+        &cpu_##X, offsetof(CPUMBState, X), #X \
+    }
 
     static const struct {
-        TCGv_i32 *var; int ofs; char name[8];
+        TCGv_i32 *var;
+        int ofs;
+        char name[8];
     } i32s[] = {
         /*
          * Note that r0 is handled specially in reg_for_read
@@ -1863,19 +1893,15 @@ void mb_tcg_init(void)
          * Leave that element NULL, which will assert quickly
          * inside the tcg generator functions.
          */
-               R(1),  R(2),  R(3),  R(4),  R(5),  R(6),  R(7),
-        R(8),  R(9),  R(10), R(11), R(12), R(13), R(14), R(15),
-        R(16), R(17), R(18), R(19), R(20), R(21), R(22), R(23),
-        R(24), R(25), R(26), R(27), R(28), R(29), R(30), R(31),
+        R(1),        R(2),        R(3),      R(4),    R(5),       R(6),
+        R(7),        R(8),        R(9),      R(10),   R(11),      R(12),
+        R(13),       R(14),       R(15),     R(16),   R(17),      R(18),
+        R(19),       R(20),       R(21),     R(22),   R(23),      R(24),
+        R(25),       R(26),       R(27),     R(28),   R(29),      R(30),
+        R(31),
 
-        SP(pc),
-        SP(msr),
-        SP(msr_c),
-        SP(imm),
-        SP(iflags),
-        SP(bvalue),
-        SP(btarget),
-        SP(res_val),
+        SP(pc),      SP(msr),     SP(msr_c), SP(imm), SP(iflags), SP(bvalue),
+        SP(btarget), SP(res_val),
     };
 
 #undef R
@@ -1883,7 +1909,7 @@ void mb_tcg_init(void)
 
     for (int i = 0; i < ARRAY_SIZE(i32s); ++i) {
         *i32s[i].var =
-          tcg_global_mem_new_i32(cpu_env, i32s[i].ofs, i32s[i].name);
+            tcg_global_mem_new_i32(cpu_env, i32s[i].ofs, i32s[i].name);
     }
 
     cpu_res_addr =

@@ -317,20 +317,17 @@ static void tswap_nlmsghdr(struct nlmsghdr *nlh)
     nlh->nlmsg_pid = tswap32(nlh->nlmsg_pid);
 }
 
-static abi_long host_to_target_for_each_nlmsg(struct nlmsghdr *nlh,
-                                              size_t len,
-                                              abi_long (*host_to_target_nlmsg)
-                                                       (struct nlmsghdr *))
+static abi_long host_to_target_for_each_nlmsg(
+    struct nlmsghdr *nlh, size_t len,
+    abi_long (*host_to_target_nlmsg)(struct nlmsghdr *))
 {
     uint32_t nlmsg_len;
     uint32_t aligned_nlmsg_len;
     abi_long ret;
 
     while (len > sizeof(struct nlmsghdr)) {
-
         nlmsg_len = nlh->nlmsg_len;
-        if (nlmsg_len < sizeof(struct nlmsghdr) ||
-            nlmsg_len > len) {
+        if (nlmsg_len < sizeof(struct nlmsghdr) || nlmsg_len > len) {
             break;
         }
 
@@ -340,8 +337,7 @@ static abi_long host_to_target_for_each_nlmsg(struct nlmsghdr *nlh,
             return 0;
         case NLMSG_NOOP:
             break;
-        case NLMSG_ERROR:
-        {
+        case NLMSG_ERROR: {
             struct nlmsgerr *e = NLMSG_DATA(nlh);
             e->error = tswap32(e->error);
             tswap_nlmsghdr(&e->msg);
@@ -363,15 +359,14 @@ static abi_long host_to_target_for_each_nlmsg(struct nlmsghdr *nlh,
             break;
         }
         len -= aligned_nlmsg_len;
-        nlh = (struct nlmsghdr *)(((char*)nlh) + aligned_nlmsg_len);
+        nlh = (struct nlmsghdr *)(((char *)nlh) + aligned_nlmsg_len);
     }
     return 0;
 }
 
-static abi_long target_to_host_for_each_nlmsg(struct nlmsghdr *nlh,
-                                              size_t len,
-                                              abi_long (*target_to_host_nlmsg)
-                                                       (struct nlmsghdr *))
+static abi_long target_to_host_for_each_nlmsg(
+    struct nlmsghdr *nlh, size_t len,
+    abi_long (*target_to_host_nlmsg)(struct nlmsghdr *))
 {
     uint32_t aligned_nlmsg_len;
     int ret;
@@ -387,8 +382,7 @@ static abi_long target_to_host_for_each_nlmsg(struct nlmsghdr *nlh,
             return 0;
         case NLMSG_NOOP:
             break;
-        case NLMSG_ERROR:
-        {
+        case NLMSG_ERROR: {
             struct nlmsgerr *e = NLMSG_DATA(nlh);
             e->error = tswap32(e->error);
             tswap_nlmsghdr(&e->msg);
@@ -412,11 +406,9 @@ static abi_long target_to_host_for_each_nlmsg(struct nlmsghdr *nlh,
 }
 
 #ifdef CONFIG_RTNETLINK
-static abi_long host_to_target_for_each_nlattr(struct nlattr *nlattr,
-                                               size_t len, void *context,
-                                               abi_long (*host_to_target_nlattr)
-                                                        (struct nlattr *,
-                                                         void *context))
+static abi_long host_to_target_for_each_nlattr(
+    struct nlattr *nlattr, size_t len, void *context,
+    abi_long (*host_to_target_nlattr)(struct nlattr *, void *context))
 {
     unsigned short nla_len;
     unsigned short aligned_nla_len;
@@ -424,8 +416,7 @@ static abi_long host_to_target_for_each_nlattr(struct nlattr *nlattr,
 
     while (len > sizeof(struct nlattr)) {
         nla_len = nlattr->nla_len;
-        if (nla_len < sizeof(struct nlattr) ||
-            nla_len > len) {
+        if (nla_len < sizeof(struct nlattr) || nla_len > len) {
             break;
         }
         ret = host_to_target_nlattr(nlattr, context);
@@ -445,10 +436,9 @@ static abi_long host_to_target_for_each_nlattr(struct nlattr *nlattr,
     return 0;
 }
 
-static abi_long host_to_target_for_each_rtattr(struct rtattr *rtattr,
-                                               size_t len,
-                                               abi_long (*host_to_target_rtattr)
-                                                        (struct rtattr *))
+static abi_long host_to_target_for_each_rtattr(
+    struct rtattr *rtattr, size_t len,
+    abi_long (*host_to_target_rtattr)(struct rtattr *))
 {
     unsigned short rta_len;
     unsigned short aligned_rta_len;
@@ -456,8 +446,7 @@ static abi_long host_to_target_for_each_rtattr(struct rtattr *rtattr,
 
     while (len > sizeof(struct rtattr)) {
         rta_len = rtattr->rta_len;
-        if (rta_len < sizeof(struct rtattr) ||
-            rta_len > len) {
+        if (rta_len < sizeof(struct rtattr) || rta_len > len) {
             break;
         }
         ret = host_to_target_rtattr(rtattr);
@@ -634,7 +623,7 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
 }
 
 static abi_long host_to_target_data_tun_nlattr(struct nlattr *nlattr,
-                                                  void *context)
+                                               void *context)
 {
     uint32_t *u32;
 
@@ -690,33 +679,28 @@ static abi_long host_to_target_data_linkinfo_nlattr(struct nlattr *nlattr,
         break;
     /* nested */
     case QEMU_IFLA_INFO_DATA:
-        if (strncmp(li_context->name, "bridge",
-                    li_context->len) == 0) {
-            return host_to_target_for_each_nlattr(NLA_DATA(nlattr),
-                                                  nlattr->nla_len,
-                                                  NULL,
-                                             host_to_target_data_bridge_nlattr);
-        } else if (strncmp(li_context->name, "tun",
-                    li_context->len) == 0) {
-            return host_to_target_for_each_nlattr(NLA_DATA(nlattr),
-                                                  nlattr->nla_len,
-                                                  NULL,
-                                                host_to_target_data_tun_nlattr);
+        if (strncmp(li_context->name, "bridge", li_context->len) == 0) {
+            return host_to_target_for_each_nlattr(
+                NLA_DATA(nlattr), nlattr->nla_len, NULL,
+                host_to_target_data_bridge_nlattr);
+        } else if (strncmp(li_context->name, "tun", li_context->len) == 0) {
+            return host_to_target_for_each_nlattr(
+                NLA_DATA(nlattr), nlattr->nla_len, NULL,
+                host_to_target_data_tun_nlattr);
         } else {
             qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_INFO_KIND %s\n",
                           li_context->name);
         }
         break;
     case QEMU_IFLA_INFO_SLAVE_DATA:
-        if (strncmp(li_context->slave_name, "bridge",
-                    li_context->slave_len) == 0) {
-            return host_to_target_for_each_nlattr(NLA_DATA(nlattr),
-                                                  nlattr->nla_len,
-                                                  NULL,
-                                       host_to_target_slave_data_bridge_nlattr);
+        if (strncmp(li_context->slave_name, "bridge", li_context->slave_len) ==
+            0) {
+            return host_to_target_for_each_nlattr(
+                NLA_DATA(nlattr), nlattr->nla_len, NULL,
+                host_to_target_slave_data_bridge_nlattr);
         } else {
             qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_INFO_SLAVE_KIND %s\n",
-                     li_context->slave_name);
+                          li_context->slave_name);
         }
         break;
     default:
@@ -737,8 +721,7 @@ static abi_long host_to_target_data_inet_nlattr(struct nlattr *nlattr,
     switch (nlattr->nla_type) {
     case QEMU_IFLA_INET_CONF:
         u32 = NLA_DATA(nlattr);
-        for (i = 0; i < (nlattr->nla_len - NLA_HDRLEN) / sizeof(*u32);
-             i++) {
+        for (i = 0; i < (nlattr->nla_len - NLA_HDRLEN) / sizeof(*u32); i++) {
             u32[i] = tswap32(u32[i]);
         }
         break;
@@ -750,7 +733,7 @@ static abi_long host_to_target_data_inet_nlattr(struct nlattr *nlattr,
 }
 
 static abi_long host_to_target_data_inet6_nlattr(struct nlattr *nlattr,
-                                                void *context)
+                                                 void *context)
 {
     uint32_t *u32;
     uint64_t *u64;
@@ -772,8 +755,7 @@ static abi_long host_to_target_data_inet6_nlattr(struct nlattr *nlattr,
     /* uint32_t[] */
     case QEMU_IFLA_INET6_CONF:
         u32 = NLA_DATA(nlattr);
-        for (i = 0; i < (nlattr->nla_len - NLA_HDRLEN) / sizeof(*u32);
-             i++) {
+        for (i = 0; i < (nlattr->nla_len - NLA_HDRLEN) / sizeof(*u32); i++) {
             u32[i] = tswap32(u32[i]);
         }
         break;
@@ -789,8 +771,7 @@ static abi_long host_to_target_data_inet6_nlattr(struct nlattr *nlattr,
     case QEMU_IFLA_INET6_STATS:
     case QEMU_IFLA_INET6_ICMP6STATS:
         u64 = NLA_DATA(nlattr);
-        for (i = 0; i < (nlattr->nla_len - NLA_HDRLEN) / sizeof(*u64);
-             i++) {
+        for (i = 0; i < (nlattr->nla_len - NLA_HDRLEN) / sizeof(*u64); i++) {
             u64[i] = tswap64(u64[i]);
         }
         break;
@@ -802,17 +783,17 @@ static abi_long host_to_target_data_inet6_nlattr(struct nlattr *nlattr,
 }
 
 static abi_long host_to_target_data_spec_nlattr(struct nlattr *nlattr,
-                                                    void *context)
+                                                void *context)
 {
     switch (nlattr->nla_type) {
     case AF_INET:
         return host_to_target_for_each_nlattr(NLA_DATA(nlattr), nlattr->nla_len,
                                               NULL,
-                                             host_to_target_data_inet_nlattr);
+                                              host_to_target_data_inet_nlattr);
     case AF_INET6:
         return host_to_target_for_each_nlattr(NLA_DATA(nlattr), nlattr->nla_len,
                                               NULL,
-                                             host_to_target_data_inet6_nlattr);
+                                              host_to_target_data_inet6_nlattr);
     default:
         qemu_log_mask(LOG_UNIMP, "Unknown host AF_SPEC type: %d\n",
                       nlattr->nla_type);
@@ -836,8 +817,8 @@ static abi_long host_to_target_data_xdp_nlattr(struct nlattr *nlattr,
         *u32 = tswap32(*u32);
         break;
     default:
-        qemu_log_mask(
-            LOG_UNIMP, "Unknown host XDP type: %d\n", nlattr->nla_type);
+        qemu_log_mask(LOG_UNIMP, "Unknown host XDP type: %d\n",
+                      nlattr->nla_type);
         break;
     }
     return 0;
@@ -967,13 +948,13 @@ static abi_long host_to_target_data_vfinfo_nlattr(struct nlattr *nlattr,
         break;
     /* nested */
     case QEMU_IFLA_VF_VLAN_LIST:
-        return host_to_target_for_each_nlattr(RTA_DATA(nlattr), nlattr->nla_len,
-                                              NULL,
-                                          host_to_target_data_vlan_list_nlattr);
+        return host_to_target_for_each_nlattr(
+            RTA_DATA(nlattr), nlattr->nla_len, NULL,
+            host_to_target_data_vlan_list_nlattr);
     case QEMU_IFLA_VF_STATS:
-        return host_to_target_for_each_nlattr(RTA_DATA(nlattr), nlattr->nla_len,
-                                              NULL,
-                                           host_to_target_data_vf_stats_nlattr);
+        return host_to_target_for_each_nlattr(
+            RTA_DATA(nlattr), nlattr->nla_len, NULL,
+            host_to_target_data_vf_stats_nlattr);
     default:
         qemu_log_mask(LOG_UNIMP, "Unknown host VFINFO type: %d\n",
                       nlattr->nla_type);
@@ -1108,21 +1089,21 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
     /* nested */
     case QEMU_IFLA_LINKINFO:
         memset(&li_context, 0, sizeof(li_context));
-        return host_to_target_for_each_nlattr(RTA_DATA(rtattr), rtattr->rta_len,
-                                              &li_context,
-                                           host_to_target_data_linkinfo_nlattr);
+        return host_to_target_for_each_nlattr(
+            RTA_DATA(rtattr), rtattr->rta_len, &li_context,
+            host_to_target_data_linkinfo_nlattr);
     case QEMU_IFLA_AF_SPEC:
         return host_to_target_for_each_nlattr(RTA_DATA(rtattr), rtattr->rta_len,
                                               NULL,
-                                             host_to_target_data_spec_nlattr);
+                                              host_to_target_data_spec_nlattr);
     case QEMU_IFLA_XDP:
         return host_to_target_for_each_nlattr(RTA_DATA(rtattr), rtattr->rta_len,
                                               NULL,
-                                                host_to_target_data_xdp_nlattr);
+                                              host_to_target_data_xdp_nlattr);
     case QEMU_IFLA_VFINFO_LIST:
-        return host_to_target_for_each_nlattr(RTA_DATA(rtattr), rtattr->rta_len,
-                                              NULL,
-                                             host_to_target_data_vfinfo_nlattr);
+        return host_to_target_for_each_nlattr(
+            RTA_DATA(rtattr), rtattr->rta_len, NULL,
+            host_to_target_data_vfinfo_nlattr);
     default:
         qemu_log_mask(LOG_UNIMP, "Unknown host QEMU_IFLA type: %d\n",
                       rtattr->rta_type);
@@ -1159,8 +1140,8 @@ static abi_long host_to_target_data_addr_rtattr(struct rtattr *rtattr)
         ci->tstamp = tswap32(ci->tstamp);
         break;
     default:
-        qemu_log_mask(
-            LOG_UNIMP, "Unknown host IFA type: %d\n", rtattr->rta_type);
+        qemu_log_mask(LOG_UNIMP, "Unknown host IFA type: %d\n",
+                      rtattr->rta_type);
         break;
     }
     return 0;
@@ -1202,29 +1183,29 @@ static abi_long host_to_target_data_route_rtattr(struct rtattr *rtattr)
 #endif
         break;
     default:
-        qemu_log_mask(
-            LOG_UNIMP, "Unknown host RTA type: %d\n", rtattr->rta_type);
+        qemu_log_mask(LOG_UNIMP, "Unknown host RTA type: %d\n",
+                      rtattr->rta_type);
         break;
     }
     return 0;
 }
 
 static abi_long host_to_target_link_rtattr(struct rtattr *rtattr,
-                                         uint32_t rtattr_len)
+                                           uint32_t rtattr_len)
 {
     return host_to_target_for_each_rtattr(rtattr, rtattr_len,
                                           host_to_target_data_link_rtattr);
 }
 
 static abi_long host_to_target_addr_rtattr(struct rtattr *rtattr,
-                                         uint32_t rtattr_len)
+                                           uint32_t rtattr_len)
 {
     return host_to_target_for_each_rtattr(rtattr, rtattr_len,
                                           host_to_target_data_addr_rtattr);
 }
 
 static abi_long host_to_target_route_rtattr(struct rtattr *rtattr,
-                                         uint32_t rtattr_len)
+                                            uint32_t rtattr_len)
 {
     return host_to_target_for_each_rtattr(rtattr, rtattr_len,
                                           host_to_target_data_route_rtattr);
@@ -1289,10 +1270,9 @@ static inline abi_long host_to_target_nlmsg_route(struct nlmsghdr *nlh,
     return host_to_target_for_each_nlmsg(nlh, len, host_to_target_data_route);
 }
 
-static abi_long target_to_host_for_each_nlattr(struct nlattr *nlattr,
-                                               size_t len,
-                                               abi_long (*target_to_host_nlattr)
-                                                        (struct nlattr *))
+static abi_long target_to_host_for_each_nlattr(
+    struct nlattr *nlattr, size_t len,
+    abi_long (*target_to_host_nlattr)(struct nlattr *))
 {
     unsigned short aligned_nla_len;
     abi_long ret;
@@ -1332,10 +1312,9 @@ static abi_long target_to_host_data_inet6_nlattr(struct nlattr *nlattr)
     return 0;
 }
 
-static abi_long target_to_host_for_each_rtattr(struct rtattr *rtattr,
-                                               size_t len,
-                                               abi_long (*target_to_host_rtattr)
-                                                        (struct rtattr *))
+static abi_long target_to_host_for_each_rtattr(
+    struct rtattr *rtattr, size_t len,
+    abi_long (*target_to_host_rtattr)(struct rtattr *))
 {
     unsigned short aligned_rta_len;
     abi_long ret;
@@ -1446,14 +1425,14 @@ static void target_to_host_link_rtattr(struct rtattr *rtattr,
 }
 
 static void target_to_host_addr_rtattr(struct rtattr *rtattr,
-                                     uint32_t rtattr_len)
+                                       uint32_t rtattr_len)
 {
     target_to_host_for_each_rtattr(rtattr, rtattr_len,
                                    target_to_host_data_addr_rtattr);
 }
 
 static void target_to_host_route_rtattr(struct rtattr *rtattr,
-                                     uint32_t rtattr_len)
+                                        uint32_t rtattr_len)
 {
     target_to_host_for_each_rtattr(rtattr, rtattr_len,
                                    target_to_host_data_route_rtattr);
@@ -1476,8 +1455,8 @@ static abi_long target_to_host_data_route(struct nlmsghdr *nlh)
             ifi->ifi_index = tswap32(ifi->ifi_index);
             ifi->ifi_flags = tswap32(ifi->ifi_flags);
             ifi->ifi_change = tswap32(ifi->ifi_change);
-            target_to_host_link_rtattr(IFLA_RTA(ifi), nlh->nlmsg_len -
-                                       NLMSG_LENGTH(sizeof(*ifi)));
+            target_to_host_link_rtattr(
+                IFLA_RTA(ifi), nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*ifi)));
         }
         break;
     case RTM_GETADDR:
@@ -1486,8 +1465,8 @@ static abi_long target_to_host_data_route(struct nlmsghdr *nlh)
         if (nlh->nlmsg_len >= NLMSG_LENGTH(sizeof(*ifa))) {
             ifa = NLMSG_DATA(nlh);
             ifa->ifa_index = tswap32(ifa->ifa_index);
-            target_to_host_addr_rtattr(IFA_RTA(ifa), nlh->nlmsg_len -
-                                       NLMSG_LENGTH(sizeof(*ifa)));
+            target_to_host_addr_rtattr(
+                IFA_RTA(ifa), nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*ifa)));
         }
         break;
     case RTM_NEWROUTE:
@@ -1496,8 +1475,8 @@ static abi_long target_to_host_data_route(struct nlmsghdr *nlh)
         if (nlh->nlmsg_len >= NLMSG_LENGTH(sizeof(*rtm))) {
             rtm = NLMSG_DATA(nlh);
             rtm->rtm_flags = tswap32(rtm->rtm_flags);
-            target_to_host_route_rtattr(RTM_RTA(rtm), nlh->nlmsg_len -
-                                        NLMSG_LENGTH(sizeof(*rtm)));
+            target_to_host_route_rtattr(
+                RTM_RTA(rtm), nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*rtm)));
         }
         break;
     case RTM_NEWRULE:
@@ -1641,9 +1620,8 @@ TargetFdTrans target_netlink_audit_trans = {
 
 /* signalfd siginfo conversion */
 
-static void
-host_to_target_signalfd_siginfo(struct signalfd_siginfo *tinfo,
-                                const struct signalfd_siginfo *info)
+static void host_to_target_signalfd_siginfo(struct signalfd_siginfo *tinfo,
+                                            const struct signalfd_siginfo *info)
 {
     int sig = host_to_target_signal(info->ssi_signo);
 
@@ -1652,9 +1630,8 @@ host_to_target_signalfd_siginfo(struct signalfd_siginfo *tinfo,
      */
 
 #ifdef BUS_MCEERR_AO
-    if (tinfo->ssi_signo == SIGBUS &&
-        (tinfo->ssi_code == BUS_MCEERR_AR ||
-         tinfo->ssi_code == BUS_MCEERR_AO)) {
+    if (tinfo->ssi_signo == SIGBUS && (tinfo->ssi_code == BUS_MCEERR_AR ||
+                                       tinfo->ssi_code == BUS_MCEERR_AO)) {
         uint16_t *ssi_addr_lsb = (uint16_t *)(&info->ssi_addr + 1);
         uint16_t *tssi_addr_lsb = (uint16_t *)(&tinfo->ssi_addr + 1);
         *tssi_addr_lsb = tswap16(*ssi_addr_lsb);
@@ -1720,8 +1697,8 @@ TargetFdTrans target_timerfd_trans = {
     .host_to_target_data = swap_data_u64,
 };
 
-#if defined(CONFIG_INOTIFY) && (defined(TARGET_NR_inotify_init) || \
-        defined(TARGET_NR_inotify_init1))
+#if defined(CONFIG_INOTIFY) && \
+    (defined(TARGET_NR_inotify_init) || defined(TARGET_NR_inotify_init1))
 static abi_long host_to_target_data_inotify(void *buf, size_t len)
 {
     struct inotify_event *ev;

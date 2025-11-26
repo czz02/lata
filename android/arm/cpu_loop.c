@@ -26,52 +26,58 @@
 #include "semihosting/common-semi.h"
 #include "target/arm/syndrome.h"
 
-#define get_user_code_u32(x, gaddr, env)                \
-    ({ abi_long __r = get_user_u32((x), (gaddr));       \
-        if (!__r && bswap_code(arm_sctlr_b(env))) {     \
-            (x) = bswap32(x);                           \
-        }                                               \
-        __r;                                            \
+#define get_user_code_u32(x, gaddr, env)            \
+    ({                                              \
+        abi_long __r = get_user_u32((x), (gaddr));  \
+        if (!__r && bswap_code(arm_sctlr_b(env))) { \
+            (x) = bswap32(x);                       \
+        }                                           \
+        __r;                                        \
     })
 
-#define get_user_code_u16(x, gaddr, env)                \
-    ({ abi_long __r = get_user_u16((x), (gaddr));       \
-        if (!__r && bswap_code(arm_sctlr_b(env))) {     \
-            (x) = bswap16(x);                           \
-        }                                               \
-        __r;                                            \
+#define get_user_code_u16(x, gaddr, env)            \
+    ({                                              \
+        abi_long __r = get_user_u16((x), (gaddr));  \
+        if (!__r && bswap_code(arm_sctlr_b(env))) { \
+            (x) = bswap16(x);                       \
+        }                                           \
+        __r;                                        \
     })
 
-#define get_user_data_u32(x, gaddr, env)                \
-    ({ abi_long __r = get_user_u32((x), (gaddr));       \
-        if (!__r && arm_cpu_bswap_data(env)) {          \
-            (x) = bswap32(x);                           \
-        }                                               \
-        __r;                                            \
+#define get_user_data_u32(x, gaddr, env)           \
+    ({                                             \
+        abi_long __r = get_user_u32((x), (gaddr)); \
+        if (!__r && arm_cpu_bswap_data(env)) {     \
+            (x) = bswap32(x);                      \
+        }                                          \
+        __r;                                       \
     })
 
-#define get_user_data_u16(x, gaddr, env)                \
-    ({ abi_long __r = get_user_u16((x), (gaddr));       \
-        if (!__r && arm_cpu_bswap_data(env)) {          \
-            (x) = bswap16(x);                           \
-        }                                               \
-        __r;                                            \
+#define get_user_data_u16(x, gaddr, env)           \
+    ({                                             \
+        abi_long __r = get_user_u16((x), (gaddr)); \
+        if (!__r && arm_cpu_bswap_data(env)) {     \
+            (x) = bswap16(x);                      \
+        }                                          \
+        __r;                                       \
     })
 
-#define put_user_data_u32(x, gaddr, env)                \
-    ({ typeof(x) __x = (x);                             \
-        if (arm_cpu_bswap_data(env)) {                  \
-            __x = bswap32(__x);                         \
-        }                                               \
-        put_user_u32(__x, (gaddr));                     \
+#define put_user_data_u32(x, gaddr, env) \
+    ({                                   \
+        typeof(x) __x = (x);             \
+        if (arm_cpu_bswap_data(env)) {   \
+            __x = bswap32(__x);          \
+        }                                \
+        put_user_u32(__x, (gaddr));      \
     })
 
-#define put_user_data_u16(x, gaddr, env)                \
-    ({ typeof(x) __x = (x);                             \
-        if (arm_cpu_bswap_data(env)) {                  \
-            __x = bswap16(__x);                         \
-        }                                               \
-        put_user_u16(__x, (gaddr));                     \
+#define put_user_data_u16(x, gaddr, env) \
+    ({                                   \
+        typeof(x) __x = (x);             \
+        if (arm_cpu_bswap_data(env)) {   \
+            __x = bswap16(__x);          \
+        }                                \
+        put_user_u16(__x, (gaddr));      \
     })
 
 /*
@@ -94,8 +100,9 @@ static void *atomic_mmu_lookup(CPUArchState *env, uint32_t addr, int size)
     page_flags = page_get_flags(addr);
     if (unlikely((page_flags & need_flags) != need_flags)) {
         force_sig_fault(TARGET_SIGSEGV,
-                        page_flags & PAGE_VALID ?
-                        TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR, addr);
+                        page_flags & PAGE_VALID ? TARGET_SEGV_ACCERR :
+                                                  TARGET_SEGV_MAPERR,
+                        addr);
         return NULL;
     }
 
@@ -203,15 +210,15 @@ static void arm_kernel_cmpxchg64_helper(CPUARMState *env)
     env->regs[0] = cpsr ? 0 : -1;
     return;
 
- segv:
+segv:
     force_sig_fault(TARGET_SIGSEGV,
-                    page_get_flags(addr) & PAGE_VALID ?
-                    TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR, addr);
+                    page_get_flags(addr) & PAGE_VALID ? TARGET_SEGV_ACCERR :
+                                                        TARGET_SEGV_MAPERR,
+                    addr);
 }
 
 /* Handle a jump to the kernel code page.  */
-static int
-do_kernel_trap(CPUARMState *env)
+static int do_kernel_trap(CPUARMState *env)
 {
     uint32_t addr;
 
@@ -323,136 +330,125 @@ void cpu_loop(CPUARMState *env)
     unsigned int n, insn;
     abi_ulong ret;
 
-    for(;;) {
+    for (;;) {
         cpu_exec_start(cs);
         trapnr = cpu_exec(cs);
         cpu_exec_end(cs);
         process_queued_cpu_work(cs);
 
-        switch(trapnr) {
+        switch (trapnr) {
         case EXCP_UDEF:
         case EXCP_NOCP:
-        case EXCP_INVSTATE:
-            {
-                uint32_t opcode;
+        case EXCP_INVSTATE: {
+            uint32_t opcode;
 
-                /* we handle the FPU emulation here, as Linux */
-                /* we get the opcode */
-                /* FIXME - what to do if get_user() fails? */
-                get_user_code_u32(opcode, env->regs[15], env);
+            /* we handle the FPU emulation here, as Linux */
+            /* we get the opcode */
+            /* FIXME - what to do if get_user() fails? */
+            get_user_code_u32(opcode, env->regs[15], env);
 
-                /*
-                 * The Linux kernel treats some UDF patterns specially
-                 * to use as breakpoints (instead of the architectural
-                 * bkpt insn). These should trigger a SIGTRAP rather
-                 * than SIGILL.
-                 */
-                if (insn_is_linux_bkpt(opcode, env->thumb)) {
-                    goto excp_debug;
-                }
-
-                if (!env->thumb && emulate_arm_fpa11(env, opcode)) {
-                    break;
-                }
-
-                force_sig_fault(TARGET_SIGILL, TARGET_ILL_ILLOPN,
-                                env->regs[15]);
+            /*
+             * The Linux kernel treats some UDF patterns specially
+             * to use as breakpoints (instead of the architectural
+             * bkpt insn). These should trigger a SIGTRAP rather
+             * than SIGILL.
+             */
+            if (insn_is_linux_bkpt(opcode, env->thumb)) {
+                goto excp_debug;
             }
-            break;
-        case EXCP_SWI:
-            {
-                env->eabi = true;
-                /* system call */
-                if (env->thumb) {
-                    /* Thumb is always EABI style with syscall number in r7 */
+
+            if (!env->thumb && emulate_arm_fpa11(env, opcode)) {
+                break;
+            }
+
+            force_sig_fault(TARGET_SIGILL, TARGET_ILL_ILLOPN, env->regs[15]);
+        } break;
+        case EXCP_SWI: {
+            env->eabi = true;
+            /* system call */
+            if (env->thumb) {
+                /* Thumb is always EABI style with syscall number in r7 */
+                n = env->regs[7];
+            } else {
+                /*
+                 * Equivalent of kernel CONFIG_OABI_COMPAT: read the
+                 * Arm SVC insn to extract the immediate, which is the
+                 * syscall number in OABI.
+                 */
+                /* FIXME - what to do if get_user() fails? */
+                get_user_code_u32(insn, env->regs[15] - 4, env);
+                n = insn & 0xffffff;
+                if (n == 0) {
+                    /* zero immediate: EABI, syscall number in r7 */
                     n = env->regs[7];
                 } else {
                     /*
-                     * Equivalent of kernel CONFIG_OABI_COMPAT: read the
-                     * Arm SVC insn to extract the immediate, which is the
-                     * syscall number in OABI.
+                     * This XOR matches the kernel code: an immediate
+                     * in the valid range (0x900000 .. 0x9fffff) is
+                     * converted into the correct EABI-style syscall
+                     * number; invalid immediates end up as values
+                     * > 0xfffff and are handled below as out-of-range.
                      */
-                    /* FIXME - what to do if get_user() fails? */
-                    get_user_code_u32(insn, env->regs[15] - 4, env);
-                    n = insn & 0xffffff;
-                    if (n == 0) {
-                        /* zero immediate: EABI, syscall number in r7 */
-                        n = env->regs[7];
-                    } else {
-                        /*
-                         * This XOR matches the kernel code: an immediate
-                         * in the valid range (0x900000 .. 0x9fffff) is
-                         * converted into the correct EABI-style syscall
-                         * number; invalid immediates end up as values
-                         * > 0xfffff and are handled below as out-of-range.
-                         */
-                        n ^= ARM_SYSCALL_BASE;
-                        env->eabi = false;
-                    }
-                }
-
-                if (n > ARM_NR_BASE) {
-                    switch (n) {
-                    case ARM_NR_cacheflush:
-                        /* nop */
-                        break;
-                    case ARM_NR_set_tls:
-                        cpu_set_tls(env, env->regs[0]);
-                        env->regs[0] = 0;
-                        break;
-                    case ARM_NR_breakpoint:
-                        env->regs[15] -= env->thumb ? 2 : 4;
-                        goto excp_debug;
-                    case ARM_NR_get_tls:
-                        env->regs[0] = cpu_get_tls(env);
-                        break;
-                    default:
-                        if (n < 0xf0800) {
-                            /*
-                             * Syscalls 0xf0000..0xf07ff (or 0x9f0000..
-                             * 0x9f07ff in OABI numbering) are defined
-                             * to return -ENOSYS rather than raising
-                             * SIGILL. Note that we have already
-                             * removed the 0x900000 prefix.
-                             */
-                            qemu_log_mask(LOG_UNIMP,
-                                "qemu: Unsupported ARM syscall: 0x%x\n",
-                                          n);
-                            env->regs[0] = -TARGET_ENOSYS;
-                        } else {
-                            /*
-                             * Otherwise SIGILL. This includes any SWI with
-                             * immediate not originally 0x9fxxxx, because
-                             * of the earlier XOR.
-                             * Like the real kernel, we report the addr of the
-                             * SWI in the siginfo si_addr but leave the PC
-                             * pointing at the insn after the SWI.
-                             */
-                            abi_ulong faultaddr = env->regs[15];
-                            faultaddr -= env->thumb ? 2 : 4;
-                            force_sig_fault(TARGET_SIGILL, TARGET_ILL_ILLTRP,
-                                            faultaddr);
-                        }
-                        break;
-                    }
-                } else {
-                    ret = do_syscall(env,
-                                     n,
-                                     env->regs[0],
-                                     env->regs[1],
-                                     env->regs[2],
-                                     env->regs[3],
-                                     env->regs[4],
-                                     env->regs[5],
-                                     0, 0);
-                    if (ret == -QEMU_ERESTARTSYS) {
-                        env->regs[15] -= env->thumb ? 2 : 4;
-                    } else if (ret != -QEMU_ESIGRETURN) {
-                        env->regs[0] = ret;
-                    }
+                    n ^= ARM_SYSCALL_BASE;
+                    env->eabi = false;
                 }
             }
-            break;
+
+            if (n > ARM_NR_BASE) {
+                switch (n) {
+                case ARM_NR_cacheflush:
+                    /* nop */
+                    break;
+                case ARM_NR_set_tls:
+                    cpu_set_tls(env, env->regs[0]);
+                    env->regs[0] = 0;
+                    break;
+                case ARM_NR_breakpoint:
+                    env->regs[15] -= env->thumb ? 2 : 4;
+                    goto excp_debug;
+                case ARM_NR_get_tls:
+                    env->regs[0] = cpu_get_tls(env);
+                    break;
+                default:
+                    if (n < 0xf0800) {
+                        /*
+                         * Syscalls 0xf0000..0xf07ff (or 0x9f0000..
+                         * 0x9f07ff in OABI numbering) are defined
+                         * to return -ENOSYS rather than raising
+                         * SIGILL. Note that we have already
+                         * removed the 0x900000 prefix.
+                         */
+                        qemu_log_mask(LOG_UNIMP,
+                                      "qemu: Unsupported ARM syscall: 0x%x\n",
+                                      n);
+                        env->regs[0] = -TARGET_ENOSYS;
+                    } else {
+                        /*
+                         * Otherwise SIGILL. This includes any SWI with
+                         * immediate not originally 0x9fxxxx, because
+                         * of the earlier XOR.
+                         * Like the real kernel, we report the addr of the
+                         * SWI in the siginfo si_addr but leave the PC
+                         * pointing at the insn after the SWI.
+                         */
+                        abi_ulong faultaddr = env->regs[15];
+                        faultaddr -= env->thumb ? 2 : 4;
+                        force_sig_fault(TARGET_SIGILL, TARGET_ILL_ILLTRP,
+                                        faultaddr);
+                    }
+                    break;
+                }
+            } else {
+                ret =
+                    do_syscall(env, n, env->regs[0], env->regs[1], env->regs[2],
+                               env->regs[3], env->regs[4], env->regs[5], 0, 0);
+                if (ret == -QEMU_ERESTARTSYS) {
+                    env->regs[15] -= env->thumb ? 2 : 4;
+                } else if (ret != -QEMU_ESIGRETURN) {
+                    env->regs[0] = ret;
+                }
+            }
+        } break;
         case EXCP_SEMIHOST:
             do_common_semihosting(cs);
             env->regs[15] += env->thumb ? 2 : 4;
@@ -494,7 +490,7 @@ void cpu_loop(CPUARMState *env)
             break;
         case EXCP_KERNEL_TRAP:
             if (do_kernel_trap(env))
-              goto error;
+                goto error;
             break;
         case EXCP_YIELD:
             /* nothing to do here for user-mode, just resume guest code */
@@ -504,7 +500,8 @@ void cpu_loop(CPUARMState *env)
             break;
         default:
         error:
-            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
+            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n",
+                      trapnr);
             abort();
         }
         process_pending_signals(env);
@@ -518,15 +515,14 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
     struct image_info *info = ts->info;
     int i;
 
-    cpsr_write(env, regs->uregs[16], CPSR_USER | CPSR_EXEC,
-               CPSRWriteByInstr);
-    for(i = 0; i < 16; i++) {
+    cpsr_write(env, regs->uregs[16], CPSR_USER | CPSR_EXEC, CPSRWriteByInstr);
+    for (i = 0; i < 16; i++) {
         env->regs[i] = regs->uregs[i];
     }
 #if TARGET_BIG_ENDIAN
     /* Enable BE8.  */
-    if (EF_ARM_EABI_VERSION(info->elf_flags) >= EF_ARM_EABI_VER4
-        && (info->elf_flags & EF_ARM_BE8)) {
+    if (EF_ARM_EABI_VERSION(info->elf_flags) >= EF_ARM_EABI_VER4 &&
+        (info->elf_flags & EF_ARM_BE8)) {
         env->uncached_cpsr |= CPSR_E;
         env->cp15.sctlr_el[1] |= SCTLR_E0E;
     } else {

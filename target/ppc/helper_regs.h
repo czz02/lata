@@ -27,7 +27,9 @@ void cpu_interrupt_exittb(CPUState *cs);
 int hreg_store_msr(CPUPPCState *env, target_ulong value, int alter_hv);
 
 #ifdef CONFIG_USER_ONLY
-static inline void check_tlb_flush(CPUPPCState *env, bool global) { }
+static inline void check_tlb_flush(CPUPPCState *env, bool global)
+{
+}
 #else
 void check_tlb_flush(CPUPPCState *env, bool global);
 #endif

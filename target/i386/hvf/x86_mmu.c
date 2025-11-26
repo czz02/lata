@@ -32,17 +32,17 @@
 #define pte_large_page(pte) (pte & PT_PS)
 #define pte_global_access(pte) (pte & PT_GLOBAL)
 
-#define PAE_CR3_MASK                (~0x1fllu)
-#define LEGACY_CR3_MASK             (0xffffffff)
+#define PAE_CR3_MASK (~0x1fllu)
+#define LEGACY_CR3_MASK (0xffffffff)
 
-#define LEGACY_PTE_PAGE_MASK        (0xffffffffllu << 12)
-#define PAE_PTE_PAGE_MASK           ((-1llu << 12) & ((1llu << 52) - 1))
-#define PAE_PTE_LARGE_PAGE_MASK     ((-1llu << (21)) & ((1llu << 52) - 1))
+#define LEGACY_PTE_PAGE_MASK (0xffffffffllu << 12)
+#define PAE_PTE_PAGE_MASK ((-1llu << 12) & ((1llu << 52) - 1))
+#define PAE_PTE_LARGE_PAGE_MASK ((-1llu << (21)) & ((1llu << 52) - 1))
 
 struct gpt_translation {
-    target_ulong  gva;
+    target_ulong gva;
     uint64_t gpa;
-    int    err_code;
+    int err_code;
     uint64_t pte[5];
     bool write_access;
     bool user_access;
@@ -64,7 +64,8 @@ static int gpt_top_level(struct CPUState *cpu, bool pae)
 static inline int gpt_entry(target_ulong addr, int level, bool pae)
 {
     int level_shift = pae ? 9 : 10;
-    return (addr >> (level_shift * (level - 1) + 12)) & ((1 << level_shift) - 1);
+    return (addr >> (level_shift * (level - 1) + 12)) &
+           ((1 << level_shift) - 1);
 }
 
 static inline int pte_size(bool pae)
@@ -141,7 +142,7 @@ static bool test_pt_entry(struct CPUState *cpu, struct gpt_translation *pt,
     if (pae && pt->exec_access && !pte_exec_access(pte)) {
         return false;
     }
-    
+
 exit:
     /* TODO: check reserved bits */
     return true;
@@ -165,7 +166,6 @@ static inline uint64_t large_page_gpa(struct gpt_translation *pt, bool pae)
 }
 
 
-
 static bool walk_gpt(struct CPUState *cpu, target_ulong addr, int err_code,
                      struct gpt_translation *pt, bool pae)
 {
@@ -173,7 +173,7 @@ static bool walk_gpt(struct CPUState *cpu, target_ulong addr, int err_code,
     bool is_large = false;
     target_ulong cr3 = rvmcs(cpu->accel->fd, VMCS_GUEST_CR3);
     uint64_t page_mask = pae ? PAE_PTE_PAGE_MASK : LEGACY_PTE_PAGE_MASK;
-    
+
     memset(pt, 0, sizeof(*pt));
     top_level = gpt_top_level(cpu, pae);
 
@@ -182,7 +182,7 @@ static bool walk_gpt(struct CPUState *cpu, target_ulong addr, int err_code,
     pt->user_access = (err_code & MMU_PAGE_US);
     pt->write_access = (err_code & MMU_PAGE_WT);
     pt->exec_access = (err_code & MMU_PAGE_NX);
-    
+
     for (level = top_level; level > 0; level--) {
         get_pt_entry(cpu, pt, level, pae);
 
@@ -225,7 +225,8 @@ bool mmu_gva_to_gpa(struct CPUState *cpu, target_ulong gva, uint64_t *gpa)
     return false;
 }
 
-void vmx_write_mem(struct CPUState *cpu, target_ulong gva, void *data, int bytes)
+void vmx_write_mem(struct CPUState *cpu, target_ulong gva, void *data,
+                   int bytes)
 {
     uint64_t gpa;
 

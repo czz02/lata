@@ -29,7 +29,7 @@
 #include "exec/helper-proto.h"
 
 
-//#define CRIS_HELPER_DEBUG
+// #define CRIS_HELPER_DEBUG
 
 
 #ifdef CRIS_HELPER_DEBUG
@@ -37,7 +37,9 @@
 #define D_LOG(...) qemu_log(__VA_ARGS__)
 #else
 #define D(x)
-#define D_LOG(...) do { } while (0)
+#define D_LOG(...) \
+    do {           \
+    } while (0)
 #endif
 
 static void cris_shift_ccs(CPUCRISState *env)
@@ -50,8 +52,8 @@ static void cris_shift_ccs(CPUCRISState *env)
 }
 
 bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                       MMUAccessType access_type, int mmu_idx,
-                       bool probe, uintptr_t retaddr)
+                       MMUAccessType access_type, int mmu_idx, bool probe,
+                       uintptr_t retaddr)
 {
     CRISCPU *cpu = CRIS_CPU(cs);
     CPUCRISState *env = &cpu->env;
@@ -68,8 +70,8 @@ bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
          */
         phy = res.phy & ~0x80000000;
         prot = res.prot;
-        tlb_set_page(cs, address & TARGET_PAGE_MASK, phy,
-                     prot, mmu_idx, TARGET_PAGE_SIZE);
+        tlb_set_page(cs, address & TARGET_PAGE_MASK, phy, prot, mmu_idx,
+                     TARGET_PAGE_SIZE);
         return true;
     }
 
@@ -78,9 +80,10 @@ bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
     }
 
     if (cs->exception_index == EXCP_BUSFAULT) {
-        cpu_abort(cs, "CRIS: Illegal recursive bus fault."
-                      "addr=%" VADDR_PRIx " access_type=%d\n",
-                      address, access_type);
+        cpu_abort(cs,
+                  "CRIS: Illegal recursive bus fault."
+                  "addr=%" VADDR_PRIx " access_type=%d\n",
+                  address, access_type);
     }
 
     env->pregs[PR_EDA] = address;
@@ -101,8 +104,7 @@ void crisv10_cpu_do_interrupt(CPUState *cs)
     CPUCRISState *env = &cpu->env;
     int ex_vec = -1;
 
-    D_LOG("exception index=%d interrupt_req=%d\n",
-          cs->exception_index,
+    D_LOG("exception index=%d interrupt_req=%d\n", cs->exception_index,
           cs->interrupt_request);
 
     if (env->dslot) {
@@ -151,10 +153,8 @@ void crisv10_cpu_do_interrupt(CPUState *cs)
     env->pregs[PR_CCS] |= F_FLAG_V10; /* set F.  */
 
     qemu_log_mask(CPU_LOG_INT, "%s isr=%x vec=%x ccs=%x pid=%d erp=%x\n",
-                  __func__, env->pc, ex_vec,
-                  env->pregs[PR_CCS],
-                  env->pregs[PR_PID],
-                  env->pregs[PR_ERP]);
+                  __func__, env->pc, ex_vec, env->pregs[PR_CCS],
+                  env->pregs[PR_PID], env->pregs[PR_ERP]);
 }
 
 void cris_cpu_do_interrupt(CPUState *cs)
@@ -163,8 +163,7 @@ void cris_cpu_do_interrupt(CPUState *cs)
     CPUCRISState *env = &cpu->env;
     int ex_vec = -1;
 
-    D_LOG("exception index=%d interrupt_req=%d\n",
-          cs->exception_index,
+    D_LOG("exception index=%d interrupt_req=%d\n", cs->exception_index,
           cs->interrupt_request);
 
     switch (cs->exception_index) {
@@ -202,11 +201,8 @@ void cris_cpu_do_interrupt(CPUState *cs)
     if (env->dslot) {
         D_LOG("excp isr=%x PC=%x ds=%d SP=%x"
               " ERP=%x pid=%x ccs=%x cc=%d %x\n",
-              ex_vec, env->pc, env->dslot,
-              env->regs[R_SP],
-              env->pregs[PR_ERP], env->pregs[PR_PID],
-              env->pregs[PR_CCS],
-              env->cc_op, env->cc_mask);
+              ex_vec, env->pc, env->dslot, env->regs[R_SP], env->pregs[PR_ERP],
+              env->pregs[PR_PID], env->pregs[PR_CCS], env->cc_op, env->cc_mask);
         /* We loose the btarget, btaken state here so rexec the
            branch.  */
         env->pregs[PR_ERP] -= env->dslot;
@@ -232,11 +228,8 @@ void cris_cpu_do_interrupt(CPUState *cs)
        bus faults.  */
     cs->exception_index = -1;
 
-    D_LOG("%s isr=%x vec=%x ccs=%x pid=%d erp=%x\n",
-          __func__, env->pc, ex_vec,
-          env->pregs[PR_CCS],
-          env->pregs[PR_PID],
-          env->pregs[PR_ERP]);
+    D_LOG("%s isr=%x vec=%x ccs=%x pid=%d erp=%x\n", __func__, env->pc, ex_vec,
+          env->pregs[PR_CCS], env->pregs[PR_PID], env->pregs[PR_ERP]);
 }
 
 hwaddr cris_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
@@ -266,9 +259,8 @@ bool cris_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
     CPUCRISState *env = &cpu->env;
     bool ret = false;
 
-    if (interrupt_request & CPU_INTERRUPT_HARD
-        && (env->pregs[PR_CCS] & I_FLAG)
-        && !env->locked_irq) {
+    if (interrupt_request & CPU_INTERRUPT_HARD &&
+        (env->pregs[PR_CCS] & I_FLAG) && !env->locked_irq) {
         cs->exception_index = EXCP_IRQ;
         cc->tcg_ops->do_interrupt(cs);
         ret = true;

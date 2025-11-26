@@ -94,8 +94,8 @@ static void xtensa_cpu_reset_hold(Object *obj)
     XtensaCPU *cpu = XTENSA_CPU(s);
     XtensaCPUClass *xcc = XTENSA_CPU_GET_CLASS(cpu);
     CPUXtensaState *env = &cpu->env;
-    bool dfpu = xtensa_option_enabled(env->config,
-                                      XTENSA_OPTION_DFP_COPROCESSOR);
+    bool dfpu =
+        xtensa_option_enabled(env->config, XTENSA_OPTION_DFP_COPROCESSOR);
 
     if (xcc->parent_phases.hold) {
         xcc->parent_phases.hold(obj);
@@ -104,13 +104,13 @@ static void xtensa_cpu_reset_hold(Object *obj)
     env->pc = env->config->exception_vector[EXC_RESET0 + env->static_vectors];
     env->sregs[LITBASE] &= ~1;
 #ifndef CONFIG_USER_ONLY
-    env->sregs[PS] = xtensa_option_enabled(env->config,
-            XTENSA_OPTION_INTERRUPT) ? 0x1f : 0x10;
+    env->sregs[PS] =
+        xtensa_option_enabled(env->config, XTENSA_OPTION_INTERRUPT) ? 0x1f :
+                                                                      0x10;
     env->pending_irq_level = 0;
 #else
     env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
-    if (xtensa_option_enabled(env->config,
-                              XTENSA_OPTION_WINDOWED_REGISTER) &&
+    if (xtensa_option_enabled(env->config, XTENSA_OPTION_WINDOWED_REGISTER) &&
         !xtensa_abi_call0()) {
         env->sregs[PS] |= PS_WOE;
     }
@@ -119,8 +119,8 @@ static void xtensa_cpu_reset_hold(Object *obj)
     env->sregs[VECBASE] = env->config->vecbase;
     env->sregs[IBREAKENABLE] = 0;
     env->sregs[MEMCTL] = MEMCTL_IL0EN & env->config->memctl_mask;
-    env->sregs[ATOMCTL] = xtensa_option_enabled(env->config,
-            XTENSA_OPTION_ATOMCTL) ? 0x28 : 0x15;
+    env->sregs[ATOMCTL] =
+        xtensa_option_enabled(env->config, XTENSA_OPTION_ATOMCTL) ? 0x28 : 0x15;
     env->sregs[CONFIGID0] = env->config->configid[0];
     env->sregs[CONFIGID1] = env->config->configid[1];
     env->exclusive_addr = -1;

@@ -22,7 +22,7 @@
 #include "qemu.h"
 #include "exec/user/thunk.h"
 
-//#define DEBUG
+// #define DEBUG
 
 static unsigned int max_struct_entries;
 StructEntry *struct_entries;
@@ -34,7 +34,7 @@ static inline const argtype *thunk_type_next(const argtype *type_ptr)
     int type;
 
     type = *type_ptr++;
-    switch(type) {
+    switch (type) {
     case TYPE_CHAR:
     case TYPE_SHORT:
     case TYPE_INT:
@@ -82,8 +82,7 @@ void thunk_register_struct(int id, const char *name, const argtype *types)
     se->nb_fields = nb_fields;
     se->name = name;
 #ifdef DEBUG
-    printf("struct %s: id=%d nb_fields=%d\n",
-           se->name, id, se->nb_fields);
+    printf("struct %s: id=%d nb_fields=%d\n", se->name, id, se->nb_fields);
 #endif
     /* now we can alloc the data */
 
@@ -92,7 +91,7 @@ void thunk_register_struct(int id, const char *name, const argtype *types)
         max_align = 1;
         se->field_offsets[i] = g_new(int, nb_fields);
         type_ptr = se->field_types;
-        for(j = 0;j < nb_fields; j++) {
+        for (j = 0; j < nb_fields; j++) {
             size = thunk_type_size(type_ptr, i);
             align = thunk_type_align(type_ptr, i);
             offset = (offset + align - 1) & ~(align - 1);
@@ -106,8 +105,8 @@ void thunk_register_struct(int id, const char *name, const argtype *types)
         se->size[i] = offset;
         se->align[i] = max_align;
 #ifdef DEBUG
-        printf("%s: size=%d align=%d\n",
-               i == THUNK_HOST ? "host" : "target", offset, max_align);
+        printf("%s: size=%d align=%d\n", i == THUNK_HOST ? "host" : "target",
+               offset, max_align);
 #endif
     }
 }
@@ -131,7 +130,7 @@ const argtype *thunk_convert(void *dst, const void *src,
     int type;
 
     type = *type_ptr++;
-    switch(type) {
+    switch (type) {
     case TYPE_CHAR:
         *(uint8_t *)dst = *(uint8_t *)src;
         break;
@@ -190,8 +189,7 @@ const argtype *thunk_convert(void *dst, const void *src,
 #else
 #warning unsupported conversion
 #endif
-    case TYPE_OLDDEVT:
-    {
+    case TYPE_OLDDEVT: {
         uint64_t val = 0;
         switch (thunk_type_size(type_ptr - 1, !to_host)) {
         case 2:
@@ -217,54 +215,50 @@ const argtype *thunk_convert(void *dst, const void *src,
         }
         break;
     }
-    case TYPE_ARRAY:
-        {
-            int array_length, i, dst_size, src_size;
-            const uint8_t *s;
-            uint8_t  *d;
+    case TYPE_ARRAY: {
+        int array_length, i, dst_size, src_size;
+        const uint8_t *s;
+        uint8_t *d;
 
-            array_length = *type_ptr++;
-            dst_size = thunk_type_size(type_ptr, to_host);
-            src_size = thunk_type_size(type_ptr, 1 - to_host);
+        array_length = *type_ptr++;
+        dst_size = thunk_type_size(type_ptr, to_host);
+        src_size = thunk_type_size(type_ptr, 1 - to_host);
+        d = dst;
+        s = src;
+        for (i = 0; i < array_length; i++) {
+            thunk_convert(d, s, type_ptr, to_host);
+            d += dst_size;
+            s += src_size;
+        }
+        type_ptr = thunk_type_next(type_ptr);
+    } break;
+    case TYPE_STRUCT: {
+        int i;
+        const StructEntry *se;
+        const uint8_t *s;
+        uint8_t *d;
+        const argtype *field_types;
+        const int *dst_offsets, *src_offsets;
+
+        assert(*type_ptr < max_struct_entries);
+        se = struct_entries + *type_ptr++;
+        if (se->convert[0] != NULL) {
+            /* specific conversion is needed */
+            (*se->convert[to_host])(dst, src);
+        } else {
+            /* standard struct conversion */
+            field_types = se->field_types;
+            dst_offsets = se->field_offsets[to_host];
+            src_offsets = se->field_offsets[1 - to_host];
             d = dst;
             s = src;
-            for(i = 0;i < array_length; i++) {
-                thunk_convert(d, s, type_ptr, to_host);
-                d += dst_size;
-                s += src_size;
-            }
-            type_ptr = thunk_type_next(type_ptr);
-        }
-        break;
-    case TYPE_STRUCT:
-        {
-            int i;
-            const StructEntry *se;
-            const uint8_t *s;
-            uint8_t  *d;
-            const argtype *field_types;
-            const int *dst_offsets, *src_offsets;
-
-            assert(*type_ptr < max_struct_entries);
-            se = struct_entries + *type_ptr++;
-            if (se->convert[0] != NULL) {
-                /* specific conversion is needed */
-                (*se->convert[to_host])(dst, src);
-            } else {
-                /* standard struct conversion */
-                field_types = se->field_types;
-                dst_offsets = se->field_offsets[to_host];
-                src_offsets = se->field_offsets[1 - to_host];
-                d = dst;
-                s = src;
-                for(i = 0;i < se->nb_fields; i++) {
-                    field_types = thunk_convert(d + dst_offsets[i],
-                                                s + src_offsets[i],
-                                                field_types, to_host);
-                }
+            for (i = 0; i < se->nb_fields; i++) {
+                field_types =
+                    thunk_convert(d + dst_offsets[i], s + src_offsets[i],
+                                  field_types, to_host);
             }
         }
-        break;
+    } break;
     default:
         fprintf(stderr, "Invalid type 0x%x\n", type);
         break;
@@ -335,8 +329,7 @@ const argtype *thunk_print(void *arg, const argtype *type_ptr)
         qemu_log("%" PRIu64, tswap64(*(uint64_t *)arg));
         break;
 #endif
-    case TYPE_OLDDEVT:
-    {
+    case TYPE_OLDDEVT: {
         uint64_t val = 0;
         switch (thunk_type_size(type_ptr - 1, 1)) {
         case 2:
@@ -360,71 +353,66 @@ const argtype *thunk_print(void *arg, const argtype *type_ptr)
             qemu_log("%" PRIu64, tswap64(val));
             break;
         }
-    }
-    break;
-    case TYPE_ARRAY:
-        {
-            int i, array_length, arg_size;
-            uint8_t *a;
-            int is_string = 0;
+    } break;
+    case TYPE_ARRAY: {
+        int i, array_length, arg_size;
+        uint8_t *a;
+        int is_string = 0;
 
-            array_length = *type_ptr++;
-            arg_size = thunk_type_size(type_ptr, 0);
+        array_length = *type_ptr++;
+        arg_size = thunk_type_size(type_ptr, 0);
+        a = arg;
+
+        if (*type_ptr == TYPE_CHAR) {
+            qemu_log("\"");
+            is_string = 1;
+        } else {
+            qemu_log("[");
+        }
+
+        for (i = 0; i < array_length; i++) {
+            if (i > 0 && !is_string) {
+                qemu_log(",");
+            }
+            thunk_print(a, type_ptr);
+            a += arg_size;
+        }
+
+        if (is_string) {
+            qemu_log("\"");
+        } else {
+            qemu_log("]");
+        }
+
+        type_ptr = thunk_type_next(type_ptr);
+    } break;
+    case TYPE_STRUCT: {
+        int i;
+        const StructEntry *se;
+        uint8_t *a;
+        const argtype *field_types;
+        const int *arg_offsets;
+
+        se = struct_entries + *type_ptr++;
+
+        if (se->print != NULL) {
+            se->print(arg);
+        } else {
             a = arg;
 
-            if (*type_ptr == TYPE_CHAR) {
-                qemu_log("\"");
-                is_string = 1;
-            } else {
-                qemu_log("[");
-            }
+            field_types = se->field_types;
+            arg_offsets = se->field_offsets[0];
 
-            for (i = 0; i < array_length; i++) {
-                if (i > 0 && !is_string) {
+            qemu_log("{");
+            for (i = 0; i < se->nb_fields; i++) {
+                if (i > 0) {
                     qemu_log(",");
                 }
-                thunk_print(a, type_ptr);
-                a += arg_size;
+                field_types = thunk_print(a + arg_offsets[i], field_types);
             }
-
-            if (is_string) {
-                qemu_log("\"");
-            } else {
-                qemu_log("]");
-            }
-
-            type_ptr = thunk_type_next(type_ptr);
+            qemu_log("}");
         }
-        break;
-    case TYPE_STRUCT:
-        {
-            int i;
-            const StructEntry *se;
-            uint8_t  *a;
-            const argtype *field_types;
-            const int *arg_offsets;
-
-            se = struct_entries + *type_ptr++;
-
-            if (se->print != NULL) {
-                se->print(arg);
-            } else {
-                a = arg;
-
-                field_types = se->field_types;
-                arg_offsets = se->field_offsets[0];
-
-                qemu_log("{");
-                for (i = 0; i < se->nb_fields; i++) {
-                    if (i > 0) {
-                        qemu_log(",");
-                    }
-                    field_types = thunk_print(a + arg_offsets[i], field_types);
-                }
-                qemu_log("}");
-            }
-        }
-        break;
+    } break;
     default:
         g_assert_not_reached();
     }
@@ -437,8 +425,7 @@ const argtype *thunk_print(void *arg, const argtype *type_ptr)
  * between host and target formats
  */
 unsigned int target_to_host_bitmask_len(unsigned int target_mask,
-                                        const bitmask_transtbl *tbl,
-                                        size_t len)
+                                        const bitmask_transtbl *tbl, size_t len)
 {
     unsigned int host_mask = 0;
 
@@ -451,8 +438,7 @@ unsigned int target_to_host_bitmask_len(unsigned int target_mask,
 }
 
 unsigned int host_to_target_bitmask_len(unsigned int host_mask,
-                                        const bitmask_transtbl *tbl,
-                                        size_t len)
+                                        const bitmask_transtbl *tbl, size_t len)
 {
     unsigned int target_mask = 0;
 

@@ -28,7 +28,7 @@ uint64_t helper_zapnot(uint64_t val, uint64_t mskb)
 {
     uint64_t mask;
 
-    mask  = -(mskb & 0x01) & 0x00000000000000ffull;
+    mask = -(mskb & 0x01) & 0x00000000000000ffull;
     mask |= -(mskb & 0x02) & 0x000000000000ff00ull;
     mask |= -(mskb & 0x04) & 0x0000000000ff0000ull;
     mask |= -(mskb & 0x08) & 0x00000000ff000000ull;
@@ -238,10 +238,8 @@ uint64_t helper_pklb(uint64_t op1)
 
 uint64_t helper_pkwb(uint64_t op1)
 {
-    return ((op1 & 0xff)
-            | ((op1 >> 8) & 0xff00)
-            | ((op1 >> 16) & 0xff0000)
-            | ((op1 >> 24) & 0xff000000));
+    return ((op1 & 0xff) | ((op1 >> 8) & 0xff00) | ((op1 >> 16) & 0xff0000) |
+            ((op1 >> 24) & 0xff000000));
 }
 
 uint64_t helper_unpkbl(uint64_t op1)
@@ -251,10 +249,8 @@ uint64_t helper_unpkbl(uint64_t op1)
 
 uint64_t helper_unpkbw(uint64_t op1)
 {
-    return ((op1 & 0xff)
-            | ((op1 & 0xff00) << 8)
-            | ((op1 & 0xff0000) << 16)
-            | ((op1 & 0xff000000) << 24));
+    return ((op1 & 0xff) | ((op1 & 0xff00) << 8) | ((op1 & 0xff0000) << 16) |
+            ((op1 & 0xff000000) << 24));
 }
 
 void helper_check_overflow(CPUAlphaState *env, uint64_t op1, uint64_t op2)

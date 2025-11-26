@@ -27,8 +27,12 @@
 #define D(x) x
 #define D_LOG(...) qemu_log(__VA_ARGS__)
 #else
-#define D(x) do { } while (0)
-#define D_LOG(...) do { } while (0)
+#define D(x) \
+    do {     \
+    } while (0)
+#define D_LOG(...) \
+    do {           \
+    } while (0)
 #endif
 
 void cris_mmu_init(CPUCRISState *env)
@@ -91,11 +95,11 @@ static uint32_t cris_mmu_translate_seg(CPUCRISState *env, int seg)
 }
 
 /* Used by the tlb decoder.  */
-#define EXTRACT_FIELD(src, start, end)                  \
+#define EXTRACT_FIELD(src, start, end) \
     (((src) >> start) & ((1 << (end - start + 1)) - 1))
 
 static inline void set_field(uint32_t *dst, unsigned int val,
-			     unsigned int offset, unsigned int width)
+                             unsigned int offset, unsigned int width)
 {
     uint32_t mask;
 
@@ -122,8 +126,8 @@ static void dump_tlb(CPUCRISState *env, int mmu)
             tlb_vpn = EXTRACT_FIELD(hi, 13, 31);
             tlb_pfn = EXTRACT_FIELD(lo, 13, 31);
 
-            printf("TLB: [%d][%d] hi=%x lo=%x v=%x p=%x\n",
-                   set, idx, hi, lo, tlb_vpn, tlb_pfn);
+            printf("TLB: [%d][%d] hi=%x lo=%x v=%x p=%x\n", set, idx, hi, lo,
+                   tlb_vpn, tlb_pfn);
         }
     }
 }
@@ -131,8 +135,8 @@ static void dump_tlb(CPUCRISState *env, int mmu)
 
 static int cris_mmu_translate_page(struct cris_mmu_result *res,
                                    CPUCRISState *env, uint32_t vaddr,
-                                   MMUAccessType access_type,
-                                   int usermode, int debug)
+                                   MMUAccessType access_type, int usermode,
+                                   int debug)
 {
     unsigned int vpage;
     unsigned int idx;
@@ -181,10 +185,10 @@ static int cris_mmu_translate_page(struct cris_mmu_result *res,
 
         tlb_vpn = hi >> 13;
         tlb_pid = EXTRACT_FIELD(hi, 0, 7);
-        tlb_g  = EXTRACT_FIELD(lo, 4, 4);
+        tlb_g = EXTRACT_FIELD(lo, 4, 4);
 
-        D_LOG("TLB[%d][%d][%d] v=%x vpage=%x lo=%x hi=%x\n",
-              mmu, set, idx, tlb_vpn, vpage, lo, hi);
+        D_LOG("TLB[%d][%d][%d] v=%x vpage=%x lo=%x hi=%x\n", mmu, set, idx,
+              tlb_vpn, vpage, lo, hi);
         if ((tlb_g || (tlb_pid == pid)) && tlb_vpn == vpage) {
             match = 1;
             break;
@@ -193,10 +197,10 @@ static int cris_mmu_translate_page(struct cris_mmu_result *res,
 
     res->bf_vec = vect_base;
     if (match) {
-        cfg_w  = EXTRACT_FIELD(r_cfg, 19, 19);
-        cfg_k  = EXTRACT_FIELD(r_cfg, 18, 18);
-        cfg_x  = EXTRACT_FIELD(r_cfg, 17, 17);
-        cfg_v  = EXTRACT_FIELD(r_cfg, 16, 16);
+        cfg_w = EXTRACT_FIELD(r_cfg, 19, 19);
+        cfg_k = EXTRACT_FIELD(r_cfg, 18, 18);
+        cfg_x = EXTRACT_FIELD(r_cfg, 17, 17);
+        cfg_v = EXTRACT_FIELD(r_cfg, 16, 16);
 
         tlb_pfn = EXTRACT_FIELD(lo, 13, 31);
         tlb_v = EXTRACT_FIELD(lo, 3, 3);
@@ -215,19 +219,19 @@ static int cris_mmu_translate_page(struct cris_mmu_result *res,
          * set_exception_vector(0x0b, d_mmu_write);
          */
         if (cfg_k && tlb_k && usermode) {
-            D(printf("tlb: kernel protected %x lo=%x pc=%x\n",
-                     vaddr, lo, env->pc));
+            D(printf("tlb: kernel protected %x lo=%x pc=%x\n", vaddr, lo,
+                     env->pc));
             match = 0;
             res->bf_vec = vect_base + 2;
         } else if (access_type == MMU_DATA_STORE && cfg_w && !tlb_w) {
-            D(printf("tlb: write protected %x lo=%x pc=%x\n",
-                     vaddr, lo, env->pc));
+            D(printf("tlb: write protected %x lo=%x pc=%x\n", vaddr, lo,
+                     env->pc));
             match = 0;
             /* write accesses never go through the I mmu.  */
             res->bf_vec = vect_base + 3;
         } else if (access_type == MMU_INST_FETCH && cfg_x && !tlb_x) {
-            D(printf("tlb: exec protected %x lo=%x pc=%x\n",
-                     vaddr, lo, env->pc));
+            D(printf("tlb: exec protected %x lo=%x pc=%x\n", vaddr, lo,
+                     env->pc));
             match = 0;
             res->bf_vec = vect_base + 3;
         } else if (cfg_v && !tlb_v) {
@@ -274,12 +278,8 @@ static int cris_mmu_translate_page(struct cris_mmu_result *res,
 
     D(printf("%s access=%u mtch=%d pc=%x va=%x vpn=%x tlbvpn=%x pfn=%x pid=%x"
              " %x cause=%x sel=%x sp=%x %x %x\n",
-             __func__, access_type, match, env->pc,
-             vaddr, vpage,
-             tlb_vpn, tlb_pfn, tlb_pid,
-             pid,
-             r_cause,
-             env->sregs[SFR_RW_MM_TLB_SEL],
+             __func__, access_type, match, env->pc, vaddr, vpage, tlb_vpn,
+             tlb_pfn, tlb_pid, pid, r_cause, env->sregs[SFR_RW_MM_TLB_SEL],
              env->regs[R_SP], env->pregs[PR_USP], env->ksp));
 
     res->phy = tlb_pfn << TARGET_PAGE_BITS;
@@ -305,7 +305,7 @@ void cris_mmu_flush_pid(CPUCRISState *env, uint32_t pid)
 
                 tlb_vpn = EXTRACT_FIELD(hi, 13, 31);
                 tlb_pid = EXTRACT_FIELD(hi, 0, 7);
-                tlb_g  = EXTRACT_FIELD(lo, 4, 4);
+                tlb_g = EXTRACT_FIELD(lo, 4, 4);
                 tlb_v = EXTRACT_FIELD(lo, 3, 3);
 
                 if (tlb_v && !tlb_g && (tlb_pid == pid)) {
@@ -318,9 +318,9 @@ void cris_mmu_flush_pid(CPUCRISState *env, uint32_t pid)
     }
 }
 
-int cris_mmu_translate(struct cris_mmu_result *res,
-                       CPUCRISState *env, uint32_t vaddr,
-                       MMUAccessType access_type, int mmu_idx, int debug)
+int cris_mmu_translate(struct cris_mmu_result *res, CPUCRISState *env,
+                       uint32_t vaddr, MMUAccessType access_type, int mmu_idx,
+                       int debug)
 {
     int seg;
     int miss = 0;
@@ -346,10 +346,10 @@ int cris_mmu_translate(struct cris_mmu_result *res,
         res->phy = base | (0x0fffffff & vaddr);
         res->prot = PAGE_BITS;
     } else {
-        miss = cris_mmu_translate_page(res, env, vaddr, access_type,
-                                       is_user, debug);
+        miss = cris_mmu_translate_page(res, env, vaddr, access_type, is_user,
+                                       debug);
     }
- done:
+done:
     env->pregs[PR_SRS] = old_srs;
     return miss;
 }

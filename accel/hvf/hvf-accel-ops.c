@@ -133,7 +133,7 @@ static void hvf_set_phys_mem(MemoryRegionSection *section, bool add)
              * If the memory device is not in romd_mode, then we actually want
              * to remove the hvf memory slot so all accesses will trap.
              */
-             add = false;
+            add = false;
         }
     }
 
@@ -143,15 +143,14 @@ static void hvf_set_phys_mem(MemoryRegionSection *section, bool add)
         add = false;
     }
 
-    mem = hvf_find_overlap_slot(
-            section->offset_within_address_space,
-            int128_get64(section->size));
+    mem = hvf_find_overlap_slot(section->offset_within_address_space,
+                                int128_get64(section->size));
 
     if (mem && add) {
         if (mem->size == int128_get64(section->size) &&
             mem->start == section->offset_within_address_space &&
             mem->mem == (memory_region_get_ram_ptr(area) +
-            section->offset_within_region)) {
+                         section->offset_within_region)) {
             return; /* Same region was attempted to register, go away. */
         }
     }
@@ -217,8 +216,7 @@ static void hvf_cpu_synchronize_state(CPUState *cpu)
     }
 }
 
-static void do_hvf_cpu_synchronize_set_dirty(CPUState *cpu,
-                                             run_on_cpu_data arg)
+static void do_hvf_cpu_synchronize_set_dirty(CPUState *cpu, run_on_cpu_data arg)
 {
     /* QEMU state is the reference, push it to HVF now and on next entry */
     cpu->vcpu_dirty = true;
@@ -243,16 +241,15 @@ static void hvf_set_dirty_tracking(MemoryRegionSection *section, bool on)
 {
     hvf_slot *slot;
 
-    slot = hvf_find_overlap_slot(
-            section->offset_within_address_space,
-            int128_get64(section->size));
+    slot = hvf_find_overlap_slot(section->offset_within_address_space,
+                                 int128_get64(section->size));
 
     /* protect region against writes; begin tracking it */
     if (on) {
         slot->flags |= HVF_SLOT_LOG;
         hv_vm_protect((uintptr_t)slot->start, (size_t)slot->size,
                       HV_MEMORY_READ | HV_MEMORY_EXEC);
-    /* stop tracking region*/
+        /* stop tracking region*/
     } else {
         slot->flags &= ~HVF_SLOT_LOG;
         hv_vm_protect((uintptr_t)slot->start, (size_t)slot->size,
@@ -270,8 +267,8 @@ static void hvf_log_start(MemoryListener *listener,
     hvf_set_dirty_tracking(section, 1);
 }
 
-static void hvf_log_stop(MemoryListener *listener,
-                         MemoryRegionSection *section, int old, int new)
+static void hvf_log_stop(MemoryListener *listener, MemoryRegionSection *section,
+                         int old, int new)
 {
     if (new != 0) {
         return;
@@ -280,8 +277,7 @@ static void hvf_log_stop(MemoryListener *listener,
     hvf_set_dirty_tracking(section, 0);
 }
 
-static void hvf_log_sync(MemoryListener *listener,
-                         MemoryRegionSection *section)
+static void hvf_log_sync(MemoryListener *listener, MemoryRegionSection *section)
 {
     /*
      * sync of dirty pages is handled elsewhere; just make sure we keep
@@ -397,8 +393,8 @@ static int hvf_init_vcpu(CPUState *cpu)
     sigdelset(&cpu->accel->unblock_ipi_mask, SIG_IPI);
 
 #ifdef __aarch64__
-    r = hv_vcpu_create(&cpu->accel->fd,
-                       (hv_vcpu_exit_t **)&cpu->accel->exit, NULL);
+    r = hv_vcpu_create(&cpu->accel->fd, (hv_vcpu_exit_t **)&cpu->accel->exit,
+                       NULL);
 #else
     r = hv_vcpu_create((hv_vcpuid_t *)&cpu->accel->fd, HV_VCPU_DEFAULT);
 #endif
@@ -468,13 +464,13 @@ static void hvf_start_vcpu_thread(CPUState *cpu)
     cpu->halt_cond = g_malloc0(sizeof(QemuCond));
     qemu_cond_init(cpu->halt_cond);
 
-    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
-             cpu->cpu_index);
-    qemu_thread_create(cpu->thread, thread_name, hvf_cpu_thread_fn,
-                       cpu, QEMU_THREAD_JOINABLE);
+    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF", cpu->cpu_index);
+    qemu_thread_create(cpu->thread, thread_name, hvf_cpu_thread_fn, cpu,
+                       QEMU_THREAD_JOINABLE);
 }
 
-static int hvf_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
+static int hvf_insert_breakpoint(CPUState *cpu, int type, hwaddr addr,
+                                 hwaddr len)
 {
     struct hvf_sw_breakpoint *bp;
     int err;
@@ -503,7 +499,7 @@ static int hvf_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr le
         }
     }
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         err = hvf_update_guest_debug(cpu);
         if (err) {
             return err;
@@ -512,7 +508,8 @@ static int hvf_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr le
     return 0;
 }
 
-static int hvf_remove_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
+static int hvf_remove_breakpoint(CPUState *cpu, int type, hwaddr addr,
+                                 hwaddr len)
 {
     struct hvf_sw_breakpoint *bp;
     int err;
@@ -542,7 +539,7 @@ static int hvf_remove_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr le
         }
     }
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         err = hvf_update_guest_debug(cpu);
         if (err) {
             return err;
@@ -556,11 +553,10 @@ static void hvf_remove_all_breakpoints(CPUState *cpu)
     struct hvf_sw_breakpoint *bp, *next;
     CPUState *tmpcpu;
 
-    QTAILQ_FOREACH_SAFE(bp, &hvf_state->hvf_sw_breakpoints, entry, next) {
+    QTAILQ_FOREACH_SAFE (bp, &hvf_state->hvf_sw_breakpoints, entry, next) {
         if (hvf_arch_remove_sw_breakpoint(cpu, bp) != 0) {
             /* Try harder to find a CPU that currently sees the breakpoint. */
-            CPU_FOREACH(tmpcpu)
-            {
+            CPU_FOREACH (tmpcpu) {
                 if (hvf_arch_remove_sw_breakpoint(tmpcpu, bp) == 0) {
                     break;
                 }
@@ -571,7 +567,7 @@ static void hvf_remove_all_breakpoints(CPUState *cpu)
     }
     hvf_arch_remove_all_hw_breakpoints();
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         hvf_update_guest_debug(cpu);
     }
 }

@@ -27,8 +27,8 @@
     } while (0)
 
 #else
-#define lsassert(cond)          ((void)0)
-#define lsassertm(cond, ...)    ((void)0)
+#define lsassert(cond) ((void)0)
+#define lsassertm(cond, ...) ((void)0)
 #endif
 
 #endif

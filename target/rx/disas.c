@@ -30,8 +30,8 @@ typedef struct DisasContext {
 } DisasContext;
 
 
-static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
-                                  int i, int n)
+static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn, int i,
+                                  int n)
 {
     uint32_t addr = ctx->addr;
 
@@ -112,10 +112,10 @@ static void dump_bytes(DisasContext *ctx)
     ctx->dis->fprintf_func(ctx->dis->stream, "%*c", (8 - i) * 3, '\t');
 }
 
-#define prt(...) \
-    do {                                                        \
-        dump_bytes(ctx);                                        \
-        ctx->dis->fprintf_func(ctx->dis->stream, __VA_ARGS__);  \
+#define prt(...)                                               \
+    do {                                                       \
+        dump_bytes(ctx);                                       \
+        ctx->dis->fprintf_func(ctx->dis->stream, __VA_ARGS__); \
     } while (0)
 
 #define RX_MEMORY_BYTE 0
@@ -127,14 +127,13 @@ static void dump_bytes(DisasContext *ctx)
 #define RX_IM_LONG 2
 #define RX_IM_UWORD 3
 
-static const char size[] = {'b', 'w', 'l'};
+static const char size[] = { 'b', 'w', 'l' };
 static const char cond[][4] = {
-    "eq", "ne", "c", "nc", "gtu", "leu", "pz", "n",
-    "ge", "lt", "gt", "le", "o", "no", "ra", "f"
+    "eq", "ne", "c",  "nc", "gtu", "leu", "pz", "n",
+    "ge", "lt", "gt", "le", "o",   "no",  "ra", "f"
 };
 static const char psw[] = {
-    'c', 'z', 's', 'o', 0, 0, 0, 0,
-    'i', 'u', 0, 0, 0, 0, 0, 0,
+    'c', 'z', 's', 'o', 0, 0, 0, 0, 'i', 'u', 0, 0, 0, 0, 0, 0,
 };
 
 static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
@@ -169,10 +168,10 @@ static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
     sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
 }
 
-static void prt_ldmi(DisasContext *ctx, const char *insn,
-                     int ld, int mi, int rs, int rd)
+static void prt_ldmi(DisasContext *ctx, const char *insn, int ld, int mi,
+                     int rs, int rd)
 {
-    static const char sizes[][4] = {".b", ".w", ".l", ".uw", ".ub"};
+    static const char sizes[][4] = { ".b", ".w", ".l", ".uw", ".ub" };
     char dsp[8];
 
     if (ld < 3) {
@@ -196,11 +195,9 @@ static void prt_ir(DisasContext *ctx, const char *insn, int imm, int rd)
 static bool trans_MOV_rm(DisasContext *ctx, arg_MOV_rm *a)
 {
     if (a->dsp > 0) {
-        prt("mov.%c\tr%d,%d[r%d]",
-            size[a->sz], a->rs, a->dsp << a->sz, a->rd);
+        prt("mov.%c\tr%d,%d[r%d]", size[a->sz], a->rs, a->dsp << a->sz, a->rd);
     } else {
-        prt("mov.%c\tr%d,[r%d]",
-            size[a->sz], a->rs, a->rd);
+        prt("mov.%c\tr%d,[r%d]", size[a->sz], a->rs, a->rd);
     }
     return true;
 }
@@ -209,11 +206,9 @@ static bool trans_MOV_rm(DisasContext *ctx, arg_MOV_rm *a)
 static bool trans_MOV_mr(DisasContext *ctx, arg_MOV_mr *a)
 {
     if (a->dsp > 0) {
-        prt("mov.%c\t%d[r%d], r%d",
-            size[a->sz], a->dsp << a->sz, a->rs, a->rd);
+        prt("mov.%c\t%d[r%d], r%d", size[a->sz], a->dsp << a->sz, a->rs, a->rd);
     } else {
-        prt("mov.%c\t[r%d], r%d",
-            size[a->sz], a->rs, a->rd);
+        prt("mov.%c\t[r%d], r%d", size[a->sz], a->rs, a->rd);
     }
     return true;
 }
@@ -232,11 +227,9 @@ static bool trans_MOV_ir(DisasContext *ctx, arg_MOV_ir *a)
 static bool trans_MOV_im(DisasContext *ctx, arg_MOV_im *a)
 {
     if (a->dsp > 0) {
-        prt("mov.%c\t#%d,%d[r%d]",
-            size[a->sz], a->imm, a->dsp << a->sz, a->rd);
+        prt("mov.%c\t#%d,%d[r%d]", size[a->sz], a->imm, a->dsp << a->sz, a->rd);
     } else {
-        prt("mov.%c\t#%d,[r%d]",
-            size[a->sz], a->imm, a->rd);
+        prt("mov.%c\t#%d,[r%d]", size[a->sz], a->imm, a->rd);
     }
     return true;
 }
@@ -309,8 +302,8 @@ static bool trans_MOV_pr(DisasContext *ctx, arg_MOV_pr *a)
 static bool trans_MOVU_mr(DisasContext *ctx, arg_MOVU_mr *a)
 {
     if (a->dsp > 0) {
-        prt("movu.%c\t%d[r%d], r%d", size[a->sz],
-            a->dsp << a->sz, a->rs, a->rd);
+        prt("movu.%c\t%d[r%d], r%d", size[a->sz], a->dsp << a->sz, a->rs,
+            a->rd);
     } else {
         prt("movu.%c\t[r%d], r%d", size[a->sz], a->rs, a->rd);
     }
@@ -882,7 +875,7 @@ static bool trans_REVW(DisasContext *ctx, arg_REVW *a)
 /* conditional branch helper */
 static void rx_bcnd_main(DisasContext *ctx, int cd, int len, int dst)
 {
-    static const char sz[] = {'s', 'b', 'w', 'a'};
+    static const char sz[] = { 's', 'b', 'w', 'a' };
     prt("b%s.%c\t%08x", cond[cd], sz[len - 1], ctx->pc + dst);
 }
 
@@ -936,7 +929,7 @@ static bool trans_JSR(DisasContext *ctx, arg_JSR *a)
 /* bsr dsp:24 */
 static bool trans_BSR(DisasContext *ctx, arg_BSR *a)
 {
-    static const char sz[] = {'w', 'a'};
+    static const char sz[] = { 'w', 'a' };
     prt("bsr.%c\t%08x", sz[a->sz - 3], ctx->pc + a->dsp);
     return true;
 }
@@ -1193,20 +1186,20 @@ static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
     return true;
 }
 
-#define BOP_IM(name, reg)                                       \
-    do {                                                        \
-        char dsp[8];                                            \
-        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-        prt("b%s\t#%d, %s[r%d]", #name, a->imm, dsp, reg);      \
-        return true;                                            \
+#define BOP_IM(name, reg)                                  \
+    do {                                                   \
+        char dsp[8];                                       \
+        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);    \
+        prt("b%s\t#%d, %s[r%d]", #name, a->imm, dsp, reg); \
+        return true;                                       \
     } while (0)
 
-#define BOP_RM(name)                                            \
-    do {                                                        \
-        char dsp[8];                                            \
-        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-        prt("b%s\tr%d, %s[r%d]", #name, a->rd, dsp, a->rs);     \
-        return true;                                            \
+#define BOP_RM(name)                                        \
+    do {                                                    \
+        char dsp[8];                                        \
+        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);     \
+        prt("b%s\tr%d, %s[r%d]", #name, a->rd, dsp, a->rs); \
+        return true;                                        \
     } while (0)
 
 /* bset #imm, dsp[rd] */
@@ -1290,7 +1283,7 @@ static bool trans_BTST_ir(DisasContext *ctx, arg_BTST_ir *a)
 /* bnot rs, dsp[rd] */
 static bool trans_BNOT_rm(DisasContext *ctx, arg_BNOT_rm *a)
 {
-    BOP_RM(not);
+    BOP_RM(not );
 }
 
 /* bnot rs, rd */

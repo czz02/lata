@@ -38,8 +38,7 @@ target_ulong softmmu_resize_hpt_prepare(PowerPCCPU *cpu,
 
 target_ulong softmmu_resize_hpt_commit(PowerPCCPU *cpu,
                                        SpaprMachineState *spapr,
-                                       target_ulong flags,
-                                       target_ulong shift)
+                                       target_ulong flags, target_ulong shift)
 {
     g_assert_not_reached();
 }

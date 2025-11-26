@@ -69,14 +69,17 @@
 #define KVM_GUESTDBG_BLOCKIRQ 0
 #endif
 
-//#define DEBUG_KVM
+// #define DEBUG_KVM
 
 #ifdef DEBUG_KVM
-#define DPRINTF(fmt, ...) \
-    do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)
+#define DPRINTF(fmt, ...)                    \
+    do {                                     \
+        fprintf(stderr, fmt, ##__VA_ARGS__); \
+    } while (0)
 #else
 #define DPRINTF(fmt, ...) \
-    do { } while (0)
+    do {                  \
+    } while (0)
 #endif
 
 struct KVMParkedVcpu {
@@ -108,10 +111,8 @@ static bool kvm_immediate_exit;
 static hwaddr kvm_max_slot_size = ~0;
 
 static const KVMCapabilityInfo kvm_required_capabilites[] = {
-    KVM_CAP_INFO(USER_MEMORY),
-    KVM_CAP_INFO(DESTROY_MEMORY_REGION_WORKS),
-    KVM_CAP_INFO(JOIN_MEMORY_REGIONS_WORKS),
-    KVM_CAP_LAST_INFO
+    KVM_CAP_INFO(USER_MEMORY), KVM_CAP_INFO(DESTROY_MEMORY_REGION_WORKS),
+    KVM_CAP_INFO(JOIN_MEMORY_REGIONS_WORKS), KVM_CAP_LAST_INFO
 };
 
 static NotifierList kvm_irqchip_change_notifiers =
@@ -128,13 +129,13 @@ typedef struct KVMResampleFd KVMResampleFd;
  * Only used with split irqchip where we need to do the resample fd
  * kick for the kernel from userspace.
  */
-static QLIST_HEAD(, KVMResampleFd) kvm_resample_fd_list =
-    QLIST_HEAD_INITIALIZER(kvm_resample_fd_list);
+static QLIST_HEAD(, KVMResampleFd)
+    kvm_resample_fd_list = QLIST_HEAD_INITIALIZER(kvm_resample_fd_list);
 
 static QemuMutex kml_slots_lock;
 
-#define kvm_slots_lock()    qemu_mutex_lock(&kml_slots_lock)
-#define kvm_slots_unlock()  qemu_mutex_unlock(&kml_slots_lock)
+#define kvm_slots_lock() qemu_mutex_lock(&kml_slots_lock)
+#define kvm_slots_unlock() qemu_mutex_unlock(&kml_slots_lock)
 
 static void kvm_slot_init_dirty_bitmap(KVMSlot *mem);
 
@@ -142,7 +143,7 @@ static inline void kvm_resample_fd_remove(int gsi)
 {
     KVMResampleFd *rfd;
 
-    QLIST_FOREACH(rfd, &kvm_resample_fd_list, node) {
+    QLIST_FOREACH (rfd, &kvm_resample_fd_list, node) {
         if (rfd->gsi == gsi) {
             QLIST_REMOVE(rfd, node);
             g_free(rfd);
@@ -165,7 +166,7 @@ void kvm_resample_fd_notify(int gsi)
 {
     KVMResampleFd *rfd;
 
-    QLIST_FOREACH(rfd, &kvm_resample_fd_list, node) {
+    QLIST_FOREACH (rfd, &kvm_resample_fd_list, node) {
         if (rfd->gsi == gsi) {
             event_notifier_set(rfd->resample_event);
             trace_kvm_resample_fd_notify(gsi);
@@ -223,8 +224,7 @@ static KVMSlot *kvm_alloc_slot(KVMMemoryListener *kml)
 }
 
 static KVMSlot *kvm_lookup_matching_slot(KVMMemoryListener *kml,
-                                         hwaddr start_addr,
-                                         hwaddr size)
+                                         hwaddr start_addr, hwaddr size)
 {
     KVMState *s = kvm_state;
     int i;
@@ -244,8 +244,7 @@ static KVMSlot *kvm_lookup_matching_slot(KVMMemoryListener *kml,
  * Calculate and align the start address and the size of the section.
  * Return the size. If the size is 0, the aligned section is empty.
  */
-static hwaddr kvm_align_section(MemoryRegionSection *section,
-                                hwaddr *start)
+static hwaddr kvm_align_section(MemoryRegionSection *section, hwaddr *start)
 {
     hwaddr size = int128_get64(section->size);
     hwaddr delta, aligned;
@@ -285,7 +284,8 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
     return ret;
 }
 
-static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, bool new)
+static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot,
+                                      bool new)
 {
     KVMState *s = kvm_state;
     struct kvm_userspace_memory_region mem;
@@ -296,7 +296,8 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
     mem.userspace_addr = (unsigned long)slot->ram;
     mem.flags = slot->flags;
 
-    if (slot->memory_size && !new && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
+    if (slot->memory_size && !new &&
+        (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
         /* Set the slot size to 0 before setting the slot to the desired
          * value. This is needed based on KVM commit 75d61fbc. */
         mem.memory_size = 0;
@@ -373,7 +374,7 @@ static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
 {
     struct KVMParkedVcpu *cpu;
 
-    QLIST_FOREACH(cpu, &s->kvm_parked_vcpus, node) {
+    QLIST_FOREACH (cpu, &s->kvm_parked_vcpus, node) {
         if (cpu->vcpu_id == vcpu_id) {
             int kvm_fd;
 
@@ -433,10 +434,9 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
 
     if (s->kvm_dirty_ring_size) {
         /* Use MAP_SHARED to share pages with the kernel */
-        cpu->kvm_dirty_gfns = mmap(NULL, s->kvm_dirty_ring_bytes,
-                                   PROT_READ | PROT_WRITE, MAP_SHARED,
-                                   cpu->kvm_fd,
-                                   PAGE_SIZE * KVM_DIRTY_LOG_PAGE_OFFSET);
+        cpu->kvm_dirty_gfns = mmap(
+            NULL, s->kvm_dirty_ring_bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
+            cpu->kvm_fd, PAGE_SIZE * KVM_DIRTY_LOG_PAGE_OFFSET);
         if (cpu->kvm_dirty_gfns == MAP_FAILED) {
             ret = -errno;
             DPRINTF("mmap'ing vcpu dirty gfns failed: %d\n", ret);
@@ -522,10 +522,10 @@ out:
 }
 
 static void kvm_log_start(MemoryListener *listener,
-                          MemoryRegionSection *section,
-                          int old, int new)
+                          MemoryRegionSection *section, int old, int new)
 {
-    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
+    KVMMemoryListener *kml =
+        container_of(listener, KVMMemoryListener, listener);
     int r;
 
     if (old != 0) {
@@ -538,11 +538,11 @@ static void kvm_log_start(MemoryListener *listener,
     }
 }
 
-static void kvm_log_stop(MemoryListener *listener,
-                          MemoryRegionSection *section,
-                          int old, int new)
+static void kvm_log_stop(MemoryListener *listener, MemoryRegionSection *section,
+                         int old, int new)
 {
-    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
+    KVMMemoryListener *kml =
+        container_of(listener, KVMMemoryListener, listener);
     int r;
 
     if (new != 0) {
@@ -569,7 +569,7 @@ static void kvm_slot_reset_dirty_pages(KVMSlot *slot)
     memset(slot->dirty_bmap, 0, slot->dirty_bmap_size);
 }
 
-#define ALIGN(x, y)  (((x)+(y)-1) & ~((y)-1))
+#define ALIGN(x, y) (((x) + (y) - 1) & ~((y) - 1))
 
 /* Allocate the dirty bitmap for a slot  */
 static void kvm_slot_init_dirty_bitmap(KVMSlot *mem)
@@ -596,7 +596,8 @@ static void kvm_slot_init_dirty_bitmap(KVMSlot *mem)
      * be registered to KVM).
      */
     hwaddr bitmap_size = ALIGN(mem->memory_size / qemu_real_host_page_size(),
-                                        /*HOST_LONG_BITS*/ 64) / 8;
+                               /*HOST_LONG_BITS*/ 64) /
+                         8;
     mem->dirty_bmap = g_malloc0(bitmap_size);
     mem->dirty_bmap_size = bitmap_size;
 }
@@ -619,8 +620,8 @@ static bool kvm_slot_get_dirty_log(KVMState *s, KVMSlot *slot)
         ret = 0;
     }
     if (ret) {
-        error_report_once("%s: KVM_GET_DIRTY_LOG failed with %d",
-                          __func__, ret);
+        error_report_once("%s: KVM_GET_DIRTY_LOG failed with %d", __func__,
+                          ret);
     }
     return ret == 0;
 }
@@ -639,8 +640,8 @@ static void kvm_dirty_ring_mark_page(KVMState *s, uint32_t as_id,
     kml = s->as[as_id].ml;
     mem = &kml->slots[slot_id];
 
-    if (!mem->memory_size || offset >=
-        (mem->memory_size / qemu_real_host_page_size())) {
+    if (!mem->memory_size ||
+        offset >= (mem->memory_size / qemu_real_host_page_size())) {
         return;
     }
 
@@ -665,10 +666,8 @@ static void dirty_gfn_set_collected(struct kvm_dirty_gfn *gfn)
      * CPU0                     CPU1                         CPU2
      * ------------------------------------------------------------------------------
      *                                                       fill gfn0
-     *                                                       store-rel flags for gfn0
-     * load-acq flags for gfn0
-     * store-rel RESET for gfn0
-     *                          ioctl(RESET_RINGS)
+     *                                                       store-rel flags for
+     * gfn0 load-acq flags for gfn0 store-rel RESET for gfn0 ioctl(RESET_RINGS)
      *                            load-acq flags for gfn0
      *                            check if flags have RESET
      *
@@ -718,7 +717,7 @@ static uint32_t kvm_dirty_ring_reap_one(KVMState *s, CPUState *cpu)
 }
 
 /* Must be with slots_lock held */
-static uint64_t kvm_dirty_ring_reap_locked(KVMState *s, CPUState* cpu)
+static uint64_t kvm_dirty_ring_reap_locked(KVMState *s, CPUState *cpu)
 {
     int ret;
     uint64_t total = 0;
@@ -729,7 +728,7 @@ static uint64_t kvm_dirty_ring_reap_locked(KVMState *s, CPUState* cpu)
     if (cpu) {
         total = kvm_dirty_ring_reap_one(s, cpu);
     } else {
-        CPU_FOREACH(cpu) {
+        CPU_FOREACH (cpu) {
             total += kvm_dirty_ring_reap_one(s, cpu);
         }
     }
@@ -792,7 +791,7 @@ static void kvm_cpu_synchronize_kick_all(void)
 {
     CPUState *cpu;
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         run_on_cpu(cpu, do_kvm_cpu_synchronize_kick, RUN_ON_CPU_NULL);
     }
 }
@@ -859,9 +858,9 @@ static void kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
 }
 
 /* Alignment requirement for KVM_CLEAR_DIRTY_LOG - 64 pages */
-#define KVM_CLEAR_LOG_SHIFT  6
-#define KVM_CLEAR_LOG_ALIGN  (qemu_real_host_page_size() << KVM_CLEAR_LOG_SHIFT)
-#define KVM_CLEAR_LOG_MASK   (-KVM_CLEAR_LOG_ALIGN)
+#define KVM_CLEAR_LOG_SHIFT 6
+#define KVM_CLEAR_LOG_ALIGN (qemu_real_host_page_size() << KVM_CLEAR_LOG_SHIFT)
+#define KVM_CLEAR_LOG_MASK (-KVM_CLEAR_LOG_ALIGN)
 
 static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start,
                                   uint64_t size)
@@ -888,7 +887,7 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start,
      * (2) the size fills up until the end of the KVM memslot.
      */
     bmap_npages = DIV_ROUND_UP(size + start_delta, KVM_CLEAR_LOG_ALIGN)
-        << KVM_CLEAR_LOG_SHIFT;
+                  << KVM_CLEAR_LOG_SHIFT;
     end = mem->memory_size / psize;
     if (bmap_npages > end - bmap_start) {
         bmap_npages = end - bmap_start;
@@ -923,8 +922,8 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start,
     if (start_delta || bmap_npages - size / psize) {
         /* Slow path - we need to manipulate a temp bitmap */
         bmap_clear = bitmap_new(bmap_npages);
-        bitmap_copy_with_src_offset(bmap_clear, mem->dirty_bmap,
-                                    bmap_start, start_delta + size / psize);
+        bitmap_copy_with_src_offset(bmap_clear, mem->dirty_bmap, bmap_start,
+                                    start_delta + size / psize);
         /*
          * We need to fill the holes at start because that was not
          * specified by the caller and we extended the bitmap only for
@@ -949,7 +948,7 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start,
     ret = kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d);
     if (ret < 0 && ret != -ENOENT) {
         error_report("%s: KVM_CLEAR_DIRTY_LOG failed, slot=%d, "
-                     "start=0x%"PRIx64", size=0x%"PRIx32", errno=%d",
+                     "start=0x%" PRIx64 ", size=0x%" PRIx32 ", errno=%d",
                      __func__, d.slot, (uint64_t)d.first_page,
                      (uint32_t)d.num_pages, ret);
     } else {
@@ -963,8 +962,7 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start,
      * clears the same region we know we shouldn't clear it again on
      * the remote otherwise it's data loss as well.
      */
-    bitmap_clear(mem->dirty_bmap, bmap_start + start_delta,
-                 size / psize);
+    bitmap_clear(mem->dirty_bmap, bmap_start + start_delta, size / psize);
     /* This handles the NULL case well */
     g_free(bmap_clear);
     return ret;
@@ -1007,8 +1005,7 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
     for (i = 0; i < s->nr_slots; i++) {
         mem = &kml->slots[i];
         /* Discard slots that are empty or do not overlap the section */
-        if (!mem->memory_size ||
-            mem->start_addr > start + size - 1 ||
+        if (!mem->memory_size || mem->start_addr > start + size - 1 ||
             start > mem->start_addr + mem->memory_size - 1) {
             continue;
         }
@@ -1034,8 +1031,8 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
 }
 
 static void kvm_coalesce_mmio_region(MemoryListener *listener,
-                                     MemoryRegionSection *secion,
-                                     hwaddr start, hwaddr size)
+                                     MemoryRegionSection *secion, hwaddr start,
+                                     hwaddr size)
 {
     KVMState *s = kvm_state;
 
@@ -1068,8 +1065,8 @@ static void kvm_uncoalesce_mmio_region(MemoryListener *listener,
 }
 
 static void kvm_coalesce_pio_add(MemoryListener *listener,
-                                MemoryRegionSection *section,
-                                hwaddr start, hwaddr size)
+                                 MemoryRegionSection *section, hwaddr start,
+                                 hwaddr size)
 {
     KVMState *s = kvm_state;
 
@@ -1085,8 +1082,8 @@ static void kvm_coalesce_pio_add(MemoryListener *listener,
 }
 
 static void kvm_coalesce_pio_del(MemoryListener *listener,
-                                MemoryRegionSection *section,
-                                hwaddr start, hwaddr size)
+                                 MemoryRegionSection *section, hwaddr start,
+                                 hwaddr size)
 {
     KVMState *s = kvm_state;
 
@@ -1098,7 +1095,7 @@ static void kvm_coalesce_pio_del(MemoryListener *listener,
         zone.pio = 1;
 
         (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
-     }
+    }
 }
 
 static MemoryListener kvm_coalesced_pio_listener = {
@@ -1138,14 +1135,14 @@ typedef struct HWPoisonPage {
     QLIST_ENTRY(HWPoisonPage) list;
 } HWPoisonPage;
 
-static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
-    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
+static QLIST_HEAD(, HWPoisonPage)
+    hwpoison_page_list = QLIST_HEAD_INITIALIZER(hwpoison_page_list);
 
 static void kvm_unpoison_all(void *param)
 {
     HWPoisonPage *page, *next_page;
 
-    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+    QLIST_FOREACH_SAFE (page, &hwpoison_page_list, list, next_page) {
         QLIST_REMOVE(page, list);
         qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
         g_free(page);
@@ -1156,7 +1153,7 @@ void kvm_hwpoison_page_add(ram_addr_t ram_addr)
 {
     HWPoisonPage *page;
 
-    QLIST_FOREACH(page, &hwpoison_page_list, list) {
+    QLIST_FOREACH (page, &hwpoison_page_list, list) {
         if (page->ram_addr == ram_addr) {
             return;
         }
@@ -1300,9 +1297,8 @@ kvm_check_extension_list(KVMState *s, const KVMCapabilityInfo *list)
 
 void kvm_set_max_memslot_size(hwaddr max_slot_size)
 {
-    g_assert(
-        ROUND_UP(max_slot_size, qemu_real_host_page_size()) == max_slot_size
-    );
+    g_assert(ROUND_UP(max_slot_size, qemu_real_host_page_size()) ==
+             max_slot_size);
     kvm_max_slot_size = max_slot_size;
 }
 
@@ -1335,7 +1331,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
 
     /* The offset of the kvmslot within the memory region */
     mr_offset = section->offset_within_region + start_addr -
-        section->offset_within_address_space;
+                section->offset_within_address_space;
 
     /* use aligned delta to align the ram address and offset */
     ram = memory_region_get_ram_ptr(mr) + mr_offset;
@@ -1381,8 +1377,8 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
             mem->flags = 0;
             err = kvm_set_user_memory_region(kml, mem, false);
             if (err) {
-                fprintf(stderr, "%s: error unregistering slot: %s\n",
-                        __func__, strerror(-err));
+                fprintf(stderr, "%s: error unregistering slot: %s\n", __func__,
+                        strerror(-err));
                 abort();
             }
             start_addr += slot_size;
@@ -1459,8 +1455,7 @@ static int kvm_dirty_ring_reaper_init(KVMState *s)
     struct KVMDirtyRingReaper *r = &s->reaper;
 
     qemu_thread_create(&r->reaper_thr, "kvm-reaper",
-                       kvm_dirty_ring_reaper_thread,
-                       s, QEMU_THREAD_JOINABLE);
+                       kvm_dirty_ring_reaper_thread, s, QEMU_THREAD_JOINABLE);
 
     return 0;
 }
@@ -1505,7 +1500,8 @@ static int kvm_dirty_ring_init(KVMState *s)
     ret = kvm_vm_enable_cap(s, capability, 0, ring_bytes);
     if (ret) {
         error_report("Enabling of KVM dirty ring failed: %s. "
-                     "Suggested minimum value is 1024.", strerror(-ret));
+                     "Suggested minimum value is 1024.",
+                     strerror(-ret));
         return -EIO;
     }
 
@@ -1515,7 +1511,8 @@ static int kvm_dirty_ring_init(KVMState *s)
         ret = kvm_vm_enable_cap(s, KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP, 0);
         if (ret) {
             error_report("Enabling of KVM dirty ring's backup bitmap failed: "
-                         "%s. ", strerror(-ret));
+                         "%s. ",
+                         strerror(-ret));
             return -EIO;
         }
 
@@ -1531,7 +1528,8 @@ static int kvm_dirty_ring_init(KVMState *s)
 static void kvm_region_add(MemoryListener *listener,
                            MemoryRegionSection *section)
 {
-    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
+    KVMMemoryListener *kml =
+        container_of(listener, KVMMemoryListener, listener);
     KVMMemoryUpdate *update;
 
     update = g_new0(KVMMemoryUpdate, 1);
@@ -1543,7 +1541,8 @@ static void kvm_region_add(MemoryListener *listener,
 static void kvm_region_del(MemoryListener *listener,
                            MemoryRegionSection *section)
 {
-    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
+    KVMMemoryListener *kml =
+        container_of(listener, KVMMemoryListener, listener);
     KVMMemoryUpdate *update;
 
     update = g_new0(KVMMemoryUpdate, 1);
@@ -1554,8 +1553,8 @@ static void kvm_region_del(MemoryListener *listener,
 
 static void kvm_region_commit(MemoryListener *listener)
 {
-    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener,
-                                          listener);
+    KVMMemoryListener *kml =
+        container_of(listener, KVMMemoryListener, listener);
     KVMMemoryUpdate *u1, *u2;
     bool need_inhibit = false;
 
@@ -1623,10 +1622,10 @@ static void kvm_region_commit(MemoryListener *listener)
     kvm_slots_unlock();
 }
 
-static void kvm_log_sync(MemoryListener *listener,
-                         MemoryRegionSection *section)
+static void kvm_log_sync(MemoryListener *listener, MemoryRegionSection *section)
 {
-    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
+    KVMMemoryListener *kml =
+        container_of(listener, KVMMemoryListener, listener);
 
     kvm_slots_lock();
     kvm_physical_sync_dirty_bitmap(kml, section);
@@ -1672,88 +1671,82 @@ static void kvm_log_sync_global(MemoryListener *l, bool last_stage)
 static void kvm_log_clear(MemoryListener *listener,
                           MemoryRegionSection *section)
 {
-    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
+    KVMMemoryListener *kml =
+        container_of(listener, KVMMemoryListener, listener);
     int r;
 
     r = kvm_physical_log_clear(kml, section);
     if (r < 0) {
         error_report_once("%s: kvm log clear failed: mr=%s "
-                          "offset=%"HWADDR_PRIx" size=%"PRIx64, __func__,
-                          section->mr->name, section->offset_within_region,
+                          "offset=%" HWADDR_PRIx " size=%" PRIx64,
+                          __func__, section->mr->name,
+                          section->offset_within_region,
                           int128_get64(section->size));
         abort();
     }
 }
 
 static void kvm_mem_ioeventfd_add(MemoryListener *listener,
-                                  MemoryRegionSection *section,
-                                  bool match_data, uint64_t data,
-                                  EventNotifier *e)
+                                  MemoryRegionSection *section, bool match_data,
+                                  uint64_t data, EventNotifier *e)
 {
     int fd = event_notifier_get_fd(e);
     int r;
 
-    r = kvm_set_ioeventfd_mmio(fd, section->offset_within_address_space,
-                               data, true, int128_get64(section->size),
-                               match_data);
+    r = kvm_set_ioeventfd_mmio(fd, section->offset_within_address_space, data,
+                               true, int128_get64(section->size), match_data);
     if (r < 0) {
-        fprintf(stderr, "%s: error adding ioeventfd: %s (%d)\n",
-                __func__, strerror(-r), -r);
+        fprintf(stderr, "%s: error adding ioeventfd: %s (%d)\n", __func__,
+                strerror(-r), -r);
         abort();
     }
 }
 
 static void kvm_mem_ioeventfd_del(MemoryListener *listener,
-                                  MemoryRegionSection *section,
-                                  bool match_data, uint64_t data,
-                                  EventNotifier *e)
+                                  MemoryRegionSection *section, bool match_data,
+                                  uint64_t data, EventNotifier *e)
 {
     int fd = event_notifier_get_fd(e);
     int r;
 
-    r = kvm_set_ioeventfd_mmio(fd, section->offset_within_address_space,
-                               data, false, int128_get64(section->size),
-                               match_data);
+    r = kvm_set_ioeventfd_mmio(fd, section->offset_within_address_space, data,
+                               false, int128_get64(section->size), match_data);
     if (r < 0) {
-        fprintf(stderr, "%s: error deleting ioeventfd: %s (%d)\n",
-                __func__, strerror(-r), -r);
+        fprintf(stderr, "%s: error deleting ioeventfd: %s (%d)\n", __func__,
+                strerror(-r), -r);
         abort();
     }
 }
 
 static void kvm_io_ioeventfd_add(MemoryListener *listener,
-                                 MemoryRegionSection *section,
-                                 bool match_data, uint64_t data,
-                                 EventNotifier *e)
+                                 MemoryRegionSection *section, bool match_data,
+                                 uint64_t data, EventNotifier *e)
 {
     int fd = event_notifier_get_fd(e);
     int r;
 
-    r = kvm_set_ioeventfd_pio(fd, section->offset_within_address_space,
-                              data, true, int128_get64(section->size),
-                              match_data);
+    r = kvm_set_ioeventfd_pio(fd, section->offset_within_address_space, data,
+                              true, int128_get64(section->size), match_data);
     if (r < 0) {
-        fprintf(stderr, "%s: error adding ioeventfd: %s (%d)\n",
-                __func__, strerror(-r), -r);
+        fprintf(stderr, "%s: error adding ioeventfd: %s (%d)\n", __func__,
+                strerror(-r), -r);
         abort();
     }
 }
 
 static void kvm_io_ioeventfd_del(MemoryListener *listener,
-                                 MemoryRegionSection *section,
-                                 bool match_data, uint64_t data,
-                                 EventNotifier *e)
+                                 MemoryRegionSection *section, bool match_data,
+                                 uint64_t data, EventNotifier *e)
 
 {
     int fd = event_notifier_get_fd(e);
     int r;
 
-    r = kvm_set_ioeventfd_pio(fd, section->offset_within_address_space,
-                              data, false, int128_get64(section->size),
-                              match_data);
+    r = kvm_set_ioeventfd_pio(fd, section->offset_within_address_space, data,
+                              false, int128_get64(section->size), match_data);
     if (r < 0) {
-        fprintf(stderr, "%s: error deleting ioeventfd: %s (%d)\n",
-                __func__, strerror(-r), -r);
+        fprintf(stderr, "%s: error deleting ioeventfd: %s (%d)\n", __func__,
+                strerror(-r), -r);
         abort();
     }
 }
@@ -1917,7 +1910,7 @@ static int kvm_update_routing_entry(KVMState *s,
             continue;
         }
 
-        if(!memcmp(entry, new_entry, sizeof *entry)) {
+        if (!memcmp(entry, new_entry, sizeof *entry)) {
             return 0;
         }
 
@@ -1992,7 +1985,7 @@ static void kvm_flush_dynamic_msi_routes(KVMState *s)
     unsigned int hash;
 
     for (hash = 0; hash < KVM_MSI_HASHTAB_SIZE; hash++) {
-        QTAILQ_FOREACH_SAFE(route, &s->msi_hashtab[hash], entry, next) {
+        QTAILQ_FOREACH_SAFE (route, &s->msi_hashtab[hash], entry, next) {
             kvm_irqchip_release_virq(s, route->kroute.gsi);
             QTAILQ_REMOVE(&s->msi_hashtab[hash], route, entry);
             g_free(route);
@@ -2028,7 +2021,7 @@ static KVMMSIRoute *kvm_lookup_msi_route(KVMState *s, MSIMessage msg)
     unsigned int hash = kvm_hash_msi(msg.data);
     KVMMSIRoute *route;
 
-    QTAILQ_FOREACH(route, &s->msi_hashtab[hash], entry) {
+    QTAILQ_FOREACH (route, &s->msi_hashtab[hash], entry) {
         if (route->kroute.u.msi.address_lo == (uint32_t)msg.address &&
             route->kroute.u.msi.address_hi == (msg.address >> 32) &&
             route->kroute.u.msi.data == le32_to_cpu(msg.data)) {
@@ -2087,7 +2080,7 @@ int kvm_irqchip_add_msi_route(KVMRouteChange *c, int vector, PCIDevice *dev)
     struct kvm_irq_routing_entry kroute = {};
     int virq;
     KVMState *s = c->s;
-    MSIMessage msg = {0, 0};
+    MSIMessage msg = { 0, 0 };
 
     if (pci_available && dev) {
         msg = pci_get_msi_message(dev, vector);
@@ -2121,8 +2114,8 @@ int kvm_irqchip_add_msi_route(KVMRouteChange *c, int vector, PCIDevice *dev)
         return -EINVAL;
     }
 
-    trace_kvm_irqchip_add_msi_route(dev ? dev->name : (char *)"N/A",
-                                    vector, virq);
+    trace_kvm_irqchip_add_msi_route(dev ? dev->name : (char *)"N/A", vector,
+                                    virq);
 
     kvm_add_routing_entry(s, &kroute);
     kvm_arch_add_msi_route_post(&kroute, vector, dev);
@@ -2363,7 +2356,8 @@ static void kvm_irqchip_create(KVMState *s)
     } else if (kvm_check_extension(s, KVM_CAP_S390_IRQCHIP)) {
         ret = kvm_vm_enable_cap(s, KVM_CAP_S390_IRQCHIP, 0);
         if (ret < 0) {
-            fprintf(stderr, "Enable kernel irqchip failed: %s\n", strerror(-ret));
+            fprintf(stderr, "Enable kernel irqchip failed: %s\n",
+                    strerror(-ret));
             exit(1);
         }
     } else {
@@ -2449,11 +2443,10 @@ static int kvm_init(MachineState *ms)
     const struct {
         const char *name;
         int num;
-    } num_cpus[] = {
-        { "SMP",          ms->smp.cpus },
-        { "hotpluggable", ms->smp.max_cpus },
-        { /* end of list */ }
-    }, *nc = num_cpus;
+    } num_cpus[] = { { "SMP", ms->smp.cpus },
+                     { "hotpluggable", ms->smp.max_cpus },
+                     { /* end of list */ } },
+      *nc = num_cpus;
     int soft_vcpus_limit, hard_vcpus_limit;
     KVMState *s;
     const KVMCapabilityInfo *missing_cap;
@@ -2517,9 +2510,8 @@ static int kvm_init(MachineState *ms)
     s->as = g_new0(struct KVMAs, s->nr_as);
 
     if (object_property_find(OBJECT(current_machine), "kvm-type")) {
-        g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
-                                                            "kvm-type",
-                                                            &error_abort);
+        g_autofree char *kvm_type = object_property_get_str(
+            OBJECT(current_machine), "kvm-type", &error_abort);
         type = mc->kvm_type(ms, kvm_type);
     } else if (mc->kvm_type) {
         type = mc->kvm_type(ms, NULL);
@@ -2538,7 +2530,7 @@ static int kvm_init(MachineState *ms)
             fprintf(stderr,
                     "Host kernel setup problem detected. Please verify:\n");
             fprintf(stderr, "- for kernels supporting the switch_amode or"
-                    " user_mode parameters, whether\n");
+                            " user_mode parameters, whether\n");
             fprintf(stderr,
                     "  user space is running in primary address space\n");
             fprintf(stderr,
@@ -2568,7 +2560,8 @@ static int kvm_init(MachineState *ms)
                         nc->name, nc->num, soft_vcpus_limit);
 
             if (nc->num > hard_vcpus_limit) {
-                fprintf(stderr, "Number of %s cpus requested (%d) exceeds "
+                fprintf(stderr,
+                        "Number of %s cpus requested (%d) exceeds "
                         "the maximum cpus supported by KVM (%d)\n",
                         nc->name, nc->num, hard_vcpus_limit);
                 exit(1);
@@ -2584,14 +2577,14 @@ static int kvm_init(MachineState *ms)
     }
     if (missing_cap) {
         ret = -EINVAL;
-        fprintf(stderr, "kvm does not support %s\n%s",
-                missing_cap->name, upgrade_note);
+        fprintf(stderr, "kvm does not support %s\n%s", missing_cap->name,
+                upgrade_note);
         goto err;
     }
 
     s->coalesced_mmio = kvm_check_extension(s, KVM_CAP_COALESCED_MMIO);
-    s->coalesced_pio = s->coalesced_mmio &&
-                       kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
+    s->coalesced_pio =
+        s->coalesced_mmio && kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
 
     /*
      * Enable KVM dirty ring if supported, otherwise fall back to
@@ -2618,14 +2611,14 @@ static int kvm_init(MachineState *ms)
     if (!s->kvm_dirty_ring_size) {
         dirty_log_manual_caps =
             kvm_check_extension(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-        dirty_log_manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
-                                  KVM_DIRTY_LOG_INITIALLY_SET);
+        dirty_log_manual_caps &=
+            (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | KVM_DIRTY_LOG_INITIALLY_SET);
         s->manual_dirty_log_protect = dirty_log_manual_caps;
         if (dirty_log_manual_caps) {
             ret = kvm_vm_enable_cap(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0,
                                     dirty_log_manual_caps);
             if (ret) {
-                warn_report("Trying to enable capability %"PRIu64" of "
+                warn_report("Trying to enable capability %" PRIu64 " of "
                             "KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 but failed. "
                             "Falling back to the legacy mode. ",
                             dirty_log_manual_caps);
@@ -2661,11 +2654,9 @@ static int kvm_init(MachineState *ms)
     kvm_readonly_mem_allowed =
         (kvm_check_extension(s, KVM_CAP_READONLY_MEM) > 0);
 
-    kvm_eventfds_allowed =
-        (kvm_check_extension(s, KVM_CAP_IOEVENTFD) > 0);
+    kvm_eventfds_allowed = (kvm_check_extension(s, KVM_CAP_IOEVENTFD) > 0);
 
-    kvm_irqfds_allowed =
-        (kvm_check_extension(s, KVM_CAP_IRQFD) > 0);
+    kvm_irqfds_allowed = (kvm_check_extension(s, KVM_CAP_IRQFD) > 0);
 
     kvm_resamplefds_allowed =
         (kvm_check_extension(s, KVM_CAP_IRQFD_RESAMPLE) > 0);
@@ -2677,8 +2668,7 @@ static int kvm_init(MachineState *ms)
         (kvm_check_extension(s, KVM_CAP_IOEVENTFD_ANY_LENGTH) > 0);
 
 #ifdef KVM_CAP_SET_GUEST_DEBUG
-    kvm_has_guest_debug =
-        (kvm_check_extension(s, KVM_CAP_SET_GUEST_DEBUG) > 0);
+    kvm_has_guest_debug = (kvm_check_extension(s, KVM_CAP_SET_GUEST_DEBUG) > 0);
 #endif
 
     kvm_sstep_flags = 0;
@@ -2703,7 +2693,8 @@ static int kvm_init(MachineState *ms)
     }
 
     if (s->kernel_irqchip_split == ON_OFF_AUTO_AUTO) {
-        s->kernel_irqchip_split = mc->default_kernel_irqchip_split ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+        s->kernel_irqchip_split =
+            mc->default_kernel_irqchip_split ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
     }
 
     qemu_register_reset(kvm_unpoison_all, NULL);
@@ -2719,14 +2710,12 @@ static int kvm_init(MachineState *ms)
     s->memory_listener.listener.coalesced_io_add = kvm_coalesce_mmio_region;
     s->memory_listener.listener.coalesced_io_del = kvm_uncoalesce_mmio_region;
 
-    kvm_memory_listener_register(s, &s->memory_listener,
-                                 &address_space_memory, 0, "kvm-memory");
+    kvm_memory_listener_register(s, &s->memory_listener, &address_space_memory,
+                                 0, "kvm-memory");
     if (kvm_eventfds_allowed) {
-        memory_listener_register(&kvm_io_listener,
-                                 &address_space_io);
+        memory_listener_register(&kvm_io_listener, &address_space_io);
     }
-    memory_listener_register(&kvm_coalesced_pio_listener,
-                             &address_space_io);
+    memory_listener_register(&kvm_coalesced_pio_listener, &address_space_io);
 
     s->many_ioeventfds = kvm_check_many_ioeventfds();
 
@@ -2768,15 +2757,14 @@ void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len)
     s->sigmask_len = sigmask_len;
 }
 
-static void kvm_handle_io(uint16_t port, MemTxAttrs attrs, void *data, int direction,
-                          int size, uint32_t count)
+static void kvm_handle_io(uint16_t port, MemTxAttrs attrs, void *data,
+                          int direction, int size, uint32_t count)
 {
     int i;
     uint8_t *ptr = data;
 
     for (i = 0; i < count; i++) {
-        address_space_rw(&address_space_io, port, attrs,
-                         ptr, size,
+        address_space_rw(&address_space_io, port, attrs, ptr, size,
                          direction == KVM_EXIT_IO_OUT);
         ptr += size;
     }
@@ -2791,8 +2779,8 @@ static int kvm_handle_internal_error(CPUState *cpu, struct kvm_run *run)
         int i;
 
         for (i = 0; i < run->internal.ndata; ++i) {
-            fprintf(stderr, "extra data[%d]: 0x%016"PRIx64"\n",
-                    i, (uint64_t)run->internal.data[i]);
+            fprintf(stderr, "extra data[%d]: 0x%016" PRIx64 "\n", i,
+                    (uint64_t)run->internal.data[i]);
         }
     }
     if (run->internal.suberror == KVM_INTERNAL_ERROR_EMULATION) {
@@ -2860,7 +2848,8 @@ void kvm_cpu_synchronize_state(CPUState *cpu)
     }
 }
 
-static void do_kvm_cpu_synchronize_post_reset(CPUState *cpu, run_on_cpu_data arg)
+static void do_kvm_cpu_synchronize_post_reset(CPUState *cpu,
+                                              run_on_cpu_data arg)
 {
     kvm_arch_put_registers(cpu, KVM_PUT_RESET_STATE);
     cpu->vcpu_dirty = false;
@@ -2882,7 +2871,8 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
     run_on_cpu(cpu, do_kvm_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
 }
 
-static void do_kvm_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
+static void do_kvm_cpu_synchronize_pre_loadvm(CPUState *cpu,
+                                              run_on_cpu_data arg)
 {
     cpu->vcpu_dirty = true;
 }
@@ -3007,8 +2997,7 @@ int kvm_cpu_exec(CPUState *cpu)
                 ret = EXCP_INTERRUPT;
                 break;
             }
-            fprintf(stderr, "error: kvm run failed %s\n",
-                    strerror(-run_ret));
+            fprintf(stderr, "error: kvm run failed %s\n", strerror(-run_ret));
 #ifdef TARGET_PPC
             if (run_ret == -EBUSY) {
                 fprintf(stderr,
@@ -3028,19 +3017,14 @@ int kvm_cpu_exec(CPUState *cpu)
             /* Called outside BQL */
             kvm_handle_io(run->io.port, attrs,
                           (uint8_t *)run + run->io.data_offset,
-                          run->io.direction,
-                          run->io.size,
-                          run->io.count);
+                          run->io.direction, run->io.size, run->io.count);
             ret = 0;
             break;
         case KVM_EXIT_MMIO:
             DPRINTF("handle_mmio\n");
             /* Called outside BQL */
-            address_space_rw(&address_space_memory,
-                             run->mmio.phys_addr, attrs,
-                             run->mmio.data,
-                             run->mmio.len,
-                             run->mmio.is_write);
+            address_space_rw(&address_space_memory, run->mmio.phys_addr, attrs,
+                             run->mmio.data, run->mmio.len, run->mmio.is_write);
             ret = 0;
             break;
         case KVM_EXIT_IRQ_WINDOW_OPEN:
@@ -3230,8 +3214,8 @@ int kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr)
     return kvm_device_ioctl(dev_fd, KVM_HAS_DEVICE_ATTR, &attribute) ? 0 : 1;
 }
 
-int kvm_device_access(int fd, int group, uint64_t attr,
-                      void *val, bool write, Error **errp)
+int kvm_device_access(int fd, int group, uint64_t attr, void *val, bool write,
+                      Error **errp)
 {
     struct kvm_device_attr kvmattr;
     int err;
@@ -3241,9 +3225,8 @@ int kvm_device_access(int fd, int group, uint64_t attr,
     kvmattr.attr = attr;
     kvmattr.addr = (uintptr_t)val;
 
-    err = kvm_device_ioctl(fd,
-                           write ? KVM_SET_DEVICE_ATTR : KVM_GET_DEVICE_ATTR,
-                           &kvmattr);
+    err = kvm_device_ioctl(
+        fd, write ? KVM_SET_DEVICE_ATTR : KVM_GET_DEVICE_ATTR, &kvmattr);
     if (err < 0) {
         error_setg_errno(errp, -err,
                          "KVM_%s_DEVICE_ATTR failed: Group %d "
@@ -3306,12 +3289,11 @@ bool kvm_arm_supports_user_irq(void)
 }
 
 #ifdef KVM_CAP_SET_GUEST_DEBUG
-struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu,
-                                                 target_ulong pc)
+struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu, target_ulong pc)
 {
     struct kvm_sw_breakpoint *bp;
 
-    QTAILQ_FOREACH(bp, &cpu->kvm_state->kvm_sw_breakpoints, entry) {
+    QTAILQ_FOREACH (bp, &cpu->kvm_state->kvm_sw_breakpoints, entry) {
         if (bp->pc == pc) {
             return bp;
         }
@@ -3332,10 +3314,9 @@ struct kvm_set_guest_debug_data {
 static void kvm_invoke_set_guest_debug(CPUState *cpu, run_on_cpu_data data)
 {
     struct kvm_set_guest_debug_data *dbg_data =
-        (struct kvm_set_guest_debug_data *) data.host_ptr;
+        (struct kvm_set_guest_debug_data *)data.host_ptr;
 
-    dbg_data->err = kvm_vcpu_ioctl(cpu, KVM_SET_GUEST_DEBUG,
-                                   &dbg_data->dbg);
+    dbg_data->err = kvm_vcpu_ioctl(cpu, KVM_SET_GUEST_DEBUG, &dbg_data->dbg);
 }
 
 int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap)
@@ -3353,8 +3334,7 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap)
     }
     kvm_arch_update_guest_debug(cpu, &data.dbg);
 
-    run_on_cpu(cpu, kvm_invoke_set_guest_debug,
-               RUN_ON_CPU_HOST_PTR(&data));
+    run_on_cpu(cpu, kvm_invoke_set_guest_debug, RUN_ON_CPU_HOST_PTR(&data));
     return data.err;
 }
 
@@ -3393,7 +3373,7 @@ int kvm_insert_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len)
         }
     }
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         err = kvm_update_guest_debug(cpu, 0);
         if (err) {
             return err;
@@ -3432,7 +3412,7 @@ int kvm_remove_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len)
         }
     }
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         err = kvm_update_guest_debug(cpu, 0);
         if (err) {
             return err;
@@ -3447,10 +3427,10 @@ void kvm_remove_all_breakpoints(CPUState *cpu)
     KVMState *s = cpu->kvm_state;
     CPUState *tmpcpu;
 
-    QTAILQ_FOREACH_SAFE(bp, &s->kvm_sw_breakpoints, entry, next) {
+    QTAILQ_FOREACH_SAFE (bp, &s->kvm_sw_breakpoints, entry, next) {
         if (kvm_arch_remove_sw_breakpoint(cpu, bp) != 0) {
             /* Try harder to find a CPU that currently sees the breakpoint. */
-            CPU_FOREACH(tmpcpu) {
+            CPU_FOREACH (tmpcpu) {
                 if (kvm_arch_remove_sw_breakpoint(tmpcpu, bp) == 0) {
                     break;
                 }
@@ -3461,7 +3441,7 @@ void kvm_remove_all_breakpoints(CPUState *cpu)
     }
     kvm_arch_remove_all_hw_breakpoints();
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         kvm_update_guest_debug(cpu, 0);
     }
 }
@@ -3594,7 +3574,7 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source)
     int r;
 
     reg.id = id;
-    reg.addr = (uintptr_t) source;
+    reg.addr = (uintptr_t)source;
     r = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
     if (r) {
         trace_kvm_failed_reg_set(id, strerror(-r));
@@ -3608,7 +3588,7 @@ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target)
     int r;
 
     reg.id = id;
-    reg.addr = (uintptr_t) target;
+    reg.addr = (uintptr_t)target;
     r = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
     if (r) {
         trace_kvm_failed_reg_get(id, strerror(-r));
@@ -3625,17 +3605,16 @@ static bool kvm_accel_has_memory(MachineState *ms, AddressSpace *as,
     for (i = 0; i < kvm->nr_as; ++i) {
         if (kvm->as[i].as == as && kvm->as[i].ml) {
             size = MIN(kvm_max_slot_size, size);
-            return NULL != kvm_lookup_matching_slot(kvm->as[i].ml,
-                                                    start_addr, size);
+            return NULL !=
+                   kvm_lookup_matching_slot(kvm->as[i].ml, start_addr, size);
         }
     }
 
     return false;
 }
 
-static void kvm_get_kvm_shadow_mem(Object *obj, Visitor *v,
-                                   const char *name, void *opaque,
-                                   Error **errp)
+static void kvm_get_kvm_shadow_mem(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
 {
     KVMState *s = KVM_STATE(obj);
     int64_t value = s->kvm_shadow_mem;
@@ -3643,15 +3622,16 @@ static void kvm_get_kvm_shadow_mem(Object *obj, Visitor *v,
     visit_type_int(v, name, &value, errp);
 }
 
-static void kvm_set_kvm_shadow_mem(Object *obj, Visitor *v,
-                                   const char *name, void *opaque,
-                                   Error **errp)
+static void kvm_set_kvm_shadow_mem(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
 {
     KVMState *s = KVM_STATE(obj);
     int64_t value;
 
     if (s->fd != -1) {
-        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
+        error_setg(
+            errp,
+            "Cannot set properties after the accelerator has been initialized");
         return;
     }
 
@@ -3662,15 +3642,16 @@ static void kvm_set_kvm_shadow_mem(Object *obj, Visitor *v,
     s->kvm_shadow_mem = value;
 }
 
-static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
-                                   const char *name, void *opaque,
-                                   Error **errp)
+static void kvm_set_kernel_irqchip(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
 {
     KVMState *s = KVM_STATE(obj);
     OnOffSplit mode;
 
     if (s->fd != -1) {
-        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
+        error_setg(
+            errp,
+            "Cannot set properties after the accelerator has been initialized");
         return;
     }
 
@@ -3716,9 +3697,8 @@ bool kvm_kernel_irqchip_split(void)
     return kvm_state->kernel_irqchip_split == ON_OFF_AUTO_ON;
 }
 
-static void kvm_get_dirty_ring_size(Object *obj, Visitor *v,
-                                    const char *name, void *opaque,
-                                    Error **errp)
+static void kvm_get_dirty_ring_size(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
 {
     KVMState *s = KVM_STATE(obj);
     uint32_t value = s->kvm_dirty_ring_size;
@@ -3726,15 +3706,16 @@ static void kvm_get_dirty_ring_size(Object *obj, Visitor *v,
     visit_type_uint32(v, name, &value, errp);
 }
 
-static void kvm_set_dirty_ring_size(Object *obj, Visitor *v,
-                                    const char *name, void *opaque,
-                                    Error **errp)
+static void kvm_set_dirty_ring_size(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
 {
     KVMState *s = KVM_STATE(obj);
     uint32_t value;
 
     if (s->fd != -1) {
-        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
+        error_setg(
+            errp,
+            "Cannot set properties after the accelerator has been initialized");
         return;
     }
 
@@ -3788,22 +3769,22 @@ static void kvm_accel_class_init(ObjectClass *oc, void *data)
     ac->allowed = &kvm_allowed;
     ac->gdbstub_supported_sstep_flags = kvm_gdbstub_sstep_flags;
 
-    object_class_property_add(oc, "kernel-irqchip", "on|off|split",
-        NULL, kvm_set_kernel_irqchip,
-        NULL, NULL);
+    object_class_property_add(oc, "kernel-irqchip", "on|off|split", NULL,
+                              kvm_set_kernel_irqchip, NULL, NULL);
     object_class_property_set_description(oc, "kernel-irqchip",
-        "Configure KVM in-kernel irqchip");
+                                          "Configure KVM in-kernel irqchip");
 
     object_class_property_add(oc, "kvm-shadow-mem", "int",
-        kvm_get_kvm_shadow_mem, kvm_set_kvm_shadow_mem,
-        NULL, NULL);
+                              kvm_get_kvm_shadow_mem, kvm_set_kvm_shadow_mem,
+                              NULL, NULL);
     object_class_property_set_description(oc, "kvm-shadow-mem",
-        "KVM shadow MMU size");
+                                          "KVM shadow MMU size");
 
     object_class_property_add(oc, "dirty-ring-size", "uint32",
-        kvm_get_dirty_ring_size, kvm_set_dirty_ring_size,
-        NULL, NULL);
-    object_class_property_set_description(oc, "dirty-ring-size",
+                              kvm_get_dirty_ring_size, kvm_set_dirty_ring_size,
+                              NULL, NULL);
+    object_class_property_set_description(
+        oc, "dirty-ring-size",
         "Size of KVM dirty page ring buffer (default: 0, i.e. use bitmap)");
 
     kvm_arch_accel_class_init(oc);
@@ -3834,11 +3815,9 @@ typedef struct StatsArgs {
 } StatsArgs;
 
 static StatsList *add_kvmstat_entry(struct kvm_stats_desc *pdesc,
-                                    uint64_t *stats_data,
-                                    StatsList *stats_list,
+                                    uint64_t *stats_data, StatsList *stats_list,
                                     Error **errp)
 {
-
     Stats *stats;
     uint64List *val_list = NULL;
 
@@ -3876,7 +3855,8 @@ static StatsList *add_kvmstat_entry(struct kvm_stats_desc *pdesc,
     /* Alloc and populate data list */
     stats = g_new0(Stats, 1);
     stats->name = g_strdup(pdesc->name);
-    stats->value = g_new0(StatsValue, 1);;
+    stats->value = g_new0(StatsValue, 1);
+    ;
 
     if ((pdesc->flags & KVM_STATS_UNIT_MASK) == KVM_STATS_UNIT_BOOLEAN) {
         stats->value->u.boolean = *stats_data;
@@ -3982,15 +3962,15 @@ typedef struct StatsDescriptors {
     QTAILQ_ENTRY(StatsDescriptors) next;
 } StatsDescriptors;
 
-static QTAILQ_HEAD(, StatsDescriptors) stats_descriptors =
-    QTAILQ_HEAD_INITIALIZER(stats_descriptors);
+static QTAILQ_HEAD(, StatsDescriptors)
+    stats_descriptors = QTAILQ_HEAD_INITIALIZER(stats_descriptors);
 
 /*
  * Return the descriptors for 'target', that either have already been read
  * or are retrieved from 'stats_fd'.
  */
-static StatsDescriptors *find_stats_descriptors(StatsTarget target, int stats_fd,
-                                                Error **errp)
+static StatsDescriptors *find_stats_descriptors(StatsTarget target,
+                                                int stats_fd, Error **errp)
 {
     StatsDescriptors *descriptors;
     const char *ident;
@@ -4000,7 +3980,7 @@ static StatsDescriptors *find_stats_descriptors(StatsTarget target, int stats_fd
     ssize_t ret;
 
     ident = StatsTarget_str(target);
-    QTAILQ_FOREACH(descriptors, &stats_descriptors, next) {
+    QTAILQ_FOREACH (descriptors, &stats_descriptors, next) {
         if (g_str_equal(descriptors->ident, ident)) {
             return descriptors;
         }
@@ -4012,7 +3992,8 @@ static StatsDescriptors *find_stats_descriptors(StatsTarget target, int stats_fd
     kvm_stats_header = &descriptors->kvm_stats_header;
     ret = pread(stats_fd, kvm_stats_header, sizeof(*kvm_stats_header), 0);
     if (ret != sizeof(*kvm_stats_header)) {
-        error_setg(errp, "KVM stats: failed to read stats header: "
+        error_setg(errp,
+                   "KVM stats: failed to read stats header: "
                    "expected %zu actual %zu",
                    sizeof(*kvm_stats_header), ret);
         g_free(descriptors);
@@ -4022,12 +4003,13 @@ static StatsDescriptors *find_stats_descriptors(StatsTarget target, int stats_fd
 
     /* Read stats descriptors */
     kvm_stats_desc = g_malloc0_n(kvm_stats_header->num_desc, size_desc);
-    ret = pread(stats_fd, kvm_stats_desc,
-                size_desc * kvm_stats_header->num_desc,
-                kvm_stats_header->desc_offset);
+    ret =
+        pread(stats_fd, kvm_stats_desc, size_desc * kvm_stats_header->num_desc,
+              kvm_stats_header->desc_offset);
 
     if (ret != size_desc * kvm_stats_header->num_desc) {
-        error_setg(errp, "KVM stats: failed to read stats descriptors: "
+        error_setg(errp,
+                   "KVM stats: failed to read stats descriptors: "
                    "expected %zu actual %zu",
                    size_desc * kvm_stats_header->num_desc, ret);
         g_free(descriptors);
@@ -4073,8 +4055,10 @@ static void query_stats(StatsResultList **result, StatsTarget target,
     ret = pread(stats_fd, stats_data, size_data, kvm_stats_header->data_offset);
 
     if (ret != size_data) {
-        error_setg(errp, "KVM stats: failed to read data: "
-                   "expected %zu actual %zu", size_data, ret);
+        error_setg(errp,
+                   "KVM stats: failed to read data: "
+                   "expected %zu actual %zu",
+                   size_data, ret);
         return;
     }
 
@@ -4100,8 +4084,7 @@ static void query_stats(StatsResultList **result, StatsTarget target,
         break;
     case STATS_TARGET_VCPU:
         add_stats_entry(result, STATS_PROVIDER_KVM,
-                        cpu->parent_obj.canonical_path,
-                        stats_list);
+                        cpu->parent_obj.canonical_path, stats_list);
         break;
     default:
         g_assert_not_reached();
@@ -4148,8 +4131,7 @@ static void query_stats_vcpu(CPUState *cpu, StatsArgs *kvm_stats_args)
         return;
     }
     query_stats(kvm_stats_args->result.stats, STATS_TARGET_VCPU,
-                kvm_stats_args->names, stats_fd, cpu,
-                kvm_stats_args->errp);
+                kvm_stats_args->names, stats_fd, cpu, kvm_stats_args->errp);
 }
 
 static void query_stats_schema_vcpu(CPUState *cpu, StatsArgs *kvm_stats_args)
@@ -4162,8 +4144,8 @@ static void query_stats_schema_vcpu(CPUState *cpu, StatsArgs *kvm_stats_args)
         error_propagate(kvm_stats_args->errp, local_err);
         return;
     }
-    query_stats_schema(kvm_stats_args->result.schema, STATS_TARGET_VCPU, stats_fd,
-                       kvm_stats_args->errp);
+    query_stats_schema(kvm_stats_args->result.schema, STATS_TARGET_VCPU,
+                       stats_fd, kvm_stats_args->errp);
 }
 
 static void query_stats_cb(StatsResultList **result, StatsTarget target,
@@ -4174,8 +4156,7 @@ static void query_stats_cb(StatsResultList **result, StatsTarget target,
     int stats_fd;
 
     switch (target) {
-    case STATS_TARGET_VM:
-    {
+    case STATS_TARGET_VM: {
         stats_fd = kvm_vm_ioctl(s, KVM_GET_STATS_FD, NULL);
         if (stats_fd == -1) {
             error_setg_errno(errp, errno, "KVM stats: ioctl failed");
@@ -4185,14 +4166,14 @@ static void query_stats_cb(StatsResultList **result, StatsTarget target,
         close(stats_fd);
         break;
     }
-    case STATS_TARGET_VCPU:
-    {
+    case STATS_TARGET_VCPU: {
         StatsArgs stats_args;
         stats_args.result.stats = result;
         stats_args.names = names;
         stats_args.errp = errp;
-        CPU_FOREACH(cpu) {
-            if (!apply_str_list_filter(cpu->parent_obj.canonical_path, targets)) {
+        CPU_FOREACH (cpu) {
+            if (!apply_str_list_filter(cpu->parent_obj.canonical_path,
+                                       targets)) {
                 continue;
             }
             query_stats_vcpu(cpu, &stats_args);

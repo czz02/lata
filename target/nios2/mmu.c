@@ -28,8 +28,7 @@
 
 
 /* rw - 0 = read, 1 = write, 2 = fetch.  */
-unsigned int mmu_translate(CPUNios2State *env,
-                           Nios2MMULookup *lu,
+unsigned int mmu_translate(CPUNios2State *env, Nios2MMULookup *lu,
                            target_ulong vaddr, int rw, int mmu_idx)
 {
     Nios2CPU *cpu = env_archcpu(env);
@@ -43,7 +42,7 @@ unsigned int mmu_translate(CPUNios2State *env,
 
         if (((entry->tag >> 12) != vpn) ||
             (((entry->tag & (1 << 11)) == 0) &&
-            ((entry->tag & ((1 << cpu->pid_num_bits) - 1)) != pid))) {
+             ((entry->tag & ((1 << cpu->pid_num_bits) - 1)) != pid))) {
             trace_nios2_mmu_translate_miss(vaddr, pid, index, entry->tag);
             continue;
         }
@@ -86,13 +85,11 @@ void helper_mmu_write_tlbacc(CPUNios2State *env, uint32_t v)
     CPUState *cs = env_cpu(env);
     Nios2CPU *cpu = env_archcpu(env);
 
-    trace_nios2_mmu_write_tlbacc(FIELD_EX32(v, CR_TLBACC, IG),
-                                 (v & CR_TLBACC_C) ? 'C' : '.',
-                                 (v & CR_TLBACC_R) ? 'R' : '.',
-                                 (v & CR_TLBACC_W) ? 'W' : '.',
-                                 (v & CR_TLBACC_X) ? 'X' : '.',
-                                 (v & CR_TLBACC_G) ? 'G' : '.',
-                                 FIELD_EX32(v, CR_TLBACC, PFN));
+    trace_nios2_mmu_write_tlbacc(
+        FIELD_EX32(v, CR_TLBACC, IG), (v & CR_TLBACC_C) ? 'C' : '.',
+        (v & CR_TLBACC_R) ? 'R' : '.', (v & CR_TLBACC_W) ? 'W' : '.',
+        (v & CR_TLBACC_X) ? 'X' : '.', (v & CR_TLBACC_G) ? 'G' : '.',
+        FIELD_EX32(v, CR_TLBACC, PFN));
 
     /* if tlbmisc.WE == 1 then trigger a TLB write on writes to TLBACC */
     if (env->ctrl[CR_TLBMISC] & CR_TLBMISC_WE) {
@@ -101,9 +98,8 @@ void helper_mmu_write_tlbacc(CPUNios2State *env, uint32_t v)
         int pid = FIELD_EX32(env->mmu.tlbmisc_wr, CR_TLBMISC, PID);
         int g = FIELD_EX32(v, CR_TLBACC, G);
         int valid = FIELD_EX32(vpn, CR_TLBACC, PFN) < 0xC0000;
-        Nios2TLBEntry *entry =
-            &env->mmu.tlb[(way * cpu->tlb_num_ways) +
-                          (vpn & env->mmu.tlb_entry_mask)];
+        Nios2TLBEntry *entry = &env->mmu.tlb[(way * cpu->tlb_num_ways) +
+                                             (vpn & env->mmu.tlb_entry_mask)];
         uint32_t newTag = (vpn << 12) | (g << 11) | (valid << 10) | pid;
         uint32_t newData = v & (CR_TLBACC_C | CR_TLBACC_R | CR_TLBACC_W |
                                 CR_TLBACC_X | R_CR_TLBACC_PFN_MASK);
@@ -117,9 +113,9 @@ void helper_mmu_write_tlbacc(CPUNios2State *env, uint32_t v)
             entry->data = newData;
         }
         /* Auto-increment tlbmisc.WAY */
-        env->ctrl[CR_TLBMISC] = FIELD_DP32(env->ctrl[CR_TLBMISC],
-                                           CR_TLBMISC, WAY,
-                                           (way + 1) & (cpu->tlb_num_ways - 1));
+        env->ctrl[CR_TLBMISC] =
+            FIELD_DP32(env->ctrl[CR_TLBMISC], CR_TLBMISC, WAY,
+                       (way + 1) & (cpu->tlb_num_ways - 1));
     }
 
     /* Writes to TLBACC don't change the read-back value */
@@ -133,14 +129,11 @@ void helper_mmu_write_tlbmisc(CPUNios2State *env, uint32_t v)
     uint32_t old_pid = FIELD_EX32(env->mmu.tlbmisc_wr, CR_TLBMISC, PID);
     uint32_t way = FIELD_EX32(v, CR_TLBMISC, WAY);
 
-    trace_nios2_mmu_write_tlbmisc(way,
-                                  (v & CR_TLBMISC_RD) ? 'R' : '.',
-                                  (v & CR_TLBMISC_WE) ? 'W' : '.',
-                                  (v & CR_TLBMISC_DBL) ? '2' : '.',
-                                  (v & CR_TLBMISC_BAD) ? 'B' : '.',
-                                  (v & CR_TLBMISC_PERM) ? 'P' : '.',
-                                  (v & CR_TLBMISC_D) ? 'D' : '.',
-                                  new_pid);
+    trace_nios2_mmu_write_tlbmisc(
+        way, (v & CR_TLBMISC_RD) ? 'R' : '.', (v & CR_TLBMISC_WE) ? 'W' : '.',
+        (v & CR_TLBMISC_DBL) ? '2' : '.', (v & CR_TLBMISC_BAD) ? 'B' : '.',
+        (v & CR_TLBMISC_PERM) ? 'P' : '.', (v & CR_TLBMISC_D) ? 'D' : '.',
+        new_pid);
 
     if (new_pid != old_pid) {
         mmu_flush_pid(env, old_pid);
@@ -149,19 +142,16 @@ void helper_mmu_write_tlbmisc(CPUNios2State *env, uint32_t v)
     /* if tlbmisc.RD == 1 then trigger a TLB read on writes to TLBMISC */
     if (v & CR_TLBMISC_RD) {
         int vpn = FIELD_EX32(env->mmu.pteaddr_wr, CR_PTEADDR, VPN);
-        Nios2TLBEntry *entry =
-            &env->mmu.tlb[(way * cpu->tlb_num_ways) +
-                          (vpn & env->mmu.tlb_entry_mask)];
+        Nios2TLBEntry *entry = &env->mmu.tlb[(way * cpu->tlb_num_ways) +
+                                             (vpn & env->mmu.tlb_entry_mask)];
 
         env->ctrl[CR_TLBACC] &= R_CR_TLBACC_IG_MASK;
         env->ctrl[CR_TLBACC] |= entry->data;
         env->ctrl[CR_TLBACC] |= (entry->tag & (1 << 11)) ? CR_TLBACC_G : 0;
-        env->ctrl[CR_TLBMISC] = FIELD_DP32(v, CR_TLBMISC, PID,
-                                           entry->tag &
-                                           ((1 << cpu->pid_num_bits) - 1));
-        env->ctrl[CR_PTEADDR] = FIELD_DP32(env->ctrl[CR_PTEADDR],
-                                           CR_PTEADDR, VPN,
-                                           entry->tag >> TARGET_PAGE_BITS);
+        env->ctrl[CR_TLBMISC] = FIELD_DP32(
+            v, CR_TLBMISC, PID, entry->tag & ((1 << cpu->pid_num_bits) - 1));
+        env->ctrl[CR_PTEADDR] = FIELD_DP32(env->ctrl[CR_PTEADDR], CR_PTEADDR,
+                                           VPN, entry->tag >> TARGET_PAGE_BITS);
     } else {
         env->ctrl[CR_TLBMISC] = v;
     }
@@ -194,17 +184,15 @@ void dump_mmu(CPUNios2State *env)
     Nios2CPU *cpu = env_archcpu(env);
     int i;
 
-    qemu_printf("MMU: ways %d, entries %d, pid bits %d\n",
-                cpu->tlb_num_ways, cpu->tlb_num_entries,
-                cpu->pid_num_bits);
+    qemu_printf("MMU: ways %d, entries %d, pid bits %d\n", cpu->tlb_num_ways,
+                cpu->tlb_num_entries, cpu->pid_num_bits);
 
     for (i = 0; i < cpu->tlb_num_entries; i++) {
         Nios2TLBEntry *entry = &env->mmu.tlb[i];
         qemu_printf("TLB[%d] = %08X %08X %c VPN %05X "
                     "PID %02X %c PFN %05X %c%c%c%c\n",
                     i, entry->tag, entry->data,
-                    (entry->tag & (1 << 10)) ? 'V' : '-',
-                    entry->tag >> 12,
+                    (entry->tag & (1 << 10)) ? 'V' : '-', entry->tag >> 12,
                     entry->tag & ((1 << cpu->pid_num_bits) - 1),
                     (entry->tag & (1 << 11)) ? 'G' : '-',
                     FIELD_EX32(entry->data, CR_TLBACC, PFN),

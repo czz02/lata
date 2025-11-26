@@ -27,7 +27,7 @@
 #include "qapi/visitor.h"
 #include "tcg/tcg.h"
 
-//#define DEBUG_FEATURES
+// #define DEBUG_FEATURES
 
 static void sparc_cpu_reset_hold(Object *obj)
 {
@@ -110,8 +110,8 @@ static void cpu_sparc_disas_set_info(CPUState *cpu, disassemble_info *info)
 #endif
 }
 
-static void
-cpu_add_feat_as_prop(const char *typename, const char *name, const char *val)
+static void cpu_add_feat_as_prop(const char *typename, const char *name,
+                                 const char *val)
 {
     GlobalProperty *prop = g_new0(typeof(*prop), 1);
     prop->driver = typename;
@@ -137,8 +137,7 @@ static void sparc_cpu_parse_features(const char *typename, char *features,
         return;
     }
 
-    for (featurestr = strtok(features, ",");
-         featurestr;
+    for (featurestr = strtok(features, ","); featurestr;
          featurestr = strtok(NULL, ",")) {
         const char *name;
         const char *val = NULL;
@@ -146,12 +145,12 @@ static void sparc_cpu_parse_features(const char *typename, char *features,
 
         /* Compatibility syntax: */
         if (featurestr[0] == '+') {
-            plus_features = g_list_append(plus_features,
-                                          g_strdup(featurestr + 1));
+            plus_features =
+                g_list_append(plus_features, g_strdup(featurestr + 1));
             continue;
         } else if (featurestr[0] == '-') {
-            minus_features = g_list_append(minus_features,
-                                           g_strdup(featurestr + 1));
+            minus_features =
+                g_list_append(minus_features, g_strdup(featurestr + 1));
             continue;
         }
 
@@ -171,12 +170,12 @@ static void sparc_cpu_parse_features(const char *typename, char *features,
              * TODO: remove minus-override-plus semantics after
              *       warning for a few releases
              */
-            if (!strcasecmp(val, "on") ||
-                !strcasecmp(val, "off") ||
-                !strcasecmp(val, "true") ||
-                !strcasecmp(val, "false")) {
-                error_setg(errp, "Boolean properties in format %s=%s"
-                                 " are not supported", name, val);
+            if (!strcasecmp(val, "on") || !strcasecmp(val, "off") ||
+                !strcasecmp(val, "true") || !strcasecmp(val, "false")) {
+                error_setg(errp,
+                           "Boolean properties in format %s=%s"
+                           " are not supported",
+                           name, val);
                 return;
             }
         } else {
@@ -342,8 +341,8 @@ static const sparc_def_t sparc_defs[] = {
         .mmu_version = mmu_sun4v,
         .nwindows = 8,
         .maxtl = 6,
-        .features = CPU_DEFAULT_FEATURES | CPU_FEATURE_HYPV | CPU_FEATURE_CMT
-        | CPU_FEATURE_GL,
+        .features = CPU_DEFAULT_FEATURES | CPU_FEATURE_HYPV | CPU_FEATURE_CMT |
+                    CPU_FEATURE_GL,
     },
     {
         .name = "Sun UltraSparc T2",
@@ -353,8 +352,8 @@ static const sparc_def_t sparc_defs[] = {
         .mmu_version = mmu_sun4v,
         .nwindows = 8,
         .maxtl = 6,
-        .features = CPU_DEFAULT_FEATURES | CPU_FEATURE_HYPV | CPU_FEATURE_CMT
-        | CPU_FEATURE_GL,
+        .features = CPU_DEFAULT_FEATURES | CPU_FEATURE_HYPV | CPU_FEATURE_CMT |
+                    CPU_FEATURE_GL,
     },
     {
         .name = "NEC UltraSparc I",
@@ -404,8 +403,8 @@ static const sparc_def_t sparc_defs[] = {
         .mmu_trcr_mask = 0x0000003f,
         .nwindows = 7,
         .features = CPU_FEATURE_FLOAT | CPU_FEATURE_SWAP | CPU_FEATURE_MUL |
-        CPU_FEATURE_DIV | CPU_FEATURE_FLUSH | CPU_FEATURE_FSQRT |
-        CPU_FEATURE_FMUL,
+                    CPU_FEATURE_DIV | CPU_FEATURE_FLUSH | CPU_FEATURE_FSQRT |
+                    CPU_FEATURE_FMUL,
     },
     {
         .name = "TI MicroSparc II",
@@ -539,27 +538,15 @@ static const sparc_def_t sparc_defs[] = {
         .mmu_trcr_mask = 0xffffffff,
         .nwindows = 8,
         .features = CPU_DEFAULT_FEATURES | CPU_FEATURE_TA0_SHUTDOWN |
-        CPU_FEATURE_ASR17 | CPU_FEATURE_CACHE_CTRL | CPU_FEATURE_POWERDOWN |
-        CPU_FEATURE_CASA,
+                    CPU_FEATURE_ASR17 | CPU_FEATURE_CACHE_CTRL |
+                    CPU_FEATURE_POWERDOWN | CPU_FEATURE_CASA,
     },
 #endif
 };
 
-static const char * const feature_name[] = {
-    "float",
-    "float128",
-    "swap",
-    "mul",
-    "div",
-    "flush",
-    "fsqrt",
-    "fmul",
-    "vis1",
-    "vis2",
-    "fsmuld",
-    "hypv",
-    "cmt",
-    "gl",
+static const char *const feature_name[] = {
+    "float", "float128", "swap", "mul",    "div",  "flush", "fsqrt",
+    "fmul",  "vis1",     "vis2", "fsmuld", "hypv", "cmt",   "gl",
 };
 
 static void print_features(uint32_t features, const char *prefix)
@@ -583,10 +570,8 @@ void sparc_cpu_list(void)
     for (i = 0; i < ARRAY_SIZE(sparc_defs); i++) {
         qemu_printf("Sparc %16s IU " TARGET_FMT_lx
                     " FPU %08x MMU %08x NWINS %d ",
-                    sparc_defs[i].name,
-                    sparc_defs[i].iu_version,
-                    sparc_defs[i].fpu_version,
-                    sparc_defs[i].mmu_version,
+                    sparc_defs[i].name, sparc_defs[i].iu_version,
+                    sparc_defs[i].fpu_version, sparc_defs[i].mmu_version,
                     sparc_defs[i].nwindows);
         print_features(CPU_DEFAULT_FEATURES & ~sparc_defs[i].features, "-");
         print_features(~CPU_DEFAULT_FEATURES & sparc_defs[i].features, "+");
@@ -636,8 +621,8 @@ static void sparc_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     for (x = 0; x < 3; x++) {
         for (i = 0; i < 8; i++) {
             if (i % REGS_PER_LINE == 0) {
-                qemu_fprintf(f, "%%%c%d-%d: ",
-                             x == 0 ? 'o' : (x == 1 ? 'l' : 'i'),
+                qemu_fprintf(f,
+                             "%%%c%d-%d: ", x == 0 ? 'o' : (x == 1 ? 'l' : 'i'),
                              i, i + REGS_PER_LINE - 1);
             }
             qemu_fprintf(f, TARGET_FMT_lx " ", env->regwptr[i + x * 8]);
@@ -667,9 +652,12 @@ static void sparc_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     cpu_print_cc(f, cpu_get_ccr(env) << (PSR_CARRY_SHIFT - 4));
     qemu_fprintf(f, ") asi: %02x tl: %d pil: %x gl: %d\n", env->asi, env->tl,
                  env->psrpil, env->gl);
-    qemu_fprintf(f, "tbr: " TARGET_FMT_lx " hpstate: " TARGET_FMT_lx " htba: "
-                 TARGET_FMT_lx "\n", env->tbr, env->hpstate, env->htba);
-    qemu_fprintf(f, "cansave: %d canrestore: %d otherwin: %d wstate: %d "
+    qemu_fprintf(f,
+                 "tbr: " TARGET_FMT_lx " hpstate: " TARGET_FMT_lx
+                 " htba: " TARGET_FMT_lx "\n",
+                 env->tbr, env->hpstate, env->htba);
+    qemu_fprintf(f,
+                 "cansave: %d canrestore: %d otherwin: %d wstate: %d "
                  "cleanwin: %d cwp: %d\n",
                  env->cansave, env->canrestore, env->otherwin, env->wstate,
                  env->cleanwin, env->nwindows - 1 - env->cwp);
@@ -680,10 +668,9 @@ static void sparc_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     qemu_fprintf(f, "psr: %08x (icc: ", cpu_get_psr(env));
     cpu_print_cc(f, cpu_get_psr(env));
     qemu_fprintf(f, " SPE: %c%c%c) wim: %08x\n", env->psrs ? 'S' : '-',
-                 env->psrps ? 'P' : '-', env->psret ? 'E' : '-',
-                 env->wim);
-    qemu_fprintf(f, "fsr: " TARGET_FMT_lx " y: " TARGET_FMT_lx "\n",
-                 env->fsr, env->y);
+                 env->psrps ? 'P' : '-', env->psret ? 'E' : '-', env->wim);
+    qemu_fprintf(f, "fsr: " TARGET_FMT_lx " y: " TARGET_FMT_lx "\n", env->fsr,
+                 env->y);
 #endif
     qemu_fprintf(f, "\n");
 }
@@ -822,42 +809,43 @@ static void sparc_set_nwindows(Object *obj, Visitor *v, const char *name,
     }
 
     if (value < min || value > max) {
-        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
+        error_setg(errp,
+                   "Property %s.%s doesn't take value %" PRId64
                    " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
-                   object_get_typename(obj), name ? name : "null",
-                   value, min, max);
+                   object_get_typename(obj), name ? name : "null", value, min,
+                   max);
         return;
     }
     cpu->env.def.nwindows = value;
 }
 
 static PropertyInfo qdev_prop_nwindows = {
-    .name  = "int",
-    .get   = sparc_get_nwindows,
-    .set   = sparc_set_nwindows,
+    .name = "int",
+    .get = sparc_get_nwindows,
+    .set = sparc_set_nwindows,
 };
 
 static Property sparc_cpu_properties[] = {
-    DEFINE_PROP_BIT("float",    SPARCCPU, env.def.features, 0, false),
+    DEFINE_PROP_BIT("float", SPARCCPU, env.def.features, 0, false),
     DEFINE_PROP_BIT("float128", SPARCCPU, env.def.features, 1, false),
-    DEFINE_PROP_BIT("swap",     SPARCCPU, env.def.features, 2, false),
-    DEFINE_PROP_BIT("mul",      SPARCCPU, env.def.features, 3, false),
-    DEFINE_PROP_BIT("div",      SPARCCPU, env.def.features, 4, false),
-    DEFINE_PROP_BIT("flush",    SPARCCPU, env.def.features, 5, false),
-    DEFINE_PROP_BIT("fsqrt",    SPARCCPU, env.def.features, 6, false),
-    DEFINE_PROP_BIT("fmul",     SPARCCPU, env.def.features, 7, false),
-    DEFINE_PROP_BIT("vis1",     SPARCCPU, env.def.features, 8, false),
-    DEFINE_PROP_BIT("vis2",     SPARCCPU, env.def.features, 9, false),
-    DEFINE_PROP_BIT("fsmuld",   SPARCCPU, env.def.features, 10, false),
-    DEFINE_PROP_BIT("hypv",     SPARCCPU, env.def.features, 11, false),
-    DEFINE_PROP_BIT("cmt",      SPARCCPU, env.def.features, 12, false),
-    DEFINE_PROP_BIT("gl",       SPARCCPU, env.def.features, 13, false),
+    DEFINE_PROP_BIT("swap", SPARCCPU, env.def.features, 2, false),
+    DEFINE_PROP_BIT("mul", SPARCCPU, env.def.features, 3, false),
+    DEFINE_PROP_BIT("div", SPARCCPU, env.def.features, 4, false),
+    DEFINE_PROP_BIT("flush", SPARCCPU, env.def.features, 5, false),
+    DEFINE_PROP_BIT("fsqrt", SPARCCPU, env.def.features, 6, false),
+    DEFINE_PROP_BIT("fmul", SPARCCPU, env.def.features, 7, false),
+    DEFINE_PROP_BIT("vis1", SPARCCPU, env.def.features, 8, false),
+    DEFINE_PROP_BIT("vis2", SPARCCPU, env.def.features, 9, false),
+    DEFINE_PROP_BIT("fsmuld", SPARCCPU, env.def.features, 10, false),
+    DEFINE_PROP_BIT("hypv", SPARCCPU, env.def.features, 11, false),
+    DEFINE_PROP_BIT("cmt", SPARCCPU, env.def.features, 12, false),
+    DEFINE_PROP_BIT("gl", SPARCCPU, env.def.features, 13, false),
     DEFINE_PROP_UNSIGNED("iu-version", SPARCCPU, env.def.iu_version, 0,
                          qdev_prop_uint64, target_ulong),
     DEFINE_PROP_UINT32("fpu-version", SPARCCPU, env.def.fpu_version, 0),
     DEFINE_PROP_UINT32("mmu-version", SPARCCPU, env.def.mmu_version, 0),
-    DEFINE_PROP("nwindows", SPARCCPU, env.def.nwindows,
-                qdev_prop_nwindows, uint32_t),
+    DEFINE_PROP("nwindows", SPARCCPU, env.def.nwindows, qdev_prop_nwindows,
+                uint32_t),
     DEFINE_PROP_END_OF_LIST()
 };
 

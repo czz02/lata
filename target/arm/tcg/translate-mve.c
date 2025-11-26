@@ -36,15 +36,18 @@ typedef void MVEGenOneOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
 typedef void MVEGenTwoOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_ptr);
 typedef void MVEGenTwoOpScalarFn(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_i32);
 typedef void MVEGenTwoOpShiftFn(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_i32);
-typedef void MVEGenLongDualAccOpFn(TCGv_i64, TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_i64);
+typedef void MVEGenLongDualAccOpFn(TCGv_i64, TCGv_ptr, TCGv_ptr, TCGv_ptr,
+                                   TCGv_i64);
 typedef void MVEGenVADDVFn(TCGv_i32, TCGv_ptr, TCGv_ptr, TCGv_i32);
 typedef void MVEGenOneOpImmFn(TCGv_ptr, TCGv_ptr, TCGv_i64);
 typedef void MVEGenVIDUPFn(TCGv_i32, TCGv_ptr, TCGv_ptr, TCGv_i32, TCGv_i32);
-typedef void MVEGenVIWDUPFn(TCGv_i32, TCGv_ptr, TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
+typedef void MVEGenVIWDUPFn(TCGv_i32, TCGv_ptr, TCGv_ptr, TCGv_i32, TCGv_i32,
+                            TCGv_i32);
 typedef void MVEGenCmpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
 typedef void MVEGenScalarCmpFn(TCGv_ptr, TCGv_ptr, TCGv_i32);
 typedef void MVEGenVABAVFn(TCGv_i32, TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_i32);
-typedef void MVEGenDualAccOpFn(TCGv_i32, TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_i32);
+typedef void MVEGenDualAccOpFn(TCGv_i32, TCGv_ptr, TCGv_ptr, TCGv_ptr,
+                               TCGv_i32);
 typedef void MVEGenVCVTRmodeFn(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_i32);
 
 /* Return the offset of a Qn register (same semantics as aa32_vfp_qreg()) */
@@ -148,8 +151,7 @@ static bool do_ldst(DisasContext *s, arg_VLDR_VSTR *a, MVEGenLdStFn *fn,
     uint32_t offset;
     TCGv_ptr qreg;
 
-    if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd) ||
+    if (!dc_isar_feature(aa32_mve, s) || !mve_check_qreg_bank(s, a->qd) ||
         !fn) {
         return false;
     }
@@ -191,7 +193,7 @@ static bool do_ldst(DisasContext *s, arg_VLDR_VSTR *a, MVEGenLdStFn *fn,
 
 static bool trans_VLDR_VSTR(DisasContext *s, arg_VLDR_VSTR *a)
 {
-    static MVEGenLdStFn * const ldstfns[4][2] = {
+    static MVEGenLdStFn *const ldstfns[4][2] = {
         { gen_helper_mve_vstrb, gen_helper_mve_vldrb },
         { gen_helper_mve_vstrh, gen_helper_mve_vldrh },
         { gen_helper_mve_vstrw, gen_helper_mve_vldrw },
@@ -200,14 +202,14 @@ static bool trans_VLDR_VSTR(DisasContext *s, arg_VLDR_VSTR *a)
     return do_ldst(s, a, ldstfns[a->size][a->l], a->size);
 }
 
-#define DO_VLDST_WIDE_NARROW(OP, SLD, ULD, ST, MSIZE)           \
-    static bool trans_##OP(DisasContext *s, arg_VLDR_VSTR *a)   \
-    {                                                           \
-        static MVEGenLdStFn * const ldstfns[2][2] = {           \
-            { gen_helper_mve_##ST, gen_helper_mve_##SLD },      \
-            { NULL, gen_helper_mve_##ULD },                     \
-        };                                                      \
-        return do_ldst(s, a, ldstfns[a->u][a->l], MSIZE);       \
+#define DO_VLDST_WIDE_NARROW(OP, SLD, ULD, ST, MSIZE)         \
+    static bool trans_##OP(DisasContext *s, arg_VLDR_VSTR *a) \
+    {                                                         \
+        static MVEGenLdStFn *const ldstfns[2][2] = {          \
+            { gen_helper_mve_##ST, gen_helper_mve_##SLD },    \
+            { NULL, gen_helper_mve_##ULD },                   \
+        };                                                    \
+        return do_ldst(s, a, ldstfns[a->u][a->l], MSIZE);     \
     }
 
 DO_VLDST_WIDE_NARROW(VLDSTB_H, vldrb_sh, vldrb_uh, vstrb_h, MO_8)
@@ -220,8 +222,7 @@ static bool do_ldst_sg(DisasContext *s, arg_vldst_sg *a, MVEGenLdStSGFn fn)
     TCGv_ptr qd, qm;
 
     if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd | a->qm) ||
-        !fn || a->rn == 15) {
+        !mve_check_qreg_bank(s, a->qd | a->qm) || !fn || a->rn == 15) {
         /* Rn case is UNPREDICTABLE */
         return false;
     }
@@ -250,17 +251,15 @@ static bool do_ldst_sg(DisasContext *s, arg_vldst_sg *a, MVEGenLdStSGFn fn)
 /* VLDRB/VSTRB (ie msize 1) with OS=1 is UNPREDICTABLE; we UNDEF */
 static bool trans_VLDR_S_sg(DisasContext *s, arg_vldst_sg *a)
 {
-    static MVEGenLdStSGFn * const fns[2][4][4] = { {
-            { NULL, F(vldrb_sg_sh), F(vldrb_sg_sw), NULL },
-            { NULL, NULL,           F(vldrh_sg_sw), NULL },
-            { NULL, NULL,           NULL,           NULL },
-            { NULL, NULL,           NULL,           NULL }
-        }, {
-            { NULL, NULL,              NULL,              NULL },
-            { NULL, NULL,              F(vldrh_sg_os_sw), NULL },
-            { NULL, NULL,              NULL,              NULL },
-            { NULL, NULL,              NULL,              NULL }
-        }
+    static MVEGenLdStSGFn *const fns[2][4][4] = {
+        { { NULL, F(vldrb_sg_sh), F(vldrb_sg_sw), NULL },
+          { NULL, NULL, F(vldrh_sg_sw), NULL },
+          { NULL, NULL, NULL, NULL },
+          { NULL, NULL, NULL, NULL } },
+        { { NULL, NULL, NULL, NULL },
+          { NULL, NULL, F(vldrh_sg_os_sw), NULL },
+          { NULL, NULL, NULL, NULL },
+          { NULL, NULL, NULL, NULL } }
     };
     if (a->qd == a->qm) {
         return false; /* UNPREDICTABLE */
@@ -270,17 +269,15 @@ static bool trans_VLDR_S_sg(DisasContext *s, arg_vldst_sg *a)
 
 static bool trans_VLDR_U_sg(DisasContext *s, arg_vldst_sg *a)
 {
-    static MVEGenLdStSGFn * const fns[2][4][4] = { {
-            { F(vldrb_sg_ub), F(vldrb_sg_uh), F(vldrb_sg_uw), NULL },
-            { NULL,           F(vldrh_sg_uh), F(vldrh_sg_uw), NULL },
-            { NULL,           NULL,           F(vldrw_sg_uw), NULL },
-            { NULL,           NULL,           NULL,           F(vldrd_sg_ud) }
-        }, {
-            { NULL, NULL,              NULL,              NULL },
-            { NULL, F(vldrh_sg_os_uh), F(vldrh_sg_os_uw), NULL },
-            { NULL, NULL,              F(vldrw_sg_os_uw), NULL },
-            { NULL, NULL,              NULL,              F(vldrd_sg_os_ud) }
-        }
+    static MVEGenLdStSGFn *const fns[2][4][4] = {
+        { { F(vldrb_sg_ub), F(vldrb_sg_uh), F(vldrb_sg_uw), NULL },
+          { NULL, F(vldrh_sg_uh), F(vldrh_sg_uw), NULL },
+          { NULL, NULL, F(vldrw_sg_uw), NULL },
+          { NULL, NULL, NULL, F(vldrd_sg_ud) } },
+        { { NULL, NULL, NULL, NULL },
+          { NULL, F(vldrh_sg_os_uh), F(vldrh_sg_os_uw), NULL },
+          { NULL, NULL, F(vldrw_sg_os_uw), NULL },
+          { NULL, NULL, NULL, F(vldrd_sg_os_ud) } }
     };
     if (a->qd == a->qm) {
         return false; /* UNPREDICTABLE */
@@ -290,17 +287,15 @@ static bool trans_VLDR_U_sg(DisasContext *s, arg_vldst_sg *a)
 
 static bool trans_VSTR_sg(DisasContext *s, arg_vldst_sg *a)
 {
-    static MVEGenLdStSGFn * const fns[2][4][4] = { {
-            { F(vstrb_sg_ub), F(vstrb_sg_uh), F(vstrb_sg_uw), NULL },
-            { NULL,           F(vstrh_sg_uh), F(vstrh_sg_uw), NULL },
-            { NULL,           NULL,           F(vstrw_sg_uw), NULL },
-            { NULL,           NULL,           NULL,           F(vstrd_sg_ud) }
-        }, {
-            { NULL, NULL,              NULL,              NULL },
-            { NULL, F(vstrh_sg_os_uh), F(vstrh_sg_os_uw), NULL },
-            { NULL, NULL,              F(vstrw_sg_os_uw), NULL },
-            { NULL, NULL,              NULL,              F(vstrd_sg_os_ud) }
-        }
+    static MVEGenLdStSGFn *const fns[2][4][4] = {
+        { { F(vstrb_sg_ub), F(vstrb_sg_uh), F(vstrb_sg_uw), NULL },
+          { NULL, F(vstrh_sg_uh), F(vstrh_sg_uw), NULL },
+          { NULL, NULL, F(vstrw_sg_uw), NULL },
+          { NULL, NULL, NULL, F(vstrd_sg_ud) } },
+        { { NULL, NULL, NULL, NULL },
+          { NULL, F(vstrh_sg_os_uh), F(vstrh_sg_os_uw), NULL },
+          { NULL, NULL, F(vstrw_sg_os_uw), NULL },
+          { NULL, NULL, NULL, F(vstrd_sg_os_ud) } }
     };
     return do_ldst_sg(s, a, fns[a->os][a->msize][a->size]);
 }
@@ -314,8 +309,7 @@ static bool do_ldst_sg_imm(DisasContext *s, arg_vldst_sg_imm *a,
     TCGv_ptr qd, qm;
 
     if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd | a->qm) ||
-        !fn) {
+        !mve_check_qreg_bank(s, a->qd | a->qm) || !fn) {
         return false;
     }
 
@@ -337,7 +331,7 @@ static bool do_ldst_sg_imm(DisasContext *s, arg_vldst_sg_imm *a,
 
 static bool trans_VLDRW_sg_imm(DisasContext *s, arg_vldst_sg_imm *a)
 {
-    static MVEGenLdStSGFn * const fns[] = {
+    static MVEGenLdStSGFn *const fns[] = {
         gen_helper_mve_vldrw_sg_uw,
         gen_helper_mve_vldrw_sg_wb_uw,
     };
@@ -349,7 +343,7 @@ static bool trans_VLDRW_sg_imm(DisasContext *s, arg_vldst_sg_imm *a)
 
 static bool trans_VLDRD_sg_imm(DisasContext *s, arg_vldst_sg_imm *a)
 {
-    static MVEGenLdStSGFn * const fns[] = {
+    static MVEGenLdStSGFn *const fns[] = {
         gen_helper_mve_vldrd_sg_ud,
         gen_helper_mve_vldrd_sg_wb_ud,
     };
@@ -361,7 +355,7 @@ static bool trans_VLDRD_sg_imm(DisasContext *s, arg_vldst_sg_imm *a)
 
 static bool trans_VSTRW_sg_imm(DisasContext *s, arg_vldst_sg_imm *a)
 {
-    static MVEGenLdStSGFn * const fns[] = {
+    static MVEGenLdStSGFn *const fns[] = {
         gen_helper_mve_vstrw_sg_uw,
         gen_helper_mve_vstrw_sg_wb_uw,
     };
@@ -370,7 +364,7 @@ static bool trans_VSTRW_sg_imm(DisasContext *s, arg_vldst_sg_imm *a)
 
 static bool trans_VSTRD_sg_imm(DisasContext *s, arg_vldst_sg_imm *a)
 {
-    static MVEGenLdStSGFn * const fns[] = {
+    static MVEGenLdStSGFn *const fns[] = {
         gen_helper_mve_vstrd_sg_ud,
         gen_helper_mve_vstrd_sg_wb_ud,
     };
@@ -382,8 +376,7 @@ static bool do_vldst_il(DisasContext *s, arg_vldst_il *a, MVEGenLdStIlFn *fn,
 {
     TCGv_i32 rn;
 
-    if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd) ||
+    if (!dc_isar_feature(aa32_mve, s) || !mve_check_qreg_bank(s, a->qd) ||
         !fn || (a->rn == 13 && a->w) || a->rn == 15) {
         /* Variously UNPREDICTABLE or UNDEF or related-encoding */
         return false;
@@ -412,9 +405,19 @@ static bool do_vldst_il(DisasContext *s, arg_vldst_il *a, MVEGenLdStIlFn *fn,
 
 static bool trans_VLD2(DisasContext *s, arg_vldst_il *a)
 {
-    static MVEGenLdStIlFn * const fns[4][4] = {
-        { F(vld20b), F(vld20h), F(vld20w), NULL, },
-        { F(vld21b), F(vld21h), F(vld21w), NULL, },
+    static MVEGenLdStIlFn *const fns[4][4] = {
+        {
+            F(vld20b),
+            F(vld20h),
+            F(vld20w),
+            NULL,
+        },
+        {
+            F(vld21b),
+            F(vld21h),
+            F(vld21w),
+            NULL,
+        },
         { NULL, NULL, NULL, NULL },
         { NULL, NULL, NULL, NULL },
     };
@@ -426,11 +429,31 @@ static bool trans_VLD2(DisasContext *s, arg_vldst_il *a)
 
 static bool trans_VLD4(DisasContext *s, arg_vldst_il *a)
 {
-    static MVEGenLdStIlFn * const fns[4][4] = {
-        { F(vld40b), F(vld40h), F(vld40w), NULL, },
-        { F(vld41b), F(vld41h), F(vld41w), NULL, },
-        { F(vld42b), F(vld42h), F(vld42w), NULL, },
-        { F(vld43b), F(vld43h), F(vld43w), NULL, },
+    static MVEGenLdStIlFn *const fns[4][4] = {
+        {
+            F(vld40b),
+            F(vld40h),
+            F(vld40w),
+            NULL,
+        },
+        {
+            F(vld41b),
+            F(vld41h),
+            F(vld41w),
+            NULL,
+        },
+        {
+            F(vld42b),
+            F(vld42h),
+            F(vld42w),
+            NULL,
+        },
+        {
+            F(vld43b),
+            F(vld43h),
+            F(vld43w),
+            NULL,
+        },
     };
     if (a->qd > 4) {
         return false;
@@ -440,9 +463,19 @@ static bool trans_VLD4(DisasContext *s, arg_vldst_il *a)
 
 static bool trans_VST2(DisasContext *s, arg_vldst_il *a)
 {
-    static MVEGenLdStIlFn * const fns[4][4] = {
-        { F(vst20b), F(vst20h), F(vst20w), NULL, },
-        { F(vst21b), F(vst21h), F(vst21w), NULL, },
+    static MVEGenLdStIlFn *const fns[4][4] = {
+        {
+            F(vst20b),
+            F(vst20h),
+            F(vst20w),
+            NULL,
+        },
+        {
+            F(vst21b),
+            F(vst21h),
+            F(vst21w),
+            NULL,
+        },
         { NULL, NULL, NULL, NULL },
         { NULL, NULL, NULL, NULL },
     };
@@ -454,11 +487,31 @@ static bool trans_VST2(DisasContext *s, arg_vldst_il *a)
 
 static bool trans_VST4(DisasContext *s, arg_vldst_il *a)
 {
-    static MVEGenLdStIlFn * const fns[4][4] = {
-        { F(vst40b), F(vst40h), F(vst40w), NULL, },
-        { F(vst41b), F(vst41h), F(vst41w), NULL, },
-        { F(vst42b), F(vst42h), F(vst42w), NULL, },
-        { F(vst43b), F(vst43h), F(vst43w), NULL, },
+    static MVEGenLdStIlFn *const fns[4][4] = {
+        {
+            F(vst40b),
+            F(vst40h),
+            F(vst40w),
+            NULL,
+        },
+        {
+            F(vst41b),
+            F(vst41h),
+            F(vst41w),
+            NULL,
+        },
+        {
+            F(vst42b),
+            F(vst42h),
+            F(vst42w),
+            NULL,
+        },
+        {
+            F(vst43b),
+            F(vst43h),
+            F(vst43w),
+            NULL,
+        },
     };
     if (a->qd > 4) {
         return false;
@@ -473,8 +526,7 @@ static bool trans_VDUP(DisasContext *s, arg_VDUP *a)
     TCGv_ptr qd;
     TCGv_i32 rt;
 
-    if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd)) {
+    if (!dc_isar_feature(aa32_mve, s) || !mve_check_qreg_bank(s, a->qd)) {
         return false;
     }
     if (a->rt == 13 || a->rt == 15) {
@@ -503,8 +555,7 @@ static bool do_1op_vec(DisasContext *s, arg_1op *a, MVEGenOneOpFn fn,
     TCGv_ptr qd, qm;
 
     if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd | a->qm) ||
-        !fn) {
+        !mve_check_qreg_bank(s, a->qd | a->qm) || !fn) {
         return false;
     }
 
@@ -528,16 +579,16 @@ static bool do_1op(DisasContext *s, arg_1op *a, MVEGenOneOpFn fn)
     return do_1op_vec(s, a, fn, NULL);
 }
 
-#define DO_1OP_VEC(INSN, FN, VECFN)                             \
-    static bool trans_##INSN(DisasContext *s, arg_1op *a)       \
-    {                                                           \
-        static MVEGenOneOpFn * const fns[] = {                  \
-            gen_helper_mve_##FN##b,                             \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##w,                             \
-            NULL,                                               \
-        };                                                      \
-        return do_1op_vec(s, a, fns[a->size], VECFN);           \
+#define DO_1OP_VEC(INSN, FN, VECFN)                       \
+    static bool trans_##INSN(DisasContext *s, arg_1op *a) \
+    {                                                     \
+        static MVEGenOneOpFn *const fns[] = {             \
+            gen_helper_mve_##FN##b,                       \
+            gen_helper_mve_##FN##h,                       \
+            gen_helper_mve_##FN##w,                       \
+            NULL,                                         \
+        };                                                \
+        return do_1op_vec(s, a, fns[a->size], VECFN);     \
     }
 
 #define DO_1OP(INSN, FN) DO_1OP_VEC(INSN, FN, NULL)
@@ -555,27 +606,27 @@ DO_1OP(VMINA, vmina)
  * For simple float/int conversions we use the fixed-point
  * conversion helpers with a zero shift count
  */
-#define DO_VCVT(INSN, HFN, SFN)                                         \
-    static void gen_##INSN##h(TCGv_ptr env, TCGv_ptr qd, TCGv_ptr qm)   \
-    {                                                                   \
-        gen_helper_mve_##HFN(env, qd, qm, tcg_constant_i32(0));         \
-    }                                                                   \
-    static void gen_##INSN##s(TCGv_ptr env, TCGv_ptr qd, TCGv_ptr qm)   \
-    {                                                                   \
-        gen_helper_mve_##SFN(env, qd, qm, tcg_constant_i32(0));         \
-    }                                                                   \
-    static bool trans_##INSN(DisasContext *s, arg_1op *a)               \
-    {                                                                   \
-        static MVEGenOneOpFn * const fns[] = {                          \
-            NULL,                                                       \
-            gen_##INSN##h,                                              \
-            gen_##INSN##s,                                              \
-            NULL,                                                       \
-        };                                                              \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                         \
-            return false;                                               \
-        }                                                               \
-        return do_1op(s, a, fns[a->size]);                              \
+#define DO_VCVT(INSN, HFN, SFN)                                       \
+    static void gen_##INSN##h(TCGv_ptr env, TCGv_ptr qd, TCGv_ptr qm) \
+    {                                                                 \
+        gen_helper_mve_##HFN(env, qd, qm, tcg_constant_i32(0));       \
+    }                                                                 \
+    static void gen_##INSN##s(TCGv_ptr env, TCGv_ptr qd, TCGv_ptr qm) \
+    {                                                                 \
+        gen_helper_mve_##SFN(env, qd, qm, tcg_constant_i32(0));       \
+    }                                                                 \
+    static bool trans_##INSN(DisasContext *s, arg_1op *a)             \
+    {                                                                 \
+        static MVEGenOneOpFn *const fns[] = {                         \
+            NULL,                                                     \
+            gen_##INSN##h,                                            \
+            gen_##INSN##s,                                            \
+            NULL,                                                     \
+        };                                                            \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {                       \
+            return false;                                             \
+        }                                                             \
+        return do_1op(s, a, fns[a->size]);                            \
     }
 
 DO_VCVT(VCVT_SF, vcvt_sh, vcvt_sf)
@@ -583,8 +634,8 @@ DO_VCVT(VCVT_UF, vcvt_uh, vcvt_uf)
 DO_VCVT(VCVT_FS, vcvt_hs, vcvt_fs)
 DO_VCVT(VCVT_FU, vcvt_hu, vcvt_fu)
 
-static bool do_vcvt_rmode(DisasContext *s, arg_1op *a,
-                          ARMFPRounding rmode, bool u)
+static bool do_vcvt_rmode(DisasContext *s, arg_1op *a, ARMFPRounding rmode,
+                          bool u)
 {
     /*
      * Handle VCVT fp to int with specified rounding mode.
@@ -592,7 +643,7 @@ static bool do_vcvt_rmode(DisasContext *s, arg_1op *a,
      * an immediate to the helper.
      */
     TCGv_ptr qd, qm;
-    static MVEGenVCVTRmodeFn * const fns[4][2] = {
+    static MVEGenVCVTRmodeFn *const fns[4][2] = {
         { NULL, NULL },
         { gen_helper_mve_vcvt_rm_sh, gen_helper_mve_vcvt_rm_uh },
         { gen_helper_mve_vcvt_rm_ss, gen_helper_mve_vcvt_rm_us },
@@ -601,8 +652,7 @@ static bool do_vcvt_rmode(DisasContext *s, arg_1op *a,
     MVEGenVCVTRmodeFn *fn = fns[a->size][u];
 
     if (!dc_isar_feature(aa32_mve_fp, s) ||
-        !mve_check_qreg_bank(s, a->qd | a->qm) ||
-        !fn) {
+        !mve_check_qreg_bank(s, a->qd | a->qm) || !fn) {
         return false;
     }
 
@@ -617,11 +667,11 @@ static bool do_vcvt_rmode(DisasContext *s, arg_1op *a,
     return true;
 }
 
-#define DO_VCVT_RMODE(INSN, RMODE, U)                           \
-    static bool trans_##INSN(DisasContext *s, arg_1op *a)       \
-    {                                                           \
-        return do_vcvt_rmode(s, a, RMODE, U);                   \
-    }                                                           \
+#define DO_VCVT_RMODE(INSN, RMODE, U)                     \
+    static bool trans_##INSN(DisasContext *s, arg_1op *a) \
+    {                                                     \
+        return do_vcvt_rmode(s, a, RMODE, U);             \
+    }
 
 DO_VCVT_RMODE(VCVTAS, FPROUNDING_TIEAWAY, false)
 DO_VCVT_RMODE(VCVTAU, FPROUNDING_TIEAWAY, true)
@@ -632,43 +682,43 @@ DO_VCVT_RMODE(VCVTPU, FPROUNDING_POSINF, true)
 DO_VCVT_RMODE(VCVTMS, FPROUNDING_NEGINF, false)
 DO_VCVT_RMODE(VCVTMU, FPROUNDING_NEGINF, true)
 
-#define DO_VCVT_SH(INSN, FN)                                    \
-    static bool trans_##INSN(DisasContext *s, arg_1op *a)       \
-    {                                                           \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                 \
-            return false;                                       \
-        }                                                       \
-        return do_1op(s, a, gen_helper_mve_##FN);               \
-    }                                                           \
+#define DO_VCVT_SH(INSN, FN)                              \
+    static bool trans_##INSN(DisasContext *s, arg_1op *a) \
+    {                                                     \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {           \
+            return false;                                 \
+        }                                                 \
+        return do_1op(s, a, gen_helper_mve_##FN);         \
+    }
 
 DO_VCVT_SH(VCVTB_SH, vcvtb_sh)
 DO_VCVT_SH(VCVTT_SH, vcvtt_sh)
 DO_VCVT_SH(VCVTB_HS, vcvtb_hs)
 DO_VCVT_SH(VCVTT_HS, vcvtt_hs)
 
-#define DO_VRINT(INSN, RMODE)                                           \
-    static void gen_##INSN##h(TCGv_ptr env, TCGv_ptr qd, TCGv_ptr qm)   \
-    {                                                                   \
-        gen_helper_mve_vrint_rm_h(env, qd, qm,                          \
+#define DO_VRINT(INSN, RMODE)                                                \
+    static void gen_##INSN##h(TCGv_ptr env, TCGv_ptr qd, TCGv_ptr qm)        \
+    {                                                                        \
+        gen_helper_mve_vrint_rm_h(env, qd, qm,                               \
                                   tcg_constant_i32(arm_rmode_to_sf(RMODE))); \
-    }                                                                   \
-    static void gen_##INSN##s(TCGv_ptr env, TCGv_ptr qd, TCGv_ptr qm)   \
-    {                                                                   \
-        gen_helper_mve_vrint_rm_s(env, qd, qm,                          \
+    }                                                                        \
+    static void gen_##INSN##s(TCGv_ptr env, TCGv_ptr qd, TCGv_ptr qm)        \
+    {                                                                        \
+        gen_helper_mve_vrint_rm_s(env, qd, qm,                               \
                                   tcg_constant_i32(arm_rmode_to_sf(RMODE))); \
-    }                                                                   \
-    static bool trans_##INSN(DisasContext *s, arg_1op *a)               \
-    {                                                                   \
-        static MVEGenOneOpFn * const fns[] = {                          \
-            NULL,                                                       \
-            gen_##INSN##h,                                              \
-            gen_##INSN##s,                                              \
-            NULL,                                                       \
-        };                                                              \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                         \
-            return false;                                               \
-        }                                                               \
-        return do_1op(s, a, fns[a->size]);                              \
+    }                                                                        \
+    static bool trans_##INSN(DisasContext *s, arg_1op *a)                    \
+    {                                                                        \
+        static MVEGenOneOpFn *const fns[] = {                                \
+            NULL,                                                            \
+            gen_##INSN##h,                                                   \
+            gen_##INSN##s,                                                   \
+            NULL,                                                            \
+        };                                                                   \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {                              \
+            return false;                                                    \
+        }                                                                    \
+        return do_1op(s, a, fns[a->size]);                                   \
     }
 
 DO_VRINT(VRINTN, FPROUNDING_TIEEVEN)
@@ -679,7 +729,7 @@ DO_VRINT(VRINTP, FPROUNDING_POSINF)
 
 static bool trans_VRINTX(DisasContext *s, arg_1op *a)
 {
-    static MVEGenOneOpFn * const fns[] = {
+    static MVEGenOneOpFn *const fns[] = {
         NULL,
         gen_helper_mve_vrintx_h,
         gen_helper_mve_vrintx_s,
@@ -692,16 +742,16 @@ static bool trans_VRINTX(DisasContext *s, arg_1op *a)
 }
 
 /* Narrowing moves: only size 0 and 1 are valid */
-#define DO_VMOVN(INSN, FN) \
-    static bool trans_##INSN(DisasContext *s, arg_1op *a)       \
-    {                                                           \
-        static MVEGenOneOpFn * const fns[] = {                  \
-            gen_helper_mve_##FN##b,                             \
-            gen_helper_mve_##FN##h,                             \
-            NULL,                                               \
-            NULL,                                               \
-        };                                                      \
-        return do_1op(s, a, fns[a->size]);                      \
+#define DO_VMOVN(INSN, FN)                                \
+    static bool trans_##INSN(DisasContext *s, arg_1op *a) \
+    {                                                     \
+        static MVEGenOneOpFn *const fns[] = {             \
+            gen_helper_mve_##FN##b,                       \
+            gen_helper_mve_##FN##h,                       \
+            NULL,                                         \
+            NULL,                                         \
+        };                                                \
+        return do_1op(s, a, fns[a->size]);                \
     }
 
 DO_VMOVN(VMOVNB, vmovnb)
@@ -715,7 +765,7 @@ DO_VMOVN(VQMOVN_TU, vqmovntu)
 
 static bool trans_VREV16(DisasContext *s, arg_1op *a)
 {
-    static MVEGenOneOpFn * const fns[] = {
+    static MVEGenOneOpFn *const fns[] = {
         gen_helper_mve_vrev16b,
         NULL,
         NULL,
@@ -726,7 +776,7 @@ static bool trans_VREV16(DisasContext *s, arg_1op *a)
 
 static bool trans_VREV32(DisasContext *s, arg_1op *a)
 {
-    static MVEGenOneOpFn * const fns[] = {
+    static MVEGenOneOpFn *const fns[] = {
         gen_helper_mve_vrev32b,
         gen_helper_mve_vrev32h,
         NULL,
@@ -737,7 +787,7 @@ static bool trans_VREV32(DisasContext *s, arg_1op *a)
 
 static bool trans_VREV64(DisasContext *s, arg_1op *a)
 {
-    static MVEGenOneOpFn * const fns[] = {
+    static MVEGenOneOpFn *const fns[] = {
         gen_helper_mve_vrev64b,
         gen_helper_mve_vrev64h,
         gen_helper_mve_vrev64w,
@@ -753,7 +803,7 @@ static bool trans_VMVN(DisasContext *s, arg_1op *a)
 
 static bool trans_VABS_fp(DisasContext *s, arg_1op *a)
 {
-    static MVEGenOneOpFn * const fns[] = {
+    static MVEGenOneOpFn *const fns[] = {
         NULL,
         gen_helper_mve_vfabsh,
         gen_helper_mve_vfabss,
@@ -767,7 +817,7 @@ static bool trans_VABS_fp(DisasContext *s, arg_1op *a)
 
 static bool trans_VNEG_fp(DisasContext *s, arg_1op *a)
 {
-    static MVEGenOneOpFn * const fns[] = {
+    static MVEGenOneOpFn *const fns[] = {
         NULL,
         gen_helper_mve_vfnegh,
         gen_helper_mve_vfnegs,
@@ -785,8 +835,7 @@ static bool do_2op_vec(DisasContext *s, arg_2op *a, MVEGenTwoOpFn fn,
     TCGv_ptr qd, qn, qm;
 
     if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd | a->qn | a->qm) ||
-        !fn) {
+        !mve_check_qreg_bank(s, a->qd | a->qn | a->qm) || !fn) {
         return false;
     }
     if (!mve_eci_check(s) || !vfp_access_check(s)) {
@@ -811,10 +860,10 @@ static bool do_2op(DisasContext *s, arg_2op *a, MVEGenTwoOpFn *fn)
     return do_2op_vec(s, a, fn, NULL);
 }
 
-#define DO_LOGIC(INSN, HELPER, VECFN)                           \
-    static bool trans_##INSN(DisasContext *s, arg_2op *a)       \
-    {                                                           \
-        return do_2op_vec(s, a, HELPER, VECFN);                 \
+#define DO_LOGIC(INSN, HELPER, VECFN)                     \
+    static bool trans_##INSN(DisasContext *s, arg_2op *a) \
+    {                                                     \
+        return do_2op_vec(s, a, HELPER, VECFN);           \
     }
 
 DO_LOGIC(VAND, gen_helper_mve_vand, tcg_gen_gvec_and)
@@ -830,16 +879,16 @@ static bool trans_VPSEL(DisasContext *s, arg_2op *a)
     return do_2op(s, a, gen_helper_mve_vpsel);
 }
 
-#define DO_2OP_VEC(INSN, FN, VECFN)                             \
-    static bool trans_##INSN(DisasContext *s, arg_2op *a)       \
-    {                                                           \
-        static MVEGenTwoOpFn * const fns[] = {                  \
-            gen_helper_mve_##FN##b,                             \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##w,                             \
-            NULL,                                               \
-        };                                                      \
-        return do_2op_vec(s, a, fns[a->size], VECFN);           \
+#define DO_2OP_VEC(INSN, FN, VECFN)                       \
+    static bool trans_##INSN(DisasContext *s, arg_2op *a) \
+    {                                                     \
+        static MVEGenTwoOpFn *const fns[] = {             \
+            gen_helper_mve_##FN##b,                       \
+            gen_helper_mve_##FN##h,                       \
+            gen_helper_mve_##FN##w,                       \
+            NULL,                                         \
+        };                                                \
+        return do_2op_vec(s, a, fns[a->size], VECFN);     \
     }
 
 #define DO_2OP(INSN, FN) DO_2OP_VEC(INSN, FN, NULL)
@@ -901,7 +950,7 @@ DO_2OP(VHCADD270, vhcadd270)
 
 static bool trans_VQDMULLB(DisasContext *s, arg_2op *a)
 {
-    static MVEGenTwoOpFn * const fns[] = {
+    static MVEGenTwoOpFn *const fns[] = {
         NULL,
         gen_helper_mve_vqdmullbh,
         gen_helper_mve_vqdmullbw,
@@ -916,7 +965,7 @@ static bool trans_VQDMULLB(DisasContext *s, arg_2op *a)
 
 static bool trans_VQDMULLT(DisasContext *s, arg_2op *a)
 {
-    static MVEGenTwoOpFn * const fns[] = {
+    static MVEGenTwoOpFn *const fns[] = {
         NULL,
         gen_helper_mve_vqdmullth,
         gen_helper_mve_vqdmulltw,
@@ -936,7 +985,7 @@ static bool trans_VMULLP_B(DisasContext *s, arg_2op *a)
      * is the 8x8->16 operation and a->size is MO_16; VMULL.P16
      * is the 16x16->32 operation and a->size is MO_32.
      */
-    static MVEGenTwoOpFn * const fns[] = {
+    static MVEGenTwoOpFn *const fns[] = {
         NULL,
         gen_helper_mve_vmullpbh,
         gen_helper_mve_vmullpbw,
@@ -948,7 +997,7 @@ static bool trans_VMULLP_B(DisasContext *s, arg_2op *a)
 static bool trans_VMULLP_T(DisasContext *s, arg_2op *a)
 {
     /* a->size is as for trans_VMULLP_B */
-    static MVEGenTwoOpFn * const fns[] = {
+    static MVEGenTwoOpFn *const fns[] = {
         NULL,
         gen_helper_mve_vmullpth,
         gen_helper_mve_vmullptw,
@@ -994,19 +1043,19 @@ static bool trans_VSBCI(DisasContext *s, arg_2op *a)
     return do_2op(s, a, gen_helper_mve_vsbci);
 }
 
-#define DO_2OP_FP(INSN, FN)                                     \
-    static bool trans_##INSN(DisasContext *s, arg_2op *a)       \
-    {                                                           \
-        static MVEGenTwoOpFn * const fns[] = {                  \
-            NULL,                                               \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##s,                             \
-            NULL,                                               \
-        };                                                      \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                 \
-            return false;                                       \
-        }                                                       \
-        return do_2op(s, a, fns[a->size]);                      \
+#define DO_2OP_FP(INSN, FN)                               \
+    static bool trans_##INSN(DisasContext *s, arg_2op *a) \
+    {                                                     \
+        static MVEGenTwoOpFn *const fns[] = {             \
+            NULL,                                         \
+            gen_helper_mve_##FN##h,                       \
+            gen_helper_mve_##FN##s,                       \
+            NULL,                                         \
+        };                                                \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {           \
+            return false;                                 \
+        }                                                 \
+        return do_2op(s, a, fns[a->size]);                \
     }
 
 DO_2OP_FP(VADD_fp, vfadd)
@@ -1037,8 +1086,7 @@ static bool do_2op_scalar(DisasContext *s, arg_2scalar *a,
     TCGv_i32 rm;
 
     if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd | a->qn) ||
-        !fn) {
+        !mve_check_qreg_bank(s, a->qd | a->qn) || !fn) {
         return false;
     }
     if (a->rm == 13 || a->rm == 15) {
@@ -1057,16 +1105,16 @@ static bool do_2op_scalar(DisasContext *s, arg_2scalar *a,
     return true;
 }
 
-#define DO_2OP_SCALAR(INSN, FN)                                 \
-    static bool trans_##INSN(DisasContext *s, arg_2scalar *a)   \
-    {                                                           \
-        static MVEGenTwoOpScalarFn * const fns[] = {            \
-            gen_helper_mve_##FN##b,                             \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##w,                             \
-            NULL,                                               \
-        };                                                      \
-        return do_2op_scalar(s, a, fns[a->size]);               \
+#define DO_2OP_SCALAR(INSN, FN)                               \
+    static bool trans_##INSN(DisasContext *s, arg_2scalar *a) \
+    {                                                         \
+        static MVEGenTwoOpScalarFn *const fns[] = {           \
+            gen_helper_mve_##FN##b,                           \
+            gen_helper_mve_##FN##h,                           \
+            gen_helper_mve_##FN##w,                           \
+            NULL,                                             \
+        };                                                    \
+        return do_2op_scalar(s, a, fns[a->size]);             \
     }
 
 DO_2OP_SCALAR(VADD_scalar, vadd_scalar)
@@ -1092,7 +1140,7 @@ DO_2OP_SCALAR(VQRDMLASH, vqrdmlash)
 
 static bool trans_VQDMULLB_scalar(DisasContext *s, arg_2scalar *a)
 {
-    static MVEGenTwoOpScalarFn * const fns[] = {
+    static MVEGenTwoOpScalarFn *const fns[] = {
         NULL,
         gen_helper_mve_vqdmullb_scalarh,
         gen_helper_mve_vqdmullb_scalarw,
@@ -1107,7 +1155,7 @@ static bool trans_VQDMULLB_scalar(DisasContext *s, arg_2scalar *a)
 
 static bool trans_VQDMULLT_scalar(DisasContext *s, arg_2scalar *a)
 {
-    static MVEGenTwoOpScalarFn * const fns[] = {
+    static MVEGenTwoOpScalarFn *const fns[] = {
         NULL,
         gen_helper_mve_vqdmullt_scalarh,
         gen_helper_mve_vqdmullt_scalarw,
@@ -1121,19 +1169,19 @@ static bool trans_VQDMULLT_scalar(DisasContext *s, arg_2scalar *a)
 }
 
 
-#define DO_2OP_FP_SCALAR(INSN, FN)                              \
-    static bool trans_##INSN(DisasContext *s, arg_2scalar *a)   \
-    {                                                           \
-        static MVEGenTwoOpScalarFn * const fns[] = {            \
-            NULL,                                               \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##s,                             \
-            NULL,                                               \
-        };                                                      \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                 \
-            return false;                                       \
-        }                                                       \
-        return do_2op_scalar(s, a, fns[a->size]);               \
+#define DO_2OP_FP_SCALAR(INSN, FN)                            \
+    static bool trans_##INSN(DisasContext *s, arg_2scalar *a) \
+    {                                                         \
+        static MVEGenTwoOpScalarFn *const fns[] = {           \
+            NULL,                                             \
+            gen_helper_mve_##FN##h,                           \
+            gen_helper_mve_##FN##s,                           \
+            NULL,                                             \
+        };                                                    \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {               \
+            return false;                                     \
+        }                                                     \
+        return do_2op_scalar(s, a, fns[a->size]);             \
     }
 
 DO_2OP_FP_SCALAR(VADD_fp_scalar, vfadd_scalar)
@@ -1150,8 +1198,7 @@ static bool do_long_dual_acc(DisasContext *s, arg_vmlaldav *a,
     TCGv_i32 rdalo, rdahi;
 
     if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qn | a->qm) ||
-        !fn) {
+        !mve_check_qreg_bank(s, a->qn | a->qm) || !fn) {
         return false;
     }
     /*
@@ -1197,7 +1244,7 @@ static bool do_long_dual_acc(DisasContext *s, arg_vmlaldav *a,
 
 static bool trans_VMLALDAV_S(DisasContext *s, arg_vmlaldav *a)
 {
-    static MVEGenLongDualAccOpFn * const fns[4][2] = {
+    static MVEGenLongDualAccOpFn *const fns[4][2] = {
         { NULL, NULL },
         { gen_helper_mve_vmlaldavsh, gen_helper_mve_vmlaldavxsh },
         { gen_helper_mve_vmlaldavsw, gen_helper_mve_vmlaldavxsw },
@@ -1208,7 +1255,7 @@ static bool trans_VMLALDAV_S(DisasContext *s, arg_vmlaldav *a)
 
 static bool trans_VMLALDAV_U(DisasContext *s, arg_vmlaldav *a)
 {
-    static MVEGenLongDualAccOpFn * const fns[4][2] = {
+    static MVEGenLongDualAccOpFn *const fns[4][2] = {
         { NULL, NULL },
         { gen_helper_mve_vmlaldavuh, NULL },
         { gen_helper_mve_vmlaldavuw, NULL },
@@ -1219,7 +1266,7 @@ static bool trans_VMLALDAV_U(DisasContext *s, arg_vmlaldav *a)
 
 static bool trans_VMLSLDAV(DisasContext *s, arg_vmlaldav *a)
 {
-    static MVEGenLongDualAccOpFn * const fns[4][2] = {
+    static MVEGenLongDualAccOpFn *const fns[4][2] = {
         { NULL, NULL },
         { gen_helper_mve_vmlsldavsh, gen_helper_mve_vmlsldavxsh },
         { gen_helper_mve_vmlsldavsw, gen_helper_mve_vmlsldavxsw },
@@ -1230,24 +1277,27 @@ static bool trans_VMLSLDAV(DisasContext *s, arg_vmlaldav *a)
 
 static bool trans_VRMLALDAVH_S(DisasContext *s, arg_vmlaldav *a)
 {
-    static MVEGenLongDualAccOpFn * const fns[] = {
-        gen_helper_mve_vrmlaldavhsw, gen_helper_mve_vrmlaldavhxsw,
+    static MVEGenLongDualAccOpFn *const fns[] = {
+        gen_helper_mve_vrmlaldavhsw,
+        gen_helper_mve_vrmlaldavhxsw,
     };
     return do_long_dual_acc(s, a, fns[a->x]);
 }
 
 static bool trans_VRMLALDAVH_U(DisasContext *s, arg_vmlaldav *a)
 {
-    static MVEGenLongDualAccOpFn * const fns[] = {
-        gen_helper_mve_vrmlaldavhuw, NULL,
+    static MVEGenLongDualAccOpFn *const fns[] = {
+        gen_helper_mve_vrmlaldavhuw,
+        NULL,
     };
     return do_long_dual_acc(s, a, fns[a->x]);
 }
 
 static bool trans_VRMLSLDAVH(DisasContext *s, arg_vmlaldav *a)
 {
-    static MVEGenLongDualAccOpFn * const fns[] = {
-        gen_helper_mve_vrmlsldavhsw, gen_helper_mve_vrmlsldavhxsw,
+    static MVEGenLongDualAccOpFn *const fns[] = {
+        gen_helper_mve_vrmlsldavhsw,
+        gen_helper_mve_vrmlsldavhxsw,
     };
     return do_long_dual_acc(s, a, fns[a->x]);
 }
@@ -1257,8 +1307,7 @@ static bool do_dual_acc(DisasContext *s, arg_vmladav *a, MVEGenDualAccOpFn *fn)
     TCGv_ptr qn, qm;
     TCGv_i32 rda_i, rda_o;
 
-    if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qn) ||
+    if (!dc_isar_feature(aa32_mve, s) || !mve_check_qreg_bank(s, a->qn) ||
         !fn) {
         return false;
     }
@@ -1288,16 +1337,16 @@ static bool do_dual_acc(DisasContext *s, arg_vmladav *a, MVEGenDualAccOpFn *fn)
     return true;
 }
 
-#define DO_DUAL_ACC(INSN, FN)                                           \
-    static bool trans_##INSN(DisasContext *s, arg_vmladav *a)           \
-    {                                                                   \
-        static MVEGenDualAccOpFn * const fns[4][2] = {                  \
-            { gen_helper_mve_##FN##b, gen_helper_mve_##FN##xb },        \
-            { gen_helper_mve_##FN##h, gen_helper_mve_##FN##xh },        \
-            { gen_helper_mve_##FN##w, gen_helper_mve_##FN##xw },        \
-            { NULL, NULL },                                             \
-        };                                                              \
-        return do_dual_acc(s, a, fns[a->size][a->x]);                   \
+#define DO_DUAL_ACC(INSN, FN)                                    \
+    static bool trans_##INSN(DisasContext *s, arg_vmladav *a)    \
+    {                                                            \
+        static MVEGenDualAccOpFn *const fns[4][2] = {            \
+            { gen_helper_mve_##FN##b, gen_helper_mve_##FN##xb }, \
+            { gen_helper_mve_##FN##h, gen_helper_mve_##FN##xh }, \
+            { gen_helper_mve_##FN##w, gen_helper_mve_##FN##xw }, \
+            { NULL, NULL },                                      \
+        };                                                       \
+        return do_dual_acc(s, a, fns[a->size][a->x]);            \
     }
 
 DO_DUAL_ACC(VMLADAV_S, vmladavs)
@@ -1305,7 +1354,7 @@ DO_DUAL_ACC(VMLSDAV, vmlsdav)
 
 static bool trans_VMLADAV_U(DisasContext *s, arg_vmladav *a)
 {
-    static MVEGenDualAccOpFn * const fns[4][2] = {
+    static MVEGenDualAccOpFn *const fns[4][2] = {
         { gen_helper_mve_vmladavub, NULL },
         { gen_helper_mve_vmladavuh, NULL },
         { gen_helper_mve_vmladavuw, NULL },
@@ -1330,8 +1379,7 @@ static void gen_vpst(DisasContext *s, uint32_t mask)
     case ECI_NONE:
     case ECI_A0:
         /* Update both 01 and 23 fields */
-        tcg_gen_deposit_i32(vpr, vpr,
-                            tcg_constant_i32(mask | (mask << 4)),
+        tcg_gen_deposit_i32(vpr, vpr, tcg_constant_i32(mask | (mask << 4)),
                             R_V7M_VPR_MASK01_SHIFT,
                             R_V7M_VPR_MASK01_LENGTH + R_V7M_VPR_MASK23_LENGTH);
         break;
@@ -1339,8 +1387,7 @@ static void gen_vpst(DisasContext *s, uint32_t mask)
     case ECI_A0A1A2:
     case ECI_A0A1A2B0:
         /* Update only the 23 mask field */
-        tcg_gen_deposit_i32(vpr, vpr,
-                            tcg_constant_i32(mask),
+        tcg_gen_deposit_i32(vpr, vpr, tcg_constant_i32(mask),
                             R_V7M_VPR_MASK23_SHIFT, R_V7M_VPR_MASK23_LENGTH);
         break;
     default:
@@ -1387,7 +1434,7 @@ static bool trans_VPNOT(DisasContext *s, arg_VPNOT *a)
 static bool trans_VADDV(DisasContext *s, arg_VADDV *a)
 {
     /* VADDV: vector add across vector */
-    static MVEGenVADDVFn * const fns[4][2] = {
+    static MVEGenVADDVFn *const fns[4][2] = {
         { gen_helper_mve_vaddvsb, gen_helper_mve_vaddvub },
         { gen_helper_mve_vaddvsh, gen_helper_mve_vaddvuh },
         { gen_helper_mve_vaddvsw, gen_helper_mve_vaddvuw },
@@ -1396,8 +1443,7 @@ static bool trans_VADDV(DisasContext *s, arg_VADDV *a)
     TCGv_ptr qm;
     TCGv_i32 rda_i, rda_o;
 
-    if (!dc_isar_feature(aa32_mve, s) ||
-        a->size == 3) {
+    if (!dc_isar_feature(aa32_mve, s) || a->size == 3) {
         return false;
     }
     if (!mve_eci_check(s) || !vfp_access_check(s)) {
@@ -1492,8 +1538,7 @@ static bool do_1imm(DisasContext *s, arg_1imm *a, MVEGenOneOpImmFn *fn,
     TCGv_ptr qd;
     uint64_t imm;
 
-    if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd) ||
+    if (!dc_isar_feature(aa32_mve, s) || !mve_check_qreg_bank(s, a->qd) ||
         !fn) {
         return false;
     }
@@ -1504,8 +1549,8 @@ static bool do_1imm(DisasContext *s, arg_1imm *a, MVEGenOneOpImmFn *fn,
     imm = asimd_imm_const(a->imm, a->cmode, a->op);
 
     if (vecfn && mve_no_predication(s)) {
-        vecfn(MO_64, mve_qreg_offset(a->qd), mve_qreg_offset(a->qd),
-              imm, 16, 16);
+        vecfn(MO_64, mve_qreg_offset(a->qd), mve_qreg_offset(a->qd), imm, 16,
+              16);
     } else {
         qd = mve_qreg_ptr(a->qd);
         fn(cpu_env, qd, tcg_constant_i64(imm));
@@ -1557,8 +1602,7 @@ static bool do_2shift_vec(DisasContext *s, arg_2shift *a, MVEGenTwoOpShiftFn fn,
     int shift = a->shift;
 
     if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qd | a->qm) ||
-        !fn) {
+        !mve_check_qreg_bank(s, a->qd | a->qm) || !fn) {
         return false;
     }
     if (!mve_eci_check(s) || !vfp_access_check(s)) {
@@ -1575,8 +1619,8 @@ static bool do_2shift_vec(DisasContext *s, arg_2shift *a, MVEGenTwoOpShiftFn fn,
     }
 
     if (vecfn && mve_no_predication(s)) {
-        vecfn(a->size, mve_qreg_offset(a->qd), mve_qreg_offset(a->qm),
-              shift, 16, 16);
+        vecfn(a->size, mve_qreg_offset(a->qd), mve_qreg_offset(a->qm), shift,
+              16, 16);
     } else {
         qd = mve_qreg_ptr(a->qd);
         qm = mve_qreg_ptr(a->qm);
@@ -1592,19 +1636,19 @@ static bool do_2shift(DisasContext *s, arg_2shift *a, MVEGenTwoOpShiftFn fn,
     return do_2shift_vec(s, a, fn, negateshift, NULL);
 }
 
-#define DO_2SHIFT_VEC(INSN, FN, NEGATESHIFT, VECFN)                     \
-    static bool trans_##INSN(DisasContext *s, arg_2shift *a)            \
-    {                                                                   \
-        static MVEGenTwoOpShiftFn * const fns[] = {                     \
-            gen_helper_mve_##FN##b,                                     \
-            gen_helper_mve_##FN##h,                                     \
-            gen_helper_mve_##FN##w,                                     \
-            NULL,                                                       \
-        };                                                              \
-        return do_2shift_vec(s, a, fns[a->size], NEGATESHIFT, VECFN);   \
+#define DO_2SHIFT_VEC(INSN, FN, NEGATESHIFT, VECFN)                   \
+    static bool trans_##INSN(DisasContext *s, arg_2shift *a)          \
+    {                                                                 \
+        static MVEGenTwoOpShiftFn *const fns[] = {                    \
+            gen_helper_mve_##FN##b,                                   \
+            gen_helper_mve_##FN##h,                                   \
+            gen_helper_mve_##FN##w,                                   \
+            NULL,                                                     \
+        };                                                            \
+        return do_2shift_vec(s, a, fns[a->size], NEGATESHIFT, VECFN); \
     }
 
-#define DO_2SHIFT(INSN, FN, NEGATESHIFT)        \
+#define DO_2SHIFT(INSN, FN, NEGATESHIFT) \
     DO_2SHIFT_VEC(INSN, FN, NEGATESHIFT, NULL)
 
 static void do_gvec_shri_s(unsigned vece, uint32_t dofs, uint32_t aofs,
@@ -1649,13 +1693,13 @@ DO_2SHIFT(VRSHRI_U, vrshli_u, true)
 DO_2SHIFT_VEC(VSRI, vsri, false, gen_gvec_sri)
 DO_2SHIFT_VEC(VSLI, vsli, false, gen_gvec_sli)
 
-#define DO_2SHIFT_FP(INSN, FN)                                  \
-    static bool trans_##INSN(DisasContext *s, arg_2shift *a)    \
-    {                                                           \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                 \
-            return false;                                       \
-        }                                                       \
-        return do_2shift(s, a, gen_helper_mve_##FN, false);     \
+#define DO_2SHIFT_FP(INSN, FN)                               \
+    static bool trans_##INSN(DisasContext *s, arg_2shift *a) \
+    {                                                        \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {              \
+            return false;                                    \
+        }                                                    \
+        return do_2shift(s, a, gen_helper_mve_##FN, false);  \
     }
 
 DO_2SHIFT_FP(VCVT_SH_fixed, vcvt_sh)
@@ -1673,8 +1717,7 @@ static bool do_2shift_scalar(DisasContext *s, arg_shl_scalar *a,
     TCGv_ptr qda;
     TCGv_i32 rm;
 
-    if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qda) ||
+    if (!dc_isar_feature(aa32_mve, s) || !mve_check_qreg_bank(s, a->qda) ||
         a->rm == 13 || a->rm == 15 || !fn) {
         /* Rm cases are UNPREDICTABLE */
         return false;
@@ -1690,16 +1733,16 @@ static bool do_2shift_scalar(DisasContext *s, arg_shl_scalar *a,
     return true;
 }
 
-#define DO_2SHIFT_SCALAR(INSN, FN)                                      \
-    static bool trans_##INSN(DisasContext *s, arg_shl_scalar *a)        \
-    {                                                                   \
-        static MVEGenTwoOpShiftFn * const fns[] = {                     \
-            gen_helper_mve_##FN##b,                                     \
-            gen_helper_mve_##FN##h,                                     \
-            gen_helper_mve_##FN##w,                                     \
-            NULL,                                                       \
-        };                                                              \
-        return do_2shift_scalar(s, a, fns[a->size]);                    \
+#define DO_2SHIFT_SCALAR(INSN, FN)                               \
+    static bool trans_##INSN(DisasContext *s, arg_shl_scalar *a) \
+    {                                                            \
+        static MVEGenTwoOpShiftFn *const fns[] = {               \
+            gen_helper_mve_##FN##b,                              \
+            gen_helper_mve_##FN##h,                              \
+            gen_helper_mve_##FN##w,                              \
+            NULL,                                                \
+        };                                                       \
+        return do_2shift_scalar(s, a, fns[a->size]);             \
     }
 
 DO_2SHIFT_SCALAR(VSHL_S_scalar, vshli_s)
@@ -1711,14 +1754,14 @@ DO_2SHIFT_SCALAR(VQSHL_U_scalar, vqshli_u)
 DO_2SHIFT_SCALAR(VQRSHL_S_scalar, vqrshli_s)
 DO_2SHIFT_SCALAR(VQRSHL_U_scalar, vqrshli_u)
 
-#define DO_VSHLL(INSN, FN)                                              \
-    static bool trans_##INSN(DisasContext *s, arg_2shift *a)            \
-    {                                                                   \
-        static MVEGenTwoOpShiftFn * const fns[] = {                     \
-            gen_helper_mve_##FN##b,                                     \
-            gen_helper_mve_##FN##h,                                     \
-        };                                                              \
-        return do_2shift_vec(s, a, fns[a->size], false, do_gvec_##FN);  \
+#define DO_VSHLL(INSN, FN)                                             \
+    static bool trans_##INSN(DisasContext *s, arg_2shift *a)           \
+    {                                                                  \
+        static MVEGenTwoOpShiftFn *const fns[] = {                     \
+            gen_helper_mve_##FN##b,                                    \
+            gen_helper_mve_##FN##h,                                    \
+        };                                                             \
+        return do_2shift_vec(s, a, fns[a->size], false, do_gvec_##FN); \
     }
 
 /*
@@ -1739,8 +1782,8 @@ static void do_gvec_vshllbu(unsigned vece, uint32_t dofs, uint32_t aofs,
                             int64_t shift, uint32_t oprsz, uint32_t maxsz)
 {
     unsigned ovece = vece + 1;
-    tcg_gen_gvec_andi(ovece, dofs, aofs,
-                      ovece == MO_16 ? 0xff : 0xffff, oprsz, maxsz);
+    tcg_gen_gvec_andi(ovece, dofs, aofs, ovece == MO_16 ? 0xff : 0xffff, oprsz,
+                      maxsz);
     tcg_gen_gvec_shli(ovece, dofs, dofs, shift, oprsz, maxsz);
 }
 
@@ -1777,14 +1820,14 @@ DO_VSHLL(VSHLL_BU, vshllbu)
 DO_VSHLL(VSHLL_TS, vshllts)
 DO_VSHLL(VSHLL_TU, vshlltu)
 
-#define DO_2SHIFT_N(INSN, FN)                                   \
-    static bool trans_##INSN(DisasContext *s, arg_2shift *a)    \
-    {                                                           \
-        static MVEGenTwoOpShiftFn * const fns[] = {             \
-            gen_helper_mve_##FN##b,                             \
-            gen_helper_mve_##FN##h,                             \
-        };                                                      \
-        return do_2shift(s, a, fns[a->size], false);            \
+#define DO_2SHIFT_N(INSN, FN)                                \
+    static bool trans_##INSN(DisasContext *s, arg_2shift *a) \
+    {                                                        \
+        static MVEGenTwoOpShiftFn *const fns[] = {           \
+            gen_helper_mve_##FN##b,                          \
+            gen_helper_mve_##FN##h,                          \
+        };                                                   \
+        return do_2shift(s, a, fns[a->size], false);         \
     }
 
 DO_2SHIFT_N(VSHRNB, vshrnb)
@@ -1899,7 +1942,7 @@ static bool do_viwdup(DisasContext *s, arg_viwdup *a, MVEGenVIWDUPFn *fn)
 
 static bool trans_VIDUP(DisasContext *s, arg_vidup *a)
 {
-    static MVEGenVIDUPFn * const fns[] = {
+    static MVEGenVIDUPFn *const fns[] = {
         gen_helper_mve_vidupb,
         gen_helper_mve_viduph,
         gen_helper_mve_vidupw,
@@ -1910,7 +1953,7 @@ static bool trans_VIDUP(DisasContext *s, arg_vidup *a)
 
 static bool trans_VDDUP(DisasContext *s, arg_vidup *a)
 {
-    static MVEGenVIDUPFn * const fns[] = {
+    static MVEGenVIDUPFn *const fns[] = {
         gen_helper_mve_vidupb,
         gen_helper_mve_viduph,
         gen_helper_mve_vidupw,
@@ -1923,7 +1966,7 @@ static bool trans_VDDUP(DisasContext *s, arg_vidup *a)
 
 static bool trans_VIWDUP(DisasContext *s, arg_viwdup *a)
 {
-    static MVEGenVIWDUPFn * const fns[] = {
+    static MVEGenVIWDUPFn *const fns[] = {
         gen_helper_mve_viwdupb,
         gen_helper_mve_viwduph,
         gen_helper_mve_viwdupw,
@@ -1934,7 +1977,7 @@ static bool trans_VIWDUP(DisasContext *s, arg_viwdup *a)
 
 static bool trans_VDWDUP(DisasContext *s, arg_viwdup *a)
 {
-    static MVEGenVIWDUPFn * const fns[] = {
+    static MVEGenVIWDUPFn *const fns[] = {
         gen_helper_mve_vdwdupb,
         gen_helper_mve_vdwduph,
         gen_helper_mve_vdwdupw,
@@ -1999,27 +2042,26 @@ static bool do_vcmp_scalar(DisasContext *s, arg_vcmp_scalar *a,
     return true;
 }
 
-#define DO_VCMP(INSN, FN)                                       \
-    static bool trans_##INSN(DisasContext *s, arg_vcmp *a)      \
-    {                                                           \
-        static MVEGenCmpFn * const fns[] = {                    \
-            gen_helper_mve_##FN##b,                             \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##w,                             \
-            NULL,                                               \
-        };                                                      \
-        return do_vcmp(s, a, fns[a->size]);                     \
-    }                                                           \
-    static bool trans_##INSN##_scalar(DisasContext *s,          \
-                                      arg_vcmp_scalar *a)       \
-    {                                                           \
-        static MVEGenScalarCmpFn * const fns[] = {              \
-            gen_helper_mve_##FN##_scalarb,                      \
-            gen_helper_mve_##FN##_scalarh,                      \
-            gen_helper_mve_##FN##_scalarw,                      \
-            NULL,                                               \
-        };                                                      \
-        return do_vcmp_scalar(s, a, fns[a->size]);              \
+#define DO_VCMP(INSN, FN)                                                  \
+    static bool trans_##INSN(DisasContext *s, arg_vcmp *a)                 \
+    {                                                                      \
+        static MVEGenCmpFn *const fns[] = {                                \
+            gen_helper_mve_##FN##b,                                        \
+            gen_helper_mve_##FN##h,                                        \
+            gen_helper_mve_##FN##w,                                        \
+            NULL,                                                          \
+        };                                                                 \
+        return do_vcmp(s, a, fns[a->size]);                                \
+    }                                                                      \
+    static bool trans_##INSN##_scalar(DisasContext *s, arg_vcmp_scalar *a) \
+    {                                                                      \
+        static MVEGenScalarCmpFn *const fns[] = {                          \
+            gen_helper_mve_##FN##_scalarb,                                 \
+            gen_helper_mve_##FN##_scalarh,                                 \
+            gen_helper_mve_##FN##_scalarw,                                 \
+            NULL,                                                          \
+        };                                                                 \
+        return do_vcmp_scalar(s, a, fns[a->size]);                         \
     }
 
 DO_VCMP(VCMPEQ, vcmpeq)
@@ -2031,33 +2073,32 @@ DO_VCMP(VCMPLT, vcmplt)
 DO_VCMP(VCMPGT, vcmpgt)
 DO_VCMP(VCMPLE, vcmple)
 
-#define DO_VCMP_FP(INSN, FN)                                    \
-    static bool trans_##INSN(DisasContext *s, arg_vcmp *a)      \
-    {                                                           \
-        static MVEGenCmpFn * const fns[] = {                    \
-            NULL,                                               \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##s,                             \
-            NULL,                                               \
-        };                                                      \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                 \
-            return false;                                       \
-        }                                                       \
-        return do_vcmp(s, a, fns[a->size]);                     \
-    }                                                           \
-    static bool trans_##INSN##_scalar(DisasContext *s,          \
-                                      arg_vcmp_scalar *a)       \
-    {                                                           \
-        static MVEGenScalarCmpFn * const fns[] = {              \
-            NULL,                                               \
-            gen_helper_mve_##FN##_scalarh,                      \
-            gen_helper_mve_##FN##_scalars,                      \
-            NULL,                                               \
-        };                                                      \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                 \
-            return false;                                       \
-        }                                                       \
-        return do_vcmp_scalar(s, a, fns[a->size]);              \
+#define DO_VCMP_FP(INSN, FN)                                               \
+    static bool trans_##INSN(DisasContext *s, arg_vcmp *a)                 \
+    {                                                                      \
+        static MVEGenCmpFn *const fns[] = {                                \
+            NULL,                                                          \
+            gen_helper_mve_##FN##h,                                        \
+            gen_helper_mve_##FN##s,                                        \
+            NULL,                                                          \
+        };                                                                 \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {                            \
+            return false;                                                  \
+        }                                                                  \
+        return do_vcmp(s, a, fns[a->size]);                                \
+    }                                                                      \
+    static bool trans_##INSN##_scalar(DisasContext *s, arg_vcmp_scalar *a) \
+    {                                                                      \
+        static MVEGenScalarCmpFn *const fns[] = {                          \
+            NULL,                                                          \
+            gen_helper_mve_##FN##_scalarh,                                 \
+            gen_helper_mve_##FN##_scalars,                                 \
+            NULL,                                                          \
+        };                                                                 \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {                            \
+            return false;                                                  \
+        }                                                                  \
+        return do_vcmp_scalar(s, a, fns[a->size]);                         \
     }
 
 DO_VCMP_FP(VCMPEQ_fp, vfcmpeq)
@@ -2095,16 +2136,16 @@ static bool do_vmaxv(DisasContext *s, arg_vmaxv *a, MVEGenVADDVFn fn)
     return true;
 }
 
-#define DO_VMAXV(INSN, FN)                                      \
-    static bool trans_##INSN(DisasContext *s, arg_vmaxv *a)     \
-    {                                                           \
-        static MVEGenVADDVFn * const fns[] = {                  \
-            gen_helper_mve_##FN##b,                             \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##w,                             \
-            NULL,                                               \
-        };                                                      \
-        return do_vmaxv(s, a, fns[a->size]);                    \
+#define DO_VMAXV(INSN, FN)                                  \
+    static bool trans_##INSN(DisasContext *s, arg_vmaxv *a) \
+    {                                                       \
+        static MVEGenVADDVFn *const fns[] = {               \
+            gen_helper_mve_##FN##b,                         \
+            gen_helper_mve_##FN##h,                         \
+            gen_helper_mve_##FN##w,                         \
+            NULL,                                           \
+        };                                                  \
+        return do_vmaxv(s, a, fns[a->size]);                \
     }
 
 DO_VMAXV(VMAXV_S, vmaxvs)
@@ -2114,19 +2155,19 @@ DO_VMAXV(VMINV_S, vminvs)
 DO_VMAXV(VMINV_U, vminvu)
 DO_VMAXV(VMINAV, vminav)
 
-#define DO_VMAXV_FP(INSN, FN)                                   \
-    static bool trans_##INSN(DisasContext *s, arg_vmaxv *a)     \
-    {                                                           \
-        static MVEGenVADDVFn * const fns[] = {                  \
-            NULL,                                               \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##s,                             \
-            NULL,                                               \
-        };                                                      \
-        if (!dc_isar_feature(aa32_mve_fp, s)) {                 \
-            return false;                                       \
-        }                                                       \
-        return do_vmaxv(s, a, fns[a->size]);                    \
+#define DO_VMAXV_FP(INSN, FN)                               \
+    static bool trans_##INSN(DisasContext *s, arg_vmaxv *a) \
+    {                                                       \
+        static MVEGenVADDVFn *const fns[] = {               \
+            NULL,                                           \
+            gen_helper_mve_##FN##h,                         \
+            gen_helper_mve_##FN##s,                         \
+            NULL,                                           \
+        };                                                  \
+        if (!dc_isar_feature(aa32_mve_fp, s)) {             \
+            return false;                                   \
+        }                                                   \
+        return do_vmaxv(s, a, fns[a->size]);                \
     }
 
 DO_VMAXV_FP(VMAXNMV, vmaxnmv)
@@ -2141,8 +2182,8 @@ static bool do_vabav(DisasContext *s, arg_vabav *a, MVEGenVABAVFn *fn)
     TCGv_i32 rda;
 
     if (!dc_isar_feature(aa32_mve, s) ||
-        !mve_check_qreg_bank(s, a->qm | a->qn) ||
-        !fn || a->rda == 13 || a->rda == 15) {
+        !mve_check_qreg_bank(s, a->qm | a->qn) || !fn || a->rda == 13 ||
+        a->rda == 15) {
         /* Rda cases are UNPREDICTABLE */
         return false;
     }
@@ -2159,16 +2200,16 @@ static bool do_vabav(DisasContext *s, arg_vabav *a, MVEGenVABAVFn *fn)
     return true;
 }
 
-#define DO_VABAV(INSN, FN)                                      \
-    static bool trans_##INSN(DisasContext *s, arg_vabav *a)     \
-    {                                                           \
-        static MVEGenVABAVFn * const fns[] = {                  \
-            gen_helper_mve_##FN##b,                             \
-            gen_helper_mve_##FN##h,                             \
-            gen_helper_mve_##FN##w,                             \
-            NULL,                                               \
-        };                                                      \
-        return do_vabav(s, a, fns[a->size]);                    \
+#define DO_VABAV(INSN, FN)                                  \
+    static bool trans_##INSN(DisasContext *s, arg_vabav *a) \
+    {                                                       \
+        static MVEGenVABAVFn *const fns[] = {               \
+            gen_helper_mve_##FN##b,                         \
+            gen_helper_mve_##FN##h,                         \
+            gen_helper_mve_##FN##w,                         \
+            NULL,                                           \
+        };                                                  \
+        return do_vabav(s, a, fns[a->size]);                \
     }
 
 DO_VABAV(VABAV_S, vabavs)

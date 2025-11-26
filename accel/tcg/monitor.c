@@ -25,12 +25,12 @@ static void dump_drift_info(GString *buf)
         return;
     }
 
-    g_string_append_printf(buf, "Host - Guest clock  %"PRIi64" ms\n",
+    g_string_append_printf(buf, "Host - Guest clock  %" PRIi64 " ms\n",
                            (cpu_get_clock() - icount_get()) / SCALE_MS);
     if (icount_align_option) {
-        g_string_append_printf(buf, "Max guest delay     %"PRIi64" ms\n",
+        g_string_append_printf(buf, "Max guest delay     %" PRIi64 " ms\n",
                                -max_delay / SCALE_MS);
-        g_string_append_printf(buf, "Max guest advance   %"PRIi64" ms\n",
+        g_string_append_printf(buf, "Max guest advance   %" PRIi64 " ms\n",
                                max_advance / SCALE_MS);
     } else {
         g_string_append_printf(buf, "Max guest delay     NA\n");
@@ -41,9 +41,8 @@ static void dump_drift_info(GString *buf)
 static void dump_accel_info(GString *buf)
 {
     AccelState *accel = current_accel();
-    bool one_insn_per_tb = object_property_get_bool(OBJECT(accel),
-                                                    "one-insn-per-tb",
-                                                    &error_fatal);
+    bool one_insn_per_tb = object_property_get_bool(
+        OBJECT(accel), "one-insn-per-tb", &error_fatal);
 
     g_string_append_printf(buf, "Accelerator settings:\n");
     g_string_append_printf(buf, "one-insn-per-tb: %s\n\n",

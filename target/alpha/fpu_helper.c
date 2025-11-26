@@ -56,8 +56,8 @@ static uint32_t soft_to_fpcr_exc(CPUAlphaState *env)
     return ret;
 }
 
-static void fp_exc_raise1(CPUAlphaState *env, uintptr_t retaddr,
-                          uint32_t exc, uint32_t regno, uint32_t hw_exc)
+static void fp_exc_raise1(CPUAlphaState *env, uintptr_t retaddr, uint32_t exc,
+                          uint32_t regno, uint32_t hw_exc)
 {
     hw_exc |= CONVERT_BIT(exc, FPCR_INV, EXC_M_INV);
     hw_exc |= CONVERT_BIT(exc, FPCR_DZE, EXC_M_DZE);
@@ -151,8 +151,8 @@ void helper_ieee_input_cmp(CPUAlphaState *env, uint64_t val)
    nothing to compare with.  */
 void helper_ieee_input_s(CPUAlphaState *env, uint64_t val)
 {
-    if (unlikely(2 * val - 1 < 0x1fffffffffffffull)
-        && !env->fp_status.flush_inputs_to_zero) {
+    if (unlikely(2 * val - 1 < 0x1fffffffffffffull) &&
+        !env->fp_status.flush_inputs_to_zero) {
         arith_excp(env, GETPC(), EXC_M_INV | EXC_M_SWC, 0);
     }
 }
@@ -179,9 +179,8 @@ static inline uint64_t float32_to_s_int(uint32_t fi)
         }
     }
 
-    return (((uint64_t)sign << 63)
-            | ((uint64_t)exp << 52)
-            | ((uint64_t)frac << 29));
+    return (((uint64_t)sign << 63) | ((uint64_t)exp << 52) |
+            ((uint64_t)frac << 29));
 }
 
 static inline uint64_t float32_to_s(float32 fa)

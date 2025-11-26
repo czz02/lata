@@ -74,8 +74,8 @@ static bool superh_io_recompile_replay_branch(CPUState *cs,
     SuperHCPU *cpu = SUPERH_CPU(cs);
     CPUSH4State *env = &cpu->env;
 
-    if ((env->flags & (TB_FLAG_DELAY_SLOT | TB_FLAG_DELAY_SLOT_COND))
-        && !(cs->tcg_cflags & CF_PCREL) && env->pc != tb->pc) {
+    if ((env->flags & (TB_FLAG_DELAY_SLOT | TB_FLAG_DELAY_SLOT_COND)) &&
+        !(cs->tcg_cflags & CF_PCREL) && env->pc != tb->pc) {
         env->pc -= 2;
         env->flags &= ~(TB_FLAG_DELAY_SLOT | TB_FLAG_DELAY_SLOT_COND);
         return true;
@@ -107,9 +107,10 @@ static void superh_cpu_reset_hold(Object *obj)
     env->fpscr = FPSCR_PR; /* value for userspace according to the kernel */
     set_float_rounding_mode(float_round_nearest_even, &env->fp_status); /* ?! */
 #else
-    env->sr = (1u << SR_MD) | (1u << SR_RB) | (1u << SR_BL) |
-              (1u << SR_I3) | (1u << SR_I2) | (1u << SR_I1) | (1u << SR_I0);
-    env->fpscr = FPSCR_DN | FPSCR_RM_ZERO; /* CPU reset value according to SH4 manual */
+    env->sr = (1u << SR_MD) | (1u << SR_RB) | (1u << SR_BL) | (1u << SR_I3) |
+              (1u << SR_I2) | (1u << SR_I1) | (1u << SR_I0);
+    env->fpscr =
+        FPSCR_DN | FPSCR_RM_ZERO; /* CPU reset value according to SH4 manual */
     set_float_rounding_mode(float_round_to_zero, &env->fp_status);
     set_flush_to_zero(1, &env->fp_status);
 #endif
@@ -303,12 +304,10 @@ static void superh_cpu_class_init(ObjectClass *oc, void *data)
     cc->tcg_ops = &superh_tcg_ops;
 }
 
-#define DEFINE_SUPERH_CPU_TYPE(type_name, cinit, initfn) \
-    {                                                    \
-        .name = type_name,                               \
-        .parent = TYPE_SUPERH_CPU,                       \
-        .class_init = cinit,                             \
-        .instance_init = initfn,                         \
+#define DEFINE_SUPERH_CPU_TYPE(type_name, cinit, initfn)                   \
+    {                                                                      \
+        .name = type_name, .parent = TYPE_SUPERH_CPU, .class_init = cinit, \
+        .instance_init = initfn,                                           \
     }
 static const TypeInfo superh_cpu_type_infos[] = {
     {

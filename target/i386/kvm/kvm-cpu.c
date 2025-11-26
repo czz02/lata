@@ -28,7 +28,8 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
      * nothing else has been set by the user (or by accelerators) in
      * cpu->ucode_rev and cpu->phys_bits, and updates the CPUID results in
      * mwait.ecx.
-     * This accel realization code also assumes cpu features are already expanded.
+     * This accel realization code also assumes cpu features are already
+     * expanded.
      *
      * realize order:
      *
@@ -44,9 +45,8 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
             env->features[FEAT_7_0_ECX] |= CPUID_7_0_ECX_WAITPKG;
         }
         if (cpu->ucode_rev == 0) {
-            cpu->ucode_rev =
-                kvm_arch_get_supported_msr_feature(kvm_state,
-                                                   MSR_IA32_UCODE_REV);
+            cpu->ucode_rev = kvm_arch_get_supported_msr_feature(
+                kvm_state, MSR_IA32_UCODE_REV);
         }
     }
     return host_cpu_realizefn(cs, errp);
@@ -73,8 +73,7 @@ static void kvm_cpu_max_instance_init(X86CPU *cpu)
         object_property_set_bool(OBJECT(cpu), "lmce", true, &error_abort);
     }
 
-    env->cpuid_min_level =
-        kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
+    env->cpuid_min_level = kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
     env->cpuid_min_xlevel =
         kvm_arch_get_supported_cpuid(s, 0x80000000, 0, R_EAX);
     env->cpuid_min_xlevel2 =
@@ -102,8 +101,8 @@ static void kvm_cpu_xsave_init(void)
         if (!esa->size) {
             continue;
         }
-        if ((x86_cpu_get_supported_feature_word(esa->feature, false) & esa->bits)
-            != esa->bits) {
+        if ((x86_cpu_get_supported_feature_word(esa->feature, false) &
+             esa->bits) != esa->bits) {
             continue;
         }
         host_cpuid(0xd, i, &eax, &ebx, &ecx, &edx);
@@ -126,18 +125,12 @@ static void kvm_cpu_xsave_init(void)
  *       docs/system/target-i386.rst)
  */
 static PropValue kvm_default_props[] = {
-    { "kvmclock", "on" },
-    { "kvm-nopiodelay", "on" },
-    { "kvm-asyncpf", "on" },
-    { "kvm-steal-time", "on" },
-    { "kvm-pv-eoi", "on" },
-    { "kvmclock-stable-bit", "on" },
-    { "x2apic", "on" },
-    { "kvm-msi-ext-dest-id", "off" },
-    { "acpi", "off" },
-    { "monitor", "off" },
-    { "svm", "off" },
-    { NULL, NULL },
+    { "kvmclock", "on" },    { "kvm-nopiodelay", "on" },
+    { "kvm-asyncpf", "on" }, { "kvm-steal-time", "on" },
+    { "kvm-pv-eoi", "on" },  { "kvmclock-stable-bit", "on" },
+    { "x2apic", "on" },      { "kvm-msi-ext-dest-id", "off" },
+    { "acpi", "off" },       { "monitor", "off" },
+    { "svm", "off" },        { NULL, NULL },
 };
 
 /*

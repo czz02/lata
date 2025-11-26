@@ -121,8 +121,8 @@ void cpu_alpha_store_gr(CPUAlphaState *env, unsigned reg, uint64_t val)
 
 #if defined(CONFIG_USER_ONLY)
 void alpha_cpu_record_sigsegv(CPUState *cs, vaddr address,
-                              MMUAccessType access_type,
-                              bool maperr, uintptr_t retaddr)
+                              MMUAccessType access_type, bool maperr,
+                              uintptr_t retaddr)
 {
     AlphaCPU *cpu = ALPHA_CPU(cs);
     target_ulong mmcsr, cause;
@@ -162,8 +162,8 @@ void alpha_cpu_record_sigsegv(CPUState *cs, vaddr address,
 #else
 /* Returns the OSF/1 entMM failure indication, or -1 on success.  */
 static int get_physical_address(CPUAlphaState *env, target_ulong addr,
-                                int prot_need, int mmu_idx,
-                                target_ulong *pphys, int *pprot)
+                                int prot_need, int mmu_idx, target_ulong *pphys,
+                                int *pprot)
 {
     CPUState *cs = env_cpu(env);
     target_long saddr = addr;
@@ -220,7 +220,7 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
 
     /* L1 page table read.  */
     index = (addr >> (TARGET_PAGE_BITS + 20)) & 0x3ff;
-    L1pte = ldq_phys(cs->as, pt + index*8);
+    L1pte = ldq_phys(cs->as, pt + index * 8);
 
     if (unlikely((L1pte & PTE_VALID) == 0)) {
         ret = MM_K_TNV;
@@ -233,7 +233,7 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
 
     /* L2 page table read.  */
     index = (addr >> (TARGET_PAGE_BITS + 10)) & 0x3ff;
-    L2pte = ldq_phys(cs->as, pt + index*8);
+    L2pte = ldq_phys(cs->as, pt + index * 8);
 
     if (unlikely((L2pte & PTE_VALID) == 0)) {
         ret = MM_K_TNV;
@@ -246,7 +246,7 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
 
     /* L3 page table read.  */
     index = (addr >> TARGET_PAGE_BITS) & 0x3ff;
-    L3pte = ldq_phys(cs->as, pt + index*8);
+    L3pte = ldq_phys(cs->as, pt + index * 8);
 
     phys = L3pte >> 32 << TARGET_PAGE_BITS;
     if (unlikely((L3pte & PTE_VALID) == 0)) {
@@ -255,7 +255,7 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
     }
 
 #if PAGE_READ != 1 || PAGE_WRITE != 2 || PAGE_EXEC != 4
-# error page bits out of date
+#error page bits out of date
 #endif
 
     /* Check access violations.  */
@@ -273,12 +273,13 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
     prot &= ~(L3pte >> 1);
     ret = -1;
     if (unlikely((prot & prot_need) == 0)) {
-        ret = (prot_need & PAGE_EXEC ? MM_K_FOE :
+        ret = (prot_need & PAGE_EXEC  ? MM_K_FOE :
                prot_need & PAGE_WRITE ? MM_K_FOW :
-               prot_need & PAGE_READ ? MM_K_FOR : -1);
+               prot_need & PAGE_READ  ? MM_K_FOR :
+                                        -1);
     }
 
- exit:
+exit:
     *pphys = phys;
     *pprot = prot;
     return ret;
@@ -295,16 +296,16 @@ hwaddr alpha_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
 }
 
 bool alpha_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-                        MMUAccessType access_type, int mmu_idx,
-                        bool probe, uintptr_t retaddr)
+                        MMUAccessType access_type, int mmu_idx, bool probe,
+                        uintptr_t retaddr)
 {
     AlphaCPU *cpu = ALPHA_CPU(cs);
     CPUAlphaState *env = &cpu->env;
     target_ulong phys;
     int prot, fail;
 
-    fail = get_physical_address(env, addr, 1 << access_type,
-                                mmu_idx, &phys, &prot);
+    fail = get_physical_address(env, addr, 1 << access_type, mmu_idx, &phys,
+                                &prot);
     if (unlikely(fail >= 0)) {
         if (probe) {
             return false;
@@ -312,14 +313,16 @@ bool alpha_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
         cs->exception_index = EXCP_MMFAULT;
         env->trap_arg0 = addr;
         env->trap_arg1 = fail;
-        env->trap_arg2 = (access_type == MMU_DATA_LOAD ? 0ull :
-                          access_type == MMU_DATA_STORE ? 1ull :
-                          /* access_type == MMU_INST_FETCH */ -1ull);
+        env->trap_arg2 = (access_type == MMU_DATA_LOAD ?
+                              0ull :
+                          access_type == MMU_DATA_STORE ?
+                              1ull :
+                              /* access_type == MMU_INST_FETCH */ -1ull);
         cpu_loop_exit_restore(cs, retaddr);
     }
 
-    tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
-                 prot, mmu_idx, TARGET_PAGE_SIZE);
+    tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK, prot,
+                 mmu_idx, TARGET_PAGE_SIZE);
     return true;
 }
 
@@ -368,10 +371,10 @@ void alpha_cpu_do_interrupt(CPUState *cs)
             name = "call_pal";
             break;
         }
-        qemu_log("INT %6d: %s(%#x) cpu=%d pc=%016"
-                 PRIx64 " sp=%016" PRIx64 "\n",
-                 ++count, name, env->error_code, cs->cpu_index,
-                 env->pc, env->ir[IR_SP]);
+        qemu_log("INT %6d: %s(%#x) cpu=%d pc=%016" PRIx64 " sp=%016" PRIx64
+                 "\n",
+                 ++count, name, env->error_code, cs->cpu_index, env->pc,
+                 env->ir[IR_SP]);
     }
 
     cs->exception_index = -1;
@@ -482,21 +485,19 @@ bool alpha_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 void alpha_cpu_dump_state(CPUState *cs, FILE *f, int flags)
 {
     static const char linux_reg_names[31][4] = {
-        "v0",  "t0",  "t1", "t2",  "t3", "t4", "t5", "t6",
-        "t7",  "s0",  "s1", "s2",  "s3", "s4", "s5", "fp",
-        "a0",  "a1",  "a2", "a3",  "a4", "a5", "t8", "t9",
-        "t10", "t11", "ra", "t12", "at", "gp", "sp"
+        "v0", "t0", "t1",  "t2",  "t3", "t4",  "t5", "t6", "t7", "s0", "s1",
+        "s2", "s3", "s4",  "s5",  "fp", "a0",  "a1", "a2", "a3", "a4", "a5",
+        "t8", "t9", "t10", "t11", "ra", "t12", "at", "gp", "sp"
     };
     AlphaCPU *cpu = ALPHA_CPU(cs);
     CPUAlphaState *env = &cpu->env;
     int i;
 
-    qemu_fprintf(f, "PC      " TARGET_FMT_lx " PS      %02x\n",
-                 env->pc, extract32(env->flags, ENV_FLAG_PS_SHIFT, 8));
+    qemu_fprintf(f, "PC      " TARGET_FMT_lx " PS      %02x\n", env->pc,
+                 extract32(env->flags, ENV_FLAG_PS_SHIFT, 8));
     for (i = 0; i < 31; i++) {
-        qemu_fprintf(f, "%-8s" TARGET_FMT_lx "%c",
-                     linux_reg_names[i], cpu_alpha_load_gr(env, i),
-                     (i % 3) == 2 ? '\n' : ' ');
+        qemu_fprintf(f, "%-8s" TARGET_FMT_lx "%c", linux_reg_names[i],
+                     cpu_alpha_load_gr(env, i), (i % 3) == 2 ? '\n' : ' ');
     }
 
     qemu_fprintf(f, "lock_a  " TARGET_FMT_lx " lock_v  " TARGET_FMT_lx "\n",
@@ -524,8 +525,8 @@ G_NORETURN void helper_excp(CPUAlphaState *env, int excp, int error)
 }
 
 /* This may be called from any of the helpers to set up EXCEPTION_INDEX.  */
-G_NORETURN void dynamic_excp(CPUAlphaState *env, uintptr_t retaddr,
-                             int excp, int error)
+G_NORETURN void dynamic_excp(CPUAlphaState *env, uintptr_t retaddr, int excp,
+                             int error)
 {
     CPUState *cs = env_cpu(env);
 
@@ -539,8 +540,8 @@ G_NORETURN void dynamic_excp(CPUAlphaState *env, uintptr_t retaddr,
     cpu_loop_exit(cs);
 }
 
-G_NORETURN void arith_excp(CPUAlphaState *env, uintptr_t retaddr,
-                           int exc, uint64_t mask)
+G_NORETURN void arith_excp(CPUAlphaState *env, uintptr_t retaddr, int exc,
+                           uint64_t mask)
 {
     env->trap_arg0 = exc;
     env->trap_arg1 = mask;

@@ -79,23 +79,23 @@ static void dfp_prepare_rounding_mode(decContext *context, uint64_t fpscr)
         rnd = DEC_ROUND_DOWN;
         break;
     case 2:
-         rnd = DEC_ROUND_CEILING;
-         break;
+        rnd = DEC_ROUND_CEILING;
+        break;
     case 3:
-         rnd = DEC_ROUND_FLOOR;
-         break;
+        rnd = DEC_ROUND_FLOOR;
+        break;
     case 4:
-         rnd = DEC_ROUND_HALF_UP;
-         break;
+        rnd = DEC_ROUND_HALF_UP;
+        break;
     case 5:
-         rnd = DEC_ROUND_HALF_DOWN;
-         break;
+        rnd = DEC_ROUND_HALF_DOWN;
+        break;
     case 6:
-         rnd = DEC_ROUND_UP;
-         break;
+        rnd = DEC_ROUND_UP;
+        break;
     case 7:
-         rnd = DEC_ROUND_05UP;
-         break;
+        rnd = DEC_ROUND_05UP;
+        break;
     default:
         g_assert_not_reached();
     }
@@ -104,7 +104,7 @@ static void dfp_prepare_rounding_mode(decContext *context, uint64_t fpscr)
 }
 
 static void dfp_set_round_mode_from_immediate(uint8_t r, uint8_t rmc,
-                                                  struct PPC_DFP *dfp)
+                                              struct PPC_DFP *dfp)
 {
     enum rounding rnd;
     if (r == 0) {
@@ -203,7 +203,7 @@ static void dfp_finalize_decimal128(struct PPC_DFP *dfp)
 }
 
 static void dfp_set_FPSCR_flag(struct PPC_DFP *dfp, uint64_t flag,
-                uint64_t enabled)
+                               uint64_t enabled)
 {
     dfp->env->fpscr |= (flag | FP_FX);
     if (dfp->env->fpscr & enabled) {
@@ -212,7 +212,7 @@ static void dfp_set_FPSCR_flag(struct PPC_DFP *dfp, uint64_t flag,
 }
 
 static void dfp_set_FPRF_from_FRT_with_context(struct PPC_DFP *dfp,
-                decContext *context)
+                                               decContext *context)
 {
     uint64_t fprf = 0;
 
@@ -379,8 +379,7 @@ static void dfp_check_for_VXVC(struct PPC_DFP *dfp)
 static void dfp_check_for_VXCVI(struct PPC_DFP *dfp)
 {
     if ((dfp->context.status & DEC_Invalid_operation) &&
-        (!decNumberIsSNaN(&dfp->a)) &&
-        (!decNumberIsSNaN(&dfp->b))) {
+        (!decNumberIsSNaN(&dfp->a)) && (!decNumberIsSNaN(&dfp->b))) {
         dfp_set_FPSCR_flag(dfp, FP_VX | FP_VXCVI, FP_VE);
     }
 }
@@ -426,17 +425,17 @@ static inline int dfp_get_digit(decNumber *dn, int n)
     g_assert_not_reached();
 }
 
-#define DFP_HELPER_TAB(op, dnop, postprocs, size)                              \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a,               \
-                 ppc_fprp_t *b)                                                \
-{                                                                              \
-    struct PPC_DFP dfp;                                                        \
-    dfp_prepare_decimal##size(&dfp, a, b, env);                                \
-    dnop(&dfp.t, &dfp.a, &dfp.b, &dfp.context);                                \
-    dfp_finalize_decimal##size(&dfp);                                          \
-    postprocs(&dfp);                                                           \
-    set_dfp##size(t, &dfp.vt);                                                 \
-}
+#define DFP_HELPER_TAB(op, dnop, postprocs, size)                    \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a, \
+                     ppc_fprp_t *b)                                  \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+        dfp_prepare_decimal##size(&dfp, a, b, env);                  \
+        dnop(&dfp.t, &dfp.a, &dfp.b, &dfp.context);                  \
+        dfp_finalize_decimal##size(&dfp);                            \
+        postprocs(&dfp);                                             \
+        set_dfp##size(t, &dfp.vt);                                   \
+    }
 
 static void ADD_PPs(struct PPC_DFP *dfp)
 {
@@ -492,16 +491,16 @@ static void DIV_PPs(struct PPC_DFP *dfp)
 DFP_HELPER_TAB(DDIV, decNumberDivide, DIV_PPs, 64)
 DFP_HELPER_TAB(DDIVQ, decNumberDivide, DIV_PPs, 128)
 
-#define DFP_HELPER_BF_AB(op, dnop, postprocs, size)                            \
-uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, ppc_fprp_t *b)           \
-{                                                                              \
-    struct PPC_DFP dfp;                                                        \
-    dfp_prepare_decimal##size(&dfp, a, b, env);                                \
-    dnop(&dfp.t, &dfp.a, &dfp.b, &dfp.context);                                \
-    dfp_finalize_decimal##size(&dfp);                                          \
-    postprocs(&dfp);                                                           \
-    return dfp.crbf;                                                           \
-}
+#define DFP_HELPER_BF_AB(op, dnop, postprocs, size)                      \
+    uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, ppc_fprp_t *b) \
+    {                                                                    \
+        struct PPC_DFP dfp;                                              \
+        dfp_prepare_decimal##size(&dfp, a, b, env);                      \
+        dnop(&dfp.t, &dfp.a, &dfp.b, &dfp.context);                      \
+        dfp_finalize_decimal##size(&dfp);                                \
+        postprocs(&dfp);                                                 \
+        return dfp.crbf;                                                 \
+    }
 
 static void CMPU_PPs(struct PPC_DFP *dfp)
 {
@@ -524,189 +523,189 @@ static void CMPO_PPs(struct PPC_DFP *dfp)
 DFP_HELPER_BF_AB(DCMPO, decNumberCompare, CMPO_PPs, 64)
 DFP_HELPER_BF_AB(DCMPOQ, decNumberCompare, CMPO_PPs, 128)
 
-#define DFP_HELPER_TSTDC(op, size)                                       \
-uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, uint32_t dcm)      \
-{                                                                        \
-    struct PPC_DFP dfp;                                                  \
-    int match = 0;                                                       \
-                                                                         \
-    dfp_prepare_decimal##size(&dfp, a, 0, env);                          \
-                                                                         \
-    match |= (dcm & 0x20) && decNumberIsZero(&dfp.a);                    \
-    match |= (dcm & 0x10) && decNumberIsSubnormal(&dfp.a, &dfp.context); \
-    match |= (dcm & 0x08) && decNumberIsNormal(&dfp.a, &dfp.context);    \
-    match |= (dcm & 0x04) && decNumberIsInfinite(&dfp.a);                \
-    match |= (dcm & 0x02) && decNumberIsQNaN(&dfp.a);                    \
-    match |= (dcm & 0x01) && decNumberIsSNaN(&dfp.a);                    \
-                                                                         \
-    if (decNumberIsNegative(&dfp.a)) {                                   \
-        dfp.crbf = match ? 0xA : 0x8;                                    \
-    } else {                                                             \
-        dfp.crbf = match ? 0x2 : 0x0;                                    \
-    }                                                                    \
-                                                                         \
-    dfp_set_FPCC_from_CRBF(&dfp);                                        \
-    return dfp.crbf;                                                     \
-}
+#define DFP_HELPER_TSTDC(op, size)                                           \
+    uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, uint32_t dcm)      \
+    {                                                                        \
+        struct PPC_DFP dfp;                                                  \
+        int match = 0;                                                       \
+                                                                             \
+        dfp_prepare_decimal##size(&dfp, a, 0, env);                          \
+                                                                             \
+        match |= (dcm & 0x20) && decNumberIsZero(&dfp.a);                    \
+        match |= (dcm & 0x10) && decNumberIsSubnormal(&dfp.a, &dfp.context); \
+        match |= (dcm & 0x08) && decNumberIsNormal(&dfp.a, &dfp.context);    \
+        match |= (dcm & 0x04) && decNumberIsInfinite(&dfp.a);                \
+        match |= (dcm & 0x02) && decNumberIsQNaN(&dfp.a);                    \
+        match |= (dcm & 0x01) && decNumberIsSNaN(&dfp.a);                    \
+                                                                             \
+        if (decNumberIsNegative(&dfp.a)) {                                   \
+            dfp.crbf = match ? 0xA : 0x8;                                    \
+        } else {                                                             \
+            dfp.crbf = match ? 0x2 : 0x0;                                    \
+        }                                                                    \
+                                                                             \
+        dfp_set_FPCC_from_CRBF(&dfp);                                        \
+        return dfp.crbf;                                                     \
+    }
 
 DFP_HELPER_TSTDC(DTSTDC, 64)
 DFP_HELPER_TSTDC(DTSTDCQ, 128)
 
-#define DFP_HELPER_TSTDG(op, size)                                       \
-uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, uint32_t dcm)      \
-{                                                                        \
-    struct PPC_DFP dfp;                                                  \
-    int minexp, maxexp, nzero_digits, nzero_idx, is_negative, is_zero,   \
-        is_extreme_exp, is_subnormal, is_normal, leftmost_is_nonzero,    \
-        match;                                                           \
-                                                                         \
-    dfp_prepare_decimal##size(&dfp, a, 0, env);                          \
-                                                                         \
-    if ((size) == 64) {                                                  \
-        minexp = -398;                                                   \
-        maxexp = 369;                                                    \
-        nzero_digits = 16;                                               \
-        nzero_idx = 5;                                                   \
-    } else if ((size) == 128) {                                          \
-        minexp = -6176;                                                  \
-        maxexp = 6111;                                                   \
-        nzero_digits = 34;                                               \
-        nzero_idx = 11;                                                  \
-    }                                                                    \
-                                                                         \
-    is_negative = decNumberIsNegative(&dfp.a);                           \
-    is_zero = decNumberIsZero(&dfp.a);                                   \
-    is_extreme_exp = (dfp.a.exponent == maxexp) ||                       \
-                     (dfp.a.exponent == minexp);                         \
-    is_subnormal = decNumberIsSubnormal(&dfp.a, &dfp.context);           \
-    is_normal = decNumberIsNormal(&dfp.a, &dfp.context);                 \
-    leftmost_is_nonzero = (dfp.a.digits == nzero_digits) &&              \
-                          (dfp.a.lsu[nzero_idx] != 0);                   \
-    match = 0;                                                           \
-                                                                         \
-    match |= (dcm & 0x20) && is_zero && !is_extreme_exp;                 \
-    match |= (dcm & 0x10) && is_zero && is_extreme_exp;                  \
-    match |= (dcm & 0x08) &&                                             \
-             (is_subnormal || (is_normal && is_extreme_exp));            \
-    match |= (dcm & 0x04) && is_normal && !is_extreme_exp &&             \
-             !leftmost_is_nonzero;                                       \
-    match |= (dcm & 0x02) && is_normal && !is_extreme_exp &&             \
-             leftmost_is_nonzero;                                        \
-    match |= (dcm & 0x01) && decNumberIsSpecial(&dfp.a);                 \
-                                                                         \
-    if (is_negative) {                                                   \
-        dfp.crbf = match ? 0xA : 0x8;                                    \
-    } else {                                                             \
-        dfp.crbf = match ? 0x2 : 0x0;                                    \
-    }                                                                    \
-                                                                         \
-    dfp_set_FPCC_from_CRBF(&dfp);                                        \
-    return dfp.crbf;                                                     \
-}
+#define DFP_HELPER_TSTDG(op, size)                                           \
+    uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, uint32_t dcm)      \
+    {                                                                        \
+        struct PPC_DFP dfp;                                                  \
+        int minexp, maxexp, nzero_digits, nzero_idx, is_negative, is_zero,   \
+            is_extreme_exp, is_subnormal, is_normal, leftmost_is_nonzero,    \
+            match;                                                           \
+                                                                             \
+        dfp_prepare_decimal##size(&dfp, a, 0, env);                          \
+                                                                             \
+        if ((size) == 64) {                                                  \
+            minexp = -398;                                                   \
+            maxexp = 369;                                                    \
+            nzero_digits = 16;                                               \
+            nzero_idx = 5;                                                   \
+        } else if ((size) == 128) {                                          \
+            minexp = -6176;                                                  \
+            maxexp = 6111;                                                   \
+            nzero_digits = 34;                                               \
+            nzero_idx = 11;                                                  \
+        }                                                                    \
+                                                                             \
+        is_negative = decNumberIsNegative(&dfp.a);                           \
+        is_zero = decNumberIsZero(&dfp.a);                                   \
+        is_extreme_exp =                                                     \
+            (dfp.a.exponent == maxexp) || (dfp.a.exponent == minexp);        \
+        is_subnormal = decNumberIsSubnormal(&dfp.a, &dfp.context);           \
+        is_normal = decNumberIsNormal(&dfp.a, &dfp.context);                 \
+        leftmost_is_nonzero =                                                \
+            (dfp.a.digits == nzero_digits) && (dfp.a.lsu[nzero_idx] != 0);   \
+        match = 0;                                                           \
+                                                                             \
+        match |= (dcm & 0x20) && is_zero && !is_extreme_exp;                 \
+        match |= (dcm & 0x10) && is_zero && is_extreme_exp;                  \
+        match |=                                                             \
+            (dcm & 0x08) && (is_subnormal || (is_normal && is_extreme_exp)); \
+        match |= (dcm & 0x04) && is_normal && !is_extreme_exp &&             \
+                 !leftmost_is_nonzero;                                       \
+        match |= (dcm & 0x02) && is_normal && !is_extreme_exp &&             \
+                 leftmost_is_nonzero;                                        \
+        match |= (dcm & 0x01) && decNumberIsSpecial(&dfp.a);                 \
+                                                                             \
+        if (is_negative) {                                                   \
+            dfp.crbf = match ? 0xA : 0x8;                                    \
+        } else {                                                             \
+            dfp.crbf = match ? 0x2 : 0x0;                                    \
+        }                                                                    \
+                                                                             \
+        dfp_set_FPCC_from_CRBF(&dfp);                                        \
+        return dfp.crbf;                                                     \
+    }
 
 DFP_HELPER_TSTDG(DTSTDG, 64)
 DFP_HELPER_TSTDG(DTSTDGQ, 128)
 
-#define DFP_HELPER_TSTEX(op, size)                                       \
-uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, ppc_fprp_t *b)     \
-{                                                                        \
-    struct PPC_DFP dfp;                                                  \
-    int expa, expb, a_is_special, b_is_special;                          \
-                                                                         \
-    dfp_prepare_decimal##size(&dfp, a, b, env);                          \
-                                                                         \
-    expa = dfp.a.exponent;                                               \
-    expb = dfp.b.exponent;                                               \
-    a_is_special = decNumberIsSpecial(&dfp.a);                           \
-    b_is_special = decNumberIsSpecial(&dfp.b);                           \
-                                                                         \
-    if (a_is_special || b_is_special) {                                  \
-        int atype = a_is_special ? (decNumberIsNaN(&dfp.a) ? 4 : 2) : 1; \
-        int btype = b_is_special ? (decNumberIsNaN(&dfp.b) ? 4 : 2) : 1; \
-        dfp.crbf = (atype ^ btype) ? 0x1 : 0x2;                          \
-    } else if (expa < expb) {                                            \
-        dfp.crbf = 0x8;                                                  \
-    } else if (expa > expb) {                                            \
-        dfp.crbf = 0x4;                                                  \
-    } else {                                                             \
-        dfp.crbf = 0x2;                                                  \
-    }                                                                    \
-                                                                         \
-    dfp_set_FPCC_from_CRBF(&dfp);                                        \
-    return dfp.crbf;                                                     \
-}
+#define DFP_HELPER_TSTEX(op, size)                                           \
+    uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, ppc_fprp_t *b)     \
+    {                                                                        \
+        struct PPC_DFP dfp;                                                  \
+        int expa, expb, a_is_special, b_is_special;                          \
+                                                                             \
+        dfp_prepare_decimal##size(&dfp, a, b, env);                          \
+                                                                             \
+        expa = dfp.a.exponent;                                               \
+        expb = dfp.b.exponent;                                               \
+        a_is_special = decNumberIsSpecial(&dfp.a);                           \
+        b_is_special = decNumberIsSpecial(&dfp.b);                           \
+                                                                             \
+        if (a_is_special || b_is_special) {                                  \
+            int atype = a_is_special ? (decNumberIsNaN(&dfp.a) ? 4 : 2) : 1; \
+            int btype = b_is_special ? (decNumberIsNaN(&dfp.b) ? 4 : 2) : 1; \
+            dfp.crbf = (atype ^ btype) ? 0x1 : 0x2;                          \
+        } else if (expa < expb) {                                            \
+            dfp.crbf = 0x8;                                                  \
+        } else if (expa > expb) {                                            \
+            dfp.crbf = 0x4;                                                  \
+        } else {                                                             \
+            dfp.crbf = 0x2;                                                  \
+        }                                                                    \
+                                                                             \
+        dfp_set_FPCC_from_CRBF(&dfp);                                        \
+        return dfp.crbf;                                                     \
+    }
 
 DFP_HELPER_TSTEX(DTSTEX, 64)
 DFP_HELPER_TSTEX(DTSTEXQ, 128)
 
 #define DFP_HELPER_TSTSF(op, size)                                       \
-uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, ppc_fprp_t *b)     \
-{                                                                        \
-    struct PPC_DFP dfp;                                                  \
-    unsigned k;                                                          \
-    ppc_vsr_t va;                                                        \
+    uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a, ppc_fprp_t *b) \
+    {                                                                    \
+        struct PPC_DFP dfp;                                              \
+        unsigned k;                                                      \
+        ppc_vsr_t va;                                                    \
                                                                          \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                          \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                      \
                                                                          \
-    get_dfp64(&va, a);                                                   \
-    k = va.VsrD(1) & 0x3F;                                               \
+        get_dfp64(&va, a);                                               \
+        k = va.VsrD(1) & 0x3F;                                           \
                                                                          \
-    if (unlikely(decNumberIsSpecial(&dfp.b))) {                          \
-        dfp.crbf = 1;                                                    \
-    } else if (k == 0) {                                                 \
-        dfp.crbf = 4;                                                    \
-    } else if (unlikely(decNumberIsZero(&dfp.b))) {                      \
-        /* Zero has no sig digits */                                     \
-        dfp.crbf = 4;                                                    \
-    } else {                                                             \
-        unsigned nsd = dfp.b.digits;                                     \
-        if (k < nsd) {                                                   \
-            dfp.crbf = 8;                                                \
-        } else if (k > nsd) {                                            \
+        if (unlikely(decNumberIsSpecial(&dfp.b))) {                      \
+            dfp.crbf = 1;                                                \
+        } else if (k == 0) {                                             \
+            dfp.crbf = 4;                                                \
+        } else if (unlikely(decNumberIsZero(&dfp.b))) {                  \
+            /* Zero has no sig digits */                                 \
             dfp.crbf = 4;                                                \
         } else {                                                         \
-            dfp.crbf = 2;                                                \
+            unsigned nsd = dfp.b.digits;                                 \
+            if (k < nsd) {                                               \
+                dfp.crbf = 8;                                            \
+            } else if (k > nsd) {                                        \
+                dfp.crbf = 4;                                            \
+            } else {                                                     \
+                dfp.crbf = 2;                                            \
+            }                                                            \
         }                                                                \
-    }                                                                    \
                                                                          \
-    dfp_set_FPCC_from_CRBF(&dfp);                                        \
-    return dfp.crbf;                                                     \
-}
+        dfp_set_FPCC_from_CRBF(&dfp);                                    \
+        return dfp.crbf;                                                 \
+    }
 
 DFP_HELPER_TSTSF(DTSTSF, 64)
 DFP_HELPER_TSTSF(DTSTSFQ, 128)
 
-#define DFP_HELPER_TSTSFI(op, size)                                     \
-uint32_t helper_##op(CPUPPCState *env, uint32_t a, ppc_fprp_t *b)       \
-{                                                                       \
-    struct PPC_DFP dfp;                                                 \
-    unsigned uim;                                                       \
-                                                                        \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                         \
-                                                                        \
-    uim = a & 0x3F;                                                     \
-                                                                        \
-    if (unlikely(decNumberIsSpecial(&dfp.b))) {                         \
-        dfp.crbf = 1;                                                   \
-    } else if (uim == 0) {                                              \
-        dfp.crbf = 4;                                                   \
-    } else if (unlikely(decNumberIsZero(&dfp.b))) {                     \
-        /* Zero has no sig digits */                                    \
-        dfp.crbf = 4;                                                   \
-    } else {                                                            \
-        unsigned nsd = dfp.b.digits;                                    \
-        if (uim < nsd) {                                                \
-            dfp.crbf = 8;                                               \
-        } else if (uim > nsd) {                                         \
-            dfp.crbf = 4;                                               \
-        } else {                                                        \
-            dfp.crbf = 2;                                               \
-        }                                                               \
-    }                                                                   \
-                                                                        \
-    dfp_set_FPCC_from_CRBF(&dfp);                                       \
-    return dfp.crbf;                                                    \
-}
+#define DFP_HELPER_TSTSFI(op, size)                                   \
+    uint32_t helper_##op(CPUPPCState *env, uint32_t a, ppc_fprp_t *b) \
+    {                                                                 \
+        struct PPC_DFP dfp;                                           \
+        unsigned uim;                                                 \
+                                                                      \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                   \
+                                                                      \
+        uim = a & 0x3F;                                               \
+                                                                      \
+        if (unlikely(decNumberIsSpecial(&dfp.b))) {                   \
+            dfp.crbf = 1;                                             \
+        } else if (uim == 0) {                                        \
+            dfp.crbf = 4;                                             \
+        } else if (unlikely(decNumberIsZero(&dfp.b))) {               \
+            /* Zero has no sig digits */                              \
+            dfp.crbf = 4;                                             \
+        } else {                                                      \
+            unsigned nsd = dfp.b.digits;                              \
+            if (uim < nsd) {                                          \
+                dfp.crbf = 8;                                         \
+            } else if (uim > nsd) {                                   \
+                dfp.crbf = 4;                                         \
+            } else {                                                  \
+                dfp.crbf = 2;                                         \
+            }                                                         \
+        }                                                             \
+                                                                      \
+        dfp_set_FPCC_from_CRBF(&dfp);                                 \
+        return dfp.crbf;                                              \
+    }
 
 DFP_HELPER_TSTSFI(DTSTSFI, 64)
 DFP_HELPER_TSTSFI(DTSTSFIQ, 128)
@@ -736,47 +735,47 @@ static void dfp_quantize(uint8_t rmc, struct PPC_DFP *dfp)
     }
 }
 
-#define DFP_HELPER_QUAI(op, size)                                       \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b,        \
-                 uint32_t te, uint32_t rmc)                             \
-{                                                                       \
-    struct PPC_DFP dfp;                                                 \
-                                                                        \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                         \
-                                                                        \
-    decNumberFromUInt32(&dfp.a, 1);                                     \
-    dfp.a.exponent = (int32_t)((int8_t)(te << 3) >> 3);                 \
-                                                                        \
-    dfp_quantize(rmc, &dfp);                                            \
-    dfp_finalize_decimal##size(&dfp);                                   \
-    QUA_PPs(&dfp);                                                      \
-                                                                        \
-    set_dfp##size(t, &dfp.vt);                                          \
-}
+#define DFP_HELPER_QUAI(op, size)                                    \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b, \
+                     uint32_t te, uint32_t rmc)                      \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+                                                                     \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                  \
+                                                                     \
+        decNumberFromUInt32(&dfp.a, 1);                              \
+        dfp.a.exponent = (int32_t)((int8_t)(te << 3) >> 3);          \
+                                                                     \
+        dfp_quantize(rmc, &dfp);                                     \
+        dfp_finalize_decimal##size(&dfp);                            \
+        QUA_PPs(&dfp);                                               \
+                                                                     \
+        set_dfp##size(t, &dfp.vt);                                   \
+    }
 
 DFP_HELPER_QUAI(DQUAI, 64)
 DFP_HELPER_QUAI(DQUAIQ, 128)
 
-#define DFP_HELPER_QUA(op, size)                                        \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a,        \
-                 ppc_fprp_t *b, uint32_t rmc)                           \
-{                                                                       \
-    struct PPC_DFP dfp;                                                 \
-                                                                        \
-    dfp_prepare_decimal##size(&dfp, a, b, env);                         \
-                                                                        \
-    dfp_quantize(rmc, &dfp);                                            \
-    dfp_finalize_decimal##size(&dfp);                                   \
-    QUA_PPs(&dfp);                                                      \
-                                                                        \
-    set_dfp##size(t, &dfp.vt);                                          \
-}
+#define DFP_HELPER_QUA(op, size)                                     \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a, \
+                     ppc_fprp_t *b, uint32_t rmc)                    \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+                                                                     \
+        dfp_prepare_decimal##size(&dfp, a, b, env);                  \
+                                                                     \
+        dfp_quantize(rmc, &dfp);                                     \
+        dfp_finalize_decimal##size(&dfp);                            \
+        QUA_PPs(&dfp);                                               \
+                                                                     \
+        set_dfp##size(t, &dfp.vt);                                   \
+    }
 
 DFP_HELPER_QUA(DQUA, 64)
 DFP_HELPER_QUA(DQUAQ, 128)
 
 static void _dfp_reround(uint8_t rmc, int32_t ref_sig, int32_t xmax,
-                             struct PPC_DFP *dfp)
+                         struct PPC_DFP *dfp)
 {
     int msd_orig, msd_rslt;
 
@@ -805,14 +804,13 @@ static void _dfp_reround(uint8_t rmc, int32_t ref_sig, int32_t xmax,
 
     dfp_quantize(rmc, dfp);
 
-    msd_orig = dfp_get_digit(&dfp->b, dfp->b.digits-1);
-    msd_rslt = dfp_get_digit(&dfp->t, dfp->t.digits-1);
+    msd_orig = dfp_get_digit(&dfp->b, dfp->b.digits - 1);
+    msd_rslt = dfp_get_digit(&dfp->t, dfp->t.digits - 1);
 
     /* If the quantization resulted in rounding up to the next magnitude, */
     /* then we need to shift the significand and adjust the exponent.     */
 
     if (unlikely((msd_orig == 9) && (msd_rslt == 1))) {
-
         decNumber negone;
 
         decNumberFromInt32(&negone, -1);
@@ -829,45 +827,45 @@ static void _dfp_reround(uint8_t rmc, int32_t ref_sig, int32_t xmax,
     }
 }
 
-#define DFP_HELPER_RRND(op, size)                                       \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a,        \
-                 ppc_fprp_t *b, uint32_t rmc)                           \
-{                                                                       \
-    struct PPC_DFP dfp;                                                 \
-    ppc_vsr_t va;                                                       \
-    int32_t ref_sig;                                                    \
-    int32_t xmax = ((size) == 64) ? 369 : 6111;                         \
-                                                                        \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                         \
-                                                                        \
-    get_dfp64(&va, a);                                                  \
-    ref_sig = va.VsrD(1) & 0x3f;                                        \
-                                                                        \
-    _dfp_reround(rmc, ref_sig, xmax, &dfp);                             \
-    dfp_finalize_decimal##size(&dfp);                                   \
-    QUA_PPs(&dfp);                                                      \
-                                                                        \
-    set_dfp##size(t, &dfp.vt);                                          \
-}
+#define DFP_HELPER_RRND(op, size)                                    \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a, \
+                     ppc_fprp_t *b, uint32_t rmc)                    \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+        ppc_vsr_t va;                                                \
+        int32_t ref_sig;                                             \
+        int32_t xmax = ((size) == 64) ? 369 : 6111;                  \
+                                                                     \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                  \
+                                                                     \
+        get_dfp64(&va, a);                                           \
+        ref_sig = va.VsrD(1) & 0x3f;                                 \
+                                                                     \
+        _dfp_reround(rmc, ref_sig, xmax, &dfp);                      \
+        dfp_finalize_decimal##size(&dfp);                            \
+        QUA_PPs(&dfp);                                               \
+                                                                     \
+        set_dfp##size(t, &dfp.vt);                                   \
+    }
 
 DFP_HELPER_RRND(DRRND, 64)
 DFP_HELPER_RRND(DRRNDQ, 128)
 
-#define DFP_HELPER_RINT(op, postprocs, size)                                   \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b,               \
-             uint32_t r, uint32_t rmc)                                         \
-{                                                                              \
-    struct PPC_DFP dfp;                                                        \
-                                                                               \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                                \
-                                                                               \
-    dfp_set_round_mode_from_immediate(r, rmc, &dfp);                           \
-    decNumberToIntegralExact(&dfp.t, &dfp.b, &dfp.context);                    \
-    dfp_finalize_decimal##size(&dfp);                                          \
-    postprocs(&dfp);                                                           \
-                                                                               \
-    set_dfp##size(t, &dfp.vt);                                                 \
-}
+#define DFP_HELPER_RINT(op, postprocs, size)                         \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b, \
+                     uint32_t r, uint32_t rmc)                       \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+                                                                     \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                  \
+                                                                     \
+        dfp_set_round_mode_from_immediate(r, rmc, &dfp);             \
+        decNumberToIntegralExact(&dfp.t, &dfp.b, &dfp.context);      \
+        dfp_finalize_decimal##size(&dfp);                            \
+        postprocs(&dfp);                                             \
+                                                                     \
+        set_dfp##size(t, &dfp.vt);                                   \
+    }
 
 static void RINTX_PPs(struct PPC_DFP *dfp)
 {
@@ -955,19 +953,19 @@ void helper_DRDPQ(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b)
     set_dfp128(t, &dfp.vt);
 }
 
-#define DFP_HELPER_CFFIX(op, size)                                             \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b)               \
-{                                                                              \
-    struct PPC_DFP dfp;                                                        \
-    ppc_vsr_t vb;                                                              \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                                \
-    get_dfp64(&vb, b);                                                         \
-    decNumberFromInt64(&dfp.t, (int64_t)vb.VsrD(1));                           \
-    dfp_finalize_decimal##size(&dfp);                                          \
-    CFFIX_PPs(&dfp);                                                           \
-                                                                               \
-    set_dfp##size(t, &dfp.vt);                                                 \
-}
+#define DFP_HELPER_CFFIX(op, size)                                   \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b) \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+        ppc_vsr_t vb;                                                \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                  \
+        get_dfp64(&vb, b);                                           \
+        decNumberFromInt64(&dfp.t, (int64_t)vb.VsrD(1));             \
+        dfp_finalize_decimal##size(&dfp);                            \
+        CFFIX_PPs(&dfp);                                             \
+                                                                     \
+        set_dfp##size(t, &dfp.vt);                                   \
+    }
 
 static void CFFIX_PPs(struct PPC_DFP *dfp)
 {
@@ -990,40 +988,40 @@ void helper_DCFFIXQQ(CPUPPCState *env, ppc_fprp_t *t, ppc_avr_t *b)
     set_dfp128(t, &dfp.vt);
 }
 
-#define DFP_HELPER_CTFIX(op, size)                                            \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b)              \
-{                                                                             \
-    struct PPC_DFP dfp;                                                       \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                               \
-                                                                              \
-    if (unlikely(decNumberIsSpecial(&dfp.b))) {                               \
-        uint64_t invalid_flags = FP_VX | FP_VXCVI;                            \
-        if (decNumberIsInfinite(&dfp.b)) {                                    \
-            dfp.vt.VsrD(1) = decNumberIsNegative(&dfp.b) ? INT64_MIN :        \
-                                                           INT64_MAX;         \
-        } else { /* NaN */                                                    \
-            dfp.vt.VsrD(1) = INT64_MIN;                                       \
-            if (decNumberIsSNaN(&dfp.b)) {                                    \
-                invalid_flags |= FP_VXSNAN;                                   \
-            }                                                                 \
-        }                                                                     \
-        dfp_set_FPSCR_flag(&dfp, invalid_flags, FP_VE);                       \
-    } else if (unlikely(decNumberIsZero(&dfp.b))) {                           \
-        dfp.vt.VsrD(1) = 0;                                                   \
-    } else {                                                                  \
-        decNumberToIntegralExact(&dfp.b, &dfp.b, &dfp.context);               \
-        dfp.vt.VsrD(1) = decNumberIntegralToInt64(&dfp.b, &dfp.context);      \
-        if (decContextTestStatus(&dfp.context, DEC_Invalid_operation)) {      \
-            dfp.vt.VsrD(1) = decNumberIsNegative(&dfp.b) ? INT64_MIN :        \
-                                                           INT64_MAX;         \
-            dfp_set_FPSCR_flag(&dfp, FP_VX | FP_VXCVI, FP_VE);                \
-        } else {                                                              \
-            dfp_check_for_XX(&dfp);                                           \
-        }                                                                     \
-    }                                                                         \
-                                                                              \
-    set_dfp64(t, &dfp.vt);                                                    \
-}
+#define DFP_HELPER_CTFIX(op, size)                                           \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b)         \
+    {                                                                        \
+        struct PPC_DFP dfp;                                                  \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                          \
+                                                                             \
+        if (unlikely(decNumberIsSpecial(&dfp.b))) {                          \
+            uint64_t invalid_flags = FP_VX | FP_VXCVI;                       \
+            if (decNumberIsInfinite(&dfp.b)) {                               \
+                dfp.vt.VsrD(1) =                                             \
+                    decNumberIsNegative(&dfp.b) ? INT64_MIN : INT64_MAX;     \
+            } else { /* NaN */                                               \
+                dfp.vt.VsrD(1) = INT64_MIN;                                  \
+                if (decNumberIsSNaN(&dfp.b)) {                               \
+                    invalid_flags |= FP_VXSNAN;                              \
+                }                                                            \
+            }                                                                \
+            dfp_set_FPSCR_flag(&dfp, invalid_flags, FP_VE);                  \
+        } else if (unlikely(decNumberIsZero(&dfp.b))) {                      \
+            dfp.vt.VsrD(1) = 0;                                              \
+        } else {                                                             \
+            decNumberToIntegralExact(&dfp.b, &dfp.b, &dfp.context);          \
+            dfp.vt.VsrD(1) = decNumberIntegralToInt64(&dfp.b, &dfp.context); \
+            if (decContextTestStatus(&dfp.context, DEC_Invalid_operation)) { \
+                dfp.vt.VsrD(1) =                                             \
+                    decNumberIsNegative(&dfp.b) ? INT64_MIN : INT64_MAX;     \
+                dfp_set_FPSCR_flag(&dfp, FP_VX | FP_VXCVI, FP_VE);           \
+            } else {                                                         \
+                dfp_check_for_XX(&dfp);                                      \
+            }                                                                \
+        }                                                                    \
+                                                                             \
+        set_dfp64(t, &dfp.vt);                                               \
+    }
 
 DFP_HELPER_CTFIX(DCTFIX, 64)
 DFP_HELPER_CTFIX(DCTFIXQ, 128)
@@ -1056,8 +1054,8 @@ void helper_DCTFIXQQ(CPUPPCState *env, ppc_avr_t *t, ppc_fprp_t *b)
         dfp.vt.VsrD(1) = 0;
     } else {
         decNumberToIntegralExact(&dfp.b, &dfp.b, &dfp.context);
-        decNumberIntegralToInt128(&dfp.b, &dfp.context,
-                &dfp.vt.VsrD(1), &dfp.vt.VsrD(0));
+        decNumberIntegralToInt128(&dfp.b, &dfp.context, &dfp.vt.VsrD(1),
+                                  &dfp.vt.VsrD(0));
         if (decContextTestStatus(&dfp.context, DEC_Invalid_operation)) {
             if (decNumberIsNegative(&dfp.b)) {
                 dfp.vt.VsrD(0) = INT64_MIN;
@@ -1075,8 +1073,7 @@ void helper_DCTFIXQQ(CPUPPCState *env, ppc_avr_t *t, ppc_fprp_t *b)
     set_dfp128_to_avr(t, &dfp.vt);
 }
 
-static inline void dfp_set_bcd_digit_64(ppc_vsr_t *t, uint8_t digit,
-                                        unsigned n)
+static inline void dfp_set_bcd_digit_64(ppc_vsr_t *t, uint8_t digit, unsigned n)
 {
     t->VsrD(1) |= ((uint64_t)(digit & 0xF) << (n << 2));
 }
@@ -1084,8 +1081,7 @@ static inline void dfp_set_bcd_digit_64(ppc_vsr_t *t, uint8_t digit,
 static inline void dfp_set_bcd_digit_128(ppc_vsr_t *t, uint8_t digit,
                                          unsigned n)
 {
-    t->VsrD((n & 0x10) ? 0 : 1) |=
-        ((uint64_t)(digit & 0xF) << ((n & 15) << 2));
+    t->VsrD((n & 0x10) ? 0 : 1) |= ((uint64_t)(digit & 0xF) << ((n & 15) << 2));
 }
 
 static inline void dfp_set_sign_64(ppc_vsr_t *t, uint8_t sgn)
@@ -1102,37 +1098,37 @@ static inline void dfp_set_sign_128(ppc_vsr_t *t, uint8_t sgn)
     t->VsrD(1) |= (sgn & 0xF);
 }
 
-#define DFP_HELPER_DEDPD(op, size)                                        \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b,          \
-                 uint32_t sp)                                             \
-{                                                                         \
-    struct PPC_DFP dfp;                                                   \
-    uint8_t digits[34];                                                   \
-    int i, N;                                                             \
-                                                                          \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                           \
-                                                                          \
-    decNumberGetBCD(&dfp.b, digits);                                      \
-    dfp.vt.VsrD(0) = dfp.vt.VsrD(1) = 0;                                  \
-    N = dfp.b.digits;                                                     \
-                                                                          \
-    for (i = 0; (i < N) && (i < (size)/4); i++) {                         \
-        dfp_set_bcd_digit_##size(&dfp.vt, digits[N - i - 1], i);          \
-    }                                                                     \
-                                                                          \
-    if (sp & 2) {                                                         \
-        uint8_t sgn;                                                      \
-                                                                          \
-        if (decNumberIsNegative(&dfp.b)) {                                \
-            sgn = 0xD;                                                    \
-        } else {                                                          \
-            sgn = ((sp & 1) ? 0xF : 0xC);                                 \
-        }                                                                 \
-        dfp_set_sign_##size(&dfp.vt, sgn);                                \
-    }                                                                     \
-                                                                          \
-    set_dfp##size(t, &dfp.vt);                                            \
-}
+#define DFP_HELPER_DEDPD(op, size)                                   \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b, \
+                     uint32_t sp)                                    \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+        uint8_t digits[34];                                          \
+        int i, N;                                                    \
+                                                                     \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                  \
+                                                                     \
+        decNumberGetBCD(&dfp.b, digits);                             \
+        dfp.vt.VsrD(0) = dfp.vt.VsrD(1) = 0;                         \
+        N = dfp.b.digits;                                            \
+                                                                     \
+        for (i = 0; (i < N) && (i < (size) / 4); i++) {              \
+            dfp_set_bcd_digit_##size(&dfp.vt, digits[N - i - 1], i); \
+        }                                                            \
+                                                                     \
+        if (sp & 2) {                                                \
+            uint8_t sgn;                                             \
+                                                                     \
+            if (decNumberIsNegative(&dfp.b)) {                       \
+                sgn = 0xD;                                           \
+            } else {                                                 \
+                sgn = ((sp & 1) ? 0xF : 0xC);                        \
+            }                                                        \
+            dfp_set_sign_##size(&dfp.vt, sgn);                       \
+        }                                                            \
+                                                                     \
+        set_dfp##size(t, &dfp.vt);                                   \
+    }
 
 DFP_HELPER_DEDPD(DDEDPD, 64)
 DFP_HELPER_DEDPD(DDEDPDQ, 128)
@@ -1168,95 +1164,95 @@ static inline void dfp_invalid_op_vxcvi_128(struct PPC_DFP *dfp)
 }
 
 #define DFP_HELPER_ENBCD(op, size)                                           \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b,             \
-                 uint32_t s)                                                 \
-{                                                                            \
-    struct PPC_DFP dfp;                                                      \
-    uint8_t digits[32];                                                      \
-    int n = 0, offset = 0, sgn = 0, nonzero = 0;                             \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b,         \
+                     uint32_t s)                                             \
+    {                                                                        \
+        struct PPC_DFP dfp;                                                  \
+        uint8_t digits[32];                                                  \
+        int n = 0, offset = 0, sgn = 0, nonzero = 0;                         \
                                                                              \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                              \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                          \
                                                                              \
-    decNumberZero(&dfp.t);                                                   \
+        decNumberZero(&dfp.t);                                               \
                                                                              \
-    if (s) {                                                                 \
-        uint8_t sgnNibble = dfp_get_bcd_digit_##size(&dfp.vb, offset++);     \
-        switch (sgnNibble) {                                                 \
-        case 0xD:                                                            \
-        case 0xB:                                                            \
-            sgn = 1;                                                         \
-            break;                                                           \
-        case 0xC:                                                            \
-        case 0xF:                                                            \
-        case 0xA:                                                            \
-        case 0xE:                                                            \
-            sgn = 0;                                                         \
-            break;                                                           \
-        default:                                                             \
-            dfp_invalid_op_vxcvi_##size(&dfp);                               \
-            set_dfp##size(t, &dfp.vt);                                       \
-            return;                                                          \
+        if (s) {                                                             \
+            uint8_t sgnNibble = dfp_get_bcd_digit_##size(&dfp.vb, offset++); \
+            switch (sgnNibble) {                                             \
+            case 0xD:                                                        \
+            case 0xB:                                                        \
+                sgn = 1;                                                     \
+                break;                                                       \
+            case 0xC:                                                        \
+            case 0xF:                                                        \
+            case 0xA:                                                        \
+            case 0xE:                                                        \
+                sgn = 0;                                                     \
+                break;                                                       \
+            default:                                                         \
+                dfp_invalid_op_vxcvi_##size(&dfp);                           \
+                set_dfp##size(t, &dfp.vt);                                   \
+                return;                                                      \
+            }                                                                \
         }                                                                    \
+                                                                             \
+        while (offset < (size) / 4) {                                        \
+            n++;                                                             \
+            digits[(size) / 4 - n] =                                         \
+                dfp_get_bcd_digit_##size(&dfp.vb, offset++);                 \
+            if (digits[(size) / 4 - n] > 10) {                               \
+                dfp_invalid_op_vxcvi_##size(&dfp);                           \
+                set_dfp##size(t, &dfp.vt);                                   \
+                return;                                                      \
+            } else {                                                         \
+                nonzero |= (digits[(size) / 4 - n] > 0);                     \
+            }                                                                \
         }                                                                    \
                                                                              \
-    while (offset < (size) / 4) {                                            \
-        n++;                                                                 \
-        digits[(size) / 4 - n] = dfp_get_bcd_digit_##size(&dfp.vb,           \
-                                                          offset++);         \
-        if (digits[(size) / 4 - n] > 10) {                                   \
-            dfp_invalid_op_vxcvi_##size(&dfp);                               \
-            set_dfp##size(t, &dfp.vt);                                       \
-            return;                                                          \
-        } else {                                                             \
-            nonzero |= (digits[(size) / 4 - n] > 0);                         \
+        if (nonzero) {                                                       \
+            decNumberSetBCD(&dfp.t, digits + ((size) / 4) - n, n);           \
         }                                                                    \
-    }                                                                        \
                                                                              \
-    if (nonzero) {                                                           \
-        decNumberSetBCD(&dfp.t, digits + ((size) / 4) - n, n);               \
-    }                                                                        \
-                                                                             \
-    if (s && sgn)  {                                                         \
-        dfp.t.bits |= DECNEG;                                                \
-    }                                                                        \
-    dfp_finalize_decimal##size(&dfp);                                        \
-    dfp_set_FPRF_from_FRT(&dfp);                                             \
-    set_dfp##size(t, &dfp.vt);                                               \
-}
+        if (s && sgn) {                                                      \
+            dfp.t.bits |= DECNEG;                                            \
+        }                                                                    \
+        dfp_finalize_decimal##size(&dfp);                                    \
+        dfp_set_FPRF_from_FRT(&dfp);                                         \
+        set_dfp##size(t, &dfp.vt);                                           \
+    }
 
 DFP_HELPER_ENBCD(DENBCD, 64)
 DFP_HELPER_ENBCD(DENBCDQ, 128)
 
-#define DFP_HELPER_XEX(op, size)                               \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b) \
-{                                                              \
-    struct PPC_DFP dfp;                                        \
-    ppc_vsr_t vt;                                              \
-                                                               \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                \
-                                                               \
-    if (unlikely(decNumberIsSpecial(&dfp.b))) {                \
-        if (decNumberIsInfinite(&dfp.b)) {                     \
-            vt.VsrD(1) = -1;                                   \
-        } else if (decNumberIsSNaN(&dfp.b)) {                  \
-            vt.VsrD(1) = -3;                                   \
-        } else if (decNumberIsQNaN(&dfp.b)) {                  \
-            vt.VsrD(1) = -2;                                   \
-        } else {                                               \
-            assert(0);                                         \
-        }                                                      \
-        set_dfp64(t, &vt);                                     \
-    } else {                                                   \
-        if ((size) == 64) {                                    \
-            vt.VsrD(1) = dfp.b.exponent + 398;                 \
-        } else if ((size) == 128) {                            \
-            vt.VsrD(1) = dfp.b.exponent + 6176;                \
-        } else {                                               \
-            assert(0);                                         \
-        }                                                      \
-        set_dfp64(t, &vt);                                     \
-    }                                                          \
-}
+#define DFP_HELPER_XEX(op, size)                                     \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *b) \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+        ppc_vsr_t vt;                                                \
+                                                                     \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                  \
+                                                                     \
+        if (unlikely(decNumberIsSpecial(&dfp.b))) {                  \
+            if (decNumberIsInfinite(&dfp.b)) {                       \
+                vt.VsrD(1) = -1;                                     \
+            } else if (decNumberIsSNaN(&dfp.b)) {                    \
+                vt.VsrD(1) = -3;                                     \
+            } else if (decNumberIsQNaN(&dfp.b)) {                    \
+                vt.VsrD(1) = -2;                                     \
+            } else {                                                 \
+                assert(0);                                           \
+            }                                                        \
+            set_dfp64(t, &vt);                                       \
+        } else {                                                     \
+            if ((size) == 64) {                                      \
+                vt.VsrD(1) = dfp.b.exponent + 398;                   \
+            } else if ((size) == 128) {                              \
+                vt.VsrD(1) = dfp.b.exponent + 6176;                  \
+            } else {                                                 \
+                assert(0);                                           \
+            }                                                        \
+            set_dfp64(t, &vt);                                       \
+        }                                                            \
+    }
 
 DFP_HELPER_XEX(DXEX, 64)
 DFP_HELPER_XEX(DXEXQ, 128)
@@ -1273,63 +1269,62 @@ static void dfp_set_raw_exp_128(ppc_vsr_t *t, uint64_t raw)
     t->VsrD(0) |= (raw << (63 - 17));
 }
 
-#define DFP_HELPER_IEX(op, size)                                          \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a,          \
-                 ppc_fprp_t *b)                                           \
-{                                                                         \
-    struct PPC_DFP dfp;                                                   \
-    uint64_t raw_qnan, raw_snan, raw_inf, max_exp;                        \
-    ppc_vsr_t va;                                                         \
-    int bias;                                                             \
-    int64_t exp;                                                          \
-                                                                          \
-    get_dfp64(&va, a);                                                    \
-    exp = (int64_t)va.VsrD(1);                                            \
-    dfp_prepare_decimal##size(&dfp, 0, b, env);                           \
-                                                                          \
-    if ((size) == 64) {                                                   \
-        max_exp = 767;                                                    \
-        raw_qnan = 0x1F00;                                                \
-        raw_snan = 0x1F80;                                                \
-        raw_inf = 0x1E00;                                                 \
-        bias = 398;                                                       \
-    } else if ((size) == 128) {                                           \
-        max_exp = 12287;                                                  \
-        raw_qnan = 0x1f000;                                               \
-        raw_snan = 0x1f800;                                               \
-        raw_inf = 0x1e000;                                                \
-        bias = 6176;                                                      \
-    } else {                                                              \
-        assert(0);                                                        \
-    }                                                                     \
-                                                                          \
-    if (unlikely((exp < 0) || (exp > max_exp))) {                         \
-        dfp.vt.VsrD(0) = dfp.vb.VsrD(0);                                  \
-        dfp.vt.VsrD(1) = dfp.vb.VsrD(1);                                  \
-        if (exp == -1) {                                                  \
-            dfp_set_raw_exp_##size(&dfp.vt, raw_inf);                     \
-        } else if (exp == -3) {                                           \
-            dfp_set_raw_exp_##size(&dfp.vt, raw_snan);                    \
-        } else {                                                          \
-            dfp_set_raw_exp_##size(&dfp.vt, raw_qnan);                    \
-        }                                                                 \
-    } else {                                                              \
-        dfp.t = dfp.b;                                                    \
-        if (unlikely(decNumberIsSpecial(&dfp.t))) {                       \
-            dfp.t.bits &= ~DECSPECIAL;                                    \
-        }                                                                 \
-        dfp.t.exponent = exp - bias;                                      \
-        dfp_finalize_decimal##size(&dfp);                                 \
-    }                                                                     \
-    set_dfp##size(t, &dfp.vt);                                            \
-}
+#define DFP_HELPER_IEX(op, size)                                     \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a, \
+                     ppc_fprp_t *b)                                  \
+    {                                                                \
+        struct PPC_DFP dfp;                                          \
+        uint64_t raw_qnan, raw_snan, raw_inf, max_exp;               \
+        ppc_vsr_t va;                                                \
+        int bias;                                                    \
+        int64_t exp;                                                 \
+                                                                     \
+        get_dfp64(&va, a);                                           \
+        exp = (int64_t)va.VsrD(1);                                   \
+        dfp_prepare_decimal##size(&dfp, 0, b, env);                  \
+                                                                     \
+        if ((size) == 64) {                                          \
+            max_exp = 767;                                           \
+            raw_qnan = 0x1F00;                                       \
+            raw_snan = 0x1F80;                                       \
+            raw_inf = 0x1E00;                                        \
+            bias = 398;                                              \
+        } else if ((size) == 128) {                                  \
+            max_exp = 12287;                                         \
+            raw_qnan = 0x1f000;                                      \
+            raw_snan = 0x1f800;                                      \
+            raw_inf = 0x1e000;                                       \
+            bias = 6176;                                             \
+        } else {                                                     \
+            assert(0);                                               \
+        }                                                            \
+                                                                     \
+        if (unlikely((exp < 0) || (exp > max_exp))) {                \
+            dfp.vt.VsrD(0) = dfp.vb.VsrD(0);                         \
+            dfp.vt.VsrD(1) = dfp.vb.VsrD(1);                         \
+            if (exp == -1) {                                         \
+                dfp_set_raw_exp_##size(&dfp.vt, raw_inf);            \
+            } else if (exp == -3) {                                  \
+                dfp_set_raw_exp_##size(&dfp.vt, raw_snan);           \
+            } else {                                                 \
+                dfp_set_raw_exp_##size(&dfp.vt, raw_qnan);           \
+            }                                                        \
+        } else {                                                     \
+            dfp.t = dfp.b;                                           \
+            if (unlikely(decNumberIsSpecial(&dfp.t))) {              \
+                dfp.t.bits &= ~DECSPECIAL;                           \
+            }                                                        \
+            dfp.t.exponent = exp - bias;                             \
+            dfp_finalize_decimal##size(&dfp);                        \
+        }                                                            \
+        set_dfp##size(t, &dfp.vt);                                   \
+    }
 
 DFP_HELPER_IEX(DIEX, 64)
 DFP_HELPER_IEX(DIEXQ, 128)
 
 static void dfp_clear_lmd_from_g5msb(uint64_t *t)
 {
-
     /* The most significant 5 bits of the PowerPC DFP format combine bits  */
     /* from the left-most decimal digit (LMD) and the biased exponent.     */
     /* This  routine clears the LMD bits while preserving the exponent     */
@@ -1339,78 +1334,75 @@ static void dfp_clear_lmd_from_g5msb(uint64_t *t)
     uint64_t g5msb = (*t >> 58) & 0x1F;
 
     if ((g5msb >> 3) < 3) { /* LMD in [0-7] ? */
-       *t &= ~(7ULL << 58);
+        *t &= ~(7ULL << 58);
     } else {
-       switch (g5msb & 7) {
-       case 0:
-       case 1:
-           g5msb = 0;
-           break;
-       case 2:
-       case 3:
-           g5msb = 0x8;
-           break;
-       case 4:
-       case 5:
-           g5msb = 0x10;
-           break;
-       case 6:
-           g5msb = 0x1E;
-           break;
-       case 7:
-           g5msb = 0x1F;
-           break;
-       }
+        switch (g5msb & 7) {
+        case 0:
+        case 1:
+            g5msb = 0;
+            break;
+        case 2:
+        case 3:
+            g5msb = 0x8;
+            break;
+        case 4:
+        case 5:
+            g5msb = 0x10;
+            break;
+        case 6:
+            g5msb = 0x1E;
+            break;
+        case 7:
+            g5msb = 0x1F;
+            break;
+        }
 
         *t &= ~(0x1fULL << 58);
         *t |= (g5msb << 58);
     }
 }
 
-#define DFP_HELPER_SHIFT(op, size, shift_left)                      \
-void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a,    \
-                 uint32_t sh)                                       \
-{                                                                   \
-    struct PPC_DFP dfp;                                             \
-    unsigned max_digits = ((size) == 64) ? 16 : 34;                 \
-                                                                    \
-    dfp_prepare_decimal##size(&dfp, a, 0, env);                     \
-                                                                    \
-    if (sh <= max_digits) {                                         \
-                                                                    \
-        decNumber shd;                                              \
-        unsigned special = dfp.a.bits & DECSPECIAL;                 \
-                                                                    \
-        if (shift_left) {                                           \
-            decNumberFromUInt32(&shd, sh);                          \
-        } else {                                                    \
-            decNumberFromInt32(&shd, -((int32_t)sh));               \
-        }                                                           \
-                                                                    \
-        dfp.a.bits &= ~DECSPECIAL;                                  \
-        decNumberShift(&dfp.t, &dfp.a, &shd, &dfp.context);         \
-                                                                    \
-        dfp.t.bits |= special;                                      \
-        if (special && (dfp.t.digits >= max_digits)) {              \
-            dfp.t.digits = max_digits - 1;                          \
-        }                                                           \
-                                                                    \
-        dfp_finalize_decimal##size(&dfp);                           \
-    } else {                                                        \
-        if ((size) == 64) {                                         \
-            dfp.vt.VsrD(1) = dfp.va.VsrD(1) &                       \
-                             0xFFFC000000000000ULL;                 \
-            dfp_clear_lmd_from_g5msb(&dfp.vt.VsrD(1));              \
-        } else {                                                    \
-            dfp.vt.VsrD(0) = dfp.va.VsrD(0) &                       \
-                             0xFFFFC00000000000ULL;                 \
-            dfp_clear_lmd_from_g5msb(&dfp.vt.VsrD(0));              \
-            dfp.vt.VsrD(1) = 0;                                     \
-        }                                                           \
-    }                                                               \
-                                                                    \
-    set_dfp##size(t, &dfp.vt);                                      \
-}
+#define DFP_HELPER_SHIFT(op, size, shift_left)                           \
+    void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc_fprp_t *a,     \
+                     uint32_t sh)                                        \
+    {                                                                    \
+        struct PPC_DFP dfp;                                              \
+        unsigned max_digits = ((size) == 64) ? 16 : 34;                  \
+                                                                         \
+        dfp_prepare_decimal##size(&dfp, a, 0, env);                      \
+                                                                         \
+        if (sh <= max_digits) {                                          \
+            decNumber shd;                                               \
+            unsigned special = dfp.a.bits & DECSPECIAL;                  \
+                                                                         \
+            if (shift_left) {                                            \
+                decNumberFromUInt32(&shd, sh);                           \
+            } else {                                                     \
+                decNumberFromInt32(&shd, -((int32_t)sh));                \
+            }                                                            \
+                                                                         \
+            dfp.a.bits &= ~DECSPECIAL;                                   \
+            decNumberShift(&dfp.t, &dfp.a, &shd, &dfp.context);          \
+                                                                         \
+            dfp.t.bits |= special;                                       \
+            if (special && (dfp.t.digits >= max_digits)) {               \
+                dfp.t.digits = max_digits - 1;                           \
+            }                                                            \
+                                                                         \
+            dfp_finalize_decimal##size(&dfp);                            \
+        } else {                                                         \
+            if ((size) == 64) {                                          \
+                dfp.vt.VsrD(1) = dfp.va.VsrD(1) & 0xFFFC000000000000ULL; \
+                dfp_clear_lmd_from_g5msb(&dfp.vt.VsrD(1));               \
+            } else {                                                     \
+                dfp.vt.VsrD(0) = dfp.va.VsrD(0) & 0xFFFFC00000000000ULL; \
+                dfp_clear_lmd_from_g5msb(&dfp.vt.VsrD(0));               \
+                dfp.vt.VsrD(1) = 0;                                      \
+            }                                                            \
+        }                                                                \
+                                                                         \
+        set_dfp##size(t, &dfp.vt);                                       \
+    }
 
 DFP_HELPER_SHIFT(DSCLI, 64, 1)
 DFP_HELPER_SHIFT(DSCLIQ, 128, 1)

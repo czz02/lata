@@ -55,16 +55,16 @@ static int get_phys_mmu(OpenRISCCPU *cpu, hwaddr *phys_addr, int *prot,
     }
 
     /* Check if either of the entries matches the source address.  */
-    match  = (imr ^ addr) & TARGET_PAGE_MASK ? 0 : PAGE_EXEC;
+    match = (imr ^ addr) & TARGET_PAGE_MASK ? 0 : PAGE_EXEC;
     match |= (dmr ^ addr) & TARGET_PAGE_MASK ? 0 : PAGE_READ | PAGE_WRITE;
 
     /* Check if either of the entries is valid.  */
-    valid  = imr & 1 ? PAGE_EXEC : 0;
+    valid = imr & 1 ? PAGE_EXEC : 0;
     valid |= dmr & 1 ? PAGE_READ | PAGE_WRITE : 0;
     valid &= match;
 
     /* Collect the permissions from the entries.  */
-    right  = itr & (super ? SXE : UXE) ? PAGE_EXEC : 0;
+    right = itr & (super ? SXE : UXE) ? PAGE_EXEC : 0;
     right |= dtr & (super ? SRE : URE) ? PAGE_READ : 0;
     right |= dtr & (super ? SWE : UWE) ? PAGE_WRITE : 0;
     right &= valid;
@@ -82,7 +82,7 @@ static int get_phys_mmu(OpenRISCCPU *cpu, hwaddr *phys_addr, int *prot,
 
     /* Check the collective permissions are present.  */
     if (likely(need & right)) {
-        return 0;  /* success! */
+        return 0; /* success! */
     }
 
     /* Determine what kind of failure we have.  */
@@ -104,8 +104,8 @@ static void raise_mmu_exception(OpenRISCCPU *cpu, target_ulong address,
 }
 
 bool openrisc_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-                           MMUAccessType access_type, int mmu_idx,
-                           bool probe, uintptr_t retaddr)
+                           MMUAccessType access_type, int mmu_idx, bool probe,
+                           uintptr_t retaddr)
 {
     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
     int excp = EXCP_DPF;
@@ -118,16 +118,15 @@ bool openrisc_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
         excp = 0;
     } else {
         bool super = mmu_idx == MMU_SUPERVISOR_IDX;
-        int need = (access_type == MMU_INST_FETCH ? PAGE_EXEC
-                    : access_type == MMU_DATA_STORE ? PAGE_WRITE
-                    : PAGE_READ);
+        int need = (access_type == MMU_INST_FETCH ? PAGE_EXEC :
+                    access_type == MMU_DATA_STORE ? PAGE_WRITE :
+                                                    PAGE_READ);
         excp = get_phys_mmu(cpu, &phys_addr, &prot, addr, need, super);
     }
 
     if (likely(excp == 0)) {
-        tlb_set_page(cs, addr & TARGET_PAGE_MASK,
-                     phys_addr & TARGET_PAGE_MASK, prot,
-                     mmu_idx, TARGET_PAGE_SIZE);
+        tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys_addr & TARGET_PAGE_MASK,
+                     prot, mmu_idx, TARGET_PAGE_SIZE);
         return true;
     }
     if (probe) {
@@ -147,14 +146,12 @@ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
     switch (sr & (SR_DME | SR_IME)) {
     case SR_DME | SR_IME:
         /* The mmu is definitely enabled.  */
-        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr,
-                            PAGE_READ,
+        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr, PAGE_READ,
                             (sr & SR_SM) != 0);
         if (!excp) {
             return phys_addr;
         }
-        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr,
-                            PAGE_EXEC,
+        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr, PAGE_EXEC,
                             (sr & SR_SM) != 0);
         return excp ? -1 : phys_addr;
 
@@ -162,9 +159,9 @@ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
         /* The mmu is partially enabled, and we don't really have
            a "real" access type.  Begin by trying the mmu, but if
            that fails try again without.  */
-        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr,
-                            PAGE_EXEC | PAGE_READ | PAGE_WRITE,
-                            (sr & SR_SM) != 0);
+        excp =
+            get_phys_mmu(cpu, &phys_addr, &prot, addr,
+                         PAGE_EXEC | PAGE_READ | PAGE_WRITE, (sr & SR_SM) != 0);
         if (!excp) {
             return phys_addr;
         }

@@ -151,11 +151,11 @@ void m68k_cpu_init_gdb(M68kCPU *cpu)
     CPUM68KState *env = &cpu->env;
 
     if (m68k_feature(env, M68K_FEATURE_CF_FPU)) {
-        gdb_register_coprocessor(cs, cf_fpu_gdb_get_reg, cf_fpu_gdb_set_reg,
-                                 11, "cf-fp.xml", 18);
+        gdb_register_coprocessor(cs, cf_fpu_gdb_get_reg, cf_fpu_gdb_set_reg, 11,
+                                 "cf-fp.xml", 18);
     } else if (m68k_feature(env, M68K_FEATURE_FPU)) {
-        gdb_register_coprocessor(cs, m68k_fpu_gdb_get_reg,
-                                 m68k_fpu_gdb_set_reg, 11, "m68k-fp.xml", 18);
+        gdb_register_coprocessor(cs, m68k_fpu_gdb_get_reg, m68k_fpu_gdb_set_reg,
+                                 11, "m68k-fp.xml", 18);
     }
     /* TODO: Add [E]MAC registers.  */
 }
@@ -179,8 +179,8 @@ void HELPER(cf_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
     /* TODO: Implement control registers.  */
     default:
         cpu_abort(env_cpu(env),
-                  "Unimplemented control register write 0x%x = 0x%x\n",
-                  reg, val);
+                  "Unimplemented control register write 0x%x = 0x%x\n", reg,
+                  val);
     }
 }
 
@@ -224,8 +224,8 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
         return;
     /* MC680[46]0 */
     case M68K_CR_TC:
-        if (m68k_feature(env, M68K_FEATURE_M68040)
-         || m68k_feature(env, M68K_FEATURE_M68060)) {
+        if (m68k_feature(env, M68K_FEATURE_M68040) ||
+            m68k_feature(env, M68K_FEATURE_M68060)) {
             env->mmu.tcr = val;
             return;
         }
@@ -239,16 +239,16 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
         break;
     /* MC680[46]0 */
     case M68K_CR_SRP:
-        if (m68k_feature(env, M68K_FEATURE_M68040)
-         || m68k_feature(env, M68K_FEATURE_M68060)) {
+        if (m68k_feature(env, M68K_FEATURE_M68040) ||
+            m68k_feature(env, M68K_FEATURE_M68060)) {
             env->mmu.srp = val;
             return;
         }
         break;
     /* MC680[46]0 */
     case M68K_CR_URP:
-        if (m68k_feature(env, M68K_FEATURE_M68040)
-         || m68k_feature(env, M68K_FEATURE_M68060)) {
+        if (m68k_feature(env, M68K_FEATURE_M68040) ||
+            m68k_feature(env, M68K_FEATURE_M68060)) {
             env->mmu.urp = val;
             return;
         }
@@ -259,18 +259,18 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
         return;
     /* MC680[234]0 */
     case M68K_CR_MSP:
-        if (m68k_feature(env, M68K_FEATURE_M68020)
-         || m68k_feature(env, M68K_FEATURE_M68030)
-         || m68k_feature(env, M68K_FEATURE_M68040)) {
+        if (m68k_feature(env, M68K_FEATURE_M68020) ||
+            m68k_feature(env, M68K_FEATURE_M68030) ||
+            m68k_feature(env, M68K_FEATURE_M68040)) {
             env->sp[M68K_SSP] = val;
             return;
         }
         break;
     /* MC680[234]0 */
     case M68K_CR_ISP:
-        if (m68k_feature(env, M68K_FEATURE_M68020)
-         || m68k_feature(env, M68K_FEATURE_M68030)
-         || m68k_feature(env, M68K_FEATURE_M68040)) {
+        if (m68k_feature(env, M68K_FEATURE_M68020) ||
+            m68k_feature(env, M68K_FEATURE_M68030) ||
+            m68k_feature(env, M68K_FEATURE_M68040)) {
             env->sp[M68K_ISP] = val;
             return;
         }
@@ -308,8 +308,8 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
     case M68K_CR_PCR:
     case M68K_CR_BUSCR:
         cpu_abort(env_cpu(env),
-                  "Unimplemented control register write 0x%x = 0x%x\n",
-                  reg, val);
+                  "Unimplemented control register write 0x%x = 0x%x\n", reg,
+                  val);
     }
 
     /* Invalid control registers will generate an exception. */
@@ -331,17 +331,17 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
         return env->vbr;
     /* MC680[2346]0 */
     case M68K_CR_CACR:
-        if (m68k_feature(env, M68K_FEATURE_M68020)
-         || m68k_feature(env, M68K_FEATURE_M68030)
-         || m68k_feature(env, M68K_FEATURE_M68040)
-         || m68k_feature(env, M68K_FEATURE_M68060)) {
+        if (m68k_feature(env, M68K_FEATURE_M68020) ||
+            m68k_feature(env, M68K_FEATURE_M68030) ||
+            m68k_feature(env, M68K_FEATURE_M68040) ||
+            m68k_feature(env, M68K_FEATURE_M68060)) {
             return env->cacr;
         }
         break;
     /* MC680[46]0 */
     case M68K_CR_TC:
-        if (m68k_feature(env, M68K_FEATURE_M68040)
-         || m68k_feature(env, M68K_FEATURE_M68060)) {
+        if (m68k_feature(env, M68K_FEATURE_M68040) ||
+            m68k_feature(env, M68K_FEATURE_M68060)) {
             return env->mmu.tcr;
         }
         break;
@@ -353,15 +353,15 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
         break;
     /* MC680[46]0 */
     case M68K_CR_SRP:
-        if (m68k_feature(env, M68K_FEATURE_M68040)
-         || m68k_feature(env, M68K_FEATURE_M68060)) {
+        if (m68k_feature(env, M68K_FEATURE_M68040) ||
+            m68k_feature(env, M68K_FEATURE_M68060)) {
             return env->mmu.srp;
         }
         break;
     /* MC68040/MC68LC040 */
     case M68K_CR_URP:
-        if (m68k_feature(env, M68K_FEATURE_M68040)
-         || m68k_feature(env, M68K_FEATURE_M68060)) {
+        if (m68k_feature(env, M68K_FEATURE_M68040) ||
+            m68k_feature(env, M68K_FEATURE_M68060)) {
             return env->mmu.urp;
         }
         break;
@@ -370,17 +370,17 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
         return env->sp[M68K_USP];
     /* MC680[234]0 */
     case M68K_CR_MSP:
-        if (m68k_feature(env, M68K_FEATURE_M68020)
-         || m68k_feature(env, M68K_FEATURE_M68030)
-         || m68k_feature(env, M68K_FEATURE_M68040)) {
+        if (m68k_feature(env, M68K_FEATURE_M68020) ||
+            m68k_feature(env, M68K_FEATURE_M68030) ||
+            m68k_feature(env, M68K_FEATURE_M68040)) {
             return env->sp[M68K_SSP];
         }
         break;
     /* MC680[234]0 */
     case M68K_CR_ISP:
-        if (m68k_feature(env, M68K_FEATURE_M68020)
-         || m68k_feature(env, M68K_FEATURE_M68030)
-         || m68k_feature(env, M68K_FEATURE_M68040)) {
+        if (m68k_feature(env, M68K_FEATURE_M68020) ||
+            m68k_feature(env, M68K_FEATURE_M68030) ||
+            m68k_feature(env, M68K_FEATURE_M68040)) {
             return env->sp[M68K_ISP];
         }
         break;
@@ -473,8 +473,8 @@ void m68k_switch_sp(CPUM68KState *env)
             new_sp = M68K_USP;
         }
     } else {
-        new_sp = (env->sr & SR_S && env->cacr & M68K_CACR_EUSP)
-                 ? M68K_SSP : M68K_USP;
+        new_sp = (env->sr & SR_S && env->cacr & M68K_CACR_EUSP) ? M68K_SSP :
+                                                                  M68K_USP;
     }
     env->aregs[7] = env->sp[new_sp];
     env->current_sp = new_sp;
@@ -486,10 +486,8 @@ void m68k_switch_sp(CPUM68KState *env)
 static void print_address_zone(uint32_t logical, uint32_t physical,
                                uint32_t size, int attr)
 {
-    qemu_printf("%08x - %08x -> %08x - %08x %c ",
-                logical, logical + size - 1,
-                physical, physical + size - 1,
-                attr & 4 ? 'W' : '-');
+    qemu_printf("%08x - %08x -> %08x - %08x %c ", logical, logical + size - 1,
+                physical, physical + size - 1, attr & 4 ? 'W' : '-');
     size >>= 10;
     if (size < 1024) {
         qemu_printf("(%d KiB)\n", size);
@@ -557,8 +555,7 @@ static void dump_address_map(CPUM68KState *env, uint32_t root_pointer)
 
                 last_logical = logical;
                 logical = (i << M68K_TTS_ROOT_SHIFT) |
-                          (j << M68K_TTS_POINTER_SHIFT) |
-                          (k << tic_shift);
+                          (j << M68K_TTS_POINTER_SHIFT) | (k << tic_shift);
 
                 last_physical = physical;
                 physical = tic & ~((1 << tic_shift) - 1);
@@ -569,12 +566,10 @@ static void dump_address_map(CPUM68KState *env, uint32_t root_pointer)
                 if ((logical != (last_logical + (1 << tic_shift))) ||
                     (physical != (last_physical + (1 << tic_shift))) ||
                     (attr & 4) != (last_attr & 4)) {
-
                     if (first_logical != 0xffffffff) {
-                        size = last_logical + (1 << tic_shift) -
-                               first_logical;
-                        print_address_zone(first_logical,
-                                           first_physical, size, last_attr);
+                        size = last_logical + (1 << tic_shift) - first_logical;
+                        print_address_zone(first_logical, first_physical, size,
+                                           last_attr);
                     }
                     first_logical = logical;
                     first_physical = physical;
@@ -588,20 +583,20 @@ static void dump_address_map(CPUM68KState *env, uint32_t root_pointer)
     }
 }
 
-#define DUMP_CACHEFLAGS(a) \
-    switch (a & M68K_DESC_CACHEMODE) { \
+#define DUMP_CACHEFLAGS(a)                                   \
+    switch (a & M68K_DESC_CACHEMODE) {                       \
     case M68K_DESC_CM_WRTHRU: /* cacheable, write-through */ \
-        qemu_printf("T"); \
-        break; \
-    case M68K_DESC_CM_COPYBK: /* cacheable, copyback */ \
-        qemu_printf("C"); \
-        break; \
-    case M68K_DESC_CM_SERIAL: /* noncachable, serialized */ \
-        qemu_printf("S"); \
-        break; \
-    case M68K_DESC_CM_NCACHE: /* noncachable */ \
-        qemu_printf("N"); \
-        break; \
+        qemu_printf("T");                                    \
+        break;                                               \
+    case M68K_DESC_CM_COPYBK: /* cacheable, copyback */      \
+        qemu_printf("C");                                    \
+        break;                                               \
+    case M68K_DESC_CM_SERIAL: /* noncachable, serialized */  \
+        qemu_printf("S");                                    \
+        break;                                               \
+    case M68K_DESC_CM_NCACHE: /* noncachable */              \
+        qemu_printf("N");                                    \
+        break;                                               \
     }
 
 static void dump_ttr(uint32_t ttr)
@@ -610,8 +605,7 @@ static void dump_ttr(uint32_t ttr)
         qemu_printf("disabled\n");
         return;
     }
-    qemu_printf("Base: 0x%08x Mask: 0x%08x Control: ",
-                ttr & M68K_TTR_ADDR_BASE,
+    qemu_printf("Base: 0x%08x Mask: 0x%08x Control: ", ttr & M68K_TTR_ADDR_BASE,
                 (ttr & M68K_TTR_ADDR_MASK) << M68K_TTR_ADDR_MASK_SHIFT);
     switch (ttr & M68K_TTR_SFIELD) {
     case M68K_TTR_SFIELD_USER:
@@ -630,8 +624,8 @@ static void dump_ttr(uint32_t ttr)
     } else {
         qemu_printf("W");
     }
-    qemu_printf(" U: %d\n", (ttr & M68K_DESC_USERATTR) >>
-                               M68K_DESC_USERATTR_SHIFT);
+    qemu_printf(" U: %d\n",
+                (ttr & M68K_DESC_USERATTR) >> M68K_DESC_USERATTR_SHIFT);
 }
 
 void dump_mmu(CPUM68KState *env)
@@ -752,9 +746,9 @@ static int check_TTR(uint32_t ttr, int *prot, target_ulong addr,
     return 1;
 }
 
-static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-                                int *prot, target_ulong address,
-                                int access_type, target_ulong *page_size)
+static int get_physical_address(CPUM68KState *env, hwaddr *physical, int *prot,
+                                target_ulong address, int access_type,
+                                target_ulong *page_size)
 {
     CPUState *cs = env_cpu(env);
     uint32_t entry;
@@ -767,8 +761,8 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
 
     /* Transparent Translation (physical = logical) */
     for (i = 0; i < M68K_MAX_TTR; i++) {
-        if (check_TTR(env->mmu.TTR(access_type, i),
-                      prot, address, access_type)) {
+        if (check_TTR(env->mmu.TTR(access_type, i), prot, address,
+                      access_type)) {
             if (access_type & ACCESS_PTEST) {
                 /* Transparent Translation Register bit */
                 env->mmu.mmusr = M68K_MMU_T_040 | M68K_MMU_R_040;
@@ -876,7 +870,8 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
                 }
             }
         } else if ((next & (M68K_DESC_MODIFIED | M68K_DESC_USED)) !=
-                           (M68K_DESC_MODIFIED | M68K_DESC_USED) && !debug) {
+                       (M68K_DESC_MODIFIED | M68K_DESC_USED) &&
+                   !debug) {
             address_space_stl(cs->as, entry,
                               next | (M68K_DESC_MODIFIED | M68K_DESC_USED),
                               MEMTXATTRS_UNSPECIFIED, &txres);
@@ -951,8 +946,8 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
         access_type |= ACCESS_SUPER;
     }
 
-    if (get_physical_address(env, &phys_addr, &prot,
-                             addr, access_type, &page_size) != 0) {
+    if (get_physical_address(env, &phys_addr, &prot, addr, access_type,
+                             &page_size) != 0) {
         return -1;
     }
 
@@ -980,8 +975,8 @@ void m68k_set_irq_level(M68kCPU *cpu, int level, uint8_t vector)
 }
 
 bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                       MMUAccessType qemu_access_type, int mmu_idx,
-                       bool probe, uintptr_t retaddr)
+                       MMUAccessType qemu_access_type, int mmu_idx, bool probe,
+                       uintptr_t retaddr)
 {
     M68kCPU *cpu = M68K_CPU(cs);
     CPUM68KState *env = &cpu->env;
@@ -993,10 +988,9 @@ bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
 
     if ((env->mmu.tcr & M68K_TCR_ENABLED) == 0) {
         /* MMU disabled */
-        tlb_set_page(cs, address & TARGET_PAGE_MASK,
-                     address & TARGET_PAGE_MASK,
-                     PAGE_READ | PAGE_WRITE | PAGE_EXEC,
-                     mmu_idx, TARGET_PAGE_SIZE);
+        tlb_set_page(cs, address & TARGET_PAGE_MASK, address & TARGET_PAGE_MASK,
+                     PAGE_READ | PAGE_WRITE | PAGE_EXEC, mmu_idx,
+                     TARGET_PAGE_SIZE);
         return true;
     }
 
@@ -1012,8 +1006,8 @@ bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
         access_type |= ACCESS_SUPER;
     }
 
-    ret = get_physical_address(&cpu->env, &physical, &prot,
-                               address, access_type, &page_size);
+    ret = get_physical_address(&cpu->env, &physical, &prot, address,
+                               access_type, &page_size);
     if (likely(ret == 0)) {
         tlb_set_page(cs, address & TARGET_PAGE_MASK,
                      physical & TARGET_PAGE_MASK, prot, mmu_idx, page_size);
@@ -1255,54 +1249,55 @@ void HELPER(mac_set_flags)(CPUM68KState *env, uint32_t acc)
     }
 }
 
-#define EXTSIGN(val, index) (     \
-    (index == 0) ? (int8_t)(val) : ((index == 1) ? (int16_t)(val) : (val)) \
-)
+#define EXTSIGN(val, index) \
+    ((index == 0) ? (int8_t)(val) : ((index == 1) ? (int16_t)(val) : (val)))
 
-#define COMPUTE_CCR(op, x, n, z, v, c) {                                   \
-    switch (op) {                                                          \
-    case CC_OP_FLAGS:                                                      \
-        /* Everything in place.  */                                        \
-        break;                                                             \
-    case CC_OP_ADDB:                                                       \
-    case CC_OP_ADDW:                                                       \
-    case CC_OP_ADDL:                                                       \
-        res = n;                                                           \
-        src2 = v;                                                          \
-        src1 = EXTSIGN(res - src2, op - CC_OP_ADDB);                       \
-        c = x;                                                             \
-        z = n;                                                             \
-        v = (res ^ src1) & ~(src1 ^ src2);                                 \
-        break;                                                             \
-    case CC_OP_SUBB:                                                       \
-    case CC_OP_SUBW:                                                       \
-    case CC_OP_SUBL:                                                       \
-        res = n;                                                           \
-        src2 = v;                                                          \
-        src1 = EXTSIGN(res + src2, op - CC_OP_SUBB);                       \
-        c = x;                                                             \
-        z = n;                                                             \
-        v = (res ^ src1) & (src1 ^ src2);                                  \
-        break;                                                             \
-    case CC_OP_CMPB:                                                       \
-    case CC_OP_CMPW:                                                       \
-    case CC_OP_CMPL:                                                       \
-        src1 = n;                                                          \
-        src2 = v;                                                          \
-        res = EXTSIGN(src1 - src2, op - CC_OP_CMPB);                       \
-        n = res;                                                           \
-        z = res;                                                           \
-        c = src1 < src2;                                                   \
-        v = (res ^ src1) & (src1 ^ src2);                                  \
-        break;                                                             \
-    case CC_OP_LOGIC:                                                      \
-        c = v = 0;                                                         \
-        z = n;                                                             \
-        break;                                                             \
-    default:                                                               \
-        cpu_abort(env_cpu(env), "Bad CC_OP %d", op);                       \
-    }                                                                      \
-} while (0)
+#define COMPUTE_CCR(op, x, n, z, v, c)                   \
+    {                                                    \
+        switch (op) {                                    \
+        case CC_OP_FLAGS:                                \
+            /* Everything in place.  */                  \
+            break;                                       \
+        case CC_OP_ADDB:                                 \
+        case CC_OP_ADDW:                                 \
+        case CC_OP_ADDL:                                 \
+            res = n;                                     \
+            src2 = v;                                    \
+            src1 = EXTSIGN(res - src2, op - CC_OP_ADDB); \
+            c = x;                                       \
+            z = n;                                       \
+            v = (res ^ src1) & ~(src1 ^ src2);           \
+            break;                                       \
+        case CC_OP_SUBB:                                 \
+        case CC_OP_SUBW:                                 \
+        case CC_OP_SUBL:                                 \
+            res = n;                                     \
+            src2 = v;                                    \
+            src1 = EXTSIGN(res + src2, op - CC_OP_SUBB); \
+            c = x;                                       \
+            z = n;                                       \
+            v = (res ^ src1) & (src1 ^ src2);            \
+            break;                                       \
+        case CC_OP_CMPB:                                 \
+        case CC_OP_CMPW:                                 \
+        case CC_OP_CMPL:                                 \
+            src1 = n;                                    \
+            src2 = v;                                    \
+            res = EXTSIGN(src1 - src2, op - CC_OP_CMPB); \
+            n = res;                                     \
+            z = res;                                     \
+            c = src1 < src2;                             \
+            v = (res ^ src1) & (src1 ^ src2);            \
+            break;                                       \
+        case CC_OP_LOGIC:                                \
+            c = v = 0;                                   \
+            z = n;                                       \
+            break;                                       \
+        default:                                         \
+            cpu_abort(env_cpu(env), "Bad CC_OP %d", op); \
+        }                                                \
+    }                                                    \
+    while (0)
 
 uint32_t cpu_m68k_get_ccr(CPUM68KState *env)
 {
@@ -1380,7 +1375,7 @@ uint32_t HELPER(get_macf)(CPUM68KState *env, uint64_t val)
     if (env->macsr & MACSR_OMC) {
         /* Saturate.  */
         if (env->macsr & MACSR_SU) {
-            if (val != (uint16_t) val) {
+            if (val != (uint16_t)val) {
                 result = ((val >> 63) ^ 0x7fff) & 0xffff;
             } else {
                 result = val & 0xffff;
@@ -1502,13 +1497,13 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
 
     env->mmu.mmusr = 0;
     env->mmu.ssw = 0;
-    ret = get_physical_address(env, &physical, &prot, addr,
-                               access_type, &page_size);
+    ret = get_physical_address(env, &physical, &prot, addr, access_type,
+                               &page_size);
     if (ret == 0) {
         tlb_set_page(env_cpu(env), addr & TARGET_PAGE_MASK,
-                     physical & TARGET_PAGE_MASK,
-                     prot, access_type & ACCESS_SUPER ?
-                     MMU_KERNEL_IDX : MMU_USER_IDX, page_size);
+                     physical & TARGET_PAGE_MASK, prot,
+                     access_type & ACCESS_SUPER ? MMU_KERNEL_IDX : MMU_USER_IDX,
+                     page_size);
     }
 }
 

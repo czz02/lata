@@ -81,7 +81,8 @@ static int gdb_get_qreg(CPUHexagonState *env, GByteArray *mem_buf, int n)
     return total;
 }
 
-int hexagon_hvx_gdb_read_register(CPUHexagonState *env, GByteArray *mem_buf, int n)
+int hexagon_hvx_gdb_read_register(CPUHexagonState *env, GByteArray *mem_buf,
+                                  int n)
 {
     if (n < NUM_VREGS) {
         return gdb_get_vreg(env, mem_buf, n);
@@ -115,9 +116,10 @@ static int gdb_put_qreg(CPUHexagonState *env, uint8_t *mem_buf, int n)
     return MAX_VEC_SIZE_BYTES / 8;
 }
 
-int hexagon_hvx_gdb_write_register(CPUHexagonState *env, uint8_t *mem_buf, int n)
+int hexagon_hvx_gdb_write_register(CPUHexagonState *env, uint8_t *mem_buf,
+                                   int n)
 {
-   if (n < NUM_VREGS) {
+    if (n < NUM_VREGS) {
         return gdb_put_vreg(env, mem_buf, n);
     }
     n -= NUM_VREGS;

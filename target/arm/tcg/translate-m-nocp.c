@@ -140,8 +140,8 @@ static bool trans_VSCCLRM(DisasContext *s, arg_VSCCLRM *a)
     tcg_gen_brcondi_i32(TCG_COND_EQ, sfpa, 0, s->condlabel.label);
 
     if (s->fp_excp_el != 0) {
-        gen_exception_insn_el(s, 0, EXCP_NOCP,
-                              syn_uncategorized(), s->fp_excp_el);
+        gen_exception_insn_el(s, 0, EXCP_NOCP, syn_uncategorized(),
+                              s->fp_excp_el);
         return true;
     }
 
@@ -303,8 +303,7 @@ static void gen_branch_fpInactive(DisasContext *s, TCGCond cond,
 }
 
 static bool gen_M_fp_sysreg_write(DisasContext *s, int regno,
-                                  fp_sysreg_loadfn *loadfn,
-                                  void *opaque)
+                                  fp_sysreg_loadfn *loadfn, void *opaque)
 {
     /* Do a write to an M-profile floating point system register */
     TCGv_i32 tmp;
@@ -325,8 +324,7 @@ static bool gen_M_fp_sysreg_write(DisasContext *s, int regno,
         gen_helper_vfp_set_fpscr(cpu_env, tmp);
         gen_lookup_tb(s);
         break;
-    case ARM_VFP_FPSCR_NZCVQC:
-    {
+    case ARM_VFP_FPSCR_NZCVQC: {
         TCGv_i32 fpscr;
         tmp = loadfn(s, opaque, true);
         if (dc_isar_feature(aa32_mve, s)) {
@@ -337,8 +335,8 @@ static bool gen_M_fp_sysreg_write(DisasContext *s, int regno,
              * The 4 vfp.qc[] fields need only be "zero" vs "non-zero";
              * here writing the same value into all elements is simplest.
              */
-            tcg_gen_gvec_dup_i32(MO_32, offsetof(CPUARMState, vfp.qc),
-                                 16, 16, qc);
+            tcg_gen_gvec_dup_i32(MO_32, offsetof(CPUARMState, vfp.qc), 16, 16,
+                                 qc);
         }
         tcg_gen_andi_i32(tmp, tmp, FPCR_NZCV_MASK);
         fpscr = load_cpu_field(vfp.xregs[ARM_VFP_FPSCR]);
@@ -347,8 +345,7 @@ static bool gen_M_fp_sysreg_write(DisasContext *s, int regno,
         store_cpu_field(fpscr, vfp.xregs[ARM_VFP_FPSCR]);
         break;
     }
-    case ARM_VFP_FPCXT_NS:
-    {
+    case ARM_VFP_FPCXT_NS: {
         TCGLabel *lab_active = gen_new_label();
 
         lab_end = gen_new_label();
@@ -376,8 +373,7 @@ static bool gen_M_fp_sysreg_write(DisasContext *s, int regno,
         }
     }
     /* fall through */
-    case ARM_VFP_FPCXT_S:
-    {
+    case ARM_VFP_FPCXT_S: {
         TCGv_i32 sfpa, control;
         /*
          * Set FPSCR and CONTROL.SFPA from value; the new FPSCR takes
@@ -387,8 +383,8 @@ static bool gen_M_fp_sysreg_write(DisasContext *s, int regno,
         sfpa = tcg_temp_new_i32();
         tcg_gen_shri_i32(sfpa, tmp, 31);
         control = load_cpu_field(v7m.control[M_REG_S]);
-        tcg_gen_deposit_i32(control, control, sfpa,
-                            R_V7M_CONTROL_SFPA_SHIFT, 1);
+        tcg_gen_deposit_i32(control, control, sfpa, R_V7M_CONTROL_SFPA_SHIFT,
+                            1);
         store_cpu_field(control, v7m.control[M_REG_S]);
         tcg_gen_andi_i32(tmp, tmp, ~FPCR_NZCV_MASK);
         gen_helper_vfp_set_fpscr(cpu_env, tmp);
@@ -405,13 +401,12 @@ static bool gen_M_fp_sysreg_write(DisasContext *s, int regno,
         store_cpu_field(tmp, v7m.vpr);
         s->base.is_jmp = DISAS_UPDATE_NOCHAIN;
         break;
-    case ARM_VFP_P0:
-    {
+    case ARM_VFP_P0: {
         TCGv_i32 vpr;
         tmp = loadfn(s, opaque, true);
         vpr = load_cpu_field(v7m.vpr);
-        tcg_gen_deposit_i32(vpr, vpr, tmp,
-                            R_V7M_VPR_P0_SHIFT, R_V7M_VPR_P0_LENGTH);
+        tcg_gen_deposit_i32(vpr, vpr, tmp, R_V7M_VPR_P0_SHIFT,
+                            R_V7M_VPR_P0_LENGTH);
         store_cpu_field(vpr, v7m.vpr);
         s->base.is_jmp = DISAS_UPDATE_NOCHAIN;
         break;
@@ -426,8 +421,7 @@ static bool gen_M_fp_sysreg_write(DisasContext *s, int regno,
 }
 
 static bool gen_M_fp_sysreg_read(DisasContext *s, int regno,
-                                 fp_sysreg_storefn *storefn,
-                                 void *opaque)
+                                 fp_sysreg_storefn *storefn, void *opaque)
 {
     /* Do a read from an M-profile floating point system register */
     TCGv_i32 tmp;
@@ -469,8 +463,7 @@ static bool gen_M_fp_sysreg_read(DisasContext *s, int regno,
         tcg_gen_andi_i32(tmp, tmp, FPCR_NZCV_MASK);
         storefn(s, opaque, tmp, true);
         break;
-    case ARM_VFP_FPCXT_S:
-    {
+    case ARM_VFP_FPCXT_S: {
         TCGv_i32 control, sfpa, fpscr;
         /* Bits [27:0] from FPSCR, bit [31] from CONTROL.SFPA */
         tmp = tcg_temp_new_i32();
@@ -497,8 +490,7 @@ static bool gen_M_fp_sysreg_read(DisasContext *s, int regno,
         lookup_tb = true;
         break;
     }
-    case ARM_VFP_FPCXT_NS:
-    {
+    case ARM_VFP_FPCXT_NS: {
         TCGv_i32 control, sfpa, fpscr, fpdscr;
         TCGLabel *lab_active = gen_new_label();
 
@@ -748,8 +740,8 @@ static bool trans_NOCP(DisasContext *s, arg_nocp *a)
     }
 
     if (s->fp_excp_el != 0) {
-        gen_exception_insn_el(s, 0, EXCP_NOCP,
-                              syn_uncategorized(), s->fp_excp_el);
+        gen_exception_insn_el(s, 0, EXCP_NOCP, syn_uncategorized(),
+                              s->fp_excp_el);
         return true;
     }
 

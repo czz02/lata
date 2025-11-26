@@ -98,14 +98,11 @@ static void whpx_apic_set_base(APICCommonState *s, uint64_t val)
 static void whpx_put_apic_base(CPUState *cpu, uint64_t val)
 {
     HRESULT hr;
-    WHV_REGISTER_VALUE reg_value = {.Reg64 = val};
+    WHV_REGISTER_VALUE reg_value = { .Reg64 = val };
     WHV_REGISTER_NAME reg_name = WHvX64RegisterApicBase;
 
     hr = whp_dispatch.WHvSetVirtualProcessorRegisters(
-             whpx_global.partition,
-             cpu->cpu_index,
-             &reg_name, 1,
-             &reg_value);
+        whpx_global.partition, cpu->cpu_index, &reg_name, 1, &reg_value);
 
     if (FAILED(hr)) {
         error_report("WHPX: Failed to set MSR APIC base, hr=%08lx", hr);
@@ -137,14 +134,12 @@ static void whpx_apic_put(CPUState *cs, run_on_cpu_data data)
     whpx_put_apic_state(s, &kapic);
 
     hr = whp_dispatch.WHvSetVirtualProcessorInterruptControllerState2(
-        whpx_global.partition,
-        cs->cpu_index,
-        &kapic,
-        sizeof(kapic));
+        whpx_global.partition, cs->cpu_index, &kapic, sizeof(kapic));
     if (FAILED(hr)) {
-        fprintf(stderr,
+        fprintf(
+            stderr,
             "WHvSetVirtualProcessorInterruptControllerState failed: %08lx\n",
-             hr);
+            hr);
 
         abort();
     }
@@ -157,13 +152,10 @@ void whpx_apic_get(DeviceState *dev)
     struct whpx_lapic_state kapic;
 
     HRESULT hr = whp_dispatch.WHvGetVirtualProcessorInterruptControllerState2(
-        whpx_global.partition,
-        cpu->cpu_index,
-        &kapic,
-        sizeof(kapic),
-        NULL);
+        whpx_global.partition, cpu->cpu_index, &kapic, sizeof(kapic), NULL);
     if (FAILED(hr)) {
-        fprintf(stderr,
+        fprintf(
+            stderr,
             "WHvSetVirtualProcessorInterruptControllerState failed: %08lx\n",
             hr);
 
@@ -195,33 +187,32 @@ static void whpx_send_msi(MSIMessage *msg)
     WHV_INTERRUPT_CONTROL interrupt = {
         /* Values correspond to delivery modes */
         .Type = delivery,
-        .DestinationMode = dest_mode ?
-            WHvX64InterruptDestinationModeLogical :
-            WHvX64InterruptDestinationModePhysical,
+        .DestinationMode = dest_mode ? WHvX64InterruptDestinationModeLogical :
+                                       WHvX64InterruptDestinationModePhysical,
 
-        .TriggerMode = trigger_mode ?
-            WHvX64InterruptTriggerModeLevel : WHvX64InterruptTriggerModeEdge,
+        .TriggerMode = trigger_mode ? WHvX64InterruptTriggerModeLevel :
+                                      WHvX64InterruptTriggerModeEdge,
         .Reserved = 0,
         .Vector = vector,
         .Destination = dest,
     };
-    HRESULT hr = whp_dispatch.WHvRequestInterrupt(whpx_global.partition,
-                     &interrupt, sizeof(interrupt));
+    HRESULT hr = whp_dispatch.WHvRequestInterrupt(
+        whpx_global.partition, &interrupt, sizeof(interrupt));
     if (FAILED(hr)) {
-        fprintf(stderr, "whpx: injection failed, MSI (%llx, %x) delivery: %d, "
+        fprintf(stderr,
+                "whpx: injection failed, MSI (%llx, %x) delivery: %d, "
                 "dest_mode: %d, trigger mode: %d, vector: %d, lost (%08lx)\n",
                 addr, data, delivery, dest_mode, trigger_mode, vector, hr);
     }
 }
 
-static uint64_t whpx_apic_mem_read(void *opaque, hwaddr addr,
-                                   unsigned size)
+static uint64_t whpx_apic_mem_read(void *opaque, hwaddr addr, unsigned size)
 {
     return ~(uint64_t)0;
 }
 
-static void whpx_apic_mem_write(void *opaque, hwaddr addr,
-                                uint64_t data, unsigned size)
+static void whpx_apic_mem_write(void *opaque, hwaddr addr, uint64_t data,
+                                unsigned size)
 {
     MSIMessage msg = { .address = addr, .data = data };
     whpx_send_msi(&msg);

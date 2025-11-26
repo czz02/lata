@@ -20,15 +20,15 @@
 
 #include "qemu/bitops.h"
 
-#define HEX_EXCP_FETCH_NO_UPAGE  0x012
-#define HEX_EXCP_INVALID_PACKET  0x015
-#define HEX_EXCP_INVALID_OPCODE  0x015
-#define HEX_EXCP_PRIV_NO_UREAD   0x024
-#define HEX_EXCP_PRIV_NO_UWRITE  0x025
+#define HEX_EXCP_FETCH_NO_UPAGE 0x012
+#define HEX_EXCP_INVALID_PACKET 0x015
+#define HEX_EXCP_INVALID_OPCODE 0x015
+#define HEX_EXCP_PRIV_NO_UREAD 0x024
+#define HEX_EXCP_PRIV_NO_UWRITE 0x025
 
-#define HEX_EXCP_TRAP0           0x172
+#define HEX_EXCP_TRAP0 0x172
 
-#define PACKET_WORDS_MAX         4
+#define PACKET_WORDS_MAX 4
 
 static inline uint32_t parse_bits(uint32_t encoding)
 {

@@ -192,8 +192,7 @@ bool s390_cpu_has_ext_int(S390CPU *cpu)
         return true;
     }
 
-    if (qemu_s390_flic_has_service(flic) &&
-        (env->cregs[0] & CR0_SERVICE_SC)) {
+    if (qemu_s390_flic_has_service(flic) && (env->cregs[0] & CR0_SERVICE_SC)) {
         return true;
     }
 
@@ -233,10 +232,8 @@ bool s390_cpu_has_int(S390CPU *cpu)
     if (!tcg_enabled()) {
         return false;
     }
-    return s390_cpu_has_mcck_int(cpu) ||
-           s390_cpu_has_ext_int(cpu) ||
-           s390_cpu_has_io_int(cpu) ||
-           s390_cpu_has_restart_int(cpu) ||
+    return s390_cpu_has_mcck_int(cpu) || s390_cpu_has_ext_int(cpu) ||
+           s390_cpu_has_io_int(cpu) || s390_cpu_has_restart_int(cpu) ||
            s390_cpu_has_stop_int(cpu);
 #else
     return false;

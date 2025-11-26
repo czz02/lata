@@ -33,7 +33,7 @@
 #define SLOTS_MAX 4
 #define STORES_MAX 2
 #define REG_WRITES_MAX 32
-#define PRED_WRITES_MAX 5                   /* 4 insns + endloop */
+#define PRED_WRITES_MAX 5 /* 4 insns + endloop */
 #define VSTORES_MAX 2
 
 #define TYPE_HEXAGON_CPU "hexagon-cpu"
@@ -67,20 +67,20 @@ typedef struct {
     MMVector data QEMU_ALIGNED(16);
 } VStoreLog;
 
-#define EXEC_STATUS_OK          0x0000
-#define EXEC_STATUS_STOP        0x0002
-#define EXEC_STATUS_REPLAY      0x0010
-#define EXEC_STATUS_LOCKED      0x0020
-#define EXEC_STATUS_EXCEPTION   0x0100
+#define EXEC_STATUS_OK 0x0000
+#define EXEC_STATUS_STOP 0x0002
+#define EXEC_STATUS_REPLAY 0x0010
+#define EXEC_STATUS_LOCKED 0x0020
+#define EXEC_STATUS_EXCEPTION 0x0100
 
 
-#define EXCEPTION_DETECTED      (env->status & EXEC_STATUS_EXCEPTION)
-#define REPLAY_DETECTED         (env->status & EXEC_STATUS_REPLAY)
-#define CLEAR_EXCEPTION         (env->status &= (~EXEC_STATUS_EXCEPTION))
-#define SET_EXCEPTION           (env->status |= EXEC_STATUS_EXCEPTION)
+#define EXCEPTION_DETECTED (env->status & EXEC_STATUS_EXCEPTION)
+#define REPLAY_DETECTED (env->status & EXEC_STATUS_REPLAY)
+#define CLEAR_EXCEPTION (env->status &= (~EXEC_STATUS_EXCEPTION))
+#define SET_EXCEPTION (env->status |= EXEC_STATUS_EXCEPTION)
 
 /* Maximum number of vector temps in a packet */
-#define VECTOR_TEMPS_MAX            4
+#define VECTOR_TEMPS_MAX 4
 
 typedef struct CPUArchState {
     target_ulong gpr[TOTAL_PER_THREAD_REGS];
@@ -105,7 +105,7 @@ typedef struct CPUArchState {
 
     target_ulong llsc_addr;
     target_ulong llsc_val;
-    uint64_t     llsc_val_i64;
+    uint64_t llsc_val_i64;
 
     MMVector VRegs[NUM_VREGS] QEMU_ALIGNED(16);
     MMVector future_VRegs[VECTOR_TEMPS_MAX] QEMU_ALIGNED(16);
@@ -118,8 +118,8 @@ typedef struct CPUArchState {
     MMVectorPair VuuV QEMU_ALIGNED(16);
     MMVectorPair VvvV QEMU_ALIGNED(16);
     MMVectorPair VxxV QEMU_ALIGNED(16);
-    MMVector     vtmp QEMU_ALIGNED(16);
-    MMQReg       qtmp QEMU_ALIGNED(16);
+    MMVector vtmp QEMU_ALIGNED(16);
+    MMQReg qtmp QEMU_ALIGNED(16);
 
     VStoreLog vstore[VSTORES_MAX];
     target_ulong vstore_pending[VSTORES_MAX];

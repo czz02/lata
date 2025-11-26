@@ -43,12 +43,12 @@ static int64_t icount_get_limit(void)
          * Include all the timers, because they may need an attention.
          * Too long CPU execution may create unnecessary delay in UI.
          */
-        deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL,
-                                              QEMU_TIMER_ATTR_ALL);
+        deadline =
+            qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL, QEMU_TIMER_ATTR_ALL);
         /* Check realtime timers, because they help with input processing */
-        deadline = qemu_soonest_timeout(deadline,
-                qemu_clock_deadline_ns_all(QEMU_CLOCK_REALTIME,
-                                           QEMU_TIMER_ATTR_ALL));
+        deadline = qemu_soonest_timeout(
+            deadline, qemu_clock_deadline_ns_all(QEMU_CLOCK_REALTIME,
+                                                 QEMU_TIMER_ATTR_ALL));
 
         /*
          * Maintain prior (possibly buggy) behaviour where if no deadline
@@ -76,8 +76,8 @@ static void icount_notify_aio_contexts(void)
 void icount_handle_deadline(void)
 {
     assert(qemu_in_vcpu_thread());
-    int64_t deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL,
-                                                  QEMU_TIMER_ATTR_ALL);
+    int64_t deadline =
+        qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL, QEMU_TIMER_ATTR_ALL);
 
     /*
      * Instructions, interrupts, and exceptions are processed in cpu-exec.
@@ -152,9 +152,7 @@ void icount_handle_interrupt(CPUState *cpu, int mask)
     int old_mask = cpu->interrupt_request;
 
     tcg_handle_interrupt(cpu, mask);
-    if (qemu_cpu_is_self(cpu) &&
-        !cpu->can_do_io
-        && (mask & ~old_mask) != 0) {
+    if (qemu_cpu_is_self(cpu) && !cpu->can_do_io && (mask & ~old_mask) != 0) {
         cpu_abort(cpu, "Raised interrupt while not in I/O function");
     }
 }

@@ -135,8 +135,7 @@ static int riscv_gdb_get_vector(CPURISCVState *env, GByteArray *buf, int n)
         int i;
         int cnt = 0;
         for (i = 0; i < vlenb; i += 8) {
-            cnt += gdb_get_reg64(buf,
-                                 env->vreg[(n * vlenb + i) / 8]);
+            cnt += gdb_get_reg64(buf, env->vreg[(n * vlenb + i) / 8]);
         }
         return cnt;
     }
@@ -287,8 +286,7 @@ static int ricsv_gen_dynamic_vector_xml(CPUState *cs, int base_reg)
     g_string_append_printf(s, "<union id=\"riscv_vector\">");
     for (i = 0; i < ARRAY_SIZE(vec_lanes); i++) {
         g_string_append_printf(s, "<field name=\"%c\" type=\"%s\"/>",
-                               vec_lanes[i].suffix,
-                               vec_lanes[i].id);
+                               vec_lanes[i].suffix, vec_lanes[i].id);
     }
     g_string_append(s, "</union>");
 
@@ -313,30 +311,29 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
     RISCVCPU *cpu = RISCV_CPU(cs);
     CPURISCVState *env = &cpu->env;
     if (env->misa_ext & RVD) {
-        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-                                 32, "riscv-64bit-fpu.xml", 0);
+        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu, 32,
+                                 "riscv-64bit-fpu.xml", 0);
     } else if (env->misa_ext & RVF) {
-        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-                                 32, "riscv-32bit-fpu.xml", 0);
+        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu, 32,
+                                 "riscv-32bit-fpu.xml", 0);
     }
     if (env->misa_ext & RVV) {
         int base_reg = cs->gdb_num_regs;
-        gdb_register_coprocessor(cs, riscv_gdb_get_vector,
-                                 riscv_gdb_set_vector,
+        gdb_register_coprocessor(cs, riscv_gdb_get_vector, riscv_gdb_set_vector,
                                  ricsv_gen_dynamic_vector_xml(cs, base_reg),
                                  "riscv-vector.xml", 0);
     }
     switch (env->misa_mxl_max) {
     case MXL_RV32:
         gdb_register_coprocessor(cs, riscv_gdb_get_virtual,
-                                 riscv_gdb_set_virtual,
-                                 1, "riscv-32bit-virtual.xml", 0);
+                                 riscv_gdb_set_virtual, 1,
+                                 "riscv-32bit-virtual.xml", 0);
         break;
     case MXL_RV64:
     case MXL_RV128:
         gdb_register_coprocessor(cs, riscv_gdb_get_virtual,
-                                 riscv_gdb_set_virtual,
-                                 1, "riscv-64bit-virtual.xml", 0);
+                                 riscv_gdb_set_virtual, 1,
+                                 "riscv-64bit-virtual.xml", 0);
         break;
     default:
         g_assert_not_reached();

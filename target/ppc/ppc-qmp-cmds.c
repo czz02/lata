@@ -97,13 +97,29 @@ const MonitorDef monitor_defs[] = {
     { "nip|pc", offsetof(CPUPPCState, nip) },
     { "lr", offsetof(CPUPPCState, lr) },
     { "ctr", offsetof(CPUPPCState, ctr) },
-    { "decr", 0, &monitor_get_decr, },
-    { "ccr|cr", 0, &monitor_get_ccr, },
+    {
+        "decr",
+        0,
+        &monitor_get_decr,
+    },
+    {
+        "ccr|cr",
+        0,
+        &monitor_get_ccr,
+    },
     /* Machine state register */
     { "xer", 0, &monitor_get_xer },
     { "msr", offsetof(CPUPPCState, msr) },
-    { "tbu", 0, &monitor_get_tbu, },
-    { "tbl", 0, &monitor_get_tbl, },
+    {
+        "tbu",
+        0,
+        &monitor_get_tbu,
+    },
+    {
+        "tbl",
+        0,
+        &monitor_get_tbl,
+    },
     { NULL },
 };
 
@@ -181,8 +197,8 @@ static void ppc_cpu_defs_entry(gpointer data, gpointer user_data)
 
     typename = object_class_get_name(oc);
     info = g_malloc0(sizeof(*info));
-    info->name = g_strndup(typename,
-                           strlen(typename) - strlen(POWERPC_CPU_TYPE_SUFFIX));
+    info->name =
+        g_strndup(typename, strlen(typename) - strlen(POWERPC_CPU_TYPE_SUFFIX));
 
     QAPI_LIST_PREPEND(*first, info);
 }

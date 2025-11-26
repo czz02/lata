@@ -32,93 +32,92 @@ floatx80 floatx80_arctan(floatx80 rFm);
 floatx80 floatx80_log(floatx80 rFm);
 floatx80 floatx80_tan(floatx80 rFm);
 floatx80 floatx80_arccos(floatx80 rFm);
-floatx80 floatx80_pow(floatx80 rFn,floatx80 rFm);
-floatx80 floatx80_pol(floatx80 rFn,floatx80 rFm);
+floatx80 floatx80_pow(floatx80 rFn, floatx80 rFm);
+floatx80 floatx80_pol(floatx80 rFn, floatx80 rFm);
 
 unsigned int ExtendedCPDO(const unsigned int opcode)
 {
-   FPA11 *fpa11 = GET_FPA11();
-   floatx80 rFm, rFn;
-   unsigned int Fd, Fm, Fn, nRc = 1;
+    FPA11 *fpa11 = GET_FPA11();
+    floatx80 rFm, rFn;
+    unsigned int Fd, Fm, Fn, nRc = 1;
 
-   //printk("ExtendedCPDO(0x%08x)\n",opcode);
+    // printk("ExtendedCPDO(0x%08x)\n",opcode);
 
-   Fm = getFm(opcode);
-   if (CONSTANT_FM(opcode))
-   {
-     rFm = getExtendedConstant(Fm);
-   }
-   else
-   {
-     switch (fpa11->fType[Fm])
-     {
+    Fm = getFm(opcode);
+    if (CONSTANT_FM(opcode)) {
+        rFm = getExtendedConstant(Fm);
+    } else {
+        switch (fpa11->fType[Fm]) {
         case typeSingle:
-          rFm = float32_to_floatx80(fpa11->fpreg[Fm].fSingle, &fpa11->fp_status);
-        break;
+            rFm = float32_to_floatx80(fpa11->fpreg[Fm].fSingle,
+                                      &fpa11->fp_status);
+            break;
 
         case typeDouble:
-          rFm = float64_to_floatx80(fpa11->fpreg[Fm].fDouble, &fpa11->fp_status);
-        break;
+            rFm = float64_to_floatx80(fpa11->fpreg[Fm].fDouble,
+                                      &fpa11->fp_status);
+            break;
 
         case typeExtended:
-          rFm = fpa11->fpreg[Fm].fExtended;
-        break;
+            rFm = fpa11->fpreg[Fm].fExtended;
+            break;
 
-        default: return 0;
-     }
-   }
+        default:
+            return 0;
+        }
+    }
 
-   if (!MONADIC_INSTRUCTION(opcode))
-   {
-      Fn = getFn(opcode);
-      switch (fpa11->fType[Fn])
-      {
+    if (!MONADIC_INSTRUCTION(opcode)) {
+        Fn = getFn(opcode);
+        switch (fpa11->fType[Fn]) {
         case typeSingle:
-          rFn = float32_to_floatx80(fpa11->fpreg[Fn].fSingle, &fpa11->fp_status);
-        break;
+            rFn = float32_to_floatx80(fpa11->fpreg[Fn].fSingle,
+                                      &fpa11->fp_status);
+            break;
 
         case typeDouble:
-          rFn = float64_to_floatx80(fpa11->fpreg[Fn].fDouble, &fpa11->fp_status);
-        break;
+            rFn = float64_to_floatx80(fpa11->fpreg[Fn].fDouble,
+                                      &fpa11->fp_status);
+            break;
 
         case typeExtended:
-          rFn = fpa11->fpreg[Fn].fExtended;
+            rFn = fpa11->fpreg[Fn].fExtended;
+            break;
+
+        default:
+            return 0;
+        }
+    }
+
+    Fd = getFd(opcode);
+    switch (opcode & MASK_ARITHMETIC_OPCODE) {
+    /* dyadic opcodes */
+    case ADF_CODE:
+        fpa11->fpreg[Fd].fExtended = floatx80_add(rFn, rFm, &fpa11->fp_status);
         break;
 
-        default: return 0;
-      }
-   }
+    case MUF_CODE:
+    case FML_CODE:
+        fpa11->fpreg[Fd].fExtended = floatx80_mul(rFn, rFm, &fpa11->fp_status);
+        break;
 
-   Fd = getFd(opcode);
-   switch (opcode & MASK_ARITHMETIC_OPCODE)
-   {
-      /* dyadic opcodes */
-      case ADF_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_add(rFn,rFm, &fpa11->fp_status);
-      break;
+    case SUF_CODE:
+        fpa11->fpreg[Fd].fExtended = floatx80_sub(rFn, rFm, &fpa11->fp_status);
+        break;
 
-      case MUF_CODE:
-      case FML_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_mul(rFn,rFm, &fpa11->fp_status);
-      break;
+    case RSF_CODE:
+        fpa11->fpreg[Fd].fExtended = floatx80_sub(rFm, rFn, &fpa11->fp_status);
+        break;
 
-      case SUF_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_sub(rFn,rFm, &fpa11->fp_status);
-      break;
+    case DVF_CODE:
+    case FDV_CODE:
+        fpa11->fpreg[Fd].fExtended = floatx80_div(rFn, rFm, &fpa11->fp_status);
+        break;
 
-      case RSF_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_sub(rFm,rFn, &fpa11->fp_status);
-      break;
-
-      case DVF_CODE:
-      case FDV_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_div(rFn,rFm, &fpa11->fp_status);
-      break;
-
-      case RDF_CODE:
-      case FRD_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_div(rFm,rFn, &fpa11->fp_status);
-      break;
+    case RDF_CODE:
+    case FRD_CODE:
+        fpa11->fpreg[Fd].fExtended = floatx80_div(rFm, rFn, &fpa11->fp_status);
+        break;
 
 #if 0
       case POW_CODE:
@@ -130,9 +129,9 @@ unsigned int ExtendedCPDO(const unsigned int opcode)
       break;
 #endif
 
-      case RMF_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_rem(rFn,rFm, &fpa11->fp_status);
-      break;
+    case RMF_CODE:
+        fpa11->fpreg[Fd].fExtended = floatx80_rem(rFn, rFm, &fpa11->fp_status);
+        break;
 
 #if 0
       case POL_CODE:
@@ -140,29 +139,30 @@ unsigned int ExtendedCPDO(const unsigned int opcode)
       break;
 #endif
 
-      /* monadic opcodes */
-      case MVF_CODE:
-         fpa11->fpreg[Fd].fExtended = rFm;
-      break;
+    /* monadic opcodes */
+    case MVF_CODE:
+        fpa11->fpreg[Fd].fExtended = rFm;
+        break;
 
-      case MNF_CODE:
-         rFm.high ^= 0x8000;
-         fpa11->fpreg[Fd].fExtended = rFm;
-      break;
+    case MNF_CODE:
+        rFm.high ^= 0x8000;
+        fpa11->fpreg[Fd].fExtended = rFm;
+        break;
 
-      case ABS_CODE:
-         rFm.high &= 0x7fff;
-         fpa11->fpreg[Fd].fExtended = rFm;
-      break;
+    case ABS_CODE:
+        rFm.high &= 0x7fff;
+        fpa11->fpreg[Fd].fExtended = rFm;
+        break;
 
-      case RND_CODE:
-      case URD_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_round_to_int(rFm, &fpa11->fp_status);
-      break;
+    case RND_CODE:
+    case URD_CODE:
+        fpa11->fpreg[Fd].fExtended =
+            floatx80_round_to_int(rFm, &fpa11->fp_status);
+        break;
 
-      case SQT_CODE:
-         fpa11->fpreg[Fd].fExtended = floatx80_sqrt(rFm, &fpa11->fp_status);
-      break;
+    case SQT_CODE:
+        fpa11->fpreg[Fd].fExtended = floatx80_sqrt(rFm, &fpa11->fp_status);
+        break;
 
 #if 0
       case LOG_CODE:
@@ -202,17 +202,17 @@ unsigned int ExtendedCPDO(const unsigned int opcode)
       break;
 #endif
 
-      case NRM_CODE:
-      break;
+    case NRM_CODE:
+        break;
 
-      default:
-      {
+    default: {
         nRc = 0;
-      }
-   }
+    }
+    }
 
-   if (0 != nRc) fpa11->fType[Fd] = typeExtended;
-   return nRc;
+    if (0 != nRc)
+        fpa11->fType[Fd] = typeExtended;
+    return nRc;
 }
 
 #if 0

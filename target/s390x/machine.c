@@ -66,26 +66,24 @@ static const VMStateDescription vmstate_fpu = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = fpu_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.vregs[0][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[1][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[2][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[3][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[4][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[5][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[6][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[7][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[8][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[9][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[10][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[11][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[12][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[13][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[14][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[15][0], S390CPU),
-        VMSTATE_UINT32(env.fpc, S390CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.vregs[0][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[1][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[2][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[3][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[4][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[5][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[6][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[7][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[8][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[9][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[10][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[11][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[12][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[13][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[14][0], S390CPU),
+                                VMSTATE_UINT64(env.vregs[15][0], S390CPU),
+                                VMSTATE_UINT32(env.fpc, S390CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool vregs_needed(void *opaque)
@@ -98,58 +96,58 @@ static const VMStateDescription vmstate_vregs = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = vregs_needed,
-    .fields = (VMStateField[]) {
-        /* vregs[0][0] -> vregs[15][0] and fregs are overlays */
-        VMSTATE_UINT64(env.vregs[16][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[17][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[18][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[19][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[20][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[21][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[22][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[23][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[24][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[25][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[26][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[27][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[28][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[29][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[30][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[31][0], S390CPU),
-        VMSTATE_UINT64(env.vregs[0][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[1][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[2][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[3][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[4][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[5][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[6][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[7][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[8][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[9][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[10][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[11][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[12][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[13][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[14][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[15][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[16][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[17][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[18][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[19][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[20][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[21][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[22][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[23][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[24][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[25][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[26][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[27][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[28][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[29][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[30][1], S390CPU),
-        VMSTATE_UINT64(env.vregs[31][1], S390CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            /* vregs[0][0] -> vregs[15][0] and fregs are overlays */
+            VMSTATE_UINT64(env.vregs[16][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[17][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[18][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[19][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[20][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[21][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[22][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[23][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[24][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[25][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[26][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[27][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[28][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[29][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[30][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[31][0], S390CPU),
+            VMSTATE_UINT64(env.vregs[0][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[1][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[2][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[3][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[4][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[5][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[6][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[7][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[8][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[9][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[10][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[11][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[12][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[13][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[14][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[15][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[16][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[17][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[18][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[19][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[20][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[21][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[22][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[23][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[24][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[25][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[26][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[27][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[28][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[29][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[30][1], S390CPU),
+            VMSTATE_UINT64(env.vregs[31][1], S390CPU),
+            VMSTATE_END_OF_LIST() }
 };
 
 static bool riccb_needed(void *opaque)
@@ -162,10 +160,8 @@ const VMStateDescription vmstate_riccb = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = riccb_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT8_ARRAY(env.riccb, S390CPU, 64),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT8_ARRAY(env.riccb, S390CPU, 64),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool exval_needed(void *opaque)
@@ -179,10 +175,8 @@ const VMStateDescription vmstate_exval = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = exval_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.ex_value, S390CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.ex_value, S390CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool gscb_needed(void *opaque)
@@ -195,10 +189,8 @@ const VMStateDescription vmstate_gscb = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = gscb_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64_ARRAY(env.gscb, S390CPU, 4),
-        VMSTATE_END_OF_LIST()
-        }
+    .fields = (VMStateField[]){ VMSTATE_UINT64_ARRAY(env.gscb, S390CPU, 4),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool bpbc_needed(void *opaque)
@@ -206,16 +198,13 @@ static bool bpbc_needed(void *opaque)
     return s390_has_feat(S390_FEAT_BPB);
 }
 
-const VMStateDescription vmstate_bpbc = {
-    .name = "cpu/bpbc",
-    .version_id = 1,
-    .minimum_version_id = 1,
-    .needed = bpbc_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_BOOL(env.bpbc, S390CPU),
-        VMSTATE_END_OF_LIST()
-    }
-};
+const VMStateDescription vmstate_bpbc = { .name = "cpu/bpbc",
+                                          .version_id = 1,
+                                          .minimum_version_id = 1,
+                                          .needed = bpbc_needed,
+                                          .fields = (VMStateField[]){
+                                              VMSTATE_BOOL(env.bpbc, S390CPU),
+                                              VMSTATE_END_OF_LIST() } };
 
 static bool etoken_needed(void *opaque)
 {
@@ -227,11 +216,9 @@ const VMStateDescription vmstate_etoken = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = etoken_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.etoken, S390CPU),
-        VMSTATE_UINT64(env.etoken_extension, S390CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.etoken, S390CPU),
+                                VMSTATE_UINT64(env.etoken_extension, S390CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static bool diag318_needed(void *opaque)
@@ -244,10 +231,8 @@ const VMStateDescription vmstate_diag318 = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = diag318_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(env.diag318_info, S390CPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT64(env.diag318_info, S390CPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 const VMStateDescription vmstate_s390_cpu = {
@@ -256,37 +241,30 @@ const VMStateDescription vmstate_s390_cpu = {
     .pre_save = cpu_pre_save,
     .version_id = 4,
     .minimum_version_id = 3,
-    .fields      = (VMStateField[]) {
-        VMSTATE_UINT64_ARRAY(env.regs, S390CPU, 16),
-        VMSTATE_UINT64(env.psw.mask, S390CPU),
-        VMSTATE_UINT64(env.psw.addr, S390CPU),
-        VMSTATE_UINT64(env.psa, S390CPU),
-        VMSTATE_UINT32(env.todpr, S390CPU),
-        VMSTATE_UINT64(env.pfault_token, S390CPU),
-        VMSTATE_UINT64(env.pfault_compare, S390CPU),
-        VMSTATE_UINT64(env.pfault_select, S390CPU),
-        VMSTATE_UINT64(env.cputm, S390CPU),
-        VMSTATE_UINT64(env.ckc, S390CPU),
-        VMSTATE_UINT64(env.gbea, S390CPU),
-        VMSTATE_UINT64(env.pp, S390CPU),
-        VMSTATE_UINT32_ARRAY(env.aregs, S390CPU, 16),
-        VMSTATE_UINT64_ARRAY(env.cregs, S390CPU, 16),
-        VMSTATE_UINT8(env.cpu_state, S390CPU),
-        VMSTATE_UINT8(env.sigp_order, S390CPU),
-        VMSTATE_UINT32_V(irqstate_saved_size, S390CPU, 4),
-        VMSTATE_VBUFFER_UINT32(irqstate, S390CPU, 4, NULL,
-                               irqstate_saved_size),
-        VMSTATE_END_OF_LIST()
-    },
-    .subsections = (const VMStateDescription*[]) {
-        &vmstate_fpu,
-        &vmstate_vregs,
-        &vmstate_riccb,
-        &vmstate_exval,
-        &vmstate_gscb,
-        &vmstate_bpbc,
-        &vmstate_etoken,
-        &vmstate_diag318,
-        NULL
-    },
+    .fields =
+        (VMStateField[]){ VMSTATE_UINT64_ARRAY(env.regs, S390CPU, 16),
+                          VMSTATE_UINT64(env.psw.mask, S390CPU),
+                          VMSTATE_UINT64(env.psw.addr, S390CPU),
+                          VMSTATE_UINT64(env.psa, S390CPU),
+                          VMSTATE_UINT32(env.todpr, S390CPU),
+                          VMSTATE_UINT64(env.pfault_token, S390CPU),
+                          VMSTATE_UINT64(env.pfault_compare, S390CPU),
+                          VMSTATE_UINT64(env.pfault_select, S390CPU),
+                          VMSTATE_UINT64(env.cputm, S390CPU),
+                          VMSTATE_UINT64(env.ckc, S390CPU),
+                          VMSTATE_UINT64(env.gbea, S390CPU),
+                          VMSTATE_UINT64(env.pp, S390CPU),
+                          VMSTATE_UINT32_ARRAY(env.aregs, S390CPU, 16),
+                          VMSTATE_UINT64_ARRAY(env.cregs, S390CPU, 16),
+                          VMSTATE_UINT8(env.cpu_state, S390CPU),
+                          VMSTATE_UINT8(env.sigp_order, S390CPU),
+                          VMSTATE_UINT32_V(irqstate_saved_size, S390CPU, 4),
+                          VMSTATE_VBUFFER_UINT32(irqstate, S390CPU, 4, NULL,
+                                                 irqstate_saved_size),
+                          VMSTATE_END_OF_LIST() },
+    .subsections =
+        (const VMStateDescription *[]){
+            &vmstate_fpu, &vmstate_vregs, &vmstate_riccb, &vmstate_exval,
+            &vmstate_gscb, &vmstate_bpbc, &vmstate_etoken, &vmstate_diag318,
+            NULL },
 };

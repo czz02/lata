@@ -115,7 +115,8 @@ static bool trans_MTLO1(DisasContext *ctx, arg_r *a)
  */
 
 static bool trans_parallel_arith(DisasContext *ctx, arg_r *a,
-                                 void (*gen_logic_i64)(TCGv_i64, TCGv_i64, TCGv_i64))
+                                 void (*gen_logic_i64)(TCGv_i64, TCGv_i64,
+                                                       TCGv_i64))
 {
     TCGv_i64 ax, bx;
 
@@ -231,8 +232,8 @@ static bool trans_PNOR(DisasContext *ctx, arg_r *a)
  * PCEQW   rd, rs, rt        Parallel Compare for Equal Word
  */
 
-static bool trans_parallel_compare(DisasContext *ctx, arg_r *a,
-                                   TCGCond cond, unsigned wlen)
+static bool trans_parallel_compare(DisasContext *ctx, arg_r *a, TCGCond cond,
+                                   unsigned wlen)
 {
     TCGv_i64 c0, c1, ax, bx, t0, t1, t2;
 
@@ -265,7 +266,8 @@ static bool trans_parallel_compare(DisasContext *ctx, arg_r *a,
         tcg_gen_sextract_i64(t0, ax, wlen * i, wlen);
         tcg_gen_sextract_i64(t1, bx, wlen * i, wlen);
         tcg_gen_movcond_i64(cond, t2, t1, t0, c1, c0);
-        tcg_gen_deposit_i64(cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rd], t2, wlen * i, wlen);
+        tcg_gen_deposit_i64(cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rd], t2, wlen * i,
+                            wlen);
     }
     return true;
 }
@@ -462,19 +464,19 @@ static bool trans_PEXTLx(DisasContext *ctx, arg_r *a, unsigned wlen)
 
     /* Lower half */
     for (int i = 0; i < 64 / (2 * wlen); i++) {
-        tcg_gen_deposit_i64(cpu_gpr[a->rd],
-                            cpu_gpr[a->rd], bx, 2 * wlen * i, wlen);
-        tcg_gen_deposit_i64(cpu_gpr[a->rd],
-                            cpu_gpr[a->rd], ax, 2 * wlen * i + wlen, wlen);
+        tcg_gen_deposit_i64(cpu_gpr[a->rd], cpu_gpr[a->rd], bx, 2 * wlen * i,
+                            wlen);
+        tcg_gen_deposit_i64(cpu_gpr[a->rd], cpu_gpr[a->rd], ax,
+                            2 * wlen * i + wlen, wlen);
         tcg_gen_shri_i64(bx, bx, wlen);
         tcg_gen_shri_i64(ax, ax, wlen);
     }
     /* Upper half */
     for (int i = 0; i < 64 / (2 * wlen); i++) {
-        tcg_gen_deposit_i64(cpu_gpr_hi[a->rd],
-                            cpu_gpr_hi[a->rd], bx, 2 * wlen * i, wlen);
-        tcg_gen_deposit_i64(cpu_gpr_hi[a->rd],
-                            cpu_gpr_hi[a->rd], ax, 2 * wlen * i + wlen, wlen);
+        tcg_gen_deposit_i64(cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rd], bx,
+                            2 * wlen * i, wlen);
+        tcg_gen_deposit_i64(cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rd], ax,
+                            2 * wlen * i + wlen, wlen);
         tcg_gen_shri_i64(bx, bx, wlen);
         tcg_gen_shri_i64(ax, ax, wlen);
     }
@@ -568,8 +570,10 @@ static bool trans_PCPYH(DisasContext *s, arg_r *a)
 
     tcg_gen_deposit_i64(cpu_gpr[a->rd], cpu_gpr[a->rt], cpu_gpr[a->rt], 16, 16);
     tcg_gen_deposit_i64(cpu_gpr[a->rd], cpu_gpr[a->rd], cpu_gpr[a->rd], 32, 32);
-    tcg_gen_deposit_i64(cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rt], cpu_gpr_hi[a->rt], 16, 16);
-    tcg_gen_deposit_i64(cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rd], 32, 32);
+    tcg_gen_deposit_i64(cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rt], cpu_gpr_hi[a->rt],
+                        16, 16);
+    tcg_gen_deposit_i64(cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rd], cpu_gpr_hi[a->rd],
+                        32, 32);
 
     return true;
 }

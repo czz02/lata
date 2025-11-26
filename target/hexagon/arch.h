@@ -29,10 +29,10 @@ uint64_t deinterleave(uint64_t src);
 int32_t conv_round(int32_t a, int n);
 void arch_fpop_start(CPUHexagonState *env);
 void arch_fpop_end(CPUHexagonState *env);
-int arch_sf_recip_common(float32 *Rs, float32 *Rt, float32 *Rd,
-                         int *adjust, float_status *fp_status);
+int arch_sf_recip_common(float32 *Rs, float32 *Rt, float32 *Rd, int *adjust,
+                         float_status *fp_status);
 int arch_sf_invsqrt_common(float32 *Rs, float32 *Rd, int *adjust,
-                          float_status *fp_status);
+                           float_status *fp_status);
 
 extern const uint8_t recip_lookup_table[128];
 

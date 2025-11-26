@@ -154,11 +154,11 @@ struct CPUArchState {
     target_ulong vext_ver;
 
     /* RISCVMXL, but uint32_t for vmstate migration */
-    uint32_t misa_mxl;      /* current mxl */
-    uint32_t misa_mxl_max;  /* max mxl for this cpu */
-    uint32_t misa_ext;      /* current extensions */
+    uint32_t misa_mxl; /* current mxl */
+    uint32_t misa_mxl_max; /* max mxl for this cpu */
+    uint32_t misa_ext; /* current extensions */
     uint32_t misa_ext_mask; /* max ext for this cpu */
-    uint32_t xl;            /* current xlen */
+    uint32_t xl; /* current xlen */
 
     /* 128-bit helpers upper part return value */
     target_ulong retxh;
@@ -198,7 +198,7 @@ struct CPUArchState {
     uint64_t mie;
     uint64_t mideleg;
 
-    target_ulong satp;   /* since: priv-1.10.0 */
+    target_ulong satp; /* since: priv-1.10.0 */
     target_ulong stval;
     target_ulong medeleg;
 
@@ -209,7 +209,7 @@ struct CPUArchState {
     target_ulong mtvec;
     target_ulong mepc;
     target_ulong mcause;
-    target_ulong mtval;  /* since: priv-1.10.0 */
+    target_ulong mtval; /* since: priv-1.10.0 */
 
     /* Machine and Supervisor interrupt priorities */
     uint8_t miprio[64];
@@ -321,18 +321,15 @@ struct CPUArchState {
 
     /* machine specific AIA ireg read-modify-write callback */
 #define AIA_MAKE_IREG(__isel, __priv, __virt, __vgein, __xlen) \
-    ((((__xlen) & 0xff) << 24) | \
-     (((__vgein) & 0x3f) << 20) | \
-     (((__virt) & 0x1) << 18) | \
-     (((__priv) & 0x3) << 16) | \
-     (__isel & 0xffff))
-#define AIA_IREG_ISEL(__ireg)                  ((__ireg) & 0xffff)
-#define AIA_IREG_PRIV(__ireg)                  (((__ireg) >> 16) & 0x3)
-#define AIA_IREG_VIRT(__ireg)                  (((__ireg) >> 18) & 0x1)
-#define AIA_IREG_VGEIN(__ireg)                 (((__ireg) >> 20) & 0x3f)
-#define AIA_IREG_XLEN(__ireg)                  (((__ireg) >> 24) & 0xff)
-    int (*aia_ireg_rmw_fn[4])(void *arg, target_ulong reg,
-        target_ulong *val, target_ulong new_val, target_ulong write_mask);
+    ((((__xlen) & 0xff) << 24) | (((__vgein) & 0x3f) << 20) |  \
+     (((__virt) & 0x1) << 18) | (((__priv) & 0x3) << 16) | (__isel & 0xffff))
+#define AIA_IREG_ISEL(__ireg) ((__ireg) & 0xffff)
+#define AIA_IREG_PRIV(__ireg) (((__ireg) >> 16) & 0x3)
+#define AIA_IREG_VIRT(__ireg) (((__ireg) >> 18) & 0x1)
+#define AIA_IREG_VGEIN(__ireg) (((__ireg) >> 20) & 0x3f)
+#define AIA_IREG_XLEN(__ireg) (((__ireg) >> 24) & 0xff)
+    int (*aia_ireg_rmw_fn[4])(void *arg, target_ulong reg, target_ulong *val,
+                              target_ulong new_val, target_ulong write_mask);
     void *aia_ireg_rmw_fn_arg[4];
 
     /* True if in debugger mode.  */
@@ -411,16 +408,16 @@ static inline int riscv_has_ext(CPURISCVState *env, target_ulong ext)
 
 #include "cpu_user.h"
 
-extern const char * const riscv_int_regnames[];
-extern const char * const riscv_int_regnamesh[];
-extern const char * const riscv_fpr_regnames[];
+extern const char *const riscv_int_regnames[];
+extern const char *const riscv_int_regnamesh[];
+extern const char *const riscv_fpr_regnames[];
 
 const char *riscv_cpu_get_trap_name(target_ulong cause, bool async);
 void riscv_cpu_do_interrupt(CPUState *cpu);
-int riscv_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                               int cpuid, DumpState *s);
-int riscv_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-                               int cpuid, DumpState *s);
+int riscv_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                               DumpState *s);
+int riscv_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                               DumpState *s);
 int riscv_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
 int riscv_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
 int riscv_cpu_hviprio_index2irq(int index, int *out_irq, int *out_rdzero);
@@ -435,12 +432,12 @@ void riscv_cpu_set_geilen(CPURISCVState *env, target_ulong geilen);
 bool riscv_cpu_vector_enabled(CPURISCVState *env);
 void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable);
 int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch);
-G_NORETURN void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                               MMUAccessType access_type,
-                                               int mmu_idx, uintptr_t retaddr);
+G_NORETURN void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+                                              MMUAccessType access_type,
+                                              int mmu_idx, uintptr_t retaddr);
 bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                        MMUAccessType access_type, int mmu_idx,
-                        bool probe, uintptr_t retaddr);
+                        MMUAccessType access_type, int mmu_idx, bool probe,
+                        uintptr_t retaddr);
 char *riscv_isa_string(RISCVCPU *cpu);
 void riscv_cpu_list(void);
 void riscv_cpu_validate_set_extensions(RISCVCPU *cpu, Error **errp);
@@ -449,9 +446,8 @@ void riscv_cpu_validate_set_extensions(RISCVCPU *cpu, Error **errp);
 #define cpu_mmu_index riscv_cpu_mmu_index
 
 #ifndef CONFIG_USER_ONLY
-void riscv_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                     vaddr addr, unsigned size,
-                                     MMUAccessType access_type,
+void riscv_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                     unsigned size, MMUAccessType access_type,
                                      int mmu_idx, MemTxAttrs attrs,
                                      MemTxResult response, uintptr_t retaddr);
 hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
@@ -464,8 +460,7 @@ uint64_t riscv_cpu_update_mip(CPURISCVState *env, uint64_t mask,
 void riscv_cpu_set_rdtime_fn(CPURISCVState *env, uint64_t (*fn)(void *),
                              void *arg);
 void riscv_cpu_set_aia_ireg_rmw_fn(CPURISCVState *env, uint32_t priv,
-                                   int (*rmw_fn)(void *arg,
-                                                 target_ulong reg,
+                                   int (*rmw_fn)(void *arg, target_ulong reg,
                                                  target_ulong *val,
                                                  target_ulong new_val,
                                                  target_ulong write_mask),
@@ -476,8 +471,8 @@ RISCVException smstateen_acc_ok(CPURISCVState *env, int index, uint64_t bit);
 void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv);
 
 void riscv_translate_init(void);
-G_NORETURN void riscv_raise_exception(CPURISCVState *env,
-                                      uint32_t exception, uintptr_t pc);
+G_NORETURN void riscv_raise_exception(CPURISCVState *env, uint32_t exception,
+                                      uintptr_t pc);
 
 target_ulong riscv_cpu_get_fflags(CPURISCVState *env);
 void riscv_cpu_set_fflags(CPURISCVState *env, target_ulong);
@@ -508,7 +503,7 @@ FIELD(TB_FLAGS, PRIV, 24, 2)
 FIELD(TB_FLAGS, AXL, 26, 2)
 
 #ifdef TARGET_RISCV32
-#define riscv_cpu_mxl(env)  ((void)(env), MXL_RV32)
+#define riscv_cpu_mxl(env) ((void)(env), MXL_RV32)
 #else
 static inline RISCVMXL riscv_cpu_mxl(CPURISCVState *env)
 {
@@ -559,7 +554,7 @@ static inline RISCVMXL cpu_get_xl(CPURISCVState *env, target_ulong mode)
 #endif
 
 #if defined(TARGET_RISCV32)
-#define cpu_recompute_xl(env)  ((void)(env), MXL_RV32)
+#define cpu_recompute_xl(env) ((void)(env), MXL_RV32)
 #else
 static inline RISCVMXL cpu_recompute_xl(CPURISCVState *env)
 {
@@ -572,7 +567,7 @@ static inline RISCVMXL cpu_recompute_xl(CPURISCVState *env)
 #endif
 
 #if defined(TARGET_RISCV32)
-#define cpu_address_xl(env)  ((void)(env), MXL_RV32)
+#define cpu_address_xl(env) ((void)(env), MXL_RV32)
 #else
 static inline RISCVMXL cpu_address_xl(CPURISCVState *env)
 {
@@ -592,7 +587,7 @@ static inline int riscv_cpu_xlen(CPURISCVState *env)
 }
 
 #ifdef TARGET_RISCV32
-#define riscv_cpu_sxl(env)  ((void)(env), MXL_RV32)
+#define riscv_cpu_sxl(env) ((void)(env), MXL_RV32)
 #else
 static inline RISCVMXL riscv_cpu_sxl(CPURISCVState *env)
 {
@@ -629,14 +624,14 @@ static inline uint32_t vext_get_vlmax(RISCVCPU *cpu, target_ulong vtype)
     return cpu->cfg.vlen >> (sew + 3 - lmul);
 }
 
-void cpu_get_tb_cpu_state(CPURISCVState *env, vaddr *pc,
-                          uint64_t *cs_base, uint32_t *pflags);
+void cpu_get_tb_cpu_state(CPURISCVState *env, vaddr *pc, uint64_t *cs_base,
+                          uint32_t *pflags);
 
 void riscv_cpu_update_mask(CPURISCVState *env);
 
 RISCVException riscv_csrrw(CPURISCVState *env, int csrno,
-                           target_ulong *ret_value,
-                           target_ulong new_value, target_ulong write_mask);
+                           target_ulong *ret_value, target_ulong new_value,
+                           target_ulong write_mask);
 RISCVException riscv_csrrw_debug(CPURISCVState *env, int csrno,
                                  target_ulong *ret_value,
                                  target_ulong new_value,
@@ -655,8 +650,7 @@ static inline target_ulong riscv_csr_read(CPURISCVState *env, int csrno)
     return val;
 }
 
-typedef RISCVException (*riscv_csr_predicate_fn)(CPURISCVState *env,
-                                                 int csrno);
+typedef RISCVException (*riscv_csr_predicate_fn)(CPURISCVState *env, int csrno);
 typedef RISCVException (*riscv_csr_read_fn)(CPURISCVState *env, int csrno,
                                             target_ulong *ret_value);
 typedef RISCVException (*riscv_csr_write_fn)(CPURISCVState *env, int csrno,
@@ -667,13 +661,13 @@ typedef RISCVException (*riscv_csr_op_fn)(CPURISCVState *env, int csrno,
                                           target_ulong write_mask);
 
 RISCVException riscv_csrrw_i128(CPURISCVState *env, int csrno,
-                                Int128 *ret_value,
-                                Int128 new_value, Int128 write_mask);
+                                Int128 *ret_value, Int128 new_value,
+                                Int128 write_mask);
 
 typedef RISCVException (*riscv_csr_read128_fn)(CPURISCVState *env, int csrno,
                                                Int128 *ret_value);
 typedef RISCVException (*riscv_csr_write128_fn)(CPURISCVState *env, int csrno,
-                                             Int128 new_value);
+                                                Int128 new_value);
 
 typedef struct {
     const char *name;
@@ -688,9 +682,7 @@ typedef struct {
 } riscv_csr_operations;
 
 /* CSR function table constants */
-enum {
-    CSR_TABLE_SIZE = 0x1000
-};
+enum { CSR_TABLE_SIZE = 0x1000 };
 
 /*
  * The event id are encoded based on the encoding specified in the

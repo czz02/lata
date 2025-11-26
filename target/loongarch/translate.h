@@ -10,9 +10,11 @@
 
 #include "exec/translator.h"
 
-#define TRANS(NAME, FUNC, ...) \
-    static bool trans_##NAME(DisasContext *ctx, arg_##NAME * a) \
-    { return FUNC(ctx, a, __VA_ARGS__); }
+#define TRANS(NAME, FUNC, ...)                                 \
+    static bool trans_##NAME(DisasContext *ctx, arg_##NAME *a) \
+    {                                                          \
+        return FUNC(ctx, a, __VA_ARGS__);                      \
+    }
 
 /*
  * If an operation is being performed on less than TARGET_LONG_BITS,
@@ -31,9 +33,9 @@ typedef struct DisasContext {
     uint32_t opcode;
     uint16_t mem_idx;
     uint16_t plv;
-    int vl;   /* Vector length */
+    int vl; /* Vector length */
     TCGv zero;
-    #ifdef CONFIG_LATA
+#ifdef CONFIG_LATA
     void *arg;
     int insn_type;
 #endif

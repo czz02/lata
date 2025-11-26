@@ -68,36 +68,37 @@ enum {
 
 typedef struct CPUArchState {
     /* CPU registers */
-    uint32_t regs[NUM_REGS];    /* general registers */
-    uint32_t psw_o;             /* O bit of status register */
-    uint32_t psw_s;             /* S bit of status register */
-    uint32_t psw_z;             /* Z bit of status register */
-    uint32_t psw_c;             /* C bit of status register */
+    uint32_t regs[NUM_REGS]; /* general registers */
+    uint32_t psw_o; /* O bit of status register */
+    uint32_t psw_s; /* S bit of status register */
+    uint32_t psw_z; /* Z bit of status register */
+    uint32_t psw_c; /* C bit of status register */
     uint32_t psw_u;
     uint32_t psw_i;
     uint32_t psw_pm;
     uint32_t psw_ipl;
-    uint32_t bpsw;              /* backup status */
-    uint32_t bpc;               /* backup pc */
-    uint32_t isp;               /* global base register */
-    uint32_t usp;               /* vector base register */
-    uint32_t pc;                /* program counter */
-    uint32_t intb;              /* interrupt vector */
+    uint32_t bpsw; /* backup status */
+    uint32_t bpc; /* backup pc */
+    uint32_t isp; /* global base register */
+    uint32_t usp; /* vector base register */
+    uint32_t pc; /* program counter */
+    uint32_t intb; /* interrupt vector */
     uint32_t fintv;
     uint32_t fpsw;
     uint64_t acc;
 
     /* Fields up to this point are cleared by a CPU reset */
-    struct {} end_reset_fields;
+    struct {
+    } end_reset_fields;
 
     /* Internal use */
     uint32_t in_sleep;
-    uint32_t req_irq;           /* Requested interrupt no (hard) */
-    uint32_t req_ipl;           /* Requested interrupt level */
-    uint32_t ack_irq;           /* execute irq */
-    uint32_t ack_ipl;           /* execute ipl */
+    uint32_t req_irq; /* Requested interrupt no (hard) */
+    uint32_t req_ipl; /* Requested interrupt level */
+    uint32_t ack_irq; /* execute irq */
+    uint32_t ack_ipl; /* execute ipl */
     float_status fp_status;
-    qemu_irq ack;               /* Interrupt acknowledge */
+    qemu_irq ack; /* Interrupt acknowledge */
 } CPURXState;
 
 /*
@@ -138,7 +139,7 @@ void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
 #include "exec/cpu-all.h"
 
 #define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
-#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
+#define CPU_INTERRUPT_FIR CPU_INTERRUPT_TGT_INT_1
 
 #define RX_CPU_IRQ 0
 #define RX_CPU_FIR 1
@@ -161,13 +162,13 @@ static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
 {
     uint32_t psw = 0;
     psw = FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
-    psw = FIELD_DP32(psw, PSW, PM,  env->psw_pm);
-    psw = FIELD_DP32(psw, PSW, U,   env->psw_u);
-    psw = FIELD_DP32(psw, PSW, I,   env->psw_i);
-    psw = FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
-    psw = FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
-    psw = FIELD_DP32(psw, PSW, Z,   env->psw_z == 0);
-    psw = FIELD_DP32(psw, PSW, C,   env->psw_c);
+    psw = FIELD_DP32(psw, PSW, PM, env->psw_pm);
+    psw = FIELD_DP32(psw, PSW, U, env->psw_u);
+    psw = FIELD_DP32(psw, PSW, I, env->psw_i);
+    psw = FIELD_DP32(psw, PSW, O, env->psw_o >> 31);
+    psw = FIELD_DP32(psw, PSW, S, env->psw_s >> 31);
+    psw = FIELD_DP32(psw, PSW, Z, env->psw_z == 0);
+    psw = FIELD_DP32(psw, PSW, C, env->psw_c);
     return psw;
 }
 

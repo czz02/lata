@@ -25,9 +25,10 @@
 
 /* Exception helpers */
 
-static G_NORETURN
-void raise_exception_sync_internal(CPUTriCoreState *env, uint32_t class, int tin,
-                                   uintptr_t pc, uint32_t fcd_pc)
+static G_NORETURN void raise_exception_sync_internal(CPUTriCoreState *env,
+                                                     uint32_t class, int tin,
+                                                     uintptr_t pc,
+                                                     uint32_t fcd_pc)
 {
     CPUState *cs = env_cpu(env);
     /* in case we come from a helper-call we need to restore the PC */
@@ -111,7 +112,7 @@ static void raise_exception_sync_helper(CPUTriCoreState *env, uint32_t class,
 static uint16_t reverse16(uint16_t val)
 {
     uint8_t high = (uint8_t)(val >> 8);
-    uint8_t low  = (uint8_t)(val & 0xff);
+    uint8_t low = (uint8_t)(val & 0xff);
 
     uint16_t rh, rl;
 
@@ -124,7 +125,7 @@ static uint16_t reverse16(uint16_t val)
 uint32_t helper_br_update(uint32_t reg)
 {
     uint32_t index = reg & 0xffff;
-    uint32_t incr  = reg >> 16;
+    uint32_t incr = reg >> 16;
     uint32_t new_index = reverse16(reverse16(index) + reverse16(incr));
     return reg - index + new_index;
 }
@@ -177,7 +178,7 @@ static uint32_t suov32_pos(CPUTriCoreState *env, uint64_t arg)
     } else {
         env->PSW_USB_V = 0;
         ret = (target_ulong)arg;
-     }
+    }
     env->PSW_USB_AV = arg ^ arg * 2u;
     env->PSW_USB_SAV |= env->PSW_USB_AV;
     return ret;
@@ -285,7 +286,7 @@ uint64_t helper_add64_ssov(CPUTriCoreState *env, uint64_t r1, uint64_t r2)
         /* ext_ret > MAX_INT */
         if ((int64_t)r1 >= 0) {
             result = INT64_MAX;
-        /* ext_ret < MIN_INT */
+            /* ext_ret < MIN_INT */
         } else {
             result = INT64_MIN;
         }
@@ -441,7 +442,7 @@ uint64_t helper_sub64_ssov(CPUTriCoreState *env, uint64_t r1, uint64_t r2)
         /* ext_ret > MAX_INT */
         if ((int64_t)r1 >= 0) {
             result = INT64_MAX;
-        /* ext_ret < MIN_INT */
+            /* ext_ret < MIN_INT */
         } else {
             result = INT64_MIN;
         }
@@ -452,7 +453,7 @@ uint64_t helper_sub64_ssov(CPUTriCoreState *env, uint64_t r1, uint64_t r2)
 }
 
 target_ulong helper_sub_h_ssov(CPUTriCoreState *env, target_ulong r1,
-                             target_ulong r2)
+                               target_ulong r2)
 {
     int32_t ret_hw0, ret_hw1;
 
@@ -691,8 +692,8 @@ target_ulong helper_madd32_suov(CPUTriCoreState *env, target_ulong r1,
     return suov32_pos(env, result);
 }
 
-uint64_t helper_madd64_ssov(CPUTriCoreState *env, target_ulong r1,
-                            uint64_t r2, target_ulong r3)
+uint64_t helper_madd64_ssov(CPUTriCoreState *env, target_ulong r1, uint64_t r2,
+                            target_ulong r3)
 {
     uint64_t ret, ovf;
     int64_t t1 = sextract64(r1, 0, 32);
@@ -713,7 +714,7 @@ uint64_t helper_madd64_ssov(CPUTriCoreState *env, target_ulong r1,
         /* ext_ret > MAX_INT */
         if (mul >= 0) {
             ret = INT64_MAX;
-        /* ext_ret < MIN_INT */
+            /* ext_ret < MIN_INT */
         } else {
             ret = INT64_MIN;
         }
@@ -724,8 +725,8 @@ uint64_t helper_madd64_ssov(CPUTriCoreState *env, target_ulong r1,
     return ret;
 }
 
-uint32_t
-helper_madd32_q_add_ssov(CPUTriCoreState *env, uint64_t r1, uint64_t r2)
+uint32_t helper_madd32_q_add_ssov(CPUTriCoreState *env, uint64_t r1,
+                                  uint64_t r2)
 {
     int64_t result;
 
@@ -791,9 +792,9 @@ uint64_t helper_madd64_q_ssov(CPUTriCoreState *env, uint64_t r1, uint32_t r2,
             /* ext_ret > MAX_INT */
             if (mul < 0) {
                 result = INT64_MAX;
-            /* ext_ret < MIN_INT */
+                /* ext_ret < MIN_INT */
             } else {
-               result = INT64_MIN;
+                result = INT64_MIN;
             }
         } else {
             env->PSW_USB_V = 0;
@@ -805,9 +806,9 @@ uint64_t helper_madd64_q_ssov(CPUTriCoreState *env, uint64_t r1, uint32_t r2,
             /* ext_ret > MAX_INT */
             if (mul >= 0) {
                 result = INT64_MAX;
-            /* ext_ret < MIN_INT */
+                /* ext_ret < MIN_INT */
             } else {
-               result = INT64_MIN;
+                result = INT64_MIN;
             }
         } else {
             env->PSW_USB_V = 0;
@@ -849,8 +850,8 @@ uint32_t helper_maddr_q_ssov(CPUTriCoreState *env, uint32_t r1, uint32_t r2,
     return ret & 0xffff0000ll;
 }
 
-uint64_t helper_madd64_suov(CPUTriCoreState *env, target_ulong r1,
-                            uint64_t r2, target_ulong r3)
+uint64_t helper_madd64_suov(CPUTriCoreState *env, target_ulong r1, uint64_t r2,
+                            target_ulong r3)
 {
     uint64_t ret, mul;
     uint64_t t1 = extract64(r1, 0, 32);
@@ -913,8 +914,8 @@ target_ulong helper_msub32_suov(CPUTriCoreState *env, target_ulong r1,
     return result;
 }
 
-uint64_t helper_msub64_ssov(CPUTriCoreState *env, target_ulong r1,
-                            uint64_t r2, target_ulong r3)
+uint64_t helper_msub64_ssov(CPUTriCoreState *env, target_ulong r1, uint64_t r2,
+                            target_ulong r3)
 {
     uint64_t ret, ovf;
     int64_t t1 = sextract64(r1, 0, 32);
@@ -935,7 +936,7 @@ uint64_t helper_msub64_ssov(CPUTriCoreState *env, target_ulong r1,
         /* ext_ret > MAX_INT */
         if (mul < 0) {
             ret = INT64_MAX;
-        /* ext_ret < MIN_INT */
+            /* ext_ret < MIN_INT */
         } else {
             ret = INT64_MIN;
         }
@@ -945,8 +946,8 @@ uint64_t helper_msub64_ssov(CPUTriCoreState *env, target_ulong r1,
     return ret;
 }
 
-uint64_t helper_msub64_suov(CPUTriCoreState *env, target_ulong r1,
-                            uint64_t r2, target_ulong r3)
+uint64_t helper_msub64_suov(CPUTriCoreState *env, target_ulong r1, uint64_t r2,
+                            target_ulong r3)
 {
     uint64_t ret, mul;
     uint64_t t1 = extract64(r1, 0, 32);
@@ -970,8 +971,8 @@ uint64_t helper_msub64_suov(CPUTriCoreState *env, target_ulong r1,
     return ret;
 }
 
-uint32_t
-helper_msub32_q_sub_ssov(CPUTriCoreState *env, uint64_t r1, uint64_t r2)
+uint32_t helper_msub32_q_sub_ssov(CPUTriCoreState *env, uint64_t r1,
+                                  uint64_t r2)
 {
     int64_t result;
     int64_t t1 = (int64_t)r1;
@@ -1039,9 +1040,9 @@ uint64_t helper_msub64_q_ssov(CPUTriCoreState *env, uint64_t r1, uint32_t r2,
             /* ext_ret > MAX_INT */
             if (mul >= 0) {
                 result = INT64_MAX;
-            /* ext_ret < MIN_INT */
+                /* ext_ret < MIN_INT */
             } else {
-               result = INT64_MIN;
+                result = INT64_MIN;
             }
         } else {
             env->PSW_USB_V = 0;
@@ -1053,9 +1054,9 @@ uint64_t helper_msub64_q_ssov(CPUTriCoreState *env, uint64_t r1, uint32_t r2,
             /* ext_ret > MAX_INT */
             if (mul < 0) {
                 result = INT64_MAX;
-            /* ext_ret < MIN_INT */
+                /* ext_ret < MIN_INT */
             } else {
-               result = INT64_MIN;
+                result = INT64_MIN;
             }
         } else {
             env->PSW_USB_V = 0;
@@ -1312,7 +1313,7 @@ uint32_t helper_add_b(CPUTriCoreState *env, target_ulong r1, target_ulong r2)
         b = extr_r1 + extr_r2;
         ovf |= ((b > 0x7f) || (b < -0x80));
         avf |= b ^ b * 2u;
-        ret |= ((b & 0xff) << (i*8));
+        ret |= ((b & 0xff) << (i * 8));
     }
 
     env->PSW_USB_V = (ovf << 31);
@@ -1467,7 +1468,7 @@ uint32_t helper_sub_b(CPUTriCoreState *env, target_ulong r1, target_ulong r2)
         b = extr_r1 - extr_r2;
         ovf |= ((b > 0x7f) || (b < -0x80));
         avf |= b ^ b * 2u;
-        ret |= ((b & 0xff) << (i*8));
+        ret |= ((b & 0xff) << (i * 8));
     }
 
     env->PSW_USB_V = (ovf << 31);
@@ -1541,7 +1542,7 @@ uint32_t helper_eqany_b(target_ulong r1, target_ulong r2)
     uint32_t ret = 0;
 
     for (i = 0; i < 4; i++) {
-        ret |= (sextract32(r1,  i * 8, 8) == sextract32(r2,  i * 8, 8));
+        ret |= (sextract32(r1, i * 8, 8) == sextract32(r2, i * 8, 8));
     }
 
     return ret;
@@ -1551,8 +1552,8 @@ uint32_t helper_eqany_h(target_ulong r1, target_ulong r2)
 {
     uint32_t ret;
 
-    ret = (sextract32(r1, 0, 16) == sextract32(r2,  0, 16));
-    ret |= (sextract32(r1, 16, 16) == sextract32(r2,  16, 16));
+    ret = (sextract32(r1, 0, 16) == sextract32(r2, 0, 16));
+    ret |= (sextract32(r1, 16, 16) == sextract32(r2, 16, 16));
 
     return ret;
 }
@@ -1563,7 +1564,7 @@ uint32_t helper_lt_b(target_ulong r1, target_ulong r2)
     uint32_t ret = 0;
 
     for (i = 0; i < 4; i++) {
-        if (sextract32(r1,  i * 8, 8) < sextract32(r2,  i * 8, 8)) {
+        if (sextract32(r1, i * 8, 8) < sextract32(r2, i * 8, 8)) {
             ret |= (0xff << (i * 8));
         }
     }
@@ -1577,7 +1578,7 @@ uint32_t helper_lt_bu(target_ulong r1, target_ulong r2)
     uint32_t ret = 0;
 
     for (i = 0; i < 4; i++) {
-        if (extract32(r1,  i * 8, 8) < extract32(r2,  i * 8, 8)) {
+        if (extract32(r1, i * 8, 8) < extract32(r2, i * 8, 8)) {
             ret |= (0xff << (i * 8));
         }
     }
@@ -1589,11 +1590,11 @@ uint32_t helper_lt_h(target_ulong r1, target_ulong r2)
 {
     uint32_t ret = 0;
 
-    if (sextract32(r1,  0, 16) < sextract32(r2,  0, 16)) {
+    if (sextract32(r1, 0, 16) < sextract32(r2, 0, 16)) {
         ret |= 0xffff;
     }
 
-    if (sextract32(r1,  16, 16) < sextract32(r2,  16, 16)) {
+    if (sextract32(r1, 16, 16) < sextract32(r2, 16, 16)) {
         ret |= 0xffff0000;
     }
 
@@ -1604,126 +1605,126 @@ uint32_t helper_lt_hu(target_ulong r1, target_ulong r2)
 {
     uint32_t ret = 0;
 
-    if (extract32(r1,  0, 16) < extract32(r2,  0, 16)) {
+    if (extract32(r1, 0, 16) < extract32(r2, 0, 16)) {
         ret |= 0xffff;
     }
 
-    if (extract32(r1,  16, 16) < extract32(r2,  16, 16)) {
+    if (extract32(r1, 16, 16) < extract32(r2, 16, 16)) {
         ret |= 0xffff0000;
     }
 
     return ret;
 }
 
-#define EXTREMA_H_B(name, op)                                 \
-uint32_t helper_##name ##_b(target_ulong r1, target_ulong r2) \
-{                                                             \
-    int32_t i, extr_r1, extr_r2;                              \
-    uint32_t ret = 0;                                         \
-                                                              \
-    for (i = 0; i < 4; i++) {                                 \
-        extr_r1 = sextract32(r1, i * 8, 8);                   \
-        extr_r2 = sextract32(r2, i * 8, 8);                   \
-        extr_r1 = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;   \
-        ret |= (extr_r1 & 0xff) << (i * 8);                   \
-    }                                                         \
-    return ret;                                               \
-}                                                             \
-                                                              \
-uint32_t helper_##name ##_bu(target_ulong r1, target_ulong r2)\
-{                                                             \
-    int32_t i;                                                \
-    uint32_t extr_r1, extr_r2;                                \
-    uint32_t ret = 0;                                         \
-                                                              \
-    for (i = 0; i < 4; i++) {                                 \
-        extr_r1 = extract32(r1, i * 8, 8);                    \
-        extr_r2 = extract32(r2, i * 8, 8);                    \
-        extr_r1 = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;   \
-        ret |= (extr_r1 & 0xff) << (i * 8);                   \
-    }                                                         \
-    return ret;                                               \
-}                                                             \
-                                                              \
-uint32_t helper_##name ##_h(target_ulong r1, target_ulong r2) \
-{                                                             \
-    int32_t extr_r1, extr_r2;                                 \
-    uint32_t ret = 0;                                         \
-                                                              \
-    extr_r1 = sextract32(r1, 0, 16);                          \
-    extr_r2 = sextract32(r2, 0, 16);                          \
-    ret = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;           \
-    ret = ret & 0xffff;                                       \
-                                                              \
-    extr_r1 = sextract32(r1, 16, 16);                         \
-    extr_r2 = sextract32(r2, 16, 16);                         \
-    extr_r1 = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;       \
-    ret |= extr_r1 << 16;                                     \
-                                                              \
-    return ret;                                               \
-}                                                             \
-                                                              \
-uint32_t helper_##name ##_hu(target_ulong r1, target_ulong r2)\
-{                                                             \
-    uint32_t extr_r1, extr_r2;                                \
-    uint32_t ret = 0;                                         \
-                                                              \
-    extr_r1 = extract32(r1, 0, 16);                           \
-    extr_r2 = extract32(r2, 0, 16);                           \
-    ret = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;           \
-    ret = ret & 0xffff;                                       \
-                                                              \
-    extr_r1 = extract32(r1, 16, 16);                          \
-    extr_r2 = extract32(r2, 16, 16);                          \
-    extr_r1 = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;       \
-    ret |= extr_r1 << (16);                                   \
-                                                              \
-    return ret;                                               \
-}                                                             \
-                                                              \
-uint64_t helper_ix##name(uint64_t r1, uint32_t r2)            \
-{                                                             \
-    int64_t r2l, r2h, r1hl;                                   \
-    uint64_t ret = 0;                                         \
-                                                              \
-    ret = ((r1 + 2) & 0xffff);                                \
-    r2l = sextract64(r2, 0, 16);                              \
-    r2h = sextract64(r2, 16, 16);                             \
-    r1hl = sextract64(r1, 32, 16);                            \
-                                                              \
-    if ((r2l op ## = r2h) && (r2l op r1hl)) {                 \
-        ret |= (r2l & 0xffff) << 32;                          \
-        ret |= extract64(r1, 0, 16) << 16;                    \
-    } else if ((r2h op r2l) && (r2h op r1hl)) {               \
-        ret |= extract64(r2, 16, 16) << 32;                   \
-        ret |= extract64(r1 + 1, 0, 16) << 16;                \
-    } else {                                                  \
-        ret |= r1 & 0xffffffff0000ull;                        \
-    }                                                         \
-    return ret;                                               \
-}                                                             \
-                                                              \
-uint64_t helper_ix##name ##_u(uint64_t r1, uint32_t r2)       \
-{                                                             \
-    int64_t r2l, r2h, r1hl;                                   \
-    uint64_t ret = 0;                                         \
-                                                              \
-    ret = ((r1 + 2) & 0xffff);                                \
-    r2l = extract64(r2, 0, 16);                               \
-    r2h = extract64(r2, 16, 16);                              \
-    r1hl = extract64(r1, 32, 16);                             \
-                                                              \
-    if ((r2l op ## = r2h) && (r2l op r1hl)) {                 \
-        ret |= (r2l & 0xffff) << 32;                          \
-        ret |= extract64(r1, 0, 16) << 16;                    \
-    } else if ((r2h op r2l) && (r2h op r1hl)) {               \
-        ret |= extract64(r2, 16, 16) << 32;                   \
-        ret |= extract64(r1 + 1, 0, 16) << 16;                \
-    } else {                                                  \
-        ret |= r1 & 0xffffffff0000ull;                        \
-    }                                                         \
-    return ret;                                               \
-}
+#define EXTREMA_H_B(name, op)                                     \
+    uint32_t helper_##name##_b(target_ulong r1, target_ulong r2)  \
+    {                                                             \
+        int32_t i, extr_r1, extr_r2;                              \
+        uint32_t ret = 0;                                         \
+                                                                  \
+        for (i = 0; i < 4; i++) {                                 \
+            extr_r1 = sextract32(r1, i * 8, 8);                   \
+            extr_r2 = sextract32(r2, i * 8, 8);                   \
+            extr_r1 = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;   \
+            ret |= (extr_r1 & 0xff) << (i * 8);                   \
+        }                                                         \
+        return ret;                                               \
+    }                                                             \
+                                                                  \
+    uint32_t helper_##name##_bu(target_ulong r1, target_ulong r2) \
+    {                                                             \
+        int32_t i;                                                \
+        uint32_t extr_r1, extr_r2;                                \
+        uint32_t ret = 0;                                         \
+                                                                  \
+        for (i = 0; i < 4; i++) {                                 \
+            extr_r1 = extract32(r1, i * 8, 8);                    \
+            extr_r2 = extract32(r2, i * 8, 8);                    \
+            extr_r1 = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;   \
+            ret |= (extr_r1 & 0xff) << (i * 8);                   \
+        }                                                         \
+        return ret;                                               \
+    }                                                             \
+                                                                  \
+    uint32_t helper_##name##_h(target_ulong r1, target_ulong r2)  \
+    {                                                             \
+        int32_t extr_r1, extr_r2;                                 \
+        uint32_t ret = 0;                                         \
+                                                                  \
+        extr_r1 = sextract32(r1, 0, 16);                          \
+        extr_r2 = sextract32(r2, 0, 16);                          \
+        ret = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;           \
+        ret = ret & 0xffff;                                       \
+                                                                  \
+        extr_r1 = sextract32(r1, 16, 16);                         \
+        extr_r2 = sextract32(r2, 16, 16);                         \
+        extr_r1 = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;       \
+        ret |= extr_r1 << 16;                                     \
+                                                                  \
+        return ret;                                               \
+    }                                                             \
+                                                                  \
+    uint32_t helper_##name##_hu(target_ulong r1, target_ulong r2) \
+    {                                                             \
+        uint32_t extr_r1, extr_r2;                                \
+        uint32_t ret = 0;                                         \
+                                                                  \
+        extr_r1 = extract32(r1, 0, 16);                           \
+        extr_r2 = extract32(r2, 0, 16);                           \
+        ret = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;           \
+        ret = ret & 0xffff;                                       \
+                                                                  \
+        extr_r1 = extract32(r1, 16, 16);                          \
+        extr_r2 = extract32(r2, 16, 16);                          \
+        extr_r1 = (extr_r1 op extr_r2) ? extr_r1 : extr_r2;       \
+        ret |= extr_r1 << (16);                                   \
+                                                                  \
+        return ret;                                               \
+    }                                                             \
+                                                                  \
+    uint64_t helper_ix##name(uint64_t r1, uint32_t r2)            \
+    {                                                             \
+        int64_t r2l, r2h, r1hl;                                   \
+        uint64_t ret = 0;                                         \
+                                                                  \
+        ret = ((r1 + 2) & 0xffff);                                \
+        r2l = sextract64(r2, 0, 16);                              \
+        r2h = sextract64(r2, 16, 16);                             \
+        r1hl = sextract64(r1, 32, 16);                            \
+                                                                  \
+        if ((r2l op## = r2h) && (r2l op r1hl)) {                  \
+            ret |= (r2l & 0xffff) << 32;                          \
+            ret |= extract64(r1, 0, 16) << 16;                    \
+        } else if ((r2h op r2l) && (r2h op r1hl)) {               \
+            ret |= extract64(r2, 16, 16) << 32;                   \
+            ret |= extract64(r1 + 1, 0, 16) << 16;                \
+        } else {                                                  \
+            ret |= r1 & 0xffffffff0000ull;                        \
+        }                                                         \
+        return ret;                                               \
+    }                                                             \
+                                                                  \
+    uint64_t helper_ix##name##_u(uint64_t r1, uint32_t r2)        \
+    {                                                             \
+        int64_t r2l, r2h, r1hl;                                   \
+        uint64_t ret = 0;                                         \
+                                                                  \
+        ret = ((r1 + 2) & 0xffff);                                \
+        r2l = extract64(r2, 0, 16);                               \
+        r2h = extract64(r2, 16, 16);                              \
+        r1hl = extract64(r1, 32, 16);                             \
+                                                                  \
+        if ((r2l op## = r2h) && (r2l op r1hl)) {                  \
+            ret |= (r2l & 0xffff) << 32;                          \
+            ret |= extract64(r1, 0, 16) << 16;                    \
+        } else if ((r2h op r2l) && (r2h op r1hl)) {               \
+            ret |= extract64(r2, 16, 16) << 32;                   \
+            ret |= extract64(r1 + 1, 0, 16) << 16;                \
+        } else {                                                  \
+            ret |= r1 & 0xffffffff0000ull;                        \
+        }                                                         \
+        return ret;                                               \
+    }
 
 EXTREMA_H_B(max, >)
 EXTREMA_H_B(min, <)
@@ -1838,8 +1839,8 @@ uint32_t helper_sha(CPUTriCoreState *env, target_ulong r1, target_ulong r2)
         /* calc carry */
         env->PSW_USB_C = ((result & 0xffffffff00000000ULL) != 0);
         /* calc v */
-        env->PSW_USB_V = (((result > 0x7fffffffLL) ||
-                           (result < -0x80000000LL)) << 31);
+        env->PSW_USB_V =
+            (((result > 0x7fffffffLL) || (result < -0x80000000LL)) << 31);
         /* calc sv */
         env->PSW_USB_SV |= env->PSW_USB_V;
         ret = (uint32_t)result;
@@ -1897,10 +1898,10 @@ uint64_t helper_bsplit(uint32_t r1)
     ret = 0;
     for (i = 0; i < 32; i = i + 2) {
         /* even */
-        ret |= (r1 & 1) << (i/2);
+        ret |= (r1 & 1) << (i / 2);
         r1 = r1 >> 1;
         /* odd */
-        ret |= (uint64_t)(r1 & 1) << (i/2 + 32);
+        ret |= (uint64_t)(r1 & 1) << (i / 2 + 32);
         r1 = r1 >> 1;
     }
     return ret;
@@ -1947,23 +1948,22 @@ uint32_t helper_pack(uint32_t carry, uint32_t r1_low, uint32_t r1_high,
 {
     uint32_t ret;
     int32_t fp_exp, fp_frac, temp_exp, fp_exp_frac;
-    int32_t int_exp  = r1_high;
+    int32_t int_exp = r1_high;
     int32_t int_mant = r1_low;
-    uint32_t flag_rnd = (int_mant & (1 << 7)) && (
-                        (int_mant & (1 << 8)) ||
-                        (int_mant & 0x7f)     ||
-                        (carry != 0));
-    if (((int_mant & (1<<31)) == 0) && (int_exp == 255)) {
+    uint32_t flag_rnd =
+        (int_mant & (1 << 7)) &&
+        ((int_mant & (1 << 8)) || (int_mant & 0x7f) || (carry != 0));
+    if (((int_mant & (1 << 31)) == 0) && (int_exp == 255)) {
         fp_exp = 255;
         fp_frac = extract32(int_mant, 8, 23);
-    } else if ((int_mant & (1<<31)) && (int_exp >= 127)) {
-        fp_exp  = 255;
+    } else if ((int_mant & (1 << 31)) && (int_exp >= 127)) {
+        fp_exp = 255;
         fp_frac = 0;
-    } else if ((int_mant & (1<<31)) && (int_exp <= -128)) {
-        fp_exp  = 0;
+    } else if ((int_mant & (1 << 31)) && (int_exp <= -128)) {
+        fp_exp = 0;
         fp_frac = 0;
     } else if (int_mant == 0) {
-        fp_exp  = 0;
+        fp_exp = 0;
         fp_frac = 0;
     } else {
         if (((int_mant & (1 << 31)) == 0)) {
@@ -1971,10 +1971,9 @@ uint32_t helper_pack(uint32_t carry, uint32_t r1_low, uint32_t r1_high,
         } else {
             temp_exp = int_exp + 128;
         }
-        fp_exp_frac = (((temp_exp & 0xff) << 23) |
-                      extract32(int_mant, 8, 23))
-                      + flag_rnd;
-        fp_exp  = extract32(fp_exp_frac, 23, 8);
+        fp_exp_frac =
+            (((temp_exp & 0xff) << 23) | extract32(int_mant, 8, 23)) + flag_rnd;
+        fp_exp = extract32(fp_exp_frac, 23, 8);
         fp_frac = extract32(fp_exp_frac, 0, 23);
     }
     ret = r2 & (1 << 31);
@@ -1986,7 +1985,7 @@ uint32_t helper_pack(uint32_t carry, uint32_t r1_low, uint32_t r1_high,
 
 uint64_t helper_unpack(target_ulong arg1)
 {
-    int32_t fp_exp  = extract32(arg1, 23, 8);
+    int32_t fp_exp = extract32(arg1, 23, 8);
     int32_t fp_frac = extract32(arg1, 0, 23);
     uint64_t ret;
     int32_t int_exp, int_mant;
@@ -1995,13 +1994,13 @@ uint64_t helper_unpack(target_ulong arg1)
         int_exp = 255;
         int_mant = (fp_frac << 7);
     } else if ((fp_exp == 0) && (fp_frac == 0)) {
-        int_exp  = -127;
+        int_exp = -127;
         int_mant = 0;
     } else if ((fp_exp == 0) && (fp_frac != 0)) {
-        int_exp  = -126;
+        int_exp = -126;
         int_mant = (fp_frac << 7);
     } else {
-        int_exp  = fp_exp - 127;
+        int_exp = fp_exp - 127;
         int_mant = (fp_frac << 7);
         int_mant |= (1 << 30);
     }
@@ -2186,7 +2185,7 @@ uint64_t helper_divide(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
         env->PSW_USB_V = (1 << 31);
     } else {
         remainder = dividend % divisor;
-        quotient = (dividend - remainder)/divisor;
+        quotient = (dividend - remainder) / divisor;
         env->PSW_USB_V = 0;
     }
     env->PSW_USB_SV |= env->PSW_USB_V;
@@ -2206,7 +2205,7 @@ uint64_t helper_divide_u(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
         env->PSW_USB_V = (1 << 31);
     } else {
         remainder = dividend % divisor;
-        quotient = (dividend - remainder)/divisor;
+        quotient = (dividend - remainder) / divisor;
         env->PSW_USB_V = 0;
     }
     env->PSW_USB_SV |= env->PSW_USB_V;
@@ -2214,8 +2213,8 @@ uint64_t helper_divide_u(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
     return ((uint64_t)remainder << 32) | quotient;
 }
 
-uint64_t helper_mul_h(uint32_t arg00, uint32_t arg01,
-                      uint32_t arg10, uint32_t arg11, uint32_t n)
+uint64_t helper_mul_h(uint32_t arg00, uint32_t arg01, uint32_t arg10,
+                      uint32_t arg11, uint32_t n)
 {
     uint32_t result0, result1;
 
@@ -2236,8 +2235,8 @@ uint64_t helper_mul_h(uint32_t arg00, uint32_t arg01,
     return (((uint64_t)result1 << 32)) | result0;
 }
 
-uint64_t helper_mulm_h(uint32_t arg00, uint32_t arg01,
-                       uint32_t arg10, uint32_t arg11, uint32_t n)
+uint64_t helper_mulm_h(uint32_t arg00, uint32_t arg01, uint32_t arg10,
+                       uint32_t arg11, uint32_t n)
 {
     uint64_t ret;
     int64_t result0, result1;
@@ -2261,8 +2260,8 @@ uint64_t helper_mulm_h(uint32_t arg00, uint32_t arg01,
     ret = ret << 16;
     return ret;
 }
-uint32_t helper_mulr_h(uint32_t arg00, uint32_t arg01,
-                       uint32_t arg10, uint32_t arg11, uint32_t n)
+uint32_t helper_mulr_h(uint32_t arg00, uint32_t arg01, uint32_t arg10,
+                       uint32_t arg11, uint32_t n)
 {
     uint32_t result0, result1;
 
@@ -2332,13 +2331,10 @@ uint32_t helper_shuffle(uint32_t arg0, uint32_t arg1)
 
     if (arg1 & 0x100) {
         /* Assign the correct nibble position.  */
-        res = ((res & 0xf0f0f0f0) >> 4)
-          | ((res & 0x0f0f0f0f) << 4);
+        res = ((res & 0xf0f0f0f0) >> 4) | ((res & 0x0f0f0f0f) << 4);
         /* Assign the correct bit position.  */
-        res = ((res & 0x88888888) >> 3)
-          | ((res & 0x44444444) >> 1)
-          | ((res & 0x22222222) << 1)
-          | ((res & 0x11111111) << 3);
+        res = ((res & 0x88888888) >> 3) | ((res & 0x44444444) >> 1) |
+              ((res & 0x22222222) << 1) | ((res & 0x11111111) << 3);
     }
 
     return res;
@@ -2398,83 +2394,83 @@ static bool cdc_zero(target_ulong *psw)
 static void save_context_upper(CPUTriCoreState *env, int ea)
 {
     cpu_stl_data(env, ea, env->PCXI);
-    cpu_stl_data(env, ea+4, psw_read(env));
-    cpu_stl_data(env, ea+8, env->gpr_a[10]);
-    cpu_stl_data(env, ea+12, env->gpr_a[11]);
-    cpu_stl_data(env, ea+16, env->gpr_d[8]);
-    cpu_stl_data(env, ea+20, env->gpr_d[9]);
-    cpu_stl_data(env, ea+24, env->gpr_d[10]);
-    cpu_stl_data(env, ea+28, env->gpr_d[11]);
-    cpu_stl_data(env, ea+32, env->gpr_a[12]);
-    cpu_stl_data(env, ea+36, env->gpr_a[13]);
-    cpu_stl_data(env, ea+40, env->gpr_a[14]);
-    cpu_stl_data(env, ea+44, env->gpr_a[15]);
-    cpu_stl_data(env, ea+48, env->gpr_d[12]);
-    cpu_stl_data(env, ea+52, env->gpr_d[13]);
-    cpu_stl_data(env, ea+56, env->gpr_d[14]);
-    cpu_stl_data(env, ea+60, env->gpr_d[15]);
+    cpu_stl_data(env, ea + 4, psw_read(env));
+    cpu_stl_data(env, ea + 8, env->gpr_a[10]);
+    cpu_stl_data(env, ea + 12, env->gpr_a[11]);
+    cpu_stl_data(env, ea + 16, env->gpr_d[8]);
+    cpu_stl_data(env, ea + 20, env->gpr_d[9]);
+    cpu_stl_data(env, ea + 24, env->gpr_d[10]);
+    cpu_stl_data(env, ea + 28, env->gpr_d[11]);
+    cpu_stl_data(env, ea + 32, env->gpr_a[12]);
+    cpu_stl_data(env, ea + 36, env->gpr_a[13]);
+    cpu_stl_data(env, ea + 40, env->gpr_a[14]);
+    cpu_stl_data(env, ea + 44, env->gpr_a[15]);
+    cpu_stl_data(env, ea + 48, env->gpr_d[12]);
+    cpu_stl_data(env, ea + 52, env->gpr_d[13]);
+    cpu_stl_data(env, ea + 56, env->gpr_d[14]);
+    cpu_stl_data(env, ea + 60, env->gpr_d[15]);
 }
 
 static void save_context_lower(CPUTriCoreState *env, int ea)
 {
     cpu_stl_data(env, ea, env->PCXI);
-    cpu_stl_data(env, ea+4, env->gpr_a[11]);
-    cpu_stl_data(env, ea+8, env->gpr_a[2]);
-    cpu_stl_data(env, ea+12, env->gpr_a[3]);
-    cpu_stl_data(env, ea+16, env->gpr_d[0]);
-    cpu_stl_data(env, ea+20, env->gpr_d[1]);
-    cpu_stl_data(env, ea+24, env->gpr_d[2]);
-    cpu_stl_data(env, ea+28, env->gpr_d[3]);
-    cpu_stl_data(env, ea+32, env->gpr_a[4]);
-    cpu_stl_data(env, ea+36, env->gpr_a[5]);
-    cpu_stl_data(env, ea+40, env->gpr_a[6]);
-    cpu_stl_data(env, ea+44, env->gpr_a[7]);
-    cpu_stl_data(env, ea+48, env->gpr_d[4]);
-    cpu_stl_data(env, ea+52, env->gpr_d[5]);
-    cpu_stl_data(env, ea+56, env->gpr_d[6]);
-    cpu_stl_data(env, ea+60, env->gpr_d[7]);
+    cpu_stl_data(env, ea + 4, env->gpr_a[11]);
+    cpu_stl_data(env, ea + 8, env->gpr_a[2]);
+    cpu_stl_data(env, ea + 12, env->gpr_a[3]);
+    cpu_stl_data(env, ea + 16, env->gpr_d[0]);
+    cpu_stl_data(env, ea + 20, env->gpr_d[1]);
+    cpu_stl_data(env, ea + 24, env->gpr_d[2]);
+    cpu_stl_data(env, ea + 28, env->gpr_d[3]);
+    cpu_stl_data(env, ea + 32, env->gpr_a[4]);
+    cpu_stl_data(env, ea + 36, env->gpr_a[5]);
+    cpu_stl_data(env, ea + 40, env->gpr_a[6]);
+    cpu_stl_data(env, ea + 44, env->gpr_a[7]);
+    cpu_stl_data(env, ea + 48, env->gpr_d[4]);
+    cpu_stl_data(env, ea + 52, env->gpr_d[5]);
+    cpu_stl_data(env, ea + 56, env->gpr_d[6]);
+    cpu_stl_data(env, ea + 60, env->gpr_d[7]);
 }
 
 static void restore_context_upper(CPUTriCoreState *env, int ea,
                                   target_ulong *new_PCXI, target_ulong *new_PSW)
 {
     *new_PCXI = cpu_ldl_data(env, ea);
-    *new_PSW = cpu_ldl_data(env, ea+4);
-    env->gpr_a[10] = cpu_ldl_data(env, ea+8);
-    env->gpr_a[11] = cpu_ldl_data(env, ea+12);
-    env->gpr_d[8]  = cpu_ldl_data(env, ea+16);
-    env->gpr_d[9]  = cpu_ldl_data(env, ea+20);
-    env->gpr_d[10] = cpu_ldl_data(env, ea+24);
-    env->gpr_d[11] = cpu_ldl_data(env, ea+28);
-    env->gpr_a[12] = cpu_ldl_data(env, ea+32);
-    env->gpr_a[13] = cpu_ldl_data(env, ea+36);
-    env->gpr_a[14] = cpu_ldl_data(env, ea+40);
-    env->gpr_a[15] = cpu_ldl_data(env, ea+44);
-    env->gpr_d[12] = cpu_ldl_data(env, ea+48);
-    env->gpr_d[13] = cpu_ldl_data(env, ea+52);
-    env->gpr_d[14] = cpu_ldl_data(env, ea+56);
-    env->gpr_d[15] = cpu_ldl_data(env, ea+60);
+    *new_PSW = cpu_ldl_data(env, ea + 4);
+    env->gpr_a[10] = cpu_ldl_data(env, ea + 8);
+    env->gpr_a[11] = cpu_ldl_data(env, ea + 12);
+    env->gpr_d[8] = cpu_ldl_data(env, ea + 16);
+    env->gpr_d[9] = cpu_ldl_data(env, ea + 20);
+    env->gpr_d[10] = cpu_ldl_data(env, ea + 24);
+    env->gpr_d[11] = cpu_ldl_data(env, ea + 28);
+    env->gpr_a[12] = cpu_ldl_data(env, ea + 32);
+    env->gpr_a[13] = cpu_ldl_data(env, ea + 36);
+    env->gpr_a[14] = cpu_ldl_data(env, ea + 40);
+    env->gpr_a[15] = cpu_ldl_data(env, ea + 44);
+    env->gpr_d[12] = cpu_ldl_data(env, ea + 48);
+    env->gpr_d[13] = cpu_ldl_data(env, ea + 52);
+    env->gpr_d[14] = cpu_ldl_data(env, ea + 56);
+    env->gpr_d[15] = cpu_ldl_data(env, ea + 60);
 }
 
 static void restore_context_lower(CPUTriCoreState *env, int ea,
                                   target_ulong *ra, target_ulong *pcxi)
 {
     *pcxi = cpu_ldl_data(env, ea);
-    *ra = cpu_ldl_data(env, ea+4);
-    env->gpr_a[2] = cpu_ldl_data(env, ea+8);
-    env->gpr_a[3] = cpu_ldl_data(env, ea+12);
-    env->gpr_d[0] = cpu_ldl_data(env, ea+16);
-    env->gpr_d[1] = cpu_ldl_data(env, ea+20);
-    env->gpr_d[2] = cpu_ldl_data(env, ea+24);
-    env->gpr_d[3] = cpu_ldl_data(env, ea+28);
-    env->gpr_a[4] = cpu_ldl_data(env, ea+32);
-    env->gpr_a[5] = cpu_ldl_data(env, ea+36);
-    env->gpr_a[6] = cpu_ldl_data(env, ea+40);
-    env->gpr_a[7] = cpu_ldl_data(env, ea+44);
-    env->gpr_d[4] = cpu_ldl_data(env, ea+48);
-    env->gpr_d[5] = cpu_ldl_data(env, ea+52);
-    env->gpr_d[6] = cpu_ldl_data(env, ea+56);
-    env->gpr_d[7] = cpu_ldl_data(env, ea+60);
+    *ra = cpu_ldl_data(env, ea + 4);
+    env->gpr_a[2] = cpu_ldl_data(env, ea + 8);
+    env->gpr_a[3] = cpu_ldl_data(env, ea + 12);
+    env->gpr_d[0] = cpu_ldl_data(env, ea + 16);
+    env->gpr_d[1] = cpu_ldl_data(env, ea + 20);
+    env->gpr_d[2] = cpu_ldl_data(env, ea + 24);
+    env->gpr_d[3] = cpu_ldl_data(env, ea + 28);
+    env->gpr_a[4] = cpu_ldl_data(env, ea + 32);
+    env->gpr_a[5] = cpu_ldl_data(env, ea + 36);
+    env->gpr_a[6] = cpu_ldl_data(env, ea + 40);
+    env->gpr_a[7] = cpu_ldl_data(env, ea + 44);
+    env->gpr_d[4] = cpu_ldl_data(env, ea + 48);
+    env->gpr_d[5] = cpu_ldl_data(env, ea + 52);
+    env->gpr_d[6] = cpu_ldl_data(env, ea + 56);
+    env->gpr_d[7] = cpu_ldl_data(env, ea + 60);
 }
 
 void helper_call(CPUTriCoreState *env, uint32_t next_pc)
@@ -2509,8 +2505,7 @@ void helper_call(CPUTriCoreState *env, uint32_t next_pc)
     /* tmp_FCX = FCX; */
     tmp_FCX = env->FCX;
     /* EA = {FCX.FCXS, 6'b0, FCX.FCXO, 6'b0}; */
-    ea = ((env->FCX & MASK_FCX_FCXS) << 12) +
-         ((env->FCX & MASK_FCX_FCXO) << 6);
+    ea = ((env->FCX & MASK_FCX_FCXS) << 12) + ((env->FCX & MASK_FCX_FCXO) << 6);
     /* new_FCX = M(EA, word); */
     new_FCX = cpu_ldl_data(env, ea);
     /* M(EA, 16 * word) = {PCXI, PSW, A[10], A[11], D[8], D[9], D[10], D[11],
@@ -2547,7 +2542,7 @@ void helper_ret(CPUTriCoreState *env)
     target_ulong new_PSW, psw;
 
     psw = psw_read(env);
-     /* if (PSW.CDE) then if (cdc_decrement()) then trap(CDU);*/
+    /* if (PSW.CDE) then if (cdc_decrement()) then trap(CDU);*/
     if (psw & MASK_PSW_CDE) {
         if (cdc_decrement(&psw)) {
             /* CDU trap */
@@ -2572,8 +2567,7 @@ void helper_ret(CPUTriCoreState *env)
     env->PC = env->gpr_a[11] & 0xfffffffe;
 
     /* EA = {PCXI.PCXS, 6'b0, PCXI.PCXO, 6'b0}; */
-    ea = (pcxi_get_pcxs(env) << 28) |
-         (pcxi_get_pcxo(env) << 6);
+    ea = (pcxi_get_pcxs(env) << 28) | (pcxi_get_pcxo(env) << 6);
     /* {new_PCXI, new_PSW, A[10], A[11], D[8], D[9], D[10], D[11], A[12],
         A[13], A[14], A[15], D[12], D[13], D[14], D[15]} = M(EA, 16 * word); */
     restore_context_upper(env, ea, &new_PCXI, &new_PSW);
@@ -2601,7 +2595,7 @@ void helper_bisr(CPUTriCoreState *env, uint32_t const9)
 
     if (env->FCX == 0) {
         /* FCU trap */
-       raise_exception_sync_helper(env, TRAPC_CTX_MNG, TIN3_FCU, GETPC());
+        raise_exception_sync_helper(env, TRAPC_CTX_MNG, TIN3_FCU, GETPC());
     }
 
     tmp_FCX = env->FCX;
@@ -2665,8 +2659,7 @@ void helper_rfe(CPUTriCoreState *env)
     icr_set_ccpn(env, pcxi_get_pcpn(env));
 
     /*EA = {PCXI.PCXS, 6'b0, PCXI.PCXO, 6'b0};*/
-    ea = (pcxi_get_pcxs(env) << 28) |
-         (pcxi_get_pcxo(env) << 6);
+    ea = (pcxi_get_pcxs(env) << 28) | (pcxi_get_pcxo(env) << 6);
 
     /*{new_PCXI, PSW, A[10], A[11], D[8], D[9], D[10], D[11], A[12],
       A[13], A[14], A[15], D[12], D[13], D[14], D[15]} = M(EA, 16 * word); */
@@ -2691,9 +2684,9 @@ void helper_rfm(CPUTriCoreState *env)
 
     /* {PCXI, PSW, A[10], A[11]} = M(DCX, 4 * word); */
     env->PCXI = cpu_ldl_data(env, env->DCX);
-    psw_write(env, cpu_ldl_data(env, env->DCX+4));
-    env->gpr_a[10] = cpu_ldl_data(env, env->DCX+8);
-    env->gpr_a[11] = cpu_ldl_data(env, env->DCX+12);
+    psw_write(env, cpu_ldl_data(env, env->DCX + 4));
+    env->gpr_a[10] = cpu_ldl_data(env, env->DCX + 8);
+    env->gpr_a[11] = cpu_ldl_data(env, env->DCX + 12);
 
     if (tricore_has_feature(env, TRICORE_FEATURE_131)) {
         env->DBGTCR = 0;
@@ -2737,8 +2730,7 @@ void helper_svlcx(CPUTriCoreState *env)
     /* tmp_FCX = FCX; */
     tmp_FCX = env->FCX;
     /* EA = {FCX.FCXS, 6'b0, FCX.FCXO, 6'b0}; */
-    ea = ((env->FCX & MASK_FCX_FCXS) << 12) +
-         ((env->FCX & MASK_FCX_FCXO) << 6);
+    ea = ((env->FCX & MASK_FCX_FCXS) << 12) + ((env->FCX & MASK_FCX_FCXO) << 6);
     /* new_FCX = M(EA, word); */
     new_FCX = cpu_ldl_data(env, ea);
     /* M(EA, 16 * word) = {PCXI, PSW, A[10], A[11], D[8], D[9], D[10], D[11],
@@ -2780,8 +2772,7 @@ void helper_svucx(CPUTriCoreState *env)
     /* tmp_FCX = FCX; */
     tmp_FCX = env->FCX;
     /* EA = {FCX.FCXS, 6'b0, FCX.FCXO, 6'b0}; */
-    ea = ((env->FCX & MASK_FCX_FCXS) << 12) +
-         ((env->FCX & MASK_FCX_FCXO) << 6);
+    ea = ((env->FCX & MASK_FCX_FCXS) << 12) + ((env->FCX & MASK_FCX_FCXO) << 6);
     /* new_FCX = M(EA, word); */
     new_FCX = cpu_ldl_data(env, ea);
     /* M(EA, 16 * word) = {PCXI, PSW, A[10], A[11], D[8], D[9], D[10], D[11],
@@ -2826,8 +2817,7 @@ void helper_rslcx(CPUTriCoreState *env)
     }
     /* EA = {PCXI.PCXS, 6'b0, PCXI.PCXO, 6'b0}; */
     /* EA = {PCXI.PCXS, 6'b0, PCXI.PCXO, 6'b0}; */
-    ea = (pcxi_get_pcxs(env) << 28) |
-         (pcxi_get_pcxo(env) << 6);
+    ea = (pcxi_get_pcxs(env) << 28) | (pcxi_get_pcxo(env) << 6);
 
     /* {new_PCXI, A[11], A[10], A[11], D[8], D[9], D[10], D[11], A[12],
         A[13], A[14], A[15], D[12], D[13], D[14], D[15]} = M(EA, 16 * word); */

@@ -541,8 +541,10 @@ IR2_INST *la_fcmp_cond_s(IR2_OPND cd, IR2_OPND fj, IR2_OPND fk, int imm_condf);
 IR2_INST *la_fcmp_cond_d(IR2_OPND cd, IR2_OPND fj, IR2_OPND fk, int imm_condf);
 IR2_INST *la_vfcmp_cond_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, int imm_condf);
 IR2_INST *la_vfcmp_cond_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, int imm_condf);
-IR2_INST *la_xvfcmp_cond_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, int imm_condf);
-IR2_INST *la_xvfcmp_cond_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, int imm_condf);
+IR2_INST *la_xvfcmp_cond_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk,
+                           int imm_condf);
+IR2_INST *la_xvfcmp_cond_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk,
+                           int imm_condf);
 IR2_INST *la_fsel(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND ca);
 IR2_INST *la_vbitsel_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va);
 IR2_INST *la_xvbitsel_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa);

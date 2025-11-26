@@ -128,8 +128,7 @@ void arm_handle_psci_call(ARMCPU *cpu)
         goto cpu_off;
     case QEMU_PSCI_0_1_FN_CPU_ON:
     case QEMU_PSCI_0_2_FN_CPU_ON:
-    case QEMU_PSCI_0_2_FN64_CPU_ON:
-    {
+    case QEMU_PSCI_0_2_FN64_CPU_ON: {
         /* The PSCI spec mandates that newly brought up CPUs start
          * in the highest exception level which exists and is enabled
          * on the calling CPU. Since the QEMU PSCI implementation is
@@ -147,8 +146,8 @@ void arm_handle_psci_call(ARMCPU *cpu)
         mpidr = param[1];
         entry = param[2];
         context_id = param[3];
-        ret = arm_set_cpu_on(mpidr, entry, context_id,
-                             target_el, target_aarch64);
+        ret =
+            arm_set_cpu_on(mpidr, entry, context_id, target_el, target_aarch64);
         break;
     }
     case QEMU_PSCI_0_1_FN_CPU_OFF:

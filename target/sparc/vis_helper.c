@@ -22,24 +22,24 @@
 #include "exec/helper-proto.h"
 
 /* This function uses non-native bit order */
-#define GET_FIELD(X, FROM, TO)                                  \
+#define GET_FIELD(X, FROM, TO) \
     ((X) >> (63 - (TO)) & ((1ULL << ((TO) - (FROM) + 1)) - 1))
 
 /* This function uses the order in the manuals, i.e. bit 0 is 2^0 */
-#define GET_FIELD_SP(X, FROM, TO)               \
-    GET_FIELD(X, 63 - (TO), 63 - (FROM))
+#define GET_FIELD_SP(X, FROM, TO) GET_FIELD(X, 63 - (TO), 63 - (FROM))
 
 target_ulong helper_array8(target_ulong pixel_addr, target_ulong cubesize)
 {
     return (GET_FIELD_SP(pixel_addr, 60, 63) << (17 + 2 * cubesize)) |
-        (GET_FIELD_SP(pixel_addr, 39, 39 + cubesize - 1) << (17 + cubesize)) |
-        (GET_FIELD_SP(pixel_addr, 17 + cubesize - 1, 17) << 17) |
-        (GET_FIELD_SP(pixel_addr, 56, 59) << 13) |
-        (GET_FIELD_SP(pixel_addr, 35, 38) << 9) |
-        (GET_FIELD_SP(pixel_addr, 13, 16) << 5) |
-        (((pixel_addr >> 55) & 1) << 4) |
-        (GET_FIELD_SP(pixel_addr, 33, 34) << 2) |
-        GET_FIELD_SP(pixel_addr, 11, 12);
+           (GET_FIELD_SP(pixel_addr, 39, 39 + cubesize - 1)
+            << (17 + cubesize)) |
+           (GET_FIELD_SP(pixel_addr, 17 + cubesize - 1, 17) << 17) |
+           (GET_FIELD_SP(pixel_addr, 56, 59) << 13) |
+           (GET_FIELD_SP(pixel_addr, 35, 38) << 9) |
+           (GET_FIELD_SP(pixel_addr, 13, 16) << 5) |
+           (((pixel_addr >> 55) & 1) << 4) |
+           (GET_FIELD_SP(pixel_addr, 33, 34) << 2) |
+           GET_FIELD_SP(pixel_addr, 11, 12);
 }
 
 #if HOST_BIG_ENDIAN
@@ -102,11 +102,11 @@ uint64_t helper_fmul8x16(uint64_t src1, uint64_t src2)
     s.ll = src1;
     d.ll = src2;
 
-#define PMUL(r)                                                 \
-    tmp = (int32_t)d.VIS_SW64(r) * (int32_t)s.VIS_B64(r);       \
-    if ((tmp & 0xff) > 0x7f) {                                  \
-        tmp += 0x100;                                           \
-    }                                                           \
+#define PMUL(r)                                           \
+    tmp = (int32_t)d.VIS_SW64(r) * (int32_t)s.VIS_B64(r); \
+    if ((tmp & 0xff) > 0x7f) {                            \
+        tmp += 0x100;                                     \
+    }                                                     \
     d.VIS_W64(r) = tmp >> 8;
 
     PMUL(0);
@@ -126,11 +126,11 @@ uint64_t helper_fmul8x16al(uint64_t src1, uint64_t src2)
     s.ll = src1;
     d.ll = src2;
 
-#define PMUL(r)                                                 \
-    tmp = (int32_t)d.VIS_SW64(1) * (int32_t)s.VIS_B64(r);       \
-    if ((tmp & 0xff) > 0x7f) {                                  \
-        tmp += 0x100;                                           \
-    }                                                           \
+#define PMUL(r)                                           \
+    tmp = (int32_t)d.VIS_SW64(1) * (int32_t)s.VIS_B64(r); \
+    if ((tmp & 0xff) > 0x7f) {                            \
+        tmp += 0x100;                                     \
+    }                                                     \
     d.VIS_W64(r) = tmp >> 8;
 
     PMUL(0);
@@ -150,11 +150,11 @@ uint64_t helper_fmul8x16au(uint64_t src1, uint64_t src2)
     s.ll = src1;
     d.ll = src2;
 
-#define PMUL(r)                                                 \
-    tmp = (int32_t)d.VIS_SW64(0) * (int32_t)s.VIS_B64(r);       \
-    if ((tmp & 0xff) > 0x7f) {                                  \
-        tmp += 0x100;                                           \
-    }                                                           \
+#define PMUL(r)                                           \
+    tmp = (int32_t)d.VIS_SW64(0) * (int32_t)s.VIS_B64(r); \
+    if ((tmp & 0xff) > 0x7f) {                            \
+        tmp += 0x100;                                     \
+    }                                                     \
     d.VIS_W64(r) = tmp >> 8;
 
     PMUL(0);
@@ -174,11 +174,11 @@ uint64_t helper_fmul8sux16(uint64_t src1, uint64_t src2)
     s.ll = src1;
     d.ll = src2;
 
-#define PMUL(r)                                                         \
-    tmp = (int32_t)d.VIS_SW64(r) * ((int32_t)s.VIS_SW64(r) >> 8);       \
-    if ((tmp & 0xff) > 0x7f) {                                          \
-        tmp += 0x100;                                                   \
-    }                                                                   \
+#define PMUL(r)                                                   \
+    tmp = (int32_t)d.VIS_SW64(r) * ((int32_t)s.VIS_SW64(r) >> 8); \
+    if ((tmp & 0xff) > 0x7f) {                                    \
+        tmp += 0x100;                                             \
+    }                                                             \
     d.VIS_W64(r) = tmp >> 8;
 
     PMUL(0);
@@ -198,11 +198,11 @@ uint64_t helper_fmul8ulx16(uint64_t src1, uint64_t src2)
     s.ll = src1;
     d.ll = src2;
 
-#define PMUL(r)                                                         \
-    tmp = (int32_t)d.VIS_SW64(r) * ((uint32_t)s.VIS_B64(r * 2));        \
-    if ((tmp & 0xff) > 0x7f) {                                          \
-        tmp += 0x100;                                                   \
-    }                                                                   \
+#define PMUL(r)                                                  \
+    tmp = (int32_t)d.VIS_SW64(r) * ((uint32_t)s.VIS_B64(r * 2)); \
+    if ((tmp & 0xff) > 0x7f) {                                   \
+        tmp += 0x100;                                            \
+    }                                                            \
     d.VIS_W64(r) = tmp >> 8;
 
     PMUL(0);
@@ -222,11 +222,11 @@ uint64_t helper_fmuld8sux16(uint64_t src1, uint64_t src2)
     s.ll = src1;
     d.ll = src2;
 
-#define PMUL(r)                                                         \
-    tmp = (int32_t)d.VIS_SW64(r) * ((int32_t)s.VIS_SW64(r) >> 8);       \
-    if ((tmp & 0xff) > 0x7f) {                                          \
-        tmp += 0x100;                                                   \
-    }                                                                   \
+#define PMUL(r)                                                   \
+    tmp = (int32_t)d.VIS_SW64(r) * ((int32_t)s.VIS_SW64(r) >> 8); \
+    if ((tmp & 0xff) > 0x7f) {                                    \
+        tmp += 0x100;                                             \
+    }                                                             \
     d.VIS_L64(r) = tmp;
 
     /* Reverse calculation order to handle overlap */
@@ -245,11 +245,11 @@ uint64_t helper_fmuld8ulx16(uint64_t src1, uint64_t src2)
     s.ll = src1;
     d.ll = src2;
 
-#define PMUL(r)                                                         \
-    tmp = (int32_t)d.VIS_SW64(r) * ((uint32_t)s.VIS_B64(r * 2));        \
-    if ((tmp & 0xff) > 0x7f) {                                          \
-        tmp += 0x100;                                                   \
-    }                                                                   \
+#define PMUL(r)                                                  \
+    tmp = (int32_t)d.VIS_SW64(r) * ((uint32_t)s.VIS_B64(r * 2)); \
+    if ((tmp & 0xff) > 0x7f) {                                   \
+        tmp += 0x100;                                            \
+    }                                                            \
     d.VIS_L64(r) = tmp;
 
     /* Reverse calculation order to handle overlap */
@@ -275,58 +275,58 @@ uint64_t helper_fexpand(uint64_t src1, uint64_t src2)
     return d.ll;
 }
 
-#define VIS_HELPER(name, F)                             \
-    uint64_t name##16(uint64_t src1, uint64_t src2)     \
-    {                                                   \
-        VIS64 s, d;                                     \
-                                                        \
-        s.ll = src1;                                    \
-        d.ll = src2;                                    \
-                                                        \
-        d.VIS_W64(0) = F(d.VIS_W64(0), s.VIS_W64(0));   \
-        d.VIS_W64(1) = F(d.VIS_W64(1), s.VIS_W64(1));   \
-        d.VIS_W64(2) = F(d.VIS_W64(2), s.VIS_W64(2));   \
-        d.VIS_W64(3) = F(d.VIS_W64(3), s.VIS_W64(3));   \
-                                                        \
-        return d.ll;                                    \
-    }                                                   \
-                                                        \
-    uint32_t name##16s(uint32_t src1, uint32_t src2)    \
-    {                                                   \
-        VIS32 s, d;                                     \
-                                                        \
-        s.l = src1;                                     \
-        d.l = src2;                                     \
-                                                        \
-        d.VIS_W32(0) = F(d.VIS_W32(0), s.VIS_W32(0));   \
-        d.VIS_W32(1) = F(d.VIS_W32(1), s.VIS_W32(1));   \
-                                                        \
-        return d.l;                                     \
-    }                                                   \
-                                                        \
-    uint64_t name##32(uint64_t src1, uint64_t src2)     \
-    {                                                   \
-        VIS64 s, d;                                     \
-                                                        \
-        s.ll = src1;                                    \
-        d.ll = src2;                                    \
-                                                        \
-        d.VIS_L64(0) = F(d.VIS_L64(0), s.VIS_L64(0));   \
-        d.VIS_L64(1) = F(d.VIS_L64(1), s.VIS_L64(1));   \
-                                                        \
-        return d.ll;                                    \
-    }                                                   \
-                                                        \
-    uint32_t name##32s(uint32_t src1, uint32_t src2)    \
-    {                                                   \
-        VIS32 s, d;                                     \
-                                                        \
-        s.l = src1;                                     \
-        d.l = src2;                                     \
-                                                        \
-        d.l = F(d.l, s.l);                              \
-                                                        \
-        return d.l;                                     \
+#define VIS_HELPER(name, F)                           \
+    uint64_t name##16(uint64_t src1, uint64_t src2)   \
+    {                                                 \
+        VIS64 s, d;                                   \
+                                                      \
+        s.ll = src1;                                  \
+        d.ll = src2;                                  \
+                                                      \
+        d.VIS_W64(0) = F(d.VIS_W64(0), s.VIS_W64(0)); \
+        d.VIS_W64(1) = F(d.VIS_W64(1), s.VIS_W64(1)); \
+        d.VIS_W64(2) = F(d.VIS_W64(2), s.VIS_W64(2)); \
+        d.VIS_W64(3) = F(d.VIS_W64(3), s.VIS_W64(3)); \
+                                                      \
+        return d.ll;                                  \
+    }                                                 \
+                                                      \
+    uint32_t name##16s(uint32_t src1, uint32_t src2)  \
+    {                                                 \
+        VIS32 s, d;                                   \
+                                                      \
+        s.l = src1;                                   \
+        d.l = src2;                                   \
+                                                      \
+        d.VIS_W32(0) = F(d.VIS_W32(0), s.VIS_W32(0)); \
+        d.VIS_W32(1) = F(d.VIS_W32(1), s.VIS_W32(1)); \
+                                                      \
+        return d.l;                                   \
+    }                                                 \
+                                                      \
+    uint64_t name##32(uint64_t src1, uint64_t src2)   \
+    {                                                 \
+        VIS64 s, d;                                   \
+                                                      \
+        s.ll = src1;                                  \
+        d.ll = src2;                                  \
+                                                      \
+        d.VIS_L64(0) = F(d.VIS_L64(0), s.VIS_L64(0)); \
+        d.VIS_L64(1) = F(d.VIS_L64(1), s.VIS_L64(1)); \
+                                                      \
+        return d.ll;                                  \
+    }                                                 \
+                                                      \
+    uint32_t name##32s(uint32_t src1, uint32_t src2)  \
+    {                                                 \
+        VIS32 s, d;                                   \
+                                                      \
+        s.l = src1;                                   \
+        d.l = src2;                                   \
+                                                      \
+        d.l = F(d.l, s.l);                            \
+                                                      \
+        return d.l;                                   \
     }
 
 #define FADD(a, b) ((a) + (b))
@@ -334,35 +334,35 @@ uint64_t helper_fexpand(uint64_t src1, uint64_t src2)
 VIS_HELPER(helper_fpadd, FADD)
 VIS_HELPER(helper_fpsub, FSUB)
 
-#define VIS_CMPHELPER(name, F)                                    \
-    uint64_t name##16(uint64_t src1, uint64_t src2)               \
-    {                                                             \
-        VIS64 s, d;                                               \
-                                                                  \
-        s.ll = src1;                                              \
-        d.ll = src2;                                              \
-                                                                  \
-        d.VIS_W64(0) = F(s.VIS_W64(0), d.VIS_W64(0)) ? 1 : 0;     \
-        d.VIS_W64(0) |= F(s.VIS_W64(1), d.VIS_W64(1)) ? 2 : 0;    \
-        d.VIS_W64(0) |= F(s.VIS_W64(2), d.VIS_W64(2)) ? 4 : 0;    \
-        d.VIS_W64(0) |= F(s.VIS_W64(3), d.VIS_W64(3)) ? 8 : 0;    \
-        d.VIS_W64(1) = d.VIS_W64(2) = d.VIS_W64(3) = 0;           \
-                                                                  \
-        return d.ll;                                              \
-    }                                                             \
-                                                                  \
-    uint64_t name##32(uint64_t src1, uint64_t src2)               \
-    {                                                             \
-        VIS64 s, d;                                               \
-                                                                  \
-        s.ll = src1;                                              \
-        d.ll = src2;                                              \
-                                                                  \
-        d.VIS_L64(0) = F(s.VIS_L64(0), d.VIS_L64(0)) ? 1 : 0;     \
-        d.VIS_L64(0) |= F(s.VIS_L64(1), d.VIS_L64(1)) ? 2 : 0;    \
-        d.VIS_L64(1) = 0;                                         \
-                                                                  \
-        return d.ll;                                              \
+#define VIS_CMPHELPER(name, F)                                 \
+    uint64_t name##16(uint64_t src1, uint64_t src2)            \
+    {                                                          \
+        VIS64 s, d;                                            \
+                                                               \
+        s.ll = src1;                                           \
+        d.ll = src2;                                           \
+                                                               \
+        d.VIS_W64(0) = F(s.VIS_W64(0), d.VIS_W64(0)) ? 1 : 0;  \
+        d.VIS_W64(0) |= F(s.VIS_W64(1), d.VIS_W64(1)) ? 2 : 0; \
+        d.VIS_W64(0) |= F(s.VIS_W64(2), d.VIS_W64(2)) ? 4 : 0; \
+        d.VIS_W64(0) |= F(s.VIS_W64(3), d.VIS_W64(3)) ? 8 : 0; \
+        d.VIS_W64(1) = d.VIS_W64(2) = d.VIS_W64(3) = 0;        \
+                                                               \
+        return d.ll;                                           \
+    }                                                          \
+                                                               \
+    uint64_t name##32(uint64_t src1, uint64_t src2)            \
+    {                                                          \
+        VIS64 s, d;                                            \
+                                                               \
+        s.ll = src1;                                           \
+        d.ll = src2;                                           \
+                                                               \
+        d.VIS_L64(0) = F(s.VIS_L64(0), d.VIS_L64(0)) ? 1 : 0;  \
+        d.VIS_L64(0) |= F(s.VIS_L64(1), d.VIS_L64(1)) ? 2 : 0; \
+        d.VIS_L64(1) = 0;                                      \
+                                                               \
+        return d.ll;                                           \
     }
 
 #define FCMPGT(a, b) ((a) > (b))
@@ -408,8 +408,7 @@ uint32_t helper_fpack16(uint64_t gsr, uint64_t rs2)
         int32_t scaled = src << scale;
         int32_t from_fixed = scaled >> 7;
 
-        val = (from_fixed < 0 ?  0 :
-               from_fixed > 255 ?  255 : from_fixed);
+        val = (from_fixed < 0 ? 0 : from_fixed > 255 ? 255 : from_fixed);
 
         ret |= val << (8 * byte);
     }
@@ -430,8 +429,7 @@ uint64_t helper_fpack32(uint64_t gsr, uint64_t rs1, uint64_t rs2)
         int64_t scaled = (int64_t)src << scale;
         int64_t from_fixed = scaled >> 23;
 
-        val = (from_fixed < 0 ? 0 :
-               (from_fixed > 255) ? 255 : from_fixed);
+        val = (from_fixed < 0 ? 0 : (from_fixed > 255) ? 255 : from_fixed);
 
         ret |= val << (32 * word);
     }
@@ -452,7 +450,8 @@ uint32_t helper_fpackfix(uint64_t gsr, uint64_t rs2)
         int64_t from_fixed = scaled >> 16;
 
         val = (from_fixed < -32768 ? -32768 :
-               from_fixed > 32767 ?  32767 : from_fixed);
+               from_fixed > 32767  ? 32767 :
+                                     from_fixed);
 
         ret |= (val & 0xffff) << (word * 16);
     }
@@ -482,7 +481,7 @@ uint64_t helper_bshuffle(uint64_t gsr, uint64_t src1, uint64_t src2)
     mask = gsr >> 32;
 
     for (i = 0; i < 8; ++i) {
-        unsigned e = (mask >> (28 - i*4)) & 0xf;
+        unsigned e = (mask >> (28 - i * 4)) & 0xf;
         r.VIS_B64(i) = s.b[e ^ host];
     }
 

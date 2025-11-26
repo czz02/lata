@@ -65,13 +65,8 @@ static tdata_avail tdata_mapping[TRIGGER_TYPE_NUM] = {
 
 /* only breakpoint size 1/2/4/8 supported */
 static int access_size[SIZE_NUM] = {
-    [SIZE_ANY] = 0,
-    [SIZE_1B]  = 1,
-    [SIZE_2B]  = 2,
-    [SIZE_4B]  = 4,
-    [SIZE_6B]  = -1,
-    [SIZE_8B]  = 8,
-    [6 ... 15] = -1,
+    [SIZE_ANY] = 0, [SIZE_1B] = 1, [SIZE_2B] = 2,   [SIZE_4B] = 4,
+    [SIZE_6B] = -1, [SIZE_8B] = 8, [6 ... 15] = -1,
 };
 
 static inline target_ulong extract_trigger_type(CPURISCVState *env,
@@ -127,22 +122,19 @@ static trigger_action_t get_trigger_action(CPURISCVState *env,
     return action;
 }
 
-static inline target_ulong build_tdata1(CPURISCVState *env,
-                                        trigger_type_t type,
+static inline target_ulong build_tdata1(CPURISCVState *env, trigger_type_t type,
                                         bool dmode, target_ulong data)
 {
     target_ulong tdata1;
 
     switch (riscv_cpu_mxl(env)) {
     case MXL_RV32:
-        tdata1 = RV32_TYPE(type) |
-                 (dmode ? RV32_DMODE : 0) |
+        tdata1 = RV32_TYPE(type) | (dmode ? RV32_DMODE : 0) |
                  (data & RV32_DATA_MASK);
         break;
     case MXL_RV64:
     case MXL_RV128:
-        tdata1 = RV64_TYPE(type) |
-                 (dmode ? RV64_DMODE : 0) |
+        tdata1 = RV64_TYPE(type) | (dmode ? RV64_DMODE : 0) |
                  (data & RV64_DATA_MASK);
         break;
     default:
@@ -282,8 +274,10 @@ static target_ulong type2_mcontrol_validate(CPURISCVState *env,
     /* validate size encoding */
     size = type2_breakpoint_size(env, ctrl);
     if (access_size[size] == -1) {
-        qemu_log_mask(LOG_UNIMP, "access size %d is not supported, using "
-                                 "SIZE_ANY\n", size);
+        qemu_log_mask(LOG_UNIMP,
+                      "access size %d is not supported, using "
+                      "SIZE_ANY\n",
+                      size);
     } else {
         val |= (ctrl & TYPE2_SIZELO);
         if (riscv_cpu_mxl(env) == MXL_RV64) {
@@ -292,8 +286,8 @@ static target_ulong type2_mcontrol_validate(CPURISCVState *env,
     }
 
     /* keep the mode and attribute bits */
-    val |= (ctrl & (TYPE2_U | TYPE2_S | TYPE2_M |
-                    TYPE2_LOAD | TYPE2_STORE | TYPE2_EXEC));
+    val |= (ctrl & (TYPE2_U | TYPE2_S | TYPE2_M | TYPE2_LOAD | TYPE2_STORE |
+                    TYPE2_EXEC));
 
     return val;
 }
@@ -411,8 +405,10 @@ static target_ulong type6_mcontrol6_validate(CPURISCVState *env,
     /* validate size encoding */
     size = extract32(ctrl, 16, 4);
     if (access_size[size] == -1) {
-        qemu_log_mask(LOG_UNIMP, "access size %d is not supported, using "
-                                 "SIZE_ANY\n", size);
+        qemu_log_mask(LOG_UNIMP,
+                      "access size %d is not supported, using "
+                      "SIZE_ANY\n",
+                      size);
     } else {
         val |= (ctrl & TYPE6_SIZE);
     }
@@ -499,17 +495,14 @@ static void type6_reg_write(CPURISCVState *env, target_ulong index,
 }
 
 /* icount trigger type */
-static inline int
-itrigger_get_count(CPURISCVState *env, int index)
+static inline int itrigger_get_count(CPURISCVState *env, int index)
 {
     return get_field(env->tdata1[index], ITRIGGER_COUNT);
 }
 
-static inline void
-itrigger_set_count(CPURISCVState *env, int index, int value)
+static inline void itrigger_set_count(CPURISCVState *env, int index, int value)
 {
-    env->tdata1[index] = set_field(env->tdata1[index],
-                                   ITRIGGER_COUNT, value);
+    env->tdata1[index] = set_field(env->tdata1[index], ITRIGGER_COUNT, value);
 }
 
 static bool check_itrigger_priv(CPURISCVState *env, int index)
@@ -609,8 +602,7 @@ static void riscv_itrigger_update_count(CPURISCVState *env)
              * the number of executed instructions will be discard and
              * the count field in itrigger will not change.
              */
-            timer_mod(env->itrigger_timer[i],
-                      current_icount + count);
+            timer_mod(env->itrigger_timer[i], current_icount + count);
         }
     }
 }
@@ -625,8 +617,7 @@ void riscv_itrigger_update_priv(CPURISCVState *env)
     riscv_itrigger_update_count(env);
 }
 
-static target_ulong itrigger_validate(CPURISCVState *env,
-                                      target_ulong ctrl)
+static target_ulong itrigger_validate(CPURISCVState *env, target_ulong ctrl)
 {
     target_ulong val;
 
@@ -696,8 +687,7 @@ target_ulong tdata_csr_read(CPURISCVState *env, int tdata_index)
     int trigger_type;
     switch (tdata_index) {
     case TDATA1:
-        trigger_type = extract_trigger_type(env,
-                                            env->tdata1[env->trigger_cur]);
+        trigger_type = extract_trigger_type(env, env->tdata1[env->trigger_cur]);
         if ((trigger_type == TRIGGER_TYPE_INST_CNT) && icount_enabled()) {
             return deposit64(env->tdata1[env->trigger_cur], 10, 14,
                              itrigger_get_adjust_count(env));
@@ -751,8 +741,7 @@ void tdata_csr_write(CPURISCVState *env, int tdata_index, target_ulong val)
 target_ulong tinfo_csr_read(CPURISCVState *env)
 {
     /* assume all triggers support the same types of triggers */
-    return BIT(TRIGGER_TYPE_AD_MATCH) |
-           BIT(TRIGGER_TYPE_AD_MATCH6);
+    return BIT(TRIGGER_TYPE_AD_MATCH) | BIT(TRIGGER_TYPE_AD_MATCH6);
 }
 
 void riscv_cpu_debug_excp_handler(CPUState *cs)
@@ -781,7 +770,7 @@ bool riscv_cpu_debug_check_breakpoint(CPUState *cs)
     int trigger_type;
     int i;
 
-    QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
+    QTAILQ_FOREACH (bp, &cs->breakpoints, entry) {
         for (i = 0; i < RV_MAX_TRIGGERS; i++) {
             trigger_type = get_trigger_type(env, i);
 
@@ -928,7 +917,7 @@ void riscv_trigger_init(CPURISCVState *env)
         env->tdata3[i] = 0;
         env->cpu_breakpoint[i] = NULL;
         env->cpu_watchpoint[i] = NULL;
-        env->itrigger_timer[i] = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                              riscv_itrigger_timer_cb, env);
+        env->itrigger_timer[i] =
+            timer_new_ns(QEMU_CLOCK_VIRTUAL, riscv_itrigger_timer_cb, env);
     }
 }

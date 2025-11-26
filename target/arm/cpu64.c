@@ -86,7 +86,8 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
 
         if (cpu->sve_max_vq && max_vq > cpu->sve_max_vq) {
             error_setg(errp, "cannot enable sve%d", max_vq * 128);
-            error_append_hint(errp, "sve%d is larger than the maximum vector "
+            error_append_hint(errp,
+                              "sve%d is larger than the maximum vector "
                               "length, sve-max-vq=%d (%d bits)\n",
                               max_vq * 128, cpu->sve_max_vq,
                               cpu->sve_max_vq * 128);
@@ -95,8 +96,9 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
 
         if (kvm_enabled()) {
             /*
-             * For KVM we have to automatically enable all supported uninitialized
-             * lengths, even when the smaller lengths are not all powers-of-two.
+             * For KVM we have to automatically enable all supported
+             * uninitialized lengths, even when the smaller lengths are not all
+             * powers-of-two.
              */
             vq_map |= vq_supported & ~vq_init & vq_mask;
         } else {
@@ -127,11 +129,12 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
 
         if (vq_map == 0) {
             error_setg(errp, "cannot disable sve%d", vq * 128);
-            error_append_hint(errp, "Disabling sve%d results in all "
+            error_append_hint(errp,
+                              "Disabling sve%d results in all "
                               "vector lengths being disabled.\n",
                               vq * 128);
             error_append_hint(errp, "With SVE enabled, at least one "
-                              "vector length must be enabled.\n");
+                                    "vector length must be enabled.\n");
             return;
         }
 
@@ -150,7 +153,8 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
 
         if (vq_init & ~vq_map & (1 << (max_vq - 1))) {
             error_setg(errp, "cannot disable sve%d", max_vq * 128);
-            error_append_hint(errp, "The maximum vector length must be "
+            error_append_hint(errp,
+                              "The maximum vector length must be "
                               "enabled, sve-max-vq=%d (%d bits)\n",
                               max_vq, max_vq * 128);
             return;
@@ -176,26 +180,31 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
         if (vq_map & (1 << (vq - 1))) {
             if (cpu->sve_max_vq) {
                 error_setg(errp, "cannot set sve-max-vq=%d", cpu->sve_max_vq);
-                error_append_hint(errp, "This CPU does not support "
-                                  "the vector length %d-bits.\n", vq * 128);
+                error_append_hint(errp,
+                                  "This CPU does not support "
+                                  "the vector length %d-bits.\n",
+                                  vq * 128);
                 error_append_hint(errp, "It may not be possible to use "
-                                  "sve-max-vq with this CPU. Try "
-                                  "using only sve<N> properties.\n");
+                                        "sve-max-vq with this CPU. Try "
+                                        "using only sve<N> properties.\n");
             } else {
                 error_setg(errp, "cannot enable sve%d", vq * 128);
                 if (vq_supported) {
-                    error_append_hint(errp, "This CPU does not support "
-                                      "the vector length %d-bits.\n", vq * 128);
+                    error_append_hint(errp,
+                                      "This CPU does not support "
+                                      "the vector length %d-bits.\n",
+                                      vq * 128);
                 } else {
                     error_append_hint(errp, "SVE not supported by KVM "
-                                      "on this host\n");
+                                            "on this host\n");
                 }
             }
             return;
         } else {
             if (kvm_enabled()) {
                 error_setg(errp, "cannot disable sve%d", vq * 128);
-                error_append_hint(errp, "The KVM host requires all "
+                error_append_hint(errp,
+                                  "The KVM host requires all "
                                   "supported vector lengths smaller "
                                   "than %d bits to also be enabled.\n",
                                   max_vq * 128);
@@ -206,7 +215,8 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
                 if (tmp) {
                     vq = 32 - clz32(tmp);
                     error_setg(errp, "cannot disable sve%d", vq * 128);
-                    error_append_hint(errp, "sve%d is required as it "
+                    error_append_hint(errp,
+                                      "sve%d is required as it "
                                       "is a power-of-two length smaller "
                                       "than the maximum, sve%d\n",
                                       vq * 128, max_vq * 128);
@@ -223,7 +233,7 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
     if (!cpu_isar_feature(aa64_sve, cpu)) {
         error_setg(errp, "cannot enable sve%d", max_vq * 128);
         error_append_hint(errp, "SVE must be enabled to enable vector "
-                          "lengths.\n");
+                                "lengths.\n");
         error_append_hint(errp, "Add sve=on to the CPU property list.\n");
         return;
     }
@@ -248,9 +258,8 @@ static void cpu_arm_get_vq(Object *obj, Visitor *v, const char *name,
     bool value;
 
     /* All vector lengths are disabled when feature is off. */
-    if (sve
-        ? !cpu_isar_feature(aa64_sve, cpu)
-        : !cpu_isar_feature(aa64_sme, cpu)) {
+    if (sve ? !cpu_isar_feature(aa64_sve, cpu) :
+              !cpu_isar_feature(aa64_sme, cpu)) {
         value = false;
     } else {
         value = extract32(vq_map->map, vq - 1, 1);
@@ -315,7 +324,7 @@ void arm_cpu_sme_finalize(ARMCPU *cpu, Error **errp)
             error_setg(errp, "cannot disable sme%d", vq * 128);
             error_append_hint(errp, "All SME vector lengths are disabled.\n");
             error_append_hint(errp, "With SME enabled, at least one "
-                              "vector length must be enabled.\n");
+                                    "vector length must be enabled.\n");
             return;
         }
     } else {
@@ -323,7 +332,7 @@ void arm_cpu_sme_finalize(ARMCPU *cpu, Error **errp)
             vq = 32 - clz32(vq_map);
             error_setg(errp, "cannot enable sme%d", vq * 128);
             error_append_hint(errp, "SME must be enabled to enable "
-                              "vector lengths.\n");
+                                    "vector lengths.\n");
             error_append_hint(errp, "Add sme=on to the CPU property list.\n");
             return;
         }
@@ -403,8 +412,7 @@ static void cpu_arm_set_default_vec_len(Object *obj, Visitor *v,
         } else if (default_vq < 1) {
             error_append_hint(errp, "Vector length smaller than 16\n");
         } else {
-            error_append_hint(errp, "Vector length larger than %d\n",
-                              512 * 16);
+            error_append_hint(errp, "Vector length larger than %d\n", 512 * 16);
         }
         return;
     }
@@ -433,16 +441,15 @@ void aarch64_add_sve_properties(Object *obj)
     for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
         char name[8];
         sprintf(name, "sve%d", vq * 128);
-        object_property_add(obj, name, "bool", cpu_arm_get_vq,
-                            cpu_arm_set_vq, NULL, &cpu->sve_vq);
+        object_property_add(obj, name, "bool", cpu_arm_get_vq, cpu_arm_set_vq,
+                            NULL, &cpu->sve_vq);
     }
 
 #ifdef CONFIG_USER_ONLY
     /* Mirror linux /proc/sys/abi/sve_default_vector_length. */
-    object_property_add(obj, "sve-default-vector-length", "int32",
-                        cpu_arm_get_default_vec_len,
-                        cpu_arm_set_default_vec_len, NULL,
-                        &cpu->sve_default_vq);
+    object_property_add(
+        obj, "sve-default-vector-length", "int32", cpu_arm_get_default_vec_len,
+        cpu_arm_set_default_vec_len, NULL, &cpu->sve_default_vq);
 #endif
 }
 
@@ -458,16 +465,15 @@ void aarch64_add_sme_properties(Object *obj)
     for (vq = 1; vq <= ARM_MAX_VQ; vq <<= 1) {
         char name[8];
         sprintf(name, "sme%d", vq * 128);
-        object_property_add(obj, name, "bool", cpu_arm_get_vq,
-                            cpu_arm_set_vq, NULL, &cpu->sme_vq);
+        object_property_add(obj, name, "bool", cpu_arm_get_vq, cpu_arm_set_vq,
+                            NULL, &cpu->sme_vq);
     }
 
 #ifdef CONFIG_USER_ONLY
     /* Mirror linux /proc/sys/abi/sme_default_vector_length. */
-    object_property_add(obj, "sme-default-vector-length", "int32",
-                        cpu_arm_get_default_vec_len,
-                        cpu_arm_set_default_vec_len, NULL,
-                        &cpu->sme_default_vq);
+    object_property_add(
+        obj, "sme-default-vector-length", "int32", cpu_arm_get_default_vec_len,
+        cpu_arm_set_default_vec_len, NULL, &cpu->sme_default_vq);
 #endif
 }
 
@@ -545,10 +551,10 @@ void arm_cpu_lpa2_finalize(ARMCPU *cpu, Error **errp)
     }
 
     t = cpu->isar.id_aa64mmfr0;
-    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN16, 2);   /* 16k pages w/ LPA2 */
-    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN4, 1);    /*  4k pages w/ LPA2 */
+    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN16, 2); /* 16k pages w/ LPA2 */
+    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN4, 1); /*  4k pages w/ LPA2 */
     t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN16_2, 3); /* 16k stage2 w/ LPA2 */
-    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN4_2, 3);  /*  4k stage2 w/ LPA2 */
+    t = FIELD_DP64(t, ID_AA64MMFR0, TGRAN4_2, 3); /*  4k stage2 w/ LPA2 */
     cpu->isar.id_aa64mmfr0 = t;
 }
 
@@ -703,11 +709,11 @@ static void aarch64_max_initfn(Object *obj)
 }
 
 static const ARMCPUInfo aarch64_cpus[] = {
-    { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
-    { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
-    { .name = "max",                .initfn = aarch64_max_initfn },
+    { .name = "cortex-a57", .initfn = aarch64_a57_initfn },
+    { .name = "cortex-a53", .initfn = aarch64_a53_initfn },
+    { .name = "max", .initfn = aarch64_max_initfn },
 #if defined(CONFIG_KVM) || defined(CONFIG_HVF)
-    { .name = "host",               .initfn = aarch64_host_initfn },
+    { .name = "host", .initfn = aarch64_host_initfn },
 #endif
 };
 
@@ -760,9 +766,10 @@ static void aarch64_cpu_class_init(ObjectClass *oc, void *data)
 
     object_class_property_add_bool(oc, "aarch64", aarch64_cpu_get_aarch64,
                                    aarch64_cpu_set_aarch64);
-    object_class_property_set_description(oc, "aarch64",
-                                          "Set on/off to enable/disable aarch64 "
-                                          "execution state ");
+    object_class_property_set_description(
+        oc, "aarch64",
+        "Set on/off to enable/disable aarch64 "
+        "execution state ");
 }
 
 static void aarch64_cpu_instance_init(Object *obj)

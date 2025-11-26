@@ -86,7 +86,7 @@ static bool accel_has_to_wait(void)
     CPUState *cpu;
     bool needs_to_wait = false;
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         if (qemu_lockcnt_count(&cpu->in_ioctl_lock)) {
             /* exit the ioctl, if vcpu is running it */
             qemu_cpu_kick(cpu);
@@ -108,14 +108,13 @@ void accel_ioctl_inhibit_begin(void)
     g_assert(qemu_mutex_iothread_locked());
 
     /* Block further invocations of the ioctls outside the BQL.  */
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         qemu_lockcnt_lock(&cpu->in_ioctl_lock);
     }
     qemu_lockcnt_lock(&accel_in_ioctl_lock);
 
     /* Keep waiting until there are running ioctls */
     while (true) {
-
         /* Reset event to FREE. */
         qemu_event_reset(&accel_in_ioctl_event);
 
@@ -147,8 +146,7 @@ void accel_ioctl_inhibit_end(void)
     CPUState *cpu;
 
     qemu_lockcnt_unlock(&accel_in_ioctl_lock);
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         qemu_lockcnt_unlock(&cpu->in_ioctl_lock);
     }
 }
-

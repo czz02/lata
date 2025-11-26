@@ -15,8 +15,8 @@
 #include "exec/memory.h"
 #include "qemu/error-report.h"
 
-#define KVM_ARM_VGIC_V2   (1 << 0)
-#define KVM_ARM_VGIC_V3   (1 << 1)
+#define KVM_ARM_VGIC_V2 (1 << 0)
+#define KVM_ARM_VGIC_V3 (1 << 1)
 
 /**
  * kvm_arm_init_debug() - initialize guest debug capabilities
@@ -210,8 +210,7 @@ int kvm_put_vcpu_events(ARMCPU *cpu);
  * Returns: true on success (and fdarray and init are filled in),
  * false on failure (and fdarray and init are not valid).
  */
-bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
-                                      int *fdarray,
+bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try, int *fdarray,
                                       struct kvm_vcpu_init *init);
 
 /**

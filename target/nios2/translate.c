@@ -36,21 +36,20 @@
 
 #define HELPER_H "helper.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
 
 /* is_jmp field values */
-#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
+#define DISAS_UPDATE DISAS_TARGET_1 /* cpu state was modified dynamically */
 
-#define INSTRUCTION_FLG(func, flags) { (func), (flags) }
-#define INSTRUCTION(func)                  \
-        INSTRUCTION_FLG(func, 0)
-#define INSTRUCTION_NOP()                  \
-        INSTRUCTION_FLG(nop, 0)
-#define INSTRUCTION_UNIMPLEMENTED()        \
-        INSTRUCTION_FLG(gen_excp, EXCP_UNIMPL)
-#define INSTRUCTION_ILLEGAL()              \
-        INSTRUCTION_FLG(gen_excp, EXCP_ILLEGAL)
+#define INSTRUCTION_FLG(func, flags) \
+    {                                \
+        (func), (flags)              \
+    }
+#define INSTRUCTION(func) INSTRUCTION_FLG(func, 0)
+#define INSTRUCTION_NOP() INSTRUCTION_FLG(nop, 0)
+#define INSTRUCTION_UNIMPLEMENTED() INSTRUCTION_FLG(gen_excp, EXCP_UNIMPL)
+#define INSTRUCTION_ILLEGAL() INSTRUCTION_FLG(gen_excp, EXCP_ILLEGAL)
 
 /* Special R-Type instruction opcode */
 #define INSN_R_TYPE 0x3A
@@ -66,12 +65,12 @@ typedef struct {
     uint8_t a;
 } InstrIType;
 
-#define I_TYPE(instr, code)                \
-    InstrIType (instr) = {                 \
-        .op    = extract32((code), 0, 6),  \
+#define I_TYPE(instr, code)                  \
+    InstrIType(instr) = {                    \
+        .op = extract32((code), 0, 6),       \
         .imm16.u = extract32((code), 6, 16), \
-        .b     = extract32((code), 22, 5), \
-        .a     = extract32((code), 27, 5), \
+        .b = extract32((code), 22, 5),       \
+        .a = extract32((code), 27, 5),       \
     }
 
 typedef target_ulong ImmFromIType(const InstrIType *);
@@ -101,14 +100,14 @@ typedef struct {
     uint8_t a;
 } InstrRType;
 
-#define R_TYPE(instr, code)                \
-    InstrRType (instr) = {                 \
-        .op    = extract32((code), 0, 6),  \
-        .imm5  = extract32((code), 6, 5),  \
-        .opx   = extract32((code), 11, 6), \
-        .c     = extract32((code), 17, 5), \
-        .b     = extract32((code), 22, 5), \
-        .a     = extract32((code), 27, 5), \
+#define R_TYPE(instr, code)              \
+    InstrRType(instr) = {                \
+        .op = extract32((code), 0, 6),   \
+        .imm5 = extract32((code), 6, 5), \
+        .opx = extract32((code), 11, 6), \
+        .c = extract32((code), 17, 5),   \
+        .b = extract32((code), 22, 5),   \
+        .a = extract32((code), 27, 5),   \
     }
 
 /* J-Type instruction parsing */
@@ -118,8 +117,8 @@ typedef struct {
 } InstrJType;
 
 #define J_TYPE(instr, code)                \
-    InstrJType (instr) = {                 \
-        .op    = extract32((code), 0, 6),  \
+    InstrJType(instr) = {                  \
+        .op = extract32((code), 0, 6),     \
         .imm26 = extract32((code), 6, 26), \
     }
 
@@ -128,13 +127,13 @@ typedef void GenFn3(TCGv, TCGv, TCGv);
 typedef void GenFn4(TCGv, TCGv, TCGv, TCGv);
 
 typedef struct DisasContext {
-    DisasContextBase  base;
-    target_ulong      pc;
-    int               mem_idx;
-    uint32_t          tb_flags;
-    TCGv              sink;
+    DisasContextBase base;
+    target_ulong pc;
+    int mem_idx;
+    uint32_t tb_flags;
+    TCGv sink;
     const ControlRegState *cr_state;
-    bool              eic_present;
+    bool eic_present;
 } DisasContext;
 
 static TCGv cpu_R[NUM_GP_REGS];
@@ -144,8 +143,8 @@ static TCGv cpu_crs_R[NUM_GP_REGS];
 #endif
 
 typedef struct Nios2Instruction {
-    void     (*handler)(DisasContext *dc, uint32_t code, uint32_t flags);
-    uint32_t  flags;
+    void (*handler)(DisasContext *dc, uint32_t code, uint32_t flags);
+    uint32_t flags;
 } Nios2Instruction;
 
 static uint8_t get_opcode(uint32_t code)
@@ -346,25 +345,25 @@ static void gen_bxx(DisasContext *dc, uint32_t code, uint32_t flags)
 }
 
 /* Comparison instructions */
-static void do_i_cmpxx(DisasContext *dc, uint32_t insn,
-                       TCGCond cond, ImmFromIType *imm)
+static void do_i_cmpxx(DisasContext *dc, uint32_t insn, TCGCond cond,
+                       ImmFromIType *imm)
 {
     I_TYPE(instr, insn);
-    tcg_gen_setcondi_tl(cond, dest_gpr(dc, instr.b),
-                        load_gpr(dc, instr.a), imm(&instr));
+    tcg_gen_setcondi_tl(cond, dest_gpr(dc, instr.b), load_gpr(dc, instr.a),
+                        imm(&instr));
 }
 
-#define gen_i_cmpxx(fname, imm)                                             \
-    static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)    \
-    { do_i_cmpxx(dc, code, flags, imm); }
+#define gen_i_cmpxx(fname, imm)                                          \
+    static void(fname)(DisasContext * dc, uint32_t code, uint32_t flags) \
+    {                                                                    \
+        do_i_cmpxx(dc, code, flags, imm);                                \
+    }
 
-gen_i_cmpxx(gen_cmpxxsi, imm_signed)
-gen_i_cmpxx(gen_cmpxxui, imm_unsigned)
+gen_i_cmpxx(gen_cmpxxsi, imm_signed) gen_i_cmpxx(gen_cmpxxui, imm_unsigned)
 
-/* Math/logic instructions */
-static void do_i_math_logic(DisasContext *dc, uint32_t insn,
-                            GenFn2i *fn, ImmFromIType *imm,
-                            bool x_op_0_eq_x)
+    /* Math/logic instructions */
+    static void do_i_math_logic(DisasContext *dc, uint32_t insn, GenFn2i *fn,
+                                ImmFromIType *imm, bool x_op_0_eq_x)
 {
     I_TYPE(instr, insn);
     target_ulong val;
@@ -384,23 +383,25 @@ static void do_i_math_logic(DisasContext *dc, uint32_t insn,
     }
 }
 
-#define gen_i_math_logic(fname, insn, x_op_0, imm)                          \
-    static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)    \
-    { do_i_math_logic(dc, code, tcg_gen_##insn##_tl, imm, x_op_0); }
+#define gen_i_math_logic(fname, insn, x_op_0, imm)                       \
+    static void(fname)(DisasContext * dc, uint32_t code, uint32_t flags) \
+    {                                                                    \
+        do_i_math_logic(dc, code, tcg_gen_##insn##_tl, imm, x_op_0);     \
+    }
 
-gen_i_math_logic(addi,  addi, 1, imm_signed)
-gen_i_math_logic(muli,  muli, 0, imm_signed)
+gen_i_math_logic(addi, addi, 1, imm_signed)
+    gen_i_math_logic(muli, muli, 0, imm_signed)
 
-gen_i_math_logic(andi,  andi, 0, imm_unsigned)
-gen_i_math_logic(ori,   ori,  1, imm_unsigned)
-gen_i_math_logic(xori,  xori, 1, imm_unsigned)
+        gen_i_math_logic(andi, andi, 0, imm_unsigned)
+            gen_i_math_logic(ori, ori, 1, imm_unsigned)
+                gen_i_math_logic(xori, xori, 1, imm_unsigned)
 
-gen_i_math_logic(andhi, andi, 0, imm_shifted)
-gen_i_math_logic(orhi , ori,  1, imm_shifted)
-gen_i_math_logic(xorhi, xori, 1, imm_shifted)
+                    gen_i_math_logic(andhi, andi, 0, imm_shifted)
+                        gen_i_math_logic(orhi, ori, 1, imm_shifted)
+                            gen_i_math_logic(xorhi, xori, 1, imm_shifted)
 
-/* rB <- prs.rA + sigma(IMM16) */
-static void rdprs(DisasContext *dc, uint32_t code, uint32_t flags)
+    /* rB <- prs.rA + sigma(IMM16) */
+    static void rdprs(DisasContext *dc, uint32_t code, uint32_t flags)
 {
     if (!dc->eic_present) {
         t_gen_helper_raise_exception(dc, EXCP_ILLEGAL);
@@ -425,67 +426,67 @@ static void handle_r_type_instr(DisasContext *dc, uint32_t code,
                                 uint32_t flags);
 
 static const Nios2Instruction i_type_instructions[] = {
-    INSTRUCTION(call),                                /* call */
-    INSTRUCTION(jmpi),                                /* jmpi */
+    INSTRUCTION(call), /* call */
+    INSTRUCTION(jmpi), /* jmpi */
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(gen_ldx, MO_UB),                  /* ldbu */
-    INSTRUCTION(addi),                                /* addi */
-    INSTRUCTION_FLG(gen_stx, MO_UB),                  /* stb */
-    INSTRUCTION(br),                                  /* br */
-    INSTRUCTION_FLG(gen_ldx, MO_SB),                  /* ldb */
-    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_GE),        /* cmpgei */
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(gen_ldx, MO_TEUW),                /* ldhu */
-    INSTRUCTION(andi),                                /* andi */
-    INSTRUCTION_FLG(gen_stx, MO_TEUW),                /* sth */
-    INSTRUCTION_FLG(gen_bxx, TCG_COND_GE),            /* bge */
-    INSTRUCTION_FLG(gen_ldx, MO_TESW),                /* ldh */
-    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_LT),        /* cmplti */
+    INSTRUCTION_FLG(gen_ldx, MO_UB), /* ldbu */
+    INSTRUCTION(addi), /* addi */
+    INSTRUCTION_FLG(gen_stx, MO_UB), /* stb */
+    INSTRUCTION(br), /* br */
+    INSTRUCTION_FLG(gen_ldx, MO_SB), /* ldb */
+    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_GE), /* cmpgei */
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_NOP(),                                /* initda */
-    INSTRUCTION(ori),                                 /* ori */
-    INSTRUCTION_FLG(gen_stx, MO_TEUL),                /* stw */
-    INSTRUCTION_FLG(gen_bxx, TCG_COND_LT),            /* blt */
-    INSTRUCTION_FLG(gen_ldx, MO_TEUL),                /* ldw */
-    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_NE),        /* cmpnei */
+    INSTRUCTION_FLG(gen_ldx, MO_TEUW), /* ldhu */
+    INSTRUCTION(andi), /* andi */
+    INSTRUCTION_FLG(gen_stx, MO_TEUW), /* sth */
+    INSTRUCTION_FLG(gen_bxx, TCG_COND_GE), /* bge */
+    INSTRUCTION_FLG(gen_ldx, MO_TESW), /* ldh */
+    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_LT), /* cmplti */
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_NOP(),                                /* flushda */
-    INSTRUCTION(xori),                                /* xori */
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(gen_bxx, TCG_COND_NE),            /* bne */
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_EQ),        /* cmpeqi */
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(gen_ldx, MO_UB),                  /* ldbuio */
-    INSTRUCTION(muli),                                /* muli */
-    INSTRUCTION_FLG(gen_stx, MO_UB),                  /* stbio */
-    INSTRUCTION_FLG(gen_bxx, TCG_COND_EQ),            /* beq */
-    INSTRUCTION_FLG(gen_ldx, MO_SB),                  /* ldbio */
-    INSTRUCTION_FLG(gen_cmpxxui, TCG_COND_GEU),       /* cmpgeui */
+    INSTRUCTION_NOP(), /* initda */
+    INSTRUCTION(ori), /* ori */
+    INSTRUCTION_FLG(gen_stx, MO_TEUL), /* stw */
+    INSTRUCTION_FLG(gen_bxx, TCG_COND_LT), /* blt */
+    INSTRUCTION_FLG(gen_ldx, MO_TEUL), /* ldw */
+    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_NE), /* cmpnei */
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(gen_ldx, MO_TEUW),                /* ldhuio */
-    INSTRUCTION(andhi),                               /* andhi */
-    INSTRUCTION_FLG(gen_stx, MO_TEUW),                /* sthio */
-    INSTRUCTION_FLG(gen_bxx, TCG_COND_GEU),           /* bgeu */
-    INSTRUCTION_FLG(gen_ldx, MO_TESW),                /* ldhio */
-    INSTRUCTION_FLG(gen_cmpxxui, TCG_COND_LTU),       /* cmpltui */
+    INSTRUCTION_NOP(), /* flushda */
+    INSTRUCTION(xori), /* xori */
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_UNIMPLEMENTED(),                      /* custom */
-    INSTRUCTION_NOP(),                                /* initd */
-    INSTRUCTION(orhi),                                /* orhi */
-    INSTRUCTION_FLG(gen_stx, MO_TESL),                /* stwio */
-    INSTRUCTION_FLG(gen_bxx, TCG_COND_LTU),           /* bltu */
-    INSTRUCTION_FLG(gen_ldx, MO_TEUL),                /* ldwio */
-    INSTRUCTION(rdprs),                               /* rdprs */
+    INSTRUCTION_FLG(gen_bxx, TCG_COND_NE), /* bne */
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(handle_r_type_instr, 0),          /* R-Type */
-    INSTRUCTION_NOP(),                                /* flushd */
-    INSTRUCTION(xorhi),                               /* xorhi */
+    INSTRUCTION_FLG(gen_cmpxxsi, TCG_COND_EQ), /* cmpeqi */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_FLG(gen_ldx, MO_UB), /* ldbuio */
+    INSTRUCTION(muli), /* muli */
+    INSTRUCTION_FLG(gen_stx, MO_UB), /* stbio */
+    INSTRUCTION_FLG(gen_bxx, TCG_COND_EQ), /* beq */
+    INSTRUCTION_FLG(gen_ldx, MO_SB), /* ldbio */
+    INSTRUCTION_FLG(gen_cmpxxui, TCG_COND_GEU), /* cmpgeui */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_FLG(gen_ldx, MO_TEUW), /* ldhuio */
+    INSTRUCTION(andhi), /* andhi */
+    INSTRUCTION_FLG(gen_stx, MO_TEUW), /* sthio */
+    INSTRUCTION_FLG(gen_bxx, TCG_COND_GEU), /* bgeu */
+    INSTRUCTION_FLG(gen_ldx, MO_TESW), /* ldhio */
+    INSTRUCTION_FLG(gen_cmpxxui, TCG_COND_LTU), /* cmpltui */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_UNIMPLEMENTED(), /* custom */
+    INSTRUCTION_NOP(), /* initd */
+    INSTRUCTION(orhi), /* orhi */
+    INSTRUCTION_FLG(gen_stx, MO_TESL), /* stwio */
+    INSTRUCTION_FLG(gen_bxx, TCG_COND_LTU), /* bltu */
+    INSTRUCTION_FLG(gen_ldx, MO_TEUL), /* ldwio */
+    INSTRUCTION(rdprs), /* rdprs */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_FLG(handle_r_type_instr, 0), /* R-Type */
+    INSTRUCTION_NOP(), /* flushd */
+    INSTRUCTION(xorhi), /* xorhi */
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
@@ -608,8 +609,7 @@ static void rdctl(DisasContext *dc, uint32_t code, uint32_t flags)
         tcg_gen_and_tl(dest, t1, t2);
         break;
     default:
-        tcg_gen_ld_tl(dest, cpu_env,
-                      offsetof(CPUNios2State, ctrl[instr.imm5]));
+        tcg_gen_ld_tl(dest, cpu_env, offsetof(CPUNios2State, ctrl[instr.imm5]));
         break;
     }
 #endif
@@ -693,16 +693,15 @@ static void wrprs(DisasContext *dc, uint32_t code, uint32_t flags)
     g_assert_not_reached();
 #else
     R_TYPE(instr, code);
-    gen_helper_wrprs(cpu_env, tcg_constant_i32(instr.c),
-                     load_gpr(dc, instr.a));
+    gen_helper_wrprs(cpu_env, tcg_constant_i32(instr.c), load_gpr(dc, instr.a));
     /*
      * The expected write to PRS[r0] is 0, from CRS[r0].
      * If not, and CRS == PRS (which we cannot tell from here),
      * we may now have a non-zero value in our current r0.
      * By ending the TB, we re-evaluate tb_flags and find out.
      */
-    if (instr.c == 0
-        && (instr.a != 0 || !FIELD_EX32(dc->tb_flags, TBFLAGS, R0_0))) {
+    if (instr.c == 0 &&
+        (instr.a != 0 || !FIELD_EX32(dc->tb_flags, TBFLAGS, R0_0))) {
         dc->base.is_jmp = DISAS_UPDATE;
     }
 #endif
@@ -712,8 +711,8 @@ static void wrprs(DisasContext *dc, uint32_t code, uint32_t flags)
 static void gen_cmpxx(DisasContext *dc, uint32_t code, uint32_t flags)
 {
     R_TYPE(instr, code);
-    tcg_gen_setcond_tl(flags, dest_gpr(dc, instr.c),
-                       load_gpr(dc, instr.a), load_gpr(dc, instr.b));
+    tcg_gen_setcond_tl(flags, dest_gpr(dc, instr.c), load_gpr(dc, instr.a),
+                       load_gpr(dc, instr.b));
 }
 
 /* Math/logic instructions */
@@ -729,46 +728,47 @@ static void do_rr_math_logic(DisasContext *dc, uint32_t insn, GenFn3 *fn)
     fn(dest_gpr(dc, instr.c), load_gpr(dc, instr.a), load_gpr(dc, instr.b));
 }
 
-#define gen_ri_math_logic(fname, insn)                                      \
-    static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)    \
-    { do_ri_math_logic(dc, code, tcg_gen_##insn##_tl); }
+#define gen_ri_math_logic(fname, insn)                                   \
+    static void(fname)(DisasContext * dc, uint32_t code, uint32_t flags) \
+    {                                                                    \
+        do_ri_math_logic(dc, code, tcg_gen_##insn##_tl);                 \
+    }
 
-#define gen_rr_math_logic(fname, insn)                                      \
-    static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)    \
-    { do_rr_math_logic(dc, code, tcg_gen_##insn##_tl); }
+#define gen_rr_math_logic(fname, insn)                                   \
+    static void(fname)(DisasContext * dc, uint32_t code, uint32_t flags) \
+    {                                                                    \
+        do_rr_math_logic(dc, code, tcg_gen_##insn##_tl);                 \
+    }
 
-gen_rr_math_logic(add,  add)
-gen_rr_math_logic(sub,  sub)
-gen_rr_math_logic(mul,  mul)
+gen_rr_math_logic(add, add) gen_rr_math_logic(sub, sub)
+    gen_rr_math_logic(mul, mul)
 
-gen_rr_math_logic(and,  and)
-gen_rr_math_logic(or,   or)
-gen_rr_math_logic(xor,  xor)
-gen_rr_math_logic(nor,  nor)
+        gen_rr_math_logic(and, and) gen_rr_math_logic(or, or)
+            gen_rr_math_logic(xor, xor) gen_rr_math_logic(nor, nor)
 
-gen_ri_math_logic(srai, sari)
-gen_ri_math_logic(srli, shri)
-gen_ri_math_logic(slli, shli)
-gen_ri_math_logic(roli, rotli)
+                gen_ri_math_logic(srai, sari) gen_ri_math_logic(srli, shri)
+                    gen_ri_math_logic(slli, shli) gen_ri_math_logic(roli, rotli)
 
-static void do_rr_mul_high(DisasContext *dc, uint32_t insn, GenFn4 *fn)
+                        static void do_rr_mul_high(DisasContext *dc,
+                                                   uint32_t insn, GenFn4 *fn)
 {
     R_TYPE(instr, insn);
     TCGv discard = tcg_temp_new();
 
-    fn(discard, dest_gpr(dc, instr.c),
-       load_gpr(dc, instr.a), load_gpr(dc, instr.b));
+    fn(discard, dest_gpr(dc, instr.c), load_gpr(dc, instr.a),
+       load_gpr(dc, instr.b));
 }
 
-#define gen_rr_mul_high(fname, insn)                                        \
-    static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)    \
-    { do_rr_mul_high(dc, code, tcg_gen_##insn##_tl); }
+#define gen_rr_mul_high(fname, insn)                                     \
+    static void(fname)(DisasContext * dc, uint32_t code, uint32_t flags) \
+    {                                                                    \
+        do_rr_mul_high(dc, code, tcg_gen_##insn##_tl);                   \
+    }
 
-gen_rr_mul_high(mulxss, muls2)
-gen_rr_mul_high(mulxuu, mulu2)
-gen_rr_mul_high(mulxsu, mulsu2)
+gen_rr_mul_high(mulxss, muls2) gen_rr_mul_high(mulxuu, mulu2)
+    gen_rr_mul_high(mulxsu, mulsu2)
 
-static void do_rr_shift(DisasContext *dc, uint32_t insn, GenFn3 *fn)
+        static void do_rr_shift(DisasContext *dc, uint32_t insn, GenFn3 *fn)
 {
     R_TYPE(instr, insn);
     TCGv sh = tcg_temp_new();
@@ -777,28 +777,27 @@ static void do_rr_shift(DisasContext *dc, uint32_t insn, GenFn3 *fn)
     fn(dest_gpr(dc, instr.c), load_gpr(dc, instr.a), sh);
 }
 
-#define gen_rr_shift(fname, insn)                                           \
-    static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)    \
-    { do_rr_shift(dc, code, tcg_gen_##insn##_tl); }
+#define gen_rr_shift(fname, insn)                                        \
+    static void(fname)(DisasContext * dc, uint32_t code, uint32_t flags) \
+    {                                                                    \
+        do_rr_shift(dc, code, tcg_gen_##insn##_tl);                      \
+    }
 
-gen_rr_shift(sra, sar)
-gen_rr_shift(srl, shr)
-gen_rr_shift(sll, shl)
-gen_rr_shift(rol, rotl)
-gen_rr_shift(ror, rotr)
+gen_rr_shift(sra, sar) gen_rr_shift(srl, shr) gen_rr_shift(sll, shl)
+    gen_rr_shift(rol, rotl) gen_rr_shift(ror, rotr)
 
-static void divs(DisasContext *dc, uint32_t code, uint32_t flags)
+        static void divs(DisasContext *dc, uint32_t code, uint32_t flags)
 {
     R_TYPE(instr, (code));
-    gen_helper_divs(dest_gpr(dc, instr.c), cpu_env,
-                    load_gpr(dc, instr.a), load_gpr(dc, instr.b));
+    gen_helper_divs(dest_gpr(dc, instr.c), cpu_env, load_gpr(dc, instr.a),
+                    load_gpr(dc, instr.b));
 }
 
 static void divu(DisasContext *dc, uint32_t code, uint32_t flags)
 {
     R_TYPE(instr, (code));
-    gen_helper_divu(dest_gpr(dc, instr.c), cpu_env,
-                    load_gpr(dc, instr.a), load_gpr(dc, instr.b));
+    gen_helper_divu(dest_gpr(dc, instr.c), cpu_env, load_gpr(dc, instr.a),
+                    load_gpr(dc, instr.b));
 }
 
 static void trap(DisasContext *dc, uint32_t code, uint32_t flags)
@@ -833,65 +832,65 @@ static void gen_break(DisasContext *dc, uint32_t code, uint32_t flags)
 
 static const Nios2Instruction r_type_instructions[] = {
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(eret),                                /* eret */
-    INSTRUCTION(roli),                                /* roli */
-    INSTRUCTION(rol),                                 /* rol */
-    INSTRUCTION_NOP(),                                /* flushp */
-    INSTRUCTION(ret),                                 /* ret */
-    INSTRUCTION(nor),                                 /* nor */
-    INSTRUCTION(mulxuu),                              /* mulxuu */
-    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_GE),          /* cmpge */
-    INSTRUCTION(bret),                                /* bret */
+    INSTRUCTION(eret), /* eret */
+    INSTRUCTION(roli), /* roli */
+    INSTRUCTION(rol), /* rol */
+    INSTRUCTION_NOP(), /* flushp */
+    INSTRUCTION(ret), /* ret */
+    INSTRUCTION(nor), /* nor */
+    INSTRUCTION(mulxuu), /* mulxuu */
+    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_GE), /* cmpge */
+    INSTRUCTION(bret), /* bret */
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(ror),                                 /* ror */
-    INSTRUCTION_NOP(),                                /* flushi */
-    INSTRUCTION(jmp),                                 /* jmp */
-    INSTRUCTION(and),                                 /* and */
+    INSTRUCTION(ror), /* ror */
+    INSTRUCTION_NOP(), /* flushi */
+    INSTRUCTION(jmp), /* jmp */
+    INSTRUCTION(and), /* and */
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_LT),          /* cmplt */
+    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_LT), /* cmplt */
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(slli),                                /* slli */
-    INSTRUCTION(sll),                                 /* sll */
-    INSTRUCTION(wrprs),                               /* wrprs */
+    INSTRUCTION(slli), /* slli */
+    INSTRUCTION(sll), /* sll */
+    INSTRUCTION(wrprs), /* wrprs */
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(or),                                  /* or */
-    INSTRUCTION(mulxsu),                              /* mulxsu */
-    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_NE),          /* cmpne */
+    INSTRUCTION(or), /* or */
+    INSTRUCTION(mulxsu), /* mulxsu */
+    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_NE), /* cmpne */
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(srli),                                /* srli */
-    INSTRUCTION(srl),                                 /* srl */
-    INSTRUCTION(nextpc),                              /* nextpc */
-    INSTRUCTION(callr),                               /* callr */
-    INSTRUCTION(xor),                                 /* xor */
-    INSTRUCTION(mulxss),                              /* mulxss */
-    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_EQ),          /* cmpeq */
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(divu),                                /* divu */
-    INSTRUCTION(divs),                                /* div */
-    INSTRUCTION(rdctl),                               /* rdctl */
-    INSTRUCTION(mul),                                 /* mul */
-    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_GEU),         /* cmpgeu */
-    INSTRUCTION_NOP(),                                /* initi */
+    INSTRUCTION(srli), /* srli */
+    INSTRUCTION(srl), /* srl */
+    INSTRUCTION(nextpc), /* nextpc */
+    INSTRUCTION(callr), /* callr */
+    INSTRUCTION(xor), /* xor */
+    INSTRUCTION(mulxss), /* mulxss */
+    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_EQ), /* cmpeq */
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(trap),                                /* trap */
-    INSTRUCTION(wrctl),                               /* wrctl */
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_LTU),         /* cmpltu */
-    INSTRUCTION(add),                                 /* add */
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(gen_break),                           /* break */
-    INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(nop),                                 /* nop */
+    INSTRUCTION(divu), /* divu */
+    INSTRUCTION(divs), /* div */
+    INSTRUCTION(rdctl), /* rdctl */
+    INSTRUCTION(mul), /* mul */
+    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_GEU), /* cmpgeu */
+    INSTRUCTION_NOP(), /* initi */
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
-    INSTRUCTION(sub),                                 /* sub */
-    INSTRUCTION(srai),                                /* srai */
-    INSTRUCTION(sra),                                 /* sra */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION(trap), /* trap */
+    INSTRUCTION(wrctl), /* wrctl */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_FLG(gen_cmpxx, TCG_COND_LTU), /* cmpltu */
+    INSTRUCTION(add), /* add */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION(gen_break), /* break */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION(nop), /* nop */
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION_ILLEGAL(),
+    INSTRUCTION(sub), /* sub */
+    INSTRUCTION(srai), /* srai */
+    INSTRUCTION(sra), /* sra */
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
     INSTRUCTION_ILLEGAL(),
@@ -917,27 +916,21 @@ illegal_op:
     t_gen_helper_raise_exception(dc, EXCP_ILLEGAL);
 }
 
-static const char * const gr_regnames[NUM_GP_REGS] = {
-    "zero",       "at",         "r2",         "r3",
-    "r4",         "r5",         "r6",         "r7",
-    "r8",         "r9",         "r10",        "r11",
-    "r12",        "r13",        "r14",        "r15",
-    "r16",        "r17",        "r18",        "r19",
-    "r20",        "r21",        "r22",        "r23",
-    "et",         "bt",         "gp",         "sp",
-    "fp",         "ea",         "ba",         "ra",
+static const char *const gr_regnames[NUM_GP_REGS] = {
+    "zero", "at",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
+    "r8",   "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
+    "r16",  "r17", "r18", "r19", "r20", "r21", "r22", "r23",
+    "et",   "bt",  "gp",  "sp",  "fp",  "ea",  "ba",  "ra",
 };
 
 #ifndef CONFIG_USER_ONLY
-static const char * const cr_regnames[NUM_CR_REGS] = {
-    "status",     "estatus",    "bstatus",    "ienable",
-    "ipending",   "cpuid",      "res6",       "exception",
-    "pteaddr",    "tlbacc",     "tlbmisc",    "reserved1",
-    "badaddr",    "config",     "mpubase",    "mpuacc",
-    "res16",      "res17",      "res18",      "res19",
-    "res20",      "res21",      "res22",      "res23",
-    "res24",      "res25",      "res26",      "res27",
-    "res28",      "res29",      "res30",      "res31",
+static const char *const cr_regnames[NUM_CR_REGS] = {
+    "status",  "estatus",   "bstatus", "ienable", "ipending", "cpuid",
+    "res6",    "exception", "pteaddr", "tlbacc",  "tlbmisc",  "reserved1",
+    "badaddr", "config",    "mpubase", "mpuacc",  "res16",    "res17",
+    "res18",   "res19",     "res20",   "res21",   "res22",    "res23",
+    "res24",   "res25",     "res26",   "res27",   "res28",    "res29",
+    "res30",   "res31",
 };
 #endif
 
@@ -1020,8 +1013,8 @@ static void nios2_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
     }
 }
 
-static void nios2_tr_disas_log(const DisasContextBase *dcbase,
-                               CPUState *cpu, FILE *logfile)
+static void nios2_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu,
+                               FILE *logfile)
 {
     fprintf(logfile, "IN: %s\n", lookup_symbol(dcbase->pc_first));
     target_disas(logfile, cpu, dcbase->pc_first, dcbase->tb->size);
@@ -1029,11 +1022,11 @@ static void nios2_tr_disas_log(const DisasContextBase *dcbase,
 
 static const TranslatorOps nios2_tr_ops = {
     .init_disas_context = nios2_tr_init_disas_context,
-    .tb_start           = nios2_tr_tb_start,
-    .insn_start         = nios2_tr_insn_start,
-    .translate_insn     = nios2_tr_translate_insn,
-    .tb_stop            = nios2_tr_tb_stop,
-    .disas_log          = nios2_tr_disas_log,
+    .tb_start = nios2_tr_tb_start,
+    .insn_start = nios2_tr_insn_start,
+    .translate_insn = nios2_tr_translate_insn,
+    .tb_stop = nios2_tr_tb_stop,
+    .disas_log = nios2_tr_disas_log,
 };
 
 void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
@@ -1085,25 +1078,24 @@ void nios2_cpu_dump_state(CPUState *cs, FILE *f, int flags)
 void nios2_tcg_init(void)
 {
 #ifndef CONFIG_USER_ONLY
-    TCGv_ptr crs = tcg_global_mem_new_ptr(cpu_env,
-                                          offsetof(CPUNios2State, regs), "crs");
+    TCGv_ptr crs =
+        tcg_global_mem_new_ptr(cpu_env, offsetof(CPUNios2State, regs), "crs");
 
     for (int i = 0; i < NUM_GP_REGS; i++) {
         cpu_crs_R[i] = tcg_global_mem_new(crs, 4 * i, gr_regnames[i]);
     }
 
-#define offsetof_regs0(N)  offsetof(CPUNios2State, shadow_regs[0][N])
+#define offsetof_regs0(N) offsetof(CPUNios2State, shadow_regs[0][N])
 #else
-#define offsetof_regs0(N)  offsetof(CPUNios2State, regs[N])
+#define offsetof_regs0(N) offsetof(CPUNios2State, regs[N])
 #endif
 
     for (int i = 0; i < NUM_GP_REGS; i++) {
-        cpu_R[i] = tcg_global_mem_new(cpu_env, offsetof_regs0(i),
-                                      gr_regnames[i]);
+        cpu_R[i] =
+            tcg_global_mem_new(cpu_env, offsetof_regs0(i), gr_regnames[i]);
     }
 
 #undef offsetof_regs0
 
-    cpu_pc = tcg_global_mem_new(cpu_env,
-                                offsetof(CPUNios2State, pc), "pc");
+    cpu_pc = tcg_global_mem_new(cpu_env, offsetof(CPUNios2State, pc), "pc");
 }

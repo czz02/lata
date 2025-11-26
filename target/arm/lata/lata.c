@@ -9,157 +9,65 @@
 #ifdef CONFIG_LATA_TU
 #include "tu.h"
 #endif
-//sp
-//tp
-//zero---unused
-//a0-----goto_tb
-//s8-----env 
-//t0-t5--itemp
-//FLAG---pstate
+// sp
+// tp
+// zero---unused
+// a0-----goto_tb
+// s8-----env
+// t0-t5--itemp
+// FLAG---pstate
 const int arm_la_map[] = {
-    [armv8_x0] = la_ra,
-    [armv8_x1] = la_a1,
-    [armv8_x2] = la_a2,
-    [armv8_x3] = la_a3,
-    [armv8_x4] = la_a4,
-    [armv8_x5] = la_a5,
-    [armv8_x6] = la_a6,
-    [armv8_x7] = la_a7,
-    [armv8_x8] = la_fp,
-    [armv8_x9] = la_t8,
-    [armv8_x10] = la_t6,
-    [armv8_x11] = -1,
-    [armv8_x12] = -1,
-    [armv8_x13] = -1,
-    [armv8_x14] = -1,
-    [armv8_x15] = -1,
-    [armv8_x16] = -1,
-    [armv8_x17] = -1,
-    [armv8_x18] = -1,
-    [armv8_x19] = la_s6,
-    [armv8_x20] = la_s0,
-    [armv8_x21] = la_s1,
-    [armv8_x22] = la_s2,
-    [armv8_x23] = la_s3,
-    [armv8_x24] = la_s4,
-    [armv8_x25] = -1,
-    [armv8_x26] = -1,
-    [armv8_x27] = -1,
-    [armv8_x28] = la_s7,
-    [armv8_x29] = la_t7,
-    [armv8_x30] = la_s5,
-    [armv8_xzr] = la_r21
+    [armv8_x0] = la_ra,  [armv8_x1] = la_a1,  [armv8_x2] = la_a2,
+    [armv8_x3] = la_a3,  [armv8_x4] = la_a4,  [armv8_x5] = la_a5,
+    [armv8_x6] = la_a6,  [armv8_x7] = la_a7,  [armv8_x8] = la_fp,
+    [armv8_x9] = la_t8,  [armv8_x10] = la_t6, [armv8_x11] = -1,
+    [armv8_x12] = -1,    [armv8_x13] = -1,    [armv8_x14] = -1,
+    [armv8_x15] = -1,    [armv8_x16] = -1,    [armv8_x17] = -1,
+    [armv8_x18] = -1,    [armv8_x19] = la_s6, [armv8_x20] = la_s0,
+    [armv8_x21] = la_s1, [armv8_x22] = la_s2, [armv8_x23] = la_s3,
+    [armv8_x24] = la_s4, [armv8_x25] = -1,    [armv8_x26] = -1,
+    [armv8_x27] = -1,    [armv8_x28] = la_s7, [armv8_x29] = la_t7,
+    [armv8_x30] = la_s5, [armv8_xzr] = la_r21
 };
 
 const int arm_la_reverse_map[] = {
-    [la_zero] = -1,
-    [la_ra]  = armv8_x0,
-    [la_sp]  = -1,
-    [la_t7]  = armv8_x29,
-    [la_s0]  = armv8_x20,
-    [la_s1]  = armv8_x21,
-    [la_s8]  = -1,
-    [la_t8]  = armv8_x9,
-    [la_a2]  = armv8_x2,
-    [la_a3]  = armv8_x3,
-    [la_a4]  = armv8_x4,
-    [la_a5]  = armv8_x5,
-    [la_a6]  = armv8_x6,
-    [la_a7]  = armv8_x7,
-    [la_s2]  = armv8_x22,
-    [la_s3]  = armv8_x23,
-    [la_s4]  = armv8_x24,
-    [la_s5]  = armv8_x30,
-    [la_s6]  = armv8_x19,
-    [la_s7]  = armv8_x28,
-    [la_t4]  = -1,
-    [la_t5]  = -1,
-    [la_t6]  = armv8_x10,
-    [la_r21] = armv8_xzr,
-    [la_tp] = -1,
-    [la_a0] = -1,
-    [la_a1] = armv8_x1,
-    [la_t0] = -1,
-    [la_t1] = -1,
-    [la_t2] = -1,
-    [la_t3] = -1,
-    [la_fp] = armv8_x8 
+    [la_zero] = -1,      [la_ra] = armv8_x0,  [la_sp] = -1,
+    [la_t7] = armv8_x29, [la_s0] = armv8_x20, [la_s1] = armv8_x21,
+    [la_s8] = -1,        [la_t8] = armv8_x9,  [la_a2] = armv8_x2,
+    [la_a3] = armv8_x3,  [la_a4] = armv8_x4,  [la_a5] = armv8_x5,
+    [la_a6] = armv8_x6,  [la_a7] = armv8_x7,  [la_s2] = armv8_x22,
+    [la_s3] = armv8_x23, [la_s4] = armv8_x24, [la_s5] = armv8_x30,
+    [la_s6] = armv8_x19, [la_s7] = armv8_x28, [la_t4] = -1,
+    [la_t5] = -1,        [la_t6] = armv8_x10, [la_r21] = armv8_xzr,
+    [la_tp] = -1,        [la_a0] = -1,        [la_a1] = armv8_x1,
+    [la_t0] = -1,        [la_t1] = -1,        [la_t2] = -1,
+    [la_t3] = -1,        [la_fp] = armv8_x8
 };
 
 const int arm_la_fmap[] = {
-    [armv8_v0] = 0,
-    [armv8_v1] = 1,
-    [armv8_v2] = 2,
-    [armv8_v3] = 3,
-    [armv8_v4] = 4,
-    [armv8_v5] = 5,
-    [armv8_v6] = 6,
-    [armv8_v7] = 7,
-    [armv8_v8] = 8,
-    [armv8_v9] = -1,
-    [armv8_v10] = -1,
-    [armv8_v11] = -1,
-    [armv8_v12] = -1,
-    [armv8_v13] = -1,
-    [armv8_v14] = -1,
-    [armv8_v15] = -1,
-    [armv8_v16] = 16,
-    [armv8_v17] = 17,
-    [armv8_v18] = 18,
-    [armv8_v19] = 19,
-    [armv8_v20] = 20,
-    [armv8_v21] = 21,
-    [armv8_v22] = 22,
-    [armv8_v23] = 23,
-    [armv8_v24] = 24,
-    [armv8_v25] = 25,
-    [armv8_v26] = 26,
-    [armv8_v27] = 27,
-    [armv8_v28] = 28,
-    [armv8_v29] = 29,
-    [armv8_v30] = 30,
-    [armv8_v31] = 31
+    [armv8_v0] = 0,   [armv8_v1] = 1,   [armv8_v2] = 2,   [armv8_v3] = 3,
+    [armv8_v4] = 4,   [armv8_v5] = 5,   [armv8_v6] = 6,   [armv8_v7] = 7,
+    [armv8_v8] = 8,   [armv8_v9] = -1,  [armv8_v10] = -1, [armv8_v11] = -1,
+    [armv8_v12] = -1, [armv8_v13] = -1, [armv8_v14] = -1, [armv8_v15] = -1,
+    [armv8_v16] = 16, [armv8_v17] = 17, [armv8_v18] = 18, [armv8_v19] = 19,
+    [armv8_v20] = 20, [armv8_v21] = 21, [armv8_v22] = 22, [armv8_v23] = 23,
+    [armv8_v24] = 24, [armv8_v25] = 25, [armv8_v26] = 26, [armv8_v27] = 27,
+    [armv8_v28] = 28, [armv8_v29] = 29, [armv8_v30] = 30, [armv8_v31] = 31
 };
 
 const int arm_la_reverse_fmap[] = {
-    [0] = 0,
-    [1] = 1,
-    [2] = 2,
-    [3] = 3,
-    [4] = 4,
-    [5] = 5,
-    [6] = 6,
-    [7] = 7,
-    [8] = 8,
-    [9] = -1,
-    [10] = -1,
-    [11] = -1,
-    [12] = -1,
-    [13] = -1,
-    [14] = -1,
-    [la_fsmask] = -1,
-    [16] = 16,
-    [17] = 17,
-    [18] = 18,
-    [19] = 19,
-    [20] = 20,
-    [21] = 21,
-    [22] = 22,
-    [23] = 23,
-    [24] = 24,
-    [25] = 25,
-    [26] = 26,
-    [27] = 27,
-    [28] = 28,
-    [29] = 29,
-    [30] = 30,
-    [31] = 31
+    [0] = 0,   [1] = 1,   [2] = 2,   [3] = 3,          [4] = 4,   [5] = 5,
+    [6] = 6,   [7] = 7,   [8] = 8,   [9] = -1,         [10] = -1, [11] = -1,
+    [12] = -1, [13] = -1, [14] = -1, [la_fsmask] = -1, [16] = 16, [17] = 17,
+    [18] = 18, [19] = 19, [20] = 20, [21] = 21,        [22] = 22, [23] = 23,
+    [24] = 24, [25] = 25, [26] = 26, [27] = 27,        [28] = 28, [29] = 29,
+    [30] = 30, [31] = 31
 
 };
 
 void lata(void);
-__attribute__((constructor))
-void lata(void){
+__attribute__((constructor)) void lata(void)
+{
     // printf("lata enabled\n");
 }
 
@@ -213,7 +121,7 @@ static void global_register_init(void)
     s6_ir2_opnd = INIT_RA(IR2_OPND_GPR, la_s6);
     s7_ir2_opnd = INIT_RA(IR2_OPND_GPR, la_s7);
     s8_ir2_opnd = INIT_RA(IR2_OPND_GPR, la_s8);
-    fsmask_ir2_opnd = INIT_RA(IR2_OPND_FPR, la_fsmask); //mask for scalar
+    fsmask_ir2_opnd = INIT_RA(IR2_OPND_FPR, la_fsmask); // mask for scalar
     fcsr_ir2_opnd = INIT_RA(IR2_OPND_FCSR, 0);
     fcsr1_ir2_opnd = INIT_RA(IR2_OPND_FCSR, 1);
     fcsr2_ir2_opnd = INIT_RA(IR2_OPND_FCSR, 2);
@@ -251,10 +159,10 @@ void lsenv_register_thread(CPUArchState *env)
     lsenv->tr_data = &tr_data_real;
 }
 
-void tr_init(void* tb)
+void tr_init(void *tb)
 {
     TRANSLATION_DATA *t = lsenv->tr_data;
-    //int i = 0;
+    // int i = 0;
 
     t->curr_tb = tb;
     /* register allocation init */
@@ -267,7 +175,7 @@ void tr_init(void* tb)
         t->ir2_inst_num_max = 400;
     }
     t->ir2_inst_num_current = 0;
-    //uint64 k = &(t->ir2_inst_num_current);
+    // uint64 k = &(t->ir2_inst_num_current);
     t->real_ir2_inst_num = 0;
 
     /* reset ir2 first/last/num */
@@ -276,7 +184,6 @@ void tr_init(void* tb)
 
     /* label number */
     t->label_num = 0;
-
 }
 
 void tr_fini(void)
@@ -296,20 +203,20 @@ void tr_fini(void)
     t->label_num = 0;
 }
 
-#define EXTRA_SPACE             40
-#define REG_LEN                 8
-#define S0_EXTRA_SPACE          EXTRA_SPACE
-#define S1_EXTRA_SPACE          (S0_EXTRA_SPACE + REG_LEN)
-#define S2_EXTRA_SPACE          (S1_EXTRA_SPACE + REG_LEN)
-#define S3_EXTRA_SPACE          (S2_EXTRA_SPACE + REG_LEN)
-#define S4_EXTRA_SPACE          (S3_EXTRA_SPACE + REG_LEN)
-#define S5_EXTRA_SPACE          (S4_EXTRA_SPACE + REG_LEN)
-#define S6_EXTRA_SPACE          (S5_EXTRA_SPACE + REG_LEN)
-#define S7_EXTRA_SPACE          (S6_EXTRA_SPACE + REG_LEN)
-#define S8_EXTRA_SPACE          (S7_EXTRA_SPACE + REG_LEN)
-#define FP_EXTRA_SPACE          (S8_EXTRA_SPACE + REG_LEN)
-#define RA_EXTRA_SPACE          (FP_EXTRA_SPACE + REG_LEN)
-#define FCSR_EXTRA_SPACE        (RA_EXTRA_SPACE + REG_LEN)
+#define EXTRA_SPACE 40
+#define REG_LEN 8
+#define S0_EXTRA_SPACE EXTRA_SPACE
+#define S1_EXTRA_SPACE (S0_EXTRA_SPACE + REG_LEN)
+#define S2_EXTRA_SPACE (S1_EXTRA_SPACE + REG_LEN)
+#define S3_EXTRA_SPACE (S2_EXTRA_SPACE + REG_LEN)
+#define S4_EXTRA_SPACE (S3_EXTRA_SPACE + REG_LEN)
+#define S5_EXTRA_SPACE (S4_EXTRA_SPACE + REG_LEN)
+#define S6_EXTRA_SPACE (S5_EXTRA_SPACE + REG_LEN)
+#define S7_EXTRA_SPACE (S6_EXTRA_SPACE + REG_LEN)
+#define S8_EXTRA_SPACE (S7_EXTRA_SPACE + REG_LEN)
+#define FP_EXTRA_SPACE (S8_EXTRA_SPACE + REG_LEN)
+#define RA_EXTRA_SPACE (FP_EXTRA_SPACE + REG_LEN)
+#define FCSR_EXTRA_SPACE (RA_EXTRA_SPACE + REG_LEN)
 
 
 static void generate_context_switch_bt_to_native(void)
@@ -352,14 +259,16 @@ static void generate_context_switch_bt_to_native(void)
 
 
     /* load gpr and fpr */
-    for(int i = 0; i <= 31; ++i) {
+    for (int i = 0; i <= 31; ++i) {
         if (arm_la_fmap[i] >= 0) {
-            la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd, env_offset_fpr(i));
+            la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+                   env_offset_fpr(i));
         }
     }
-    for(int i = 0; i <= 31; ++i) {
-        if(arm_la_map[i] > 0) {
-            la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd, env_offset_gpr(i));
+    for (int i = 0; i <= 31; ++i) {
+        if (arm_la_map[i] > 0) {
+            la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+                    env_offset_gpr(i));
         }
     }
 
@@ -369,27 +278,28 @@ static void generate_context_switch_bt_to_native(void)
 
     /* jmp to tb */
     la_jirl(zero_ir2_opnd, a0_ir2_opnd, 0);
-
 }
 
 static void generate_context_switch_native_to_bt(void)
 {
     la_mov64(a0_ir2_opnd, zero_ir2_opnd);
-    for(int i = 0; i <= 31; ++i) {
-        if(arm_la_map[i] > 0) {
-            la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd, env_offset_gpr(i));
+    for (int i = 0; i <= 31; ++i) {
+        if (arm_la_map[i] > 0) {
+            la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+                    env_offset_gpr(i));
         }
     }
-    for(int i = 0; i <= 31; ++i) {
+    for (int i = 0; i <= 31; ++i) {
         if (arm_la_fmap[i] >= 0) {
-            la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd, env_offset_fpr(i));
+            la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+                   env_offset_fpr(i));
         }
     }
 
     /* store pstate reg */
     la_armmfflag(t0_ir2_opnd, 0x39);
     la_st_w(t0_ir2_opnd, env_ir2_opnd, env_offset_PSTATE());
-    
+
     /* store fcsr(rouding mode) to vfp.xregs[ARM_VFP_FPSCR] */
     la_movfcsr2gr(t0_ir2_opnd, fcsr3_ir2_opnd);
     li_d(t1_ir2_opnd, 2 << 6 | 1 << 4 | 3 << 2 | 0);
@@ -425,7 +335,6 @@ static void generate_context_switch_native_to_bt(void)
 }
 
 
-
 /* bt -> native */
 int lata_gen_prologue(TCGContext *tcg_ctx)
 {
@@ -436,11 +345,11 @@ int lata_gen_prologue(TCGContext *tcg_ctx)
 
     if (lata_dump)
         qemu_log("[LATA] context_switch_bt_to_native = %p\n",
-                (void *)context_switch_bt_to_native);
+                 (void *)context_switch_bt_to_native);
 
     tr_init(NULL);
     generate_context_switch_bt_to_native();
-//    int ins_nr = la_encode(tcg_ctx, code_buf_rw);
+    //    int ins_nr = la_encode(tcg_ctx, code_buf_rw);
     int ins_nr = tr_ir2_assemble(code_buf_rw);
     tr_fini();
 
@@ -458,7 +367,7 @@ int lata_gen_epilogue(TCGContext *tcg_ctx)
 
     if (lata_dump)
         qemu_log("[LATA] context_switch_native_to_bt = %p\n",
-                (void *)context_switch_native_to_bt);
+                 (void *)context_switch_native_to_bt);
 
     tr_init(NULL);
     generate_context_switch_native_to_bt();
@@ -510,7 +419,8 @@ void label_dispose(void)
                     (label_num_to_ir2_num[label_id_0] << 2);
                 tb->jmp_reset_offset[0] =
                     (label_num_to_ir2_num[label_id_0] << 2) + B_STUB_SIZE;
-                // tb->jmp_target_addr[0] = (label_num_to_ir2_num[label_id_0] << 2);
+                // tb->jmp_target_addr[0] = (label_num_to_ir2_num[label_id_0] <<
+                // 2);
             }
 
             int label_id_1 = tb->jmp_reset_offset[1];
@@ -519,7 +429,8 @@ void label_dispose(void)
                     (label_num_to_ir2_num[label_id_1] << 2);
                 tb->jmp_reset_offset[1] =
                     (label_num_to_ir2_num[label_id_1] << 2) + B_STUB_SIZE;
-                // tb->jmp_target_addr[1] = (label_num_to_ir2_num[label_id_1] << 2);
+                // tb->jmp_target_addr[1] = (label_num_to_ir2_num[label_id_1] <<
+                // 2);
             }
 
 #ifdef CONFIG_LATA_INSTS_PATTERN
@@ -552,9 +463,10 @@ void label_dispose(void)
                        ir2_opcode_is_branch_with_2opnds(opcode)) {
                 label_opnd = &ir2_current->_opnd[1];
             }
-            if(label_opnd && ir2_opnd_is_label(label_opnd)) {
+            if (label_opnd && ir2_opnd_is_label(label_opnd)) {
                 int label_num = label_opnd->_label_id;
-                lsassert(label_num > 0 && label_num <= lsenv->tr_data->label_num);
+                lsassert(label_num > 0 &&
+                         label_num <= lsenv->tr_data->label_num);
                 int target_ir2_num = label_num_to_ir2_num[label_num];
                 lsassertm(target_ir2_num != -1, "label %d is not inserted\n",
                           label_num);
@@ -586,7 +498,7 @@ int tr_ir2_assemble(const void *code_start_addr)
     /* 3. assemble */
     IR2_INST *pir2 = lsenv->tr_data->first_ir2;
 
-    void *code_addr = (void *) code_start_addr;
+    void *code_addr = (void *)code_start_addr;
     int code_nr = 0;
 
     while (pir2 != NULL) {
@@ -596,7 +508,7 @@ int tr_ir2_assemble(const void *code_start_addr)
 
             if (lata_dump) {
                 qemu_log("IR2[%03d] at %p 0x%08x \n", pir2->_id, code_addr,
-                        result);
+                         result);
                 ir2_dump(pir2);
             }
 
@@ -612,26 +524,29 @@ int tr_ir2_assemble(const void *code_start_addr)
 
 void lata_gen_call_helper_prologue(TCGContext *tcg_ctx)
 {
-    for(int i = 0; i <= 31; ++i) {
-        if(arm_la_map[i] > 0) {
-            la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd, env_offset_gpr(i));
+    for (int i = 0; i <= 31; ++i) {
+        if (arm_la_map[i] > 0) {
+            la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+                    env_offset_gpr(i));
         }
     }
 
-    for(int i = 0; i <= 31; ++i) {
+    for (int i = 0; i <= 31; ++i) {
         if (arm_la_fmap[i] >= 0) {
-            la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd, env_offset_fpr(i));
+            la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+                   env_offset_fpr(i));
         }
         // if(arm_la_fmap[i] >= 0) {
         //     li_d(t0_ir2_opnd, env_offset_fpr(i));
-        //     la_vstx(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd, t0_ir2_opnd);
+        //     la_vstx(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+        //     t0_ir2_opnd);
         // }
     }
 
     /* store pstate reg */
     la_armmfflag(t0_ir2_opnd, 0x39);
     la_st_w(t0_ir2_opnd, env_ir2_opnd, env_offset_PSTATE());
-    
+
     /* store fcsr(rouding mode) to vfp.xregs[ARM_VFP_FPSCR] */
     la_movfcsr2gr(t0_ir2_opnd, fcsr3_ir2_opnd);
     li_d(t1_ir2_opnd, 2 << 6 | 1 << 4 | 3 << 2 | 0);
@@ -664,67 +579,78 @@ void lata_gen_call_helper_epilogue(TCGContext *tcg_ctx)
     la_slli_d(a7_ir2_opnd, a7_ir2_opnd, 8);
     la_movgr2fcsr(fcsr_ir2_opnd, a7_ir2_opnd);
 
-    for(int i = 0; i <= 31; ++i) {
+    for (int i = 0; i <= 31; ++i) {
         if (arm_la_fmap[i] >= 0) {
-            la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd, env_offset_fpr(i));
+            la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+                   env_offset_fpr(i));
         }
         // if(arm_la_fmap[i] >= 0) {
         //     li_d(a7_ir2_opnd, env_offset_fpr(i));
-        //     la_vldx(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd, a7_ir2_opnd);
+        //     la_vldx(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+        //     a7_ir2_opnd);
         // }
     }
 
-    for(int i = 0; i <= 31; ++i) {
-        if(arm_la_map[i] > 0) {
-            la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd, env_offset_gpr(i));
+    for (int i = 0; i <= 31; ++i) {
+        if (arm_la_map[i] > 0) {
+            la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+                    env_offset_gpr(i));
         }
     }
 }
 
-void lata_fast_jmp_cache_add(CPUArchState *env, uint64_t guest_pc, uint64_t host_pc)
+void lata_fast_jmp_cache_add(CPUArchState *env, uint64_t guest_pc,
+                             uint64_t host_pc)
 {
-    if(option_fam_jmp_cache){
-        if (guest_pc < env->mapping_range[0] || guest_pc >= env->mapping_range[1]) {
+    if (option_fam_jmp_cache) {
+        if (guest_pc < env->mapping_range[0] ||
+            guest_pc >= env->mapping_range[1]) {
             lsassertm(0, "option_fam_jmp_cache error pc, %lx, %lx, %lx\n",
-                    guest_pc, env->mapping_range[0], env->mapping_range[1]);
+                      guest_pc, env->mapping_range[0], env->mapping_range[1]);
         }
-        uint64_t* pc_map_cache_ptr = (uint64_t*)env->pc_map_cache;
-        pc_map_cache_ptr[guest_pc] = host_pc;  
-        // printf("cache:%p guest_pc:%p  host_pc:%p store_pc:%p store_pos:%p\n",(void*)env->pc_map_cache,(void*)guest_pc,(void*)host_pc,(void *)pc_map_cache_ptr[guest_pc],(void *)(uint64_t*)(cpu->pc_map_cache + guest_pc));
+        uint64_t *pc_map_cache_ptr = (uint64_t *)env->pc_map_cache;
+        pc_map_cache_ptr[guest_pc] = host_pc;
+        // printf("cache:%p guest_pc:%p  host_pc:%p store_pc:%p
+        // store_pos:%p\n",(void*)env->pc_map_cache,(void*)guest_pc,(void*)host_pc,(void
+        // *)pc_map_cache_ptr[guest_pc],(void *)(uint64_t*)(cpu->pc_map_cache +
+        // guest_pc));
         return;
     }
-    int64_t index = ((guest_pc >> LATA_PC_LOW_BIT) & (TB_JMP_CACHE_SIZE - 1)) << 4;
-    *(uint64_t*)((uint8_t*)env->pc_map_cache + index) = guest_pc;
-    *(uint64_t*)((uint8_t*)env->pc_map_cache + index + 8) = host_pc;
+    int64_t index = ((guest_pc >> LATA_PC_LOW_BIT) & (TB_JMP_CACHE_SIZE - 1))
+                    << 4;
+    *(uint64_t *)((uint8_t *)env->pc_map_cache + index) = guest_pc;
+    *(uint64_t *)((uint8_t *)env->pc_map_cache + index + 8) = host_pc;
 }
 
-void lata_fast_jmp_cache_init(CPUArchState *env,uint64_t start_code,uint64_t end_code)
+void lata_fast_jmp_cache_init(CPUArchState *env, uint64_t start_code,
+                              uint64_t end_code)
 {
     size_t malloc_size;
-    if(option_fam_jmp_cache){
+    if (option_fam_jmp_cache) {
         env->mapping_range[0] = start_code;
-        env->mapping_range[1] = end_code; 
+        env->mapping_range[1] = end_code;
         malloc_size = (end_code - start_code) * 8;
-        void* p = malloc(malloc_size);
+        void *p = malloc(malloc_size);
         if (!p) {
             lsassertm(0, "fam_indirect malloc error!\n");
         }
         memset(p, 0, malloc_size);
         fam_cache = p - (start_code * 8);
-        env->pc_map_cache = fam_cache;    
-        return;    
+        env->pc_map_cache = fam_cache;
+        return;
     }
     malloc_size = sizeof(uint64_t) * TB_JMP_CACHE_SIZE * 2;
     ibtc_cache = malloc(malloc_size);
     if (!ibtc_cache) {
         lsassertm(0, "ibtc_cache malloc error!\n");
     }
-    env->pc_map_cache = ibtc_cache;    
+    env->pc_map_cache = ibtc_cache;
 }
 
 /* gpr同时为src和dst, 使用alloc_gpr_src,并且需要store回去 */
-IR2_OPND alloc_gpr_src(int i) {
-    if(i==31){
+IR2_OPND alloc_gpr_src(int i)
+{
+    if (i == 31) {
         return ir2_opnd_new(IR2_OPND_GPR, la_zero);
     }
     if (arm_la_map[i] >= 0) {
@@ -736,7 +662,8 @@ IR2_OPND alloc_gpr_src(int i) {
     }
 }
 
-IR2_OPND alloc_gpr_src_sp(int i) {
+IR2_OPND alloc_gpr_src_sp(int i)
+{
     if (arm_la_map[i] >= 0) {
         return ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]);
     } else {
@@ -746,8 +673,9 @@ IR2_OPND alloc_gpr_src_sp(int i) {
     }
 }
 
-IR2_OPND alloc_gpr_dst(int i) {
-    if(i==31){
+IR2_OPND alloc_gpr_dst(int i)
+{
+    if (i == 31) {
         return ir2_opnd_new(IR2_OPND_GPR, la_zero);
     }
     if (arm_la_map[i] >= 0) {
@@ -757,7 +685,8 @@ IR2_OPND alloc_gpr_dst(int i) {
     }
 }
 
-IR2_OPND alloc_gpr_dst_sp(int i) {
+IR2_OPND alloc_gpr_dst_sp(int i)
+{
     if (arm_la_map[i] >= 0) {
         return ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]);
     } else {
@@ -766,32 +695,36 @@ IR2_OPND alloc_gpr_dst_sp(int i) {
 }
 
 /* la_zero作为目的寄存器不需要写回 */
-void store_gpr_dst(int i, IR2_OPND opnd) {
+void store_gpr_dst(int i, IR2_OPND opnd)
+{
     if (arm_la_map[i] < 0 && opnd.val != 0) {
         la_st_d(opnd, env_ir2_opnd, env_offset_gpr(i));
-    }   
+    }
 }
 
 /* la_zero写回 */
-void store_gpr_zero(int i) {
+void store_gpr_zero(int i)
+{
     if (arm_la_map[i] < 0) {
         la_st_d(zero_ir2_opnd, env_ir2_opnd, env_offset_gpr(i));
-    }else{
+    } else {
         IR2_OPND reg_d = alloc_gpr_dst(i);
         la_ori(reg_d, zero_ir2_opnd, 0);
         free_alloc_gpr(reg_d);
-    }   
+    }
 }
 
 /* la_zero不会被映射，但也不是临时寄存器 */
-void free_alloc_gpr(IR2_OPND opnd) {
+void free_alloc_gpr(IR2_OPND opnd)
+{
     if (arm_la_reverse_map[opnd.val] == -1 && opnd.val != 0) {
         ra_free_temp(opnd);
     }
 }
 
 // fpr
-IR2_OPND alloc_fpr_src(int i) {
+IR2_OPND alloc_fpr_src(int i)
+{
     if (arm_la_fmap[i] >= 0) {
         return ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]);
     } else {
@@ -809,7 +742,8 @@ IR2_OPND alloc_fpr_src(int i) {
     }
 }
 
-IR2_OPND alloc_fpr_dst(int i) {
+IR2_OPND alloc_fpr_dst(int i)
+{
     if (arm_la_fmap[i] >= 0) {
         return ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]);
     } else {
@@ -817,7 +751,8 @@ IR2_OPND alloc_fpr_dst(int i) {
     }
 }
 
-void store_fpr_dst(int i, IR2_OPND opnd) {
+void store_fpr_dst(int i, IR2_OPND opnd)
+{
     if (arm_la_fmap[i] < 0) {
         // int offset = env_offset_fpr(i);
         // assert(offset >= -(1 << 11) && offset <= (1 << 11) - 1 );
@@ -831,7 +766,8 @@ void store_fpr_dst(int i, IR2_OPND opnd) {
     }
 }
 
-void free_alloc_fpr(IR2_OPND opnd) {
+void free_alloc_fpr(IR2_OPND opnd)
+{
     if (arm_la_reverse_fmap[opnd.val] == -1) {
         ra_free_temp(opnd);
     }

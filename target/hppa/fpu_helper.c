@@ -56,10 +56,9 @@ void cpu_hppa_loaded_fr0(CPUHPPAState *env)
     helper_loaded_fr0(env);
 }
 
-#define CONVERT_BIT(X, SRC, DST)        \
-    ((SRC) > (DST)                      \
-     ? (X) / ((SRC) / (DST)) & (DST)    \
-     : ((X) & (SRC)) * ((DST) / (SRC)))
+#define CONVERT_BIT(X, SRC, DST)                     \
+    ((SRC) > (DST) ? (X) / ((SRC) / (DST)) & (DST) : \
+                     ((X) & (SRC)) * ((DST) / (SRC)))
 
 static void update_fr0_op(CPUHPPAState *env, uintptr_t ra)
 {
@@ -73,11 +72,11 @@ static void update_fr0_op(CPUHPPAState *env, uintptr_t ra)
     }
     set_float_exception_flags(0, &env->fp_status);
 
-    hard_exp |= CONVERT_BIT(soft_exp, float_flag_inexact,   1u << 0);
+    hard_exp |= CONVERT_BIT(soft_exp, float_flag_inexact, 1u << 0);
     hard_exp |= CONVERT_BIT(soft_exp, float_flag_underflow, 1u << 1);
-    hard_exp |= CONVERT_BIT(soft_exp, float_flag_overflow,  1u << 2);
+    hard_exp |= CONVERT_BIT(soft_exp, float_flag_overflow, 1u << 2);
     hard_exp |= CONVERT_BIT(soft_exp, float_flag_divbyzero, 1u << 3);
-    hard_exp |= CONVERT_BIT(soft_exp, float_flag_invalid,   1u << 4);
+    hard_exp |= CONVERT_BIT(soft_exp, float_flag_invalid, 1u << 4);
     shadow |= hard_exp << (32 - 5);
     env->fr0_shadow = shadow;
     env->fr[0] = (uint64_t)shadow << 32;
@@ -353,8 +352,8 @@ uint64_t HELPER(fcnv_t_d_udw)(CPUHPPAState *env, float64 arg)
     return ret;
 }
 
-static void update_fr0_cmp(CPUHPPAState *env, uint32_t y,
-                           uint32_t c, FloatRelation r)
+static void update_fr0_cmp(CPUHPPAState *env, uint32_t y, uint32_t c,
+                           FloatRelation r)
 {
     uint32_t shadow = env->fr0_shadow;
 
@@ -393,8 +392,8 @@ static void update_fr0_cmp(CPUHPPAState *env, uint32_t y,
     env->fr[0] = (uint64_t)shadow << 32;
 }
 
-void HELPER(fcmp_s)(CPUHPPAState *env, float32 a, float32 b,
-                    uint32_t y, uint32_t c)
+void HELPER(fcmp_s)(CPUHPPAState *env, float32 a, float32 b, uint32_t y,
+                    uint32_t c)
 {
     FloatRelation r;
     if (c & 1) {
@@ -406,8 +405,8 @@ void HELPER(fcmp_s)(CPUHPPAState *env, float32 a, float32 b,
     update_fr0_cmp(env, y, c, r);
 }
 
-void HELPER(fcmp_d)(CPUHPPAState *env, float64 a, float64 b,
-                    uint32_t y, uint32_t c)
+void HELPER(fcmp_d)(CPUHPPAState *env, float64 a, float64 b, uint32_t y,
+                    uint32_t c)
 {
     FloatRelation r;
     if (c & 1) {
@@ -428,8 +427,8 @@ float32 HELPER(fmpyfadd_s)(CPUHPPAState *env, float32 a, float32 b, float32 c)
 
 float32 HELPER(fmpynfadd_s)(CPUHPPAState *env, float32 a, float32 b, float32 c)
 {
-    float32 ret = float32_muladd(a, b, c, float_muladd_negate_product,
-                                 &env->fp_status);
+    float32 ret =
+        float32_muladd(a, b, c, float_muladd_negate_product, &env->fp_status);
     update_fr0_op(env, GETPC());
     return ret;
 }
@@ -443,8 +442,8 @@ float64 HELPER(fmpyfadd_d)(CPUHPPAState *env, float64 a, float64 b, float64 c)
 
 float64 HELPER(fmpynfadd_d)(CPUHPPAState *env, float64 a, float64 b, float64 c)
 {
-    float64 ret = float64_muladd(a, b, c, float_muladd_negate_product,
-                                 &env->fp_status);
+    float64 ret =
+        float64_muladd(a, b, c, float_muladd_negate_product, &env->fp_status);
     update_fr0_op(env, GETPC());
     return ret;
 }

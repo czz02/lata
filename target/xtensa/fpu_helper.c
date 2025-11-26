@@ -51,11 +51,26 @@ static const struct {
     uint32_t xtensa_fp_flag;
     int softfloat_fp_flag;
 } xtensa_fp_flag_map[] = {
-    { XTENSA_FP_I, float_flag_inexact, },
-    { XTENSA_FP_U, float_flag_underflow, },
-    { XTENSA_FP_O, float_flag_overflow, },
-    { XTENSA_FP_Z, float_flag_divbyzero, },
-    { XTENSA_FP_V, float_flag_invalid, },
+    {
+        XTENSA_FP_I,
+        float_flag_inexact,
+    },
+    {
+        XTENSA_FP_U,
+        float_flag_underflow,
+    },
+    {
+        XTENSA_FP_O,
+        float_flag_overflow,
+    },
+    {
+        XTENSA_FP_Z,
+        float_flag_divbyzero,
+    },
+    {
+        XTENSA_FP_V,
+        float_flag_invalid,
+    },
 };
 
 void HELPER(wur_fpu2k_fcr)(CPUXtensaState *env, uint32_t v)
@@ -157,14 +172,14 @@ float32 HELPER(fpu2k_mul_s)(CPUXtensaState *env, float32 a, float32 b)
     return float32_mul(a, b, &env->fp_status);
 }
 
-float32 HELPER(fpu2k_madd_s)(CPUXtensaState *env,
-                             float32 a, float32 b, float32 c)
+float32 HELPER(fpu2k_madd_s)(CPUXtensaState *env, float32 a, float32 b,
+                             float32 c)
 {
     return float32_muladd(b, c, a, 0, &env->fp_status);
 }
 
-float32 HELPER(fpu2k_msub_s)(CPUXtensaState *env,
-                             float32 a, float32 b, float32 c)
+float32 HELPER(fpu2k_msub_s)(CPUXtensaState *env, float32 a, float32 b,
+                             float32 c)
 {
     return float32_muladd(b, c, a, float_muladd_negate_product,
                           &env->fp_status);
@@ -256,8 +271,8 @@ float32 HELPER(mksadj_s)(CPUXtensaState *env, float32 v)
     return float32_sqrt(v, &env->fp_status);
 }
 
-uint32_t HELPER(ftoi_d)(CPUXtensaState *env, float64 v,
-                        uint32_t rounding_mode, uint32_t scale)
+uint32_t HELPER(ftoi_d)(CPUXtensaState *env, float64 v, uint32_t rounding_mode,
+                        uint32_t scale)
 {
     float_status fp_status = env->fp_status;
     uint32_t res;
@@ -269,8 +284,8 @@ uint32_t HELPER(ftoi_d)(CPUXtensaState *env, float64 v,
     return res;
 }
 
-uint32_t HELPER(ftoi_s)(CPUXtensaState *env, float32 v,
-                        uint32_t rounding_mode, uint32_t scale)
+uint32_t HELPER(ftoi_s)(CPUXtensaState *env, float32 v, uint32_t rounding_mode,
+                        uint32_t scale)
 {
     float_status fp_status = env->fp_status;
     uint32_t res;
@@ -282,8 +297,8 @@ uint32_t HELPER(ftoi_s)(CPUXtensaState *env, float32 v,
     return res;
 }
 
-uint32_t HELPER(ftoui_d)(CPUXtensaState *env, float64 v,
-                         uint32_t rounding_mode, uint32_t scale)
+uint32_t HELPER(ftoui_d)(CPUXtensaState *env, float64 v, uint32_t rounding_mode,
+                         uint32_t scale)
 {
     float_status fp_status = env->fp_status;
     float64 res;
@@ -304,8 +319,8 @@ uint32_t HELPER(ftoui_d)(CPUXtensaState *env, float64 v,
     return rv;
 }
 
-uint32_t HELPER(ftoui_s)(CPUXtensaState *env, float32 v,
-                         uint32_t rounding_mode, uint32_t scale)
+uint32_t HELPER(ftoui_s)(CPUXtensaState *env, float32 v, uint32_t rounding_mode,
+                         uint32_t scale)
 {
     float_status fp_status = env->fp_status;
     float32 res;
@@ -330,26 +345,26 @@ uint32_t HELPER(ftoui_s)(CPUXtensaState *env, float32 v,
 
 float64 HELPER(itof_d)(CPUXtensaState *env, uint32_t v, uint32_t scale)
 {
-    return float64_scalbn(int32_to_float64(v, &env->fp_status),
-                          (int32_t)scale, &env->fp_status);
+    return float64_scalbn(int32_to_float64(v, &env->fp_status), (int32_t)scale,
+                          &env->fp_status);
 }
 
 float32 HELPER(itof_s)(CPUXtensaState *env, uint32_t v, uint32_t scale)
 {
-    return float32_scalbn(int32_to_float32(v, &env->fp_status),
-                          (int32_t)scale, &env->fp_status);
+    return float32_scalbn(int32_to_float32(v, &env->fp_status), (int32_t)scale,
+                          &env->fp_status);
 }
 
 float64 HELPER(uitof_d)(CPUXtensaState *env, uint32_t v, uint32_t scale)
 {
-    return float64_scalbn(uint32_to_float64(v, &env->fp_status),
-                          (int32_t)scale, &env->fp_status);
+    return float64_scalbn(uint32_to_float64(v, &env->fp_status), (int32_t)scale,
+                          &env->fp_status);
 }
 
 float32 HELPER(uitof_s)(CPUXtensaState *env, uint32_t v, uint32_t scale)
 {
-    return float32_scalbn(uint32_to_float32(v, &env->fp_status),
-                          (int32_t)scale, &env->fp_status);
+    return float32_scalbn(uint32_to_float32(v, &env->fp_status), (int32_t)scale,
+                          &env->fp_status);
 }
 
 float64 HELPER(cvtd_s)(CPUXtensaState *env, float32 v)
@@ -386,16 +401,14 @@ uint32_t HELPER(ueq_d)(CPUXtensaState *env, float64 a, float64 b)
 {
     FloatRelation v = float64_compare_quiet(a, b, &env->fp_status);
 
-    return v == float_relation_equal ||
-           v == float_relation_unordered;
+    return v == float_relation_equal || v == float_relation_unordered;
 }
 
 uint32_t HELPER(ueq_s)(CPUXtensaState *env, float32 a, float32 b)
 {
     FloatRelation v = float32_compare_quiet(a, b, &env->fp_status);
 
-    return v == float_relation_equal ||
-           v == float_relation_unordered;
+    return v == float_relation_equal || v == float_relation_unordered;
 }
 
 uint32_t HELPER(olt_d)(CPUXtensaState *env, float64 a, float64 b)
@@ -412,16 +425,14 @@ uint32_t HELPER(ult_d)(CPUXtensaState *env, float64 a, float64 b)
 {
     FloatRelation v = float64_compare_quiet(a, b, &env->fp_status);
 
-    return v == float_relation_less ||
-           v == float_relation_unordered;
+    return v == float_relation_less || v == float_relation_unordered;
 }
 
 uint32_t HELPER(ult_s)(CPUXtensaState *env, float32 a, float32 b)
 {
     FloatRelation v = float32_compare_quiet(a, b, &env->fp_status);
 
-    return v == float_relation_less ||
-           v == float_relation_unordered;
+    return v == float_relation_less || v == float_relation_unordered;
 }
 
 uint32_t HELPER(ole_d)(CPUXtensaState *env, float64 a, float64 b)

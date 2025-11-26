@@ -25,18 +25,18 @@
 #include "qemu/cpu-float.h"
 
 /* Alpha processors have a weak memory model */
-#define TCG_GUEST_DEFAULT_MO      (0)
+#define TCG_GUEST_DEFAULT_MO (0)
 
 #define ICACHE_LINE_SIZE 32
 #define DCACHE_LINE_SIZE 32
 
 /* Alpha major type */
 enum {
-    ALPHA_EV3  = 1,
-    ALPHA_EV4  = 2,
-    ALPHA_SIM  = 3,
-    ALPHA_LCA  = 4,
-    ALPHA_EV5  = 5, /* 21164 */
+    ALPHA_EV3 = 1,
+    ALPHA_EV4 = 2,
+    ALPHA_SIM = 3,
+    ALPHA_LCA = 4,
+    ALPHA_EV5 = 5, /* 21164 */
     ALPHA_EV45 = 6, /* 21064A */
     ALPHA_EV56 = 7, /* 21164A */
 };
@@ -87,11 +87,11 @@ enum {
 };
 
 enum {
-    AMASK_BWX      = 0x00000001,
-    AMASK_FIX      = 0x00000002,
-    AMASK_CIX      = 0x00000004,
-    AMASK_MVI      = 0x00000100,
-    AMASK_TRAP     = 0x00000200,
+    AMASK_BWX = 0x00000001,
+    AMASK_FIX = 0x00000002,
+    AMASK_CIX = 0x00000004,
+    AMASK_MVI = 0x00000100,
+    AMASK_TRAP = 0x00000200,
     AMASK_PREFETCH = 0x00001000,
 };
 
@@ -111,73 +111,73 @@ enum {
 /* IEEE floating-point operations encoding */
 /* Trap mode */
 enum {
-    FP_TRAP_I   = 0x0,
-    FP_TRAP_U   = 0x1,
-    FP_TRAP_S  = 0x4,
-    FP_TRAP_SU  = 0x5,
+    FP_TRAP_I = 0x0,
+    FP_TRAP_U = 0x1,
+    FP_TRAP_S = 0x4,
+    FP_TRAP_SU = 0x5,
     FP_TRAP_SUI = 0x7,
 };
 
 /* Rounding mode */
 enum {
     FP_ROUND_CHOPPED = 0x0,
-    FP_ROUND_MINUS   = 0x1,
-    FP_ROUND_NORMAL  = 0x2,
+    FP_ROUND_MINUS = 0x1,
+    FP_ROUND_NORMAL = 0x2,
     FP_ROUND_DYNAMIC = 0x3,
 };
 
 /* FPCR bits -- right-shifted 32 so we can use a uint32_t.  */
-#define FPCR_SUM                (1U << (63 - 32))
-#define FPCR_INED               (1U << (62 - 32))
-#define FPCR_UNFD               (1U << (61 - 32))
-#define FPCR_UNDZ               (1U << (60 - 32))
-#define FPCR_DYN_SHIFT          (58 - 32)
-#define FPCR_DYN_CHOPPED        (0U << FPCR_DYN_SHIFT)
-#define FPCR_DYN_MINUS          (1U << FPCR_DYN_SHIFT)
-#define FPCR_DYN_NORMAL         (2U << FPCR_DYN_SHIFT)
-#define FPCR_DYN_PLUS           (3U << FPCR_DYN_SHIFT)
-#define FPCR_DYN_MASK           (3U << FPCR_DYN_SHIFT)
-#define FPCR_IOV                (1U << (57 - 32))
-#define FPCR_INE                (1U << (56 - 32))
-#define FPCR_UNF                (1U << (55 - 32))
-#define FPCR_OVF                (1U << (54 - 32))
-#define FPCR_DZE                (1U << (53 - 32))
-#define FPCR_INV                (1U << (52 - 32))
-#define FPCR_OVFD               (1U << (51 - 32))
-#define FPCR_DZED               (1U << (50 - 32))
-#define FPCR_INVD               (1U << (49 - 32))
-#define FPCR_DNZ                (1U << (48 - 32))
-#define FPCR_DNOD               (1U << (47 - 32))
-#define FPCR_STATUS_MASK        (FPCR_IOV | FPCR_INE | FPCR_UNF \
-                                 | FPCR_OVF | FPCR_DZE | FPCR_INV)
+#define FPCR_SUM (1U << (63 - 32))
+#define FPCR_INED (1U << (62 - 32))
+#define FPCR_UNFD (1U << (61 - 32))
+#define FPCR_UNDZ (1U << (60 - 32))
+#define FPCR_DYN_SHIFT (58 - 32)
+#define FPCR_DYN_CHOPPED (0U << FPCR_DYN_SHIFT)
+#define FPCR_DYN_MINUS (1U << FPCR_DYN_SHIFT)
+#define FPCR_DYN_NORMAL (2U << FPCR_DYN_SHIFT)
+#define FPCR_DYN_PLUS (3U << FPCR_DYN_SHIFT)
+#define FPCR_DYN_MASK (3U << FPCR_DYN_SHIFT)
+#define FPCR_IOV (1U << (57 - 32))
+#define FPCR_INE (1U << (56 - 32))
+#define FPCR_UNF (1U << (55 - 32))
+#define FPCR_OVF (1U << (54 - 32))
+#define FPCR_DZE (1U << (53 - 32))
+#define FPCR_INV (1U << (52 - 32))
+#define FPCR_OVFD (1U << (51 - 32))
+#define FPCR_DZED (1U << (50 - 32))
+#define FPCR_INVD (1U << (49 - 32))
+#define FPCR_DNZ (1U << (48 - 32))
+#define FPCR_DNOD (1U << (47 - 32))
+#define FPCR_STATUS_MASK \
+    (FPCR_IOV | FPCR_INE | FPCR_UNF | FPCR_OVF | FPCR_DZE | FPCR_INV)
 
 /* The silly software trap enables implemented by the kernel emulation.
    These are more or less architecturally required, since the real hardware
    has read-as-zero bits in the FPCR when the features aren't implemented.
    For the purposes of QEMU, we pretend the FPCR can hold everything.  */
-#define SWCR_TRAP_ENABLE_INV    (1U << 1)
-#define SWCR_TRAP_ENABLE_DZE    (1U << 2)
-#define SWCR_TRAP_ENABLE_OVF    (1U << 3)
-#define SWCR_TRAP_ENABLE_UNF    (1U << 4)
-#define SWCR_TRAP_ENABLE_INE    (1U << 5)
-#define SWCR_TRAP_ENABLE_DNO    (1U << 6)
-#define SWCR_TRAP_ENABLE_MASK   ((1U << 7) - (1U << 1))
+#define SWCR_TRAP_ENABLE_INV (1U << 1)
+#define SWCR_TRAP_ENABLE_DZE (1U << 2)
+#define SWCR_TRAP_ENABLE_OVF (1U << 3)
+#define SWCR_TRAP_ENABLE_UNF (1U << 4)
+#define SWCR_TRAP_ENABLE_INE (1U << 5)
+#define SWCR_TRAP_ENABLE_DNO (1U << 6)
+#define SWCR_TRAP_ENABLE_MASK ((1U << 7) - (1U << 1))
 
-#define SWCR_MAP_DMZ            (1U << 12)
-#define SWCR_MAP_UMZ            (1U << 13)
-#define SWCR_MAP_MASK           (SWCR_MAP_DMZ | SWCR_MAP_UMZ)
+#define SWCR_MAP_DMZ (1U << 12)
+#define SWCR_MAP_UMZ (1U << 13)
+#define SWCR_MAP_MASK (SWCR_MAP_DMZ | SWCR_MAP_UMZ)
 
-#define SWCR_STATUS_INV         (1U << 17)
-#define SWCR_STATUS_DZE         (1U << 18)
-#define SWCR_STATUS_OVF         (1U << 19)
-#define SWCR_STATUS_UNF         (1U << 20)
-#define SWCR_STATUS_INE         (1U << 21)
-#define SWCR_STATUS_DNO         (1U << 22)
-#define SWCR_STATUS_MASK        ((1U << 23) - (1U << 17))
+#define SWCR_STATUS_INV (1U << 17)
+#define SWCR_STATUS_DZE (1U << 18)
+#define SWCR_STATUS_OVF (1U << 19)
+#define SWCR_STATUS_UNF (1U << 20)
+#define SWCR_STATUS_INE (1U << 21)
+#define SWCR_STATUS_DNO (1U << 22)
+#define SWCR_STATUS_MASK ((1U << 23) - (1U << 17))
 
-#define SWCR_STATUS_TO_EXCSUM_SHIFT  16
+#define SWCR_STATUS_TO_EXCSUM_SHIFT 16
 
-#define SWCR_MASK  (SWCR_TRAP_ENABLE_MASK | SWCR_MAP_MASK | SWCR_STATUS_MASK)
+#define SWCR_MASK (SWCR_TRAP_ENABLE_MASK | SWCR_MAP_MASK | SWCR_STATUS_MASK)
 
 /* MMU modes definitions */
 
@@ -194,9 +194,9 @@ enum {
    PALcode cheats and uses the KSEG mapping for its code+data rather than
    physical addresses.  */
 
-#define MMU_KERNEL_IDX   0
-#define MMU_USER_IDX     1
-#define MMU_PHYS_IDX     2
+#define MMU_KERNEL_IDX 0
+#define MMU_USER_IDX 1
+#define MMU_PHYS_IDX 2
 
 typedef struct CPUArchState {
     uint64_t ir[31];
@@ -287,10 +287,10 @@ int alpha_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
 #include "exec/cpu-all.h"
 
 enum {
-    FEATURE_ASN    = 0x00000001,
-    FEATURE_SPS    = 0x00000002,
+    FEATURE_ASN = 0x00000001,
+    FEATURE_SPS = 0x00000002,
     FEATURE_VIRBND = 0x00000004,
-    FEATURE_TBCHK  = 0x00000008,
+    FEATURE_TBCHK = 0x00000008,
 };
 
 enum {
@@ -308,21 +308,21 @@ enum {
 };
 
 /* Alpha-specific interrupt pending bits.  */
-#define CPU_INTERRUPT_TIMER	CPU_INTERRUPT_TGT_EXT_0
-#define CPU_INTERRUPT_SMP	CPU_INTERRUPT_TGT_EXT_1
-#define CPU_INTERRUPT_MCHK	CPU_INTERRUPT_TGT_EXT_2
+#define CPU_INTERRUPT_TIMER CPU_INTERRUPT_TGT_EXT_0
+#define CPU_INTERRUPT_SMP CPU_INTERRUPT_TGT_EXT_1
+#define CPU_INTERRUPT_MCHK CPU_INTERRUPT_TGT_EXT_2
 
 /* OSF/1 Page table bits.  */
 enum {
     PTE_VALID = 0x0001,
-    PTE_FOR   = 0x0002,  /* used for page protection (fault on read) */
-    PTE_FOW   = 0x0004,  /* used for page protection (fault on write) */
-    PTE_FOE   = 0x0008,  /* used for page protection (fault on exec) */
-    PTE_ASM   = 0x0010,
-    PTE_KRE   = 0x0100,
-    PTE_URE   = 0x0200,
-    PTE_KWE   = 0x1000,
-    PTE_UWE   = 0x2000
+    PTE_FOR = 0x0002, /* used for page protection (fault on read) */
+    PTE_FOW = 0x0004, /* used for page protection (fault on write) */
+    PTE_FOE = 0x0008, /* used for page protection (fault on exec) */
+    PTE_ASM = 0x0010,
+    PTE_KRE = 0x0100,
+    PTE_URE = 0x0200,
+    PTE_KWE = 0x1000,
+    PTE_UWE = 0x2000
 };
 
 /* Hardware interrupt (entInt) constants.  */
@@ -335,51 +335,44 @@ enum {
 };
 
 /* Memory management (entMM) constants.  */
-enum {
-    MM_K_TNV,
-    MM_K_ACV,
-    MM_K_FOR,
-    MM_K_FOE,
-    MM_K_FOW
-};
+enum { MM_K_TNV, MM_K_ACV, MM_K_FOR, MM_K_FOE, MM_K_FOW };
 
 /* Arithmetic exception (entArith) constants.  */
 enum {
-    EXC_M_SWC = 1,      /* Software completion */
-    EXC_M_INV = 2,      /* Invalid operation */
-    EXC_M_DZE = 4,      /* Division by zero */
-    EXC_M_FOV = 8,      /* Overflow */
-    EXC_M_UNF = 16,     /* Underflow */
-    EXC_M_INE = 32,     /* Inexact result */
-    EXC_M_IOV = 64      /* Integer Overflow */
+    EXC_M_SWC = 1, /* Software completion */
+    EXC_M_INV = 2, /* Invalid operation */
+    EXC_M_DZE = 4, /* Division by zero */
+    EXC_M_FOV = 8, /* Overflow */
+    EXC_M_UNF = 16, /* Underflow */
+    EXC_M_INE = 32, /* Inexact result */
+    EXC_M_IOV = 64 /* Integer Overflow */
 };
 
 /* Processor status constants.  */
 /* Low 3 bits are interrupt mask level.  */
-#define PS_INT_MASK   7u
+#define PS_INT_MASK 7u
 
 /* Bits 4 and 5 are the mmu mode.  The VMS PALcode uses all 4 modes;
    The Unix PALcode only uses bit 4.  */
-#define PS_USER_MODE  8u
+#define PS_USER_MODE 8u
 
 /* CPUAlphaState->flags constants.  These are laid out so that we
    can set or reset the pieces individually by assigning to the byte,
    or manipulated as a whole.  */
 
-#define ENV_FLAG_PAL_SHIFT    0
-#define ENV_FLAG_PS_SHIFT     8
-#define ENV_FLAG_RX_SHIFT     16
-#define ENV_FLAG_FEN_SHIFT    24
+#define ENV_FLAG_PAL_SHIFT 0
+#define ENV_FLAG_PS_SHIFT 8
+#define ENV_FLAG_RX_SHIFT 16
+#define ENV_FLAG_FEN_SHIFT 24
 
-#define ENV_FLAG_PAL_MODE     (1u << ENV_FLAG_PAL_SHIFT)
-#define ENV_FLAG_PS_USER      (PS_USER_MODE << ENV_FLAG_PS_SHIFT)
-#define ENV_FLAG_RX_FLAG      (1u << ENV_FLAG_RX_SHIFT)
-#define ENV_FLAG_FEN          (1u << ENV_FLAG_FEN_SHIFT)
+#define ENV_FLAG_PAL_MODE (1u << ENV_FLAG_PAL_SHIFT)
+#define ENV_FLAG_PS_USER (PS_USER_MODE << ENV_FLAG_PS_SHIFT)
+#define ENV_FLAG_RX_FLAG (1u << ENV_FLAG_RX_SHIFT)
+#define ENV_FLAG_FEN (1u << ENV_FLAG_FEN_SHIFT)
 
-#define ENV_FLAG_TB_MASK \
-    (ENV_FLAG_PAL_MODE | ENV_FLAG_PS_USER | ENV_FLAG_FEN)
+#define ENV_FLAG_TB_MASK (ENV_FLAG_PAL_MODE | ENV_FLAG_PS_USER | ENV_FLAG_FEN)
 
-#define TB_FLAG_UNALIGN       (1u << 1)
+#define TB_FLAG_UNALIGN (1u << 1)
 
 static inline int cpu_mmu_index(CPUAlphaState *env, bool ifetch)
 {
@@ -391,39 +384,39 @@ static inline int cpu_mmu_index(CPUAlphaState *env, bool ifetch)
 }
 
 enum {
-    IR_V0   = 0,
-    IR_T0   = 1,
-    IR_T1   = 2,
-    IR_T2   = 3,
-    IR_T3   = 4,
-    IR_T4   = 5,
-    IR_T5   = 6,
-    IR_T6   = 7,
-    IR_T7   = 8,
-    IR_S0   = 9,
-    IR_S1   = 10,
-    IR_S2   = 11,
-    IR_S3   = 12,
-    IR_S4   = 13,
-    IR_S5   = 14,
-    IR_S6   = 15,
-    IR_FP   = IR_S6,
-    IR_A0   = 16,
-    IR_A1   = 17,
-    IR_A2   = 18,
-    IR_A3   = 19,
-    IR_A4   = 20,
-    IR_A5   = 21,
-    IR_T8   = 22,
-    IR_T9   = 23,
-    IR_T10  = 24,
-    IR_T11  = 25,
-    IR_RA   = 26,
-    IR_T12  = 27,
-    IR_PV   = IR_T12,
-    IR_AT   = 28,
-    IR_GP   = 29,
-    IR_SP   = 30,
+    IR_V0 = 0,
+    IR_T0 = 1,
+    IR_T1 = 2,
+    IR_T2 = 3,
+    IR_T3 = 4,
+    IR_T4 = 5,
+    IR_T5 = 6,
+    IR_T6 = 7,
+    IR_T7 = 8,
+    IR_S0 = 9,
+    IR_S1 = 10,
+    IR_S2 = 11,
+    IR_S3 = 12,
+    IR_S4 = 13,
+    IR_S5 = 14,
+    IR_S6 = 15,
+    IR_FP = IR_S6,
+    IR_A0 = 16,
+    IR_A1 = 17,
+    IR_A2 = 18,
+    IR_A3 = 19,
+    IR_A4 = 20,
+    IR_A5 = 21,
+    IR_T8 = 22,
+    IR_T9 = 23,
+    IR_T10 = 24,
+    IR_T11 = 25,
+    IR_RA = 26,
+    IR_T12 = 27,
+    IR_PV = IR_T12,
+    IR_AT = 28,
+    IR_GP = 29,
+    IR_SP = 30,
     IR_ZERO = 31,
 };
 
@@ -437,27 +430,26 @@ void alpha_cpu_list(void);
 G_NORETURN void dynamic_excp(CPUAlphaState *, uintptr_t, int, int);
 G_NORETURN void arith_excp(CPUAlphaState *, uintptr_t, int, uint64_t);
 
-uint64_t cpu_alpha_load_fpcr (CPUAlphaState *env);
-void cpu_alpha_store_fpcr (CPUAlphaState *env, uint64_t val);
+uint64_t cpu_alpha_load_fpcr(CPUAlphaState *env);
+void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val);
 uint64_t cpu_alpha_load_gr(CPUAlphaState *env, unsigned reg);
 void cpu_alpha_store_gr(CPUAlphaState *env, unsigned reg, uint64_t val);
 
 #ifdef CONFIG_USER_ONLY
 void alpha_cpu_record_sigsegv(CPUState *cs, vaddr address,
-                              MMUAccessType access_type,
-                              bool maperr, uintptr_t retaddr);
+                              MMUAccessType access_type, bool maperr,
+                              uintptr_t retaddr);
 void alpha_cpu_record_sigbus(CPUState *cs, vaddr address,
                              MMUAccessType access_type, uintptr_t retaddr);
 #else
 bool alpha_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                        MMUAccessType access_type, int mmu_idx,
-                        bool probe, uintptr_t retaddr);
+                        MMUAccessType access_type, int mmu_idx, bool probe,
+                        uintptr_t retaddr);
 G_NORETURN void alpha_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
-                                              MMUAccessType access_type, int mmu_idx,
-                                              uintptr_t retaddr);
-void alpha_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                     vaddr addr, unsigned size,
-                                     MMUAccessType access_type,
+                                              MMUAccessType access_type,
+                                              int mmu_idx, uintptr_t retaddr);
+void alpha_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                     unsigned size, MMUAccessType access_type,
                                      int mmu_idx, MemTxAttrs attrs,
                                      MemTxResult response, uintptr_t retaddr);
 #endif
@@ -481,11 +473,10 @@ static inline uint64_t alpha_ieee_swcr_to_fpcr(uint64_t swcr)
 
     fpcr |= (swcr & SWCR_STATUS_MASK) << 35;
     fpcr |= (swcr & SWCR_MAP_DMZ) << 36;
-    fpcr |= (~swcr & (SWCR_TRAP_ENABLE_INV
-                      | SWCR_TRAP_ENABLE_DZE
-                      | SWCR_TRAP_ENABLE_OVF)) << 48;
-    fpcr |= (~swcr & (SWCR_TRAP_ENABLE_UNF
-                      | SWCR_TRAP_ENABLE_INE)) << 57;
+    fpcr |= (~swcr & (SWCR_TRAP_ENABLE_INV | SWCR_TRAP_ENABLE_DZE |
+                      SWCR_TRAP_ENABLE_OVF))
+            << 48;
+    fpcr |= (~swcr & (SWCR_TRAP_ENABLE_UNF | SWCR_TRAP_ENABLE_INE)) << 57;
     fpcr |= (swcr & SWCR_MAP_UMZ ? FPCR_UNDZ | FPCR_UNFD : 0);
     fpcr |= (~swcr & SWCR_TRAP_ENABLE_DNO) << 41;
 
@@ -499,9 +490,8 @@ static inline uint64_t alpha_ieee_fpcr_to_swcr(uint64_t fpcr)
 
     swcr |= (fpcr >> 35) & SWCR_STATUS_MASK;
     swcr |= (fpcr >> 36) & SWCR_MAP_DMZ;
-    swcr |= (~fpcr >> 48) & (SWCR_TRAP_ENABLE_INV
-                             | SWCR_TRAP_ENABLE_DZE
-                             | SWCR_TRAP_ENABLE_OVF);
+    swcr |= (~fpcr >> 48) & (SWCR_TRAP_ENABLE_INV | SWCR_TRAP_ENABLE_DZE |
+                             SWCR_TRAP_ENABLE_OVF);
     swcr |= (~fpcr >> 57) & (SWCR_TRAP_ENABLE_UNF | SWCR_TRAP_ENABLE_INE);
     swcr |= (fpcr >> 47) & SWCR_MAP_UMZ;
     swcr |= (~fpcr >> 41) & SWCR_TRAP_ENABLE_DNO;

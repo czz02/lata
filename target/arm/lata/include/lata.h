@@ -11,12 +11,11 @@
 #include "macro-inst.h"
 
 #include "tcg/tcg.h"
-//#include "env.h"
+// #include "env.h"
 
 #define B_STUB_SIZE 4
 
 typedef struct TRANSLATION_DATA {
-
     void *curr_tb; /* from QEMU */
 
     /* ir1 */
@@ -24,7 +23,7 @@ typedef struct TRANSLATION_DATA {
     // int curr_ir1_count;
     /* uint8       ir1_dump_threshold[MAX_IR1_NUM_PER_TB]; */
 
-    /*  w_write_flag indicates whether a 32-bit register was written 
+    /*  w_write_flag indicates whether a 32-bit register was written
         before the current instruction, it should initialize to zero
         Each bit represents one general registers(w0-w31)
     */
@@ -54,19 +53,19 @@ typedef struct TRANSLATION_DATA {
 
     /* TODO : support static translation */
     uint8 curr_ir1_skipped_eflags; /* these eflag calculation can be skipped */
-                                   /* (because of flag pattern, etc) */
+    /* (because of flag pattern, etc) */
 } TRANSLATION_DATA;
 
 
 typedef struct ENV {
-    void *cpu_state;            /* from QEMU,CPUArchState */
-    TRANSLATION_DATA *tr_data;  /* from LATR */
+    void *cpu_state; /* from QEMU,CPUArchState */
+    TRANSLATION_DATA *tr_data; /* from LATR */
 } ENV;
 
 
 void lata_tr_data_init(CPUArchState *env);
 void lsenv_register_thread(CPUArchState *env);
-void tr_init(void*);
+void tr_init(void *);
 void tr_fini(void);
 
 extern const int arm_la_map[];
@@ -81,8 +80,10 @@ extern uint64_t context_switch_native_to_bt;
 
 int lata_gen_prologue(TCGContext *tcg_ctx);
 int lata_gen_epilogue(TCGContext *tcg_ctx);
-void lata_fast_jmp_cache_init(CPUArchState *env, uint64_t start_code, uint64_t end_code);
-void lata_fast_jmp_cache_add(CPUArchState *env, uint64_t guest_pc, uint64_t host_pc);
+void lata_fast_jmp_cache_init(CPUArchState *env, uint64_t start_code,
+                              uint64_t end_code);
+void lata_fast_jmp_cache_add(CPUArchState *env, uint64_t guest_pc,
+                             uint64_t host_pc);
 
 int tr_ir2_assemble(const void *code_start_addr);
 void label_dispose(void);

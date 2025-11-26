@@ -26,7 +26,7 @@
         .desc = _DESC,                             \
     },
 static const S390FeatDef s390_features[S390_FEAT_MAX] = {
-    #include "cpu_features_def.h.inc"
+#include "cpu_features_def.h.inc"
 };
 #undef DEF_FEAT
 
@@ -73,7 +73,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
     case S390_FEAT_TYPE_STFL:
         if (test_bit(S390_FEAT_ZARCH, features)) {
             /* Features that are always active */
-            set_be_bit(2, data);   /* z/Architecture */
+            set_be_bit(2, data); /* z/Architecture */
             set_be_bit(138, data); /* Configuration-z-architectural-mode */
         }
         break;
@@ -160,19 +160,19 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
 
     switch (type) {
     case S390_FEAT_TYPE_STFL:
-       nr_bits = 16384;
-       break;
+        nr_bits = 16384;
+        break;
     case S390_FEAT_TYPE_PLO:
     case S390_FEAT_TYPE_SORTL:
     case S390_FEAT_TYPE_DFLTCC:
-       nr_bits = 256;
-       break;
+        nr_bits = 256;
+        break;
     default:
-       /* all cpu subfunctions have 128 bit */
-       nr_bits = 128;
+        /* all cpu subfunctions have 128 bit */
+        nr_bits = 128;
     };
 
-    le_bit = find_first_bit((unsigned long *) data, nr_bits);
+    le_bit = find_first_bit((unsigned long *)data, nr_bits);
     while (le_bit < nr_bits) {
         /* convert the bit number to a big endian bit nr */
         S390Feat feat = s390_feat_by_type_and_bit(type, BE_BIT_NR(le_bit));
@@ -180,7 +180,7 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
         if (feat < S390_FEAT_MAX) {
             set_bit(feat, features);
         }
-        le_bit = find_next_bit((unsigned long *) data, nr_bits, le_bit + 1);
+        le_bit = find_next_bit((unsigned long *)data, nr_bits, le_bit + 1);
     }
 }
 
@@ -212,32 +212,45 @@ void s390_feat_bitmap_to_ascii(const S390FeatBitmap features, void *opaque,
     };
 }
 
-#define FEAT_GROUP_INIT(_name, _group, _desc)        \
-    {                                                \
-        .name = _name,                               \
-        .desc = _desc,                               \
-        .init = { S390_FEAT_GROUP_LIST_ ## _group }, \
+#define FEAT_GROUP_INIT(_name, _group, _desc)      \
+    {                                              \
+        .name = _name, .desc = _desc,              \
+        .init = { S390_FEAT_GROUP_LIST_##_group }, \
     }
 
 /* indexed by feature group number for easy lookup */
 static S390FeatGroupDef s390_feature_groups[] = {
     FEAT_GROUP_INIT("plo", PLO, "Perform-locked-operation facility"),
     FEAT_GROUP_INIT("tods", TOD_CLOCK_STEERING, "Tod-clock-steering facility"),
-    FEAT_GROUP_INIT("gen13ptff", GEN13_PTFF, "PTFF enhancements introduced with z13"),
+    FEAT_GROUP_INIT("gen13ptff", GEN13_PTFF,
+                    "PTFF enhancements introduced with z13"),
     FEAT_GROUP_INIT("msa", MSA, "Message-security-assist facility"),
-    FEAT_GROUP_INIT("msa1", MSA_EXT_1, "Message-security-assist-extension 1 facility"),
-    FEAT_GROUP_INIT("msa2", MSA_EXT_2, "Message-security-assist-extension 2 facility"),
-    FEAT_GROUP_INIT("msa3", MSA_EXT_3, "Message-security-assist-extension 3 facility"),
-    FEAT_GROUP_INIT("msa4", MSA_EXT_4, "Message-security-assist-extension 4 facility"),
-    FEAT_GROUP_INIT("msa5", MSA_EXT_5, "Message-security-assist-extension 5 facility"),
-    FEAT_GROUP_INIT("msa6", MSA_EXT_6, "Message-security-assist-extension 6 facility"),
-    FEAT_GROUP_INIT("msa7", MSA_EXT_7, "Message-security-assist-extension 7 facility"),
-    FEAT_GROUP_INIT("msa8", MSA_EXT_8, "Message-security-assist-extension 8 facility"),
-    FEAT_GROUP_INIT("msa9", MSA_EXT_9, "Message-security-assist-extension 9 facility"),
-    FEAT_GROUP_INIT("msa9_pckmo", MSA_EXT_9_PCKMO, "Message-security-assist-extension 9 PCKMO subfunctions"),
-    FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
+    FEAT_GROUP_INIT("msa1", MSA_EXT_1,
+                    "Message-security-assist-extension 1 facility"),
+    FEAT_GROUP_INIT("msa2", MSA_EXT_2,
+                    "Message-security-assist-extension 2 facility"),
+    FEAT_GROUP_INIT("msa3", MSA_EXT_3,
+                    "Message-security-assist-extension 3 facility"),
+    FEAT_GROUP_INIT("msa4", MSA_EXT_4,
+                    "Message-security-assist-extension 4 facility"),
+    FEAT_GROUP_INIT("msa5", MSA_EXT_5,
+                    "Message-security-assist-extension 5 facility"),
+    FEAT_GROUP_INIT("msa6", MSA_EXT_6,
+                    "Message-security-assist-extension 6 facility"),
+    FEAT_GROUP_INIT("msa7", MSA_EXT_7,
+                    "Message-security-assist-extension 7 facility"),
+    FEAT_GROUP_INIT("msa8", MSA_EXT_8,
+                    "Message-security-assist-extension 8 facility"),
+    FEAT_GROUP_INIT("msa9", MSA_EXT_9,
+                    "Message-security-assist-extension 9 facility"),
+    FEAT_GROUP_INIT("msa9_pckmo", MSA_EXT_9_PCKMO,
+                    "Message-security-assist-extension 9 PCKMO subfunctions"),
+    FEAT_GROUP_INIT(
+        "mepochptff", MULTIPLE_EPOCH_PTFF,
+        "PTFF enhancements introduced with Multiple-epoch facility"),
     FEAT_GROUP_INIT("esort", ENH_SORT, "Enhanced-sort facility"),
-    FEAT_GROUP_INIT("deflate", DEFLATE_CONVERSION, "Deflate-conversion facility"),
+    FEAT_GROUP_INIT("deflate", DEFLATE_CONVERSION,
+                    "Deflate-conversion facility"),
 };
 
 const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group)

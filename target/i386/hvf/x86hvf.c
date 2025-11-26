@@ -86,7 +86,7 @@ static void hvf_put_segments(CPUState *cs)
 {
     CPUX86State *env = &X86_CPU(cs)->env;
     struct vmx_segment seg;
-    
+
     wvmcs(cs->accel->fd, VMCS_GUEST_IDTR_LIMIT, env->idt.limit);
     wvmcs(cs->accel->fd, VMCS_GUEST_IDTR_BASE, env->idt.base);
 
@@ -103,7 +103,7 @@ static void hvf_put_segments(CPUState *cs)
 
     hvf_set_segment(cs, &seg, &env->segs[R_CS], false);
     vmx_write_segment_descriptor(cs, &seg, R_CS);
-    
+
     hvf_set_segment(cs, &seg, &env->segs[R_DS], false);
     vmx_write_segment_descriptor(cs, &seg, R_DS);
 
@@ -125,17 +125,14 @@ static void hvf_put_segments(CPUState *cs)
     hvf_set_segment(cs, &seg, &env->ldt, false);
     vmx_write_segment_descriptor(cs, &seg, R_LDTR);
 }
-    
+
 void hvf_put_msrs(CPUState *cs)
 {
     CPUX86State *env = &X86_CPU(cs)->env;
 
-    hv_vcpu_write_msr(cs->accel->fd, MSR_IA32_SYSENTER_CS,
-                      env->sysenter_cs);
-    hv_vcpu_write_msr(cs->accel->fd, MSR_IA32_SYSENTER_ESP,
-                      env->sysenter_esp);
-    hv_vcpu_write_msr(cs->accel->fd, MSR_IA32_SYSENTER_EIP,
-                      env->sysenter_eip);
+    hv_vcpu_write_msr(cs->accel->fd, MSR_IA32_SYSENTER_CS, env->sysenter_cs);
+    hv_vcpu_write_msr(cs->accel->fd, MSR_IA32_SYSENTER_ESP, env->sysenter_esp);
+    hv_vcpu_write_msr(cs->accel->fd, MSR_IA32_SYSENTER_EIP, env->sysenter_eip);
 
     hv_vcpu_write_msr(cs->accel->fd, MSR_STAR, env->star);
 
@@ -173,7 +170,7 @@ static void hvf_get_segments(CPUState *cs)
 
     vmx_read_segment_descriptor(cs, &seg, R_CS);
     hvf_get_segment(&env->segs[R_CS], &seg);
-    
+
     vmx_read_segment_descriptor(cs, &seg, R_DS);
     hvf_get_segment(&env->segs[R_DS], &seg);
 
@@ -204,7 +201,7 @@ static void hvf_get_segments(CPUState *cs)
     env->cr[2] = 0;
     env->cr[3] = rvmcs(cs->accel->fd, VMCS_GUEST_CR3);
     env->cr[4] = rvmcs(cs->accel->fd, VMCS_GUEST_CR4);
-    
+
     env->efer = rvmcs(cs->accel->fd, VMCS_GUEST_IA32_EFER);
 }
 
@@ -212,10 +209,10 @@ void hvf_get_msrs(CPUState *cs)
 {
     CPUX86State *env = &X86_CPU(cs)->env;
     uint64_t tmp;
-    
+
     hv_vcpu_read_msr(cs->accel->fd, MSR_IA32_SYSENTER_CS, &tmp);
     env->sysenter_cs = tmp;
-    
+
     hv_vcpu_read_msr(cs->accel->fd, MSR_IA32_SYSENTER_ESP, &tmp);
     env->sysenter_esp = tmp;
 
@@ -232,7 +229,7 @@ void hvf_get_msrs(CPUState *cs)
 #endif
 
     hv_vcpu_read_msr(cs->accel->fd, MSR_IA32_APICBASE, &tmp);
-    
+
     env->tsc = rdtscp() + rvmcs(cs->accel->fd, VMCS_TSC_OFFSET);
 }
 
@@ -259,15 +256,15 @@ int hvf_put_registers(CPUState *cs)
     wreg(cs->accel->fd, HV_X86_R15, env->regs[15]);
     wreg(cs->accel->fd, HV_X86_RFLAGS, env->eflags);
     wreg(cs->accel->fd, HV_X86_RIP, env->eip);
-   
+
     wreg(cs->accel->fd, HV_X86_XCR0, env->xcr0);
-    
+
     hvf_put_xsave(cs);
-    
+
     hvf_put_segments(cs);
-    
+
     hvf_put_msrs(cs);
-    
+
     wreg(cs->accel->fd, HV_X86_DR0, env->dr[0]);
     wreg(cs->accel->fd, HV_X86_DR1, env->dr[1]);
     wreg(cs->accel->fd, HV_X86_DR2, env->dr[2]);
@@ -276,7 +273,7 @@ int hvf_put_registers(CPUState *cs)
     wreg(cs->accel->fd, HV_X86_DR5, env->dr[5]);
     wreg(cs->accel->fd, HV_X86_DR6, env->dr[6]);
     wreg(cs->accel->fd, HV_X86_DR7, env->dr[7]);
-    
+
     return 0;
 }
 
@@ -301,16 +298,16 @@ int hvf_get_registers(CPUState *cs)
     env->regs[13] = rreg(cs->accel->fd, HV_X86_R13);
     env->regs[14] = rreg(cs->accel->fd, HV_X86_R14);
     env->regs[15] = rreg(cs->accel->fd, HV_X86_R15);
-    
+
     env->eflags = rreg(cs->accel->fd, HV_X86_RFLAGS);
     env->eip = rreg(cs->accel->fd, HV_X86_RIP);
-   
+
     hvf_get_xsave(cs);
     env->xcr0 = rreg(cs->accel->fd, HV_X86_XCR0);
-    
+
     hvf_get_segments(cs);
     hvf_get_msrs(cs);
-    
+
     env->dr[0] = rreg(cs->accel->fd, HV_X86_DR0);
     env->dr[1] = rreg(cs->accel->fd, HV_X86_DR1);
     env->dr[2] = rreg(cs->accel->fd, HV_X86_DR2);
@@ -319,25 +316,25 @@ int hvf_get_registers(CPUState *cs)
     env->dr[5] = rreg(cs->accel->fd, HV_X86_DR5);
     env->dr[6] = rreg(cs->accel->fd, HV_X86_DR6);
     env->dr[7] = rreg(cs->accel->fd, HV_X86_DR7);
-    
+
     x86_update_hflags(env);
     return 0;
 }
 
 static void vmx_set_int_window_exiting(CPUState *cs)
 {
-     uint64_t val;
-     val = rvmcs(cs->accel->fd, VMCS_PRI_PROC_BASED_CTLS);
-     wvmcs(cs->accel->fd, VMCS_PRI_PROC_BASED_CTLS, val |
-             VMCS_PRI_PROC_BASED_CTLS_INT_WINDOW_EXITING);
+    uint64_t val;
+    val = rvmcs(cs->accel->fd, VMCS_PRI_PROC_BASED_CTLS);
+    wvmcs(cs->accel->fd, VMCS_PRI_PROC_BASED_CTLS,
+          val | VMCS_PRI_PROC_BASED_CTLS_INT_WINDOW_EXITING);
 }
 
 void vmx_clear_int_window_exiting(CPUState *cs)
 {
-     uint64_t val;
-     val = rvmcs(cs->accel->fd, VMCS_PRI_PROC_BASED_CTLS);
-     wvmcs(cs->accel->fd, VMCS_PRI_PROC_BASED_CTLS, val &
-             ~VMCS_PRI_PROC_BASED_CTLS_INT_WINDOW_EXITING);
+    uint64_t val;
+    val = rvmcs(cs->accel->fd, VMCS_PRI_PROC_BASED_CTLS);
+    wvmcs(cs->accel->fd, VMCS_PRI_PROC_BASED_CTLS,
+          val & ~VMCS_PRI_PROC_BASED_CTLS_INT_WINDOW_EXITING);
 }
 
 bool hvf_inject_interrupts(CPUState *cs)
@@ -383,7 +380,7 @@ bool hvf_inject_interrupts(CPUState *cs)
                 intr_type == VMCS_INTR_T_SWEXCEPTION) {
                 wvmcs(cs->accel->fd, VMCS_ENTRY_INST_LENGTH, env->ins_len);
             }
-            
+
             if (env->has_error_code) {
                 wvmcs(cs->accel->fd, VMCS_ENTRY_EXCEPTION_ERROR,
                       env->error_code);
@@ -411,15 +408,14 @@ bool hvf_inject_interrupts(CPUState *cs)
         int line = cpu_get_pic_interrupt(&x86cpu->env);
         cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
         if (line >= 0) {
-            wvmcs(cs->accel->fd, VMCS_ENTRY_INTR_INFO, line |
-                  VMCS_INTR_VALID | VMCS_INTR_T_HWINTR);
+            wvmcs(cs->accel->fd, VMCS_ENTRY_INTR_INFO,
+                  line | VMCS_INTR_VALID | VMCS_INTR_T_HWINTR);
         }
     }
     if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
         vmx_set_int_window_exiting(cs);
     }
-    return (cs->interrupt_request
-            & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR));
+    return (cs->interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR));
 }
 
 int hvf_process_events(CPUState *cs)
@@ -442,7 +438,7 @@ int hvf_process_events(CPUState *cs)
         apic_poll_irq(cpu->apic_state);
     }
     if (((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-        (env->eflags & IF_MASK)) ||
+         (env->eflags & IF_MASK)) ||
         (cs->interrupt_request & CPU_INTERRUPT_NMI)) {
         cs->halted = 0;
     }

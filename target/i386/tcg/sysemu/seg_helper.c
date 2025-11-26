@@ -45,17 +45,14 @@ void helper_syscall(CPUX86State *env, int next_eip_addend)
 
         env->eflags &= ~(env->fmask | RF_MASK);
         cpu_load_eflags(env, env->eflags, 0);
-        cpu_x86_load_seg_cache(env, R_CS, selector & 0xfffc,
-                           0, 0xffffffff,
-                               DESC_G_MASK | DESC_P_MASK |
-                               DESC_S_MASK |
-                               DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK |
-                               DESC_L_MASK);
-        cpu_x86_load_seg_cache(env, R_SS, (selector + 8) & 0xfffc,
-                               0, 0xffffffff,
+        cpu_x86_load_seg_cache(env, R_CS, selector & 0xfffc, 0, 0xffffffff,
+                               DESC_G_MASK | DESC_P_MASK | DESC_S_MASK |
+                                   DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK |
+                                   DESC_L_MASK);
+        cpu_x86_load_seg_cache(env, R_SS, (selector + 8) & 0xfffc, 0,
+                               0xffffffff,
                                DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK |
-                               DESC_W_MASK | DESC_A_MASK);
+                                   DESC_S_MASK | DESC_W_MASK | DESC_A_MASK);
         if (code64) {
             env->eip = env->lstar;
         } else {
@@ -67,26 +64,24 @@ void helper_syscall(CPUX86State *env, int next_eip_addend)
         env->regs[R_ECX] = (uint32_t)(env->eip + next_eip_addend);
 
         env->eflags &= ~(IF_MASK | RF_MASK | VM_MASK);
-        cpu_x86_load_seg_cache(env, R_CS, selector & 0xfffc,
-                           0, 0xffffffff,
+        cpu_x86_load_seg_cache(env, R_CS, selector & 0xfffc, 0, 0xffffffff,
                                DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK |
-                               DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK);
-        cpu_x86_load_seg_cache(env, R_SS, (selector + 8) & 0xfffc,
-                               0, 0xffffffff,
+                                   DESC_S_MASK | DESC_CS_MASK | DESC_R_MASK |
+                                   DESC_A_MASK);
+        cpu_x86_load_seg_cache(env, R_SS, (selector + 8) & 0xfffc, 0,
+                               0xffffffff,
                                DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK |
-                               DESC_W_MASK | DESC_A_MASK);
+                                   DESC_S_MASK | DESC_W_MASK | DESC_A_MASK);
         env->eip = (uint32_t)env->star;
     }
 }
 
-void handle_even_inj(CPUX86State *env, int intno, int is_int,
-                     int error_code, int is_hw, int rm)
+void handle_even_inj(CPUX86State *env, int intno, int is_int, int error_code,
+                     int is_hw, int rm)
 {
     CPUState *cs = env_cpu(env);
-    uint32_t event_inj = x86_ldl_phys(cs, env->vm_vmcb + offsetof(struct vmcb,
-                                                          control.event_inj));
+    uint32_t event_inj = x86_ldl_phys(
+        cs, env->vm_vmcb + offsetof(struct vmcb, control.event_inj));
 
     if (!(event_inj & SVM_EVTINJ_VALID)) {
         int type;
@@ -99,13 +94,13 @@ void handle_even_inj(CPUX86State *env, int intno, int is_int,
         event_inj = intno | type | SVM_EVTINJ_VALID;
         if (!rm && exception_has_error_code(intno)) {
             event_inj |= SVM_EVTINJ_VALID_ERR;
-            x86_stl_phys(cs, env->vm_vmcb + offsetof(struct vmcb,
-                                             control.event_inj_err),
-                     error_code);
+            x86_stl_phys(
+                cs, env->vm_vmcb + offsetof(struct vmcb, control.event_inj_err),
+                error_code);
         }
         x86_stl_phys(cs,
-                 env->vm_vmcb + offsetof(struct vmcb, control.event_inj),
-                 event_inj);
+                     env->vm_vmcb + offsetof(struct vmcb, control.event_inj),
+                     event_inj);
     }
 }
 
@@ -118,10 +113,8 @@ void x86_cpu_do_interrupt(CPUState *cs)
         assert(env->old_exception == -1);
         do_vmexit(env);
     } else {
-        do_interrupt_all(cpu, cs->exception_index,
-                         env->exception_is_int,
-                         env->error_code,
-                         env->exception_next_eip, 0);
+        do_interrupt_all(cpu, cs->exception_index, env->exception_is_int,
+                         env->error_code, env->exception_next_eip, 0);
         /* successfully delivered */
         env->old_exception = -1;
     }
@@ -166,26 +159,25 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
         break;
     case CPU_INTERRUPT_HARD:
         cpu_svm_check_intercept_param(env, SVM_EXIT_INTR, 0, 0);
-        cs->interrupt_request &= ~(CPU_INTERRUPT_HARD |
-                                   CPU_INTERRUPT_VIRQ);
+        cs->interrupt_request &= ~(CPU_INTERRUPT_HARD | CPU_INTERRUPT_VIRQ);
         intno = cpu_get_pic_interrupt(env);
-        qemu_log_mask(CPU_LOG_INT,
-                      "Servicing hardware INT=0x%02x\n", intno);
+        qemu_log_mask(CPU_LOG_INT, "Servicing hardware INT=0x%02x\n", intno);
         do_interrupt_x86_hardirq(env, intno, 1);
         break;
     case CPU_INTERRUPT_VIRQ:
         cpu_svm_check_intercept_param(env, SVM_EXIT_VINTR, 0, 0);
-        intno = x86_ldl_phys(cs, env->vm_vmcb
-                             + offsetof(struct vmcb, control.int_vector));
-        qemu_log_mask(CPU_LOG_INT,
-                      "Servicing virtual hardware INT=0x%02x\n", intno);
+        intno = x86_ldl_phys(cs, env->vm_vmcb +
+                                     offsetof(struct vmcb, control.int_vector));
+        qemu_log_mask(CPU_LOG_INT, "Servicing virtual hardware INT=0x%02x\n",
+                      intno);
         do_interrupt_x86_hardirq(env, intno, 1);
         cs->interrupt_request &= ~CPU_INTERRUPT_VIRQ;
         env->int_ctl &= ~V_IRQ_MASK;
         break;
     }
 
-    /* Ensure that no TB jump will be modified as the program flow was changed.  */
+    /* Ensure that no TB jump will be modified as the program flow was changed.
+     */
     return true;
 }
 

@@ -20,247 +20,128 @@
 
 /***** BEGIN FEATURE DEFS *****/
 
-#define S390_FEAT_GROUP_PLO \
-    S390_FEAT_PLO_CL, \
-    S390_FEAT_PLO_CLG, \
-    S390_FEAT_PLO_CLGR, \
-    S390_FEAT_PLO_CLX, \
-    S390_FEAT_PLO_CS, \
-    S390_FEAT_PLO_CSG, \
-    S390_FEAT_PLO_CSGR, \
-    S390_FEAT_PLO_CSX, \
-    S390_FEAT_PLO_DCS, \
-    S390_FEAT_PLO_DCSG, \
-    S390_FEAT_PLO_DCSGR, \
-    S390_FEAT_PLO_DCSX, \
-    S390_FEAT_PLO_CSST, \
-    S390_FEAT_PLO_CSSTG, \
-    S390_FEAT_PLO_CSSTGR, \
-    S390_FEAT_PLO_CSSTX, \
-    S390_FEAT_PLO_CSDST, \
-    S390_FEAT_PLO_CSDSTG, \
-    S390_FEAT_PLO_CSDSTGR, \
-    S390_FEAT_PLO_CSDSTX, \
-    S390_FEAT_PLO_CSTST, \
-    S390_FEAT_PLO_CSTSTG, \
-    S390_FEAT_PLO_CSTSTGR, \
-    S390_FEAT_PLO_CSTSTX
+#define S390_FEAT_GROUP_PLO                                               \
+    S390_FEAT_PLO_CL, S390_FEAT_PLO_CLG, S390_FEAT_PLO_CLGR,              \
+        S390_FEAT_PLO_CLX, S390_FEAT_PLO_CS, S390_FEAT_PLO_CSG,           \
+        S390_FEAT_PLO_CSGR, S390_FEAT_PLO_CSX, S390_FEAT_PLO_DCS,         \
+        S390_FEAT_PLO_DCSG, S390_FEAT_PLO_DCSGR, S390_FEAT_PLO_DCSX,      \
+        S390_FEAT_PLO_CSST, S390_FEAT_PLO_CSSTG, S390_FEAT_PLO_CSSTGR,    \
+        S390_FEAT_PLO_CSSTX, S390_FEAT_PLO_CSDST, S390_FEAT_PLO_CSDSTG,   \
+        S390_FEAT_PLO_CSDSTGR, S390_FEAT_PLO_CSDSTX, S390_FEAT_PLO_CSTST, \
+        S390_FEAT_PLO_CSTSTG, S390_FEAT_PLO_CSTSTGR, S390_FEAT_PLO_CSTSTX
 
-#define S390_FEAT_GROUP_TOD_CLOCK_STEERING \
-    S390_FEAT_TOD_CLOCK_STEERING, \
-    S390_FEAT_PTFF_QTO, \
-    S390_FEAT_PTFF_QSI, \
-    S390_FEAT_PTFF_QPT, \
-    S390_FEAT_PTFF_STO
+#define S390_FEAT_GROUP_TOD_CLOCK_STEERING                                \
+    S390_FEAT_TOD_CLOCK_STEERING, S390_FEAT_PTFF_QTO, S390_FEAT_PTFF_QSI, \
+        S390_FEAT_PTFF_QPT, S390_FEAT_PTFF_STO
 
 #define S390_FEAT_GROUP_GEN13_PTFF \
-    S390_FEAT_PTFF_QUI, \
-    S390_FEAT_PTFF_QTOU, \
-    S390_FEAT_PTFF_STOU
+    S390_FEAT_PTFF_QUI, S390_FEAT_PTFF_QTOU, S390_FEAT_PTFF_STOU
 
-#define S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF \
-    S390_FEAT_PTFF_QSIE, \
-    S390_FEAT_PTFF_QTOUE, \
-    S390_FEAT_PTFF_STOE, \
-    S390_FEAT_PTFF_STOUE
+#define S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF                         \
+    S390_FEAT_PTFF_QSIE, S390_FEAT_PTFF_QTOUE, S390_FEAT_PTFF_STOE, \
+        S390_FEAT_PTFF_STOUE
 
-#define S390_FEAT_GROUP_MSA \
-    S390_FEAT_MSA, \
-    S390_FEAT_KMAC_DEA, \
-    S390_FEAT_KMAC_TDEA_128, \
-    S390_FEAT_KMAC_TDEA_192, \
-    S390_FEAT_KMC_DEA, \
-    S390_FEAT_KMC_TDEA_128, \
-    S390_FEAT_KMC_TDEA_192, \
-    S390_FEAT_KM_DEA, \
-    S390_FEAT_KM_TDEA_128, \
-    S390_FEAT_KM_TDEA_192, \
-    S390_FEAT_KIMD_SHA_1, \
-    S390_FEAT_KLMD_SHA_1
+#define S390_FEAT_GROUP_MSA                                                 \
+    S390_FEAT_MSA, S390_FEAT_KMAC_DEA, S390_FEAT_KMAC_TDEA_128,             \
+        S390_FEAT_KMAC_TDEA_192, S390_FEAT_KMC_DEA, S390_FEAT_KMC_TDEA_128, \
+        S390_FEAT_KMC_TDEA_192, S390_FEAT_KM_DEA, S390_FEAT_KM_TDEA_128,    \
+        S390_FEAT_KM_TDEA_192, S390_FEAT_KIMD_SHA_1, S390_FEAT_KLMD_SHA_1
 
-#define S390_FEAT_GROUP_MSA_EXT_1 \
-    S390_FEAT_KMC_AES_128, \
-    S390_FEAT_KM_AES_128, \
-    S390_FEAT_KIMD_SHA_256, \
-    S390_FEAT_KLMD_SHA_256
+#define S390_FEAT_GROUP_MSA_EXT_1                                        \
+    S390_FEAT_KMC_AES_128, S390_FEAT_KM_AES_128, S390_FEAT_KIMD_SHA_256, \
+        S390_FEAT_KLMD_SHA_256
 
-#define S390_FEAT_GROUP_MSA_EXT_2 \
-    S390_FEAT_KMC_AES_192, \
-    S390_FEAT_KMC_AES_256, \
-    S390_FEAT_KMC_PRNG, \
-    S390_FEAT_KM_AES_192, \
-    S390_FEAT_KM_AES_256, \
-    S390_FEAT_KIMD_SHA_512, \
-    S390_FEAT_KLMD_SHA_512
+#define S390_FEAT_GROUP_MSA_EXT_2                                           \
+    S390_FEAT_KMC_AES_192, S390_FEAT_KMC_AES_256, S390_FEAT_KMC_PRNG,       \
+        S390_FEAT_KM_AES_192, S390_FEAT_KM_AES_256, S390_FEAT_KIMD_SHA_512, \
+        S390_FEAT_KLMD_SHA_512
 
-#define S390_FEAT_GROUP_MSA_EXT_3 \
-    S390_FEAT_MSA_EXT_3, \
-    S390_FEAT_KMAC_EDEA, \
-    S390_FEAT_KMAC_ETDEA_128, \
-    S390_FEAT_KMAC_ETDEA_192, \
-    S390_FEAT_KMC_EAES_128, \
-    S390_FEAT_KMC_EAES_192, \
-    S390_FEAT_KMC_EAES_256, \
-    S390_FEAT_KMC_EDEA, \
-    S390_FEAT_KMC_ETDEA_128, \
-    S390_FEAT_KMC_ETDEA_192, \
-    S390_FEAT_KM_EDEA, \
-    S390_FEAT_KM_ETDEA_128, \
-    S390_FEAT_KM_ETDEA_192, \
-    S390_FEAT_KM_EAES_128, \
-    S390_FEAT_KM_EAES_192, \
-    S390_FEAT_KM_EAES_256, \
-    S390_FEAT_PCKMO_EDEA, \
-    S390_FEAT_PCKMO_ETDEA_128, \
-    S390_FEAT_PCKMO_ETDEA_256, \
-    S390_FEAT_PCKMO_AES_128, \
-    S390_FEAT_PCKMO_AES_192, \
-    S390_FEAT_PCKMO_AES_256
+#define S390_FEAT_GROUP_MSA_EXT_3                                              \
+    S390_FEAT_MSA_EXT_3, S390_FEAT_KMAC_EDEA, S390_FEAT_KMAC_ETDEA_128,        \
+        S390_FEAT_KMAC_ETDEA_192, S390_FEAT_KMC_EAES_128,                      \
+        S390_FEAT_KMC_EAES_192, S390_FEAT_KMC_EAES_256, S390_FEAT_KMC_EDEA,    \
+        S390_FEAT_KMC_ETDEA_128, S390_FEAT_KMC_ETDEA_192, S390_FEAT_KM_EDEA,   \
+        S390_FEAT_KM_ETDEA_128, S390_FEAT_KM_ETDEA_192, S390_FEAT_KM_EAES_128, \
+        S390_FEAT_KM_EAES_192, S390_FEAT_KM_EAES_256, S390_FEAT_PCKMO_EDEA,    \
+        S390_FEAT_PCKMO_ETDEA_128, S390_FEAT_PCKMO_ETDEA_256,                  \
+        S390_FEAT_PCKMO_AES_128, S390_FEAT_PCKMO_AES_192,                      \
+        S390_FEAT_PCKMO_AES_256
 
-#define S390_FEAT_GROUP_MSA_EXT_4 \
-    S390_FEAT_MSA_EXT_4, \
-    S390_FEAT_KMAC_AES_128, \
-    S390_FEAT_KMAC_AES_192, \
-    S390_FEAT_KMAC_AES_256, \
-    S390_FEAT_KMAC_EAES_128, \
-    S390_FEAT_KMAC_EAES_192, \
-    S390_FEAT_KMAC_EAES_256, \
-    S390_FEAT_KM_XTS_AES_128, \
-    S390_FEAT_KM_XTS_AES_256, \
-    S390_FEAT_KM_XTS_EAES_128, \
-    S390_FEAT_KM_XTS_EAES_256, \
-    S390_FEAT_KIMD_GHASH, \
-    S390_FEAT_KMCTR_DEA, \
-    S390_FEAT_KMCTR_TDEA_128, \
-    S390_FEAT_KMCTR_TDEA_192, \
-    S390_FEAT_KMCTR_EDEA, \
-    S390_FEAT_KMCTR_ETDEA_128, \
-    S390_FEAT_KMCTR_ETDEA_192, \
-    S390_FEAT_KMCTR_AES_128, \
-    S390_FEAT_KMCTR_AES_192, \
-    S390_FEAT_KMCTR_AES_256, \
-    S390_FEAT_KMCTR_EAES_128, \
-    S390_FEAT_KMCTR_EAES_192, \
-    S390_FEAT_KMCTR_EAES_256, \
-    S390_FEAT_KMF_DEA, \
-    S390_FEAT_KMF_TDEA_128, \
-    S390_FEAT_KMF_TDEA_192, \
-    S390_FEAT_KMF_EDEA, \
-    S390_FEAT_KMF_ETDEA_128, \
-    S390_FEAT_KMF_ETDEA_192, \
-    S390_FEAT_KMF_AES_128, \
-    S390_FEAT_KMF_AES_192, \
-    S390_FEAT_KMF_AES_256, \
-    S390_FEAT_KMF_EAES_128, \
-    S390_FEAT_KMF_EAES_192, \
-    S390_FEAT_KMF_EAES_256, \
-    S390_FEAT_KMO_DEA, \
-    S390_FEAT_KMO_TDEA_128, \
-    S390_FEAT_KMO_TDEA_192, \
-    S390_FEAT_KMO_EDEA, \
-    S390_FEAT_KMO_ETDEA_128, \
-    S390_FEAT_KMO_ETDEA_192, \
-    S390_FEAT_KMO_AES_128, \
-    S390_FEAT_KMO_AES_192, \
-    S390_FEAT_KMO_AES_256, \
-    S390_FEAT_KMO_EAES_128, \
-    S390_FEAT_KMO_EAES_192, \
-    S390_FEAT_KMO_EAES_256, \
-    S390_FEAT_PCC_CMAC_DEA, \
-    S390_FEAT_PCC_CMAC_TDEA_128, \
-    S390_FEAT_PCC_CMAC_TDEA_192, \
-    S390_FEAT_PCC_CMAC_ETDEA_128, \
-    S390_FEAT_PCC_CMAC_ETDEA_192, \
-    S390_FEAT_PCC_CMAC_TDEA, \
-    S390_FEAT_PCC_CMAC_AES_128, \
-    S390_FEAT_PCC_CMAC_AES_192, \
-    S390_FEAT_PCC_CMAC_AES_256, \
-    S390_FEAT_PCC_CMAC_EAES_128, \
-    S390_FEAT_PCC_CMAC_EAES_192, \
-    S390_FEAT_PCC_CMAC_EAES_256, \
-    S390_FEAT_PCC_XTS_AES_128, \
-    S390_FEAT_PCC_XTS_AES_256, \
-    S390_FEAT_PCC_XTS_EAES_128, \
-    S390_FEAT_PCC_XTS_EAES_256
+#define S390_FEAT_GROUP_MSA_EXT_4                                              \
+    S390_FEAT_MSA_EXT_4, S390_FEAT_KMAC_AES_128, S390_FEAT_KMAC_AES_192,       \
+        S390_FEAT_KMAC_AES_256, S390_FEAT_KMAC_EAES_128,                       \
+        S390_FEAT_KMAC_EAES_192, S390_FEAT_KMAC_EAES_256,                      \
+        S390_FEAT_KM_XTS_AES_128, S390_FEAT_KM_XTS_AES_256,                    \
+        S390_FEAT_KM_XTS_EAES_128, S390_FEAT_KM_XTS_EAES_256,                  \
+        S390_FEAT_KIMD_GHASH, S390_FEAT_KMCTR_DEA, S390_FEAT_KMCTR_TDEA_128,   \
+        S390_FEAT_KMCTR_TDEA_192, S390_FEAT_KMCTR_EDEA,                        \
+        S390_FEAT_KMCTR_ETDEA_128, S390_FEAT_KMCTR_ETDEA_192,                  \
+        S390_FEAT_KMCTR_AES_128, S390_FEAT_KMCTR_AES_192,                      \
+        S390_FEAT_KMCTR_AES_256, S390_FEAT_KMCTR_EAES_128,                     \
+        S390_FEAT_KMCTR_EAES_192, S390_FEAT_KMCTR_EAES_256, S390_FEAT_KMF_DEA, \
+        S390_FEAT_KMF_TDEA_128, S390_FEAT_KMF_TDEA_192, S390_FEAT_KMF_EDEA,    \
+        S390_FEAT_KMF_ETDEA_128, S390_FEAT_KMF_ETDEA_192,                      \
+        S390_FEAT_KMF_AES_128, S390_FEAT_KMF_AES_192, S390_FEAT_KMF_AES_256,   \
+        S390_FEAT_KMF_EAES_128, S390_FEAT_KMF_EAES_192,                        \
+        S390_FEAT_KMF_EAES_256, S390_FEAT_KMO_DEA, S390_FEAT_KMO_TDEA_128,     \
+        S390_FEAT_KMO_TDEA_192, S390_FEAT_KMO_EDEA, S390_FEAT_KMO_ETDEA_128,   \
+        S390_FEAT_KMO_ETDEA_192, S390_FEAT_KMO_AES_128, S390_FEAT_KMO_AES_192, \
+        S390_FEAT_KMO_AES_256, S390_FEAT_KMO_EAES_128, S390_FEAT_KMO_EAES_192, \
+        S390_FEAT_KMO_EAES_256, S390_FEAT_PCC_CMAC_DEA,                        \
+        S390_FEAT_PCC_CMAC_TDEA_128, S390_FEAT_PCC_CMAC_TDEA_192,              \
+        S390_FEAT_PCC_CMAC_ETDEA_128, S390_FEAT_PCC_CMAC_ETDEA_192,            \
+        S390_FEAT_PCC_CMAC_TDEA, S390_FEAT_PCC_CMAC_AES_128,                   \
+        S390_FEAT_PCC_CMAC_AES_192, S390_FEAT_PCC_CMAC_AES_256,                \
+        S390_FEAT_PCC_CMAC_EAES_128, S390_FEAT_PCC_CMAC_EAES_192,              \
+        S390_FEAT_PCC_CMAC_EAES_256, S390_FEAT_PCC_XTS_AES_128,                \
+        S390_FEAT_PCC_XTS_AES_256, S390_FEAT_PCC_XTS_EAES_128,                 \
+        S390_FEAT_PCC_XTS_EAES_256
 
 #define S390_FEAT_GROUP_MSA_EXT_5 \
-    S390_FEAT_MSA_EXT_5, \
-    S390_FEAT_PPNO_SHA_512_DRNG
+    S390_FEAT_MSA_EXT_5, S390_FEAT_PPNO_SHA_512_DRNG
 
-#define S390_FEAT_GROUP_MSA_EXT_6 \
-    S390_FEAT_KIMD_SHA3_224, \
-    S390_FEAT_KIMD_SHA3_256, \
-    S390_FEAT_KIMD_SHA3_384, \
-    S390_FEAT_KIMD_SHA3_512, \
-    S390_FEAT_KIMD_SHAKE_128, \
-    S390_FEAT_KIMD_SHAKE_256, \
-    S390_FEAT_KLMD_SHA3_224, \
-    S390_FEAT_KLMD_SHA3_256, \
-    S390_FEAT_KLMD_SHA3_384, \
-    S390_FEAT_KLMD_SHA3_512, \
-    S390_FEAT_KLMD_SHAKE_128, \
-    S390_FEAT_KLMD_SHAKE_256
+#define S390_FEAT_GROUP_MSA_EXT_6                                              \
+    S390_FEAT_KIMD_SHA3_224, S390_FEAT_KIMD_SHA3_256, S390_FEAT_KIMD_SHA3_384, \
+        S390_FEAT_KIMD_SHA3_512, S390_FEAT_KIMD_SHAKE_128,                     \
+        S390_FEAT_KIMD_SHAKE_256, S390_FEAT_KLMD_SHA3_224,                     \
+        S390_FEAT_KLMD_SHA3_256, S390_FEAT_KLMD_SHA3_384,                      \
+        S390_FEAT_KLMD_SHA3_512, S390_FEAT_KLMD_SHAKE_128,                     \
+        S390_FEAT_KLMD_SHAKE_256
 
-#define S390_FEAT_GROUP_MSA_EXT_7 \
-    S390_FEAT_PRNO_TRNG_QRTCR, \
-    S390_FEAT_PRNO_TRNG
+#define S390_FEAT_GROUP_MSA_EXT_7 S390_FEAT_PRNO_TRNG_QRTCR, S390_FEAT_PRNO_TRNG
 
-#define S390_FEAT_GROUP_MSA_EXT_8 \
-    S390_FEAT_MSA_EXT_8, \
-    S390_FEAT_KMA_GCM_AES_128, \
-    S390_FEAT_KMA_GCM_AES_192, \
-    S390_FEAT_KMA_GCM_AES_256 , \
-    S390_FEAT_KMA_GCM_EAES_128, \
-    S390_FEAT_KMA_GCM_EAES_192, \
-    S390_FEAT_KMA_GCM_EAES_256
+#define S390_FEAT_GROUP_MSA_EXT_8                                              \
+    S390_FEAT_MSA_EXT_8, S390_FEAT_KMA_GCM_AES_128, S390_FEAT_KMA_GCM_AES_192, \
+        S390_FEAT_KMA_GCM_AES_256, S390_FEAT_KMA_GCM_EAES_128,                 \
+        S390_FEAT_KMA_GCM_EAES_192, S390_FEAT_KMA_GCM_EAES_256
 
-#define S390_FEAT_GROUP_MSA_EXT_9 \
-    S390_FEAT_MSA_EXT_9, \
-    S390_FEAT_KDSA_ECDSA_VERIFY_P256, \
-    S390_FEAT_KDSA_ECDSA_VERIFY_P384, \
-    S390_FEAT_KDSA_ECDSA_VERIFY_P512, \
-    S390_FEAT_KDSA_ECDSA_SIGN_P256, \
-    S390_FEAT_KDSA_ECDSA_SIGN_P384, \
-    S390_FEAT_KDSA_ECDSA_SIGN_P512, \
-    S390_FEAT_KDSA_EECDSA_SIGN_P256, \
-    S390_FEAT_KDSA_EECDSA_SIGN_P384, \
-    S390_FEAT_KDSA_EECDSA_SIGN_P512, \
-    S390_FEAT_KDSA_EDDSA_VERIFY_ED25519, \
-    S390_FEAT_KDSA_EDDSA_VERIFY_ED448, \
-    S390_FEAT_KDSA_EDDSA_SIGN_ED25519, \
-    S390_FEAT_KDSA_EDDSA_SIGN_ED448, \
-    S390_FEAT_KDSA_EEDDSA_SIGN_ED25519, \
-    S390_FEAT_KDSA_EEDDSA_SIGN_ED448, \
-    S390_FEAT_PCC_SCALAR_MULT_P256, \
-    S390_FEAT_PCC_SCALAR_MULT_P384, \
-    S390_FEAT_PCC_SCALAR_MULT_P512, \
-    S390_FEAT_PCC_SCALAR_MULT_ED25519, \
-    S390_FEAT_PCC_SCALAR_MULT_ED448, \
-    S390_FEAT_PCC_SCALAR_MULT_X25519, \
-    S390_FEAT_PCC_SCALAR_MULT_X448
+#define S390_FEAT_GROUP_MSA_EXT_9                                             \
+    S390_FEAT_MSA_EXT_9, S390_FEAT_KDSA_ECDSA_VERIFY_P256,                    \
+        S390_FEAT_KDSA_ECDSA_VERIFY_P384, S390_FEAT_KDSA_ECDSA_VERIFY_P512,   \
+        S390_FEAT_KDSA_ECDSA_SIGN_P256, S390_FEAT_KDSA_ECDSA_SIGN_P384,       \
+        S390_FEAT_KDSA_ECDSA_SIGN_P512, S390_FEAT_KDSA_EECDSA_SIGN_P256,      \
+        S390_FEAT_KDSA_EECDSA_SIGN_P384, S390_FEAT_KDSA_EECDSA_SIGN_P512,     \
+        S390_FEAT_KDSA_EDDSA_VERIFY_ED25519,                                  \
+        S390_FEAT_KDSA_EDDSA_VERIFY_ED448, S390_FEAT_KDSA_EDDSA_SIGN_ED25519, \
+        S390_FEAT_KDSA_EDDSA_SIGN_ED448, S390_FEAT_KDSA_EEDDSA_SIGN_ED25519,  \
+        S390_FEAT_KDSA_EEDDSA_SIGN_ED448, S390_FEAT_PCC_SCALAR_MULT_P256,     \
+        S390_FEAT_PCC_SCALAR_MULT_P384, S390_FEAT_PCC_SCALAR_MULT_P512,       \
+        S390_FEAT_PCC_SCALAR_MULT_ED25519, S390_FEAT_PCC_SCALAR_MULT_ED448,   \
+        S390_FEAT_PCC_SCALAR_MULT_X25519, S390_FEAT_PCC_SCALAR_MULT_X448
 
-#define S390_FEAT_GROUP_MSA_EXT_9_PCKMO \
-    S390_FEAT_PCKMO_ECC_P256, \
-    S390_FEAT_PCKMO_ECC_P384, \
-    S390_FEAT_PCKMO_ECC_P521, \
-    S390_FEAT_PCKMO_ECC_ED25519, \
-    S390_FEAT_PCKMO_ECC_ED448
+#define S390_FEAT_GROUP_MSA_EXT_9_PCKMO                        \
+    S390_FEAT_PCKMO_ECC_P256, S390_FEAT_PCKMO_ECC_P384,        \
+        S390_FEAT_PCKMO_ECC_P521, S390_FEAT_PCKMO_ECC_ED25519, \
+        S390_FEAT_PCKMO_ECC_ED448
 
-#define S390_FEAT_GROUP_ENH_SORT \
-    S390_FEAT_ESORT_BASE, \
-    S390_FEAT_SORTL_SFLR, \
-    S390_FEAT_SORTL_SVLR, \
-    S390_FEAT_SORTL_32, \
-    S390_FEAT_SORTL_128, \
-    S390_FEAT_SORTL_F0
+#define S390_FEAT_GROUP_ENH_SORT                                      \
+    S390_FEAT_ESORT_BASE, S390_FEAT_SORTL_SFLR, S390_FEAT_SORTL_SVLR, \
+        S390_FEAT_SORTL_32, S390_FEAT_SORTL_128, S390_FEAT_SORTL_F0
 
 
-#define S390_FEAT_GROUP_DEFLATE_CONVERSION \
-    S390_FEAT_DEFLATE_BASE, \
-    S390_FEAT_DEFLATE_GHDT, \
-    S390_FEAT_DEFLATE_CMPR, \
-    S390_FEAT_DEFLATE_XPND, \
-    S390_FEAT_DEFLATE_F0
+#define S390_FEAT_GROUP_DEFLATE_CONVERSION                                  \
+    S390_FEAT_DEFLATE_BASE, S390_FEAT_DEFLATE_GHDT, S390_FEAT_DEFLATE_CMPR, \
+        S390_FEAT_DEFLATE_XPND, S390_FEAT_DEFLATE_F0
 
 /* cpu feature groups */
 static uint16_t group_PLO[] = {
@@ -432,12 +313,8 @@ static uint16_t base_GEN15_GA1[] = {
  * support these features yet.
  */
 static uint16_t full_GEN7_GA1[] = {
-    S390_FEAT_PPA15,
-    S390_FEAT_BPB,
-    S390_FEAT_SIE_F2,
-    S390_FEAT_SIE_SKEY,
-    S390_FEAT_SIE_GPERE,
-    S390_FEAT_SIE_IB,
+    S390_FEAT_PPA15,    S390_FEAT_BPB,       S390_FEAT_SIE_F2,
+    S390_FEAT_SIE_SKEY, S390_FEAT_SIE_GPERE, S390_FEAT_SIE_IB,
     S390_FEAT_SIE_CEI,
 };
 
@@ -570,12 +447,9 @@ static uint16_t full_GEN15_GA1[] = {
 };
 
 static uint16_t full_GEN16_GA1[] = {
-    S390_FEAT_NNPA,
-    S390_FEAT_VECTOR_PACKED_DECIMAL_ENH2,
-    S390_FEAT_BEAR_ENH,
-    S390_FEAT_RDP,
-    S390_FEAT_PAI,
-    S390_FEAT_PAIE,
+    S390_FEAT_NNPA,     S390_FEAT_VECTOR_PACKED_DECIMAL_ENH2,
+    S390_FEAT_BEAR_ENH, S390_FEAT_RDP,
+    S390_FEAT_PAI,      S390_FEAT_PAIE,
 };
 
 
@@ -642,14 +516,10 @@ static uint16_t default_GEN13_GA1[] = {
 #define default_GEN13_GA2 EmptyFeat
 
 static uint16_t default_GEN14_GA1[] = {
-    S390_FEAT_INSTRUCTION_EXEC_PROT,
-    S390_FEAT_GUARDED_STORAGE,
-    S390_FEAT_VECTOR_PACKED_DECIMAL,
-    S390_FEAT_VECTOR_ENH,
-    S390_FEAT_GROUP_MSA_EXT_6,
-    S390_FEAT_GROUP_MSA_EXT_7,
-    S390_FEAT_GROUP_MSA_EXT_8,
-    S390_FEAT_MULTIPLE_EPOCH,
+    S390_FEAT_INSTRUCTION_EXEC_PROT,     S390_FEAT_GUARDED_STORAGE,
+    S390_FEAT_VECTOR_PACKED_DECIMAL,     S390_FEAT_VECTOR_ENH,
+    S390_FEAT_GROUP_MSA_EXT_6,           S390_FEAT_GROUP_MSA_EXT_7,
+    S390_FEAT_GROUP_MSA_EXT_8,           S390_FEAT_MULTIPLE_EPOCH,
     S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
 };
 
@@ -665,12 +535,9 @@ static uint16_t default_GEN15_GA1[] = {
 };
 
 static uint16_t default_GEN16_GA1[] = {
-    S390_FEAT_NNPA,
-    S390_FEAT_VECTOR_PACKED_DECIMAL_ENH2,
-    S390_FEAT_BEAR_ENH,
-    S390_FEAT_RDP,
-    S390_FEAT_PAI,
-    S390_FEAT_PAIE,
+    S390_FEAT_NNPA,     S390_FEAT_VECTOR_PACKED_DECIMAL_ENH2,
+    S390_FEAT_BEAR_ENH, S390_FEAT_RDP,
+    S390_FEAT_PAI,      S390_FEAT_PAIE,
 };
 
 /* QEMU (CPU model) features */
@@ -762,21 +629,18 @@ static uint16_t qemu_MAX[] = {
 
 /****** END FEATURE DEFS ******/
 
-#define _YEARS  "2016"
+#define _YEARS "2016"
 #define _NAME_H "TARGET_S390X_GEN_FEATURES_H"
 
-#define CPU_FEAT_INITIALIZER(_name)                    \
-    {                                                  \
-        .name = "S390_FEAT_LIST_" #_name,              \
-        .base_bits =                                   \
-            { .data = base_##_name,                    \
-              .len = ARRAY_SIZE(base_##_name) },       \
-        .default_bits =                                \
-            { .data = default_##_name,                 \
-              .len = ARRAY_SIZE(default_##_name) },    \
-        .full_bits =                                   \
-            { .data = full_##_name,                    \
-              .len = ARRAY_SIZE(full_##_name) },       \
+#define CPU_FEAT_INITIALIZER(_name)                             \
+    {                                                           \
+        .name = "S390_FEAT_LIST_" #_name,                       \
+        .base_bits = { .data = base_##_name,                    \
+                       .len = ARRAY_SIZE(base_##_name) },       \
+        .default_bits = { .data = default_##_name,              \
+                          .len = ARRAY_SIZE(default_##_name) }, \
+        .full_bits = { .data = full_##_name,                    \
+                       .len = ARRAY_SIZE(full_##_name) },       \
     }
 
 typedef struct BitSpec {
@@ -797,39 +661,25 @@ static uint16_t EmptyFeat[] = {};
  * processor GA series
  *******************************/
 static CpuFeatDefSpec CpuFeatDef[] = {
-    CPU_FEAT_INITIALIZER(GEN7_GA1),
-    CPU_FEAT_INITIALIZER(GEN7_GA2),
-    CPU_FEAT_INITIALIZER(GEN7_GA3),
-    CPU_FEAT_INITIALIZER(GEN8_GA1),
-    CPU_FEAT_INITIALIZER(GEN8_GA2),
-    CPU_FEAT_INITIALIZER(GEN8_GA3),
-    CPU_FEAT_INITIALIZER(GEN8_GA4),
-    CPU_FEAT_INITIALIZER(GEN8_GA5),
-    CPU_FEAT_INITIALIZER(GEN9_GA1),
-    CPU_FEAT_INITIALIZER(GEN9_GA2),
-    CPU_FEAT_INITIALIZER(GEN9_GA3),
-    CPU_FEAT_INITIALIZER(GEN10_GA1),
-    CPU_FEAT_INITIALIZER(GEN10_GA2),
-    CPU_FEAT_INITIALIZER(GEN10_GA3),
-    CPU_FEAT_INITIALIZER(GEN11_GA1),
-    CPU_FEAT_INITIALIZER(GEN11_GA2),
-    CPU_FEAT_INITIALIZER(GEN12_GA1),
-    CPU_FEAT_INITIALIZER(GEN12_GA2),
-    CPU_FEAT_INITIALIZER(GEN13_GA1),
-    CPU_FEAT_INITIALIZER(GEN13_GA2),
-    CPU_FEAT_INITIALIZER(GEN14_GA1),
-    CPU_FEAT_INITIALIZER(GEN14_GA2),
-    CPU_FEAT_INITIALIZER(GEN15_GA1),
-    CPU_FEAT_INITIALIZER(GEN16_GA1),
+    CPU_FEAT_INITIALIZER(GEN7_GA1),  CPU_FEAT_INITIALIZER(GEN7_GA2),
+    CPU_FEAT_INITIALIZER(GEN7_GA3),  CPU_FEAT_INITIALIZER(GEN8_GA1),
+    CPU_FEAT_INITIALIZER(GEN8_GA2),  CPU_FEAT_INITIALIZER(GEN8_GA3),
+    CPU_FEAT_INITIALIZER(GEN8_GA4),  CPU_FEAT_INITIALIZER(GEN8_GA5),
+    CPU_FEAT_INITIALIZER(GEN9_GA1),  CPU_FEAT_INITIALIZER(GEN9_GA2),
+    CPU_FEAT_INITIALIZER(GEN9_GA3),  CPU_FEAT_INITIALIZER(GEN10_GA1),
+    CPU_FEAT_INITIALIZER(GEN10_GA2), CPU_FEAT_INITIALIZER(GEN10_GA3),
+    CPU_FEAT_INITIALIZER(GEN11_GA1), CPU_FEAT_INITIALIZER(GEN11_GA2),
+    CPU_FEAT_INITIALIZER(GEN12_GA1), CPU_FEAT_INITIALIZER(GEN12_GA2),
+    CPU_FEAT_INITIALIZER(GEN13_GA1), CPU_FEAT_INITIALIZER(GEN13_GA2),
+    CPU_FEAT_INITIALIZER(GEN14_GA1), CPU_FEAT_INITIALIZER(GEN14_GA2),
+    CPU_FEAT_INITIALIZER(GEN15_GA1), CPU_FEAT_INITIALIZER(GEN16_GA1),
 };
 
-#define FEAT_GROUP_INITIALIZER(_name)                  \
-    {                                                  \
-        .name = "S390_FEAT_GROUP_LIST_" #_name,        \
-        .enum_name = "S390_FEAT_GROUP_" #_name,        \
-        .bits =                                        \
-            { .data = group_##_name,                   \
-              .len = ARRAY_SIZE(group_##_name) },      \
+#define FEAT_GROUP_INITIALIZER(_name)                                        \
+    {                                                                        \
+        .name = "S390_FEAT_GROUP_LIST_" #_name,                              \
+        .enum_name = "S390_FEAT_GROUP_" #_name,                              \
+        .bits = { .data = group_##_name, .len = ARRAY_SIZE(group_##_name) }, \
     }
 
 typedef struct {
@@ -861,26 +711,20 @@ static FeatGroupDefSpec FeatGroupDef[] = {
     FEAT_GROUP_INITIALIZER(DEFLATE_CONVERSION),
 };
 
-#define QEMU_FEAT_INITIALIZER(_name)                   \
-    {                                                  \
-        .name = "S390_FEAT_LIST_QEMU_" #_name,         \
-        .bits =                                        \
-            { .data = qemu_##_name,                    \
-              .len = ARRAY_SIZE(qemu_##_name) },       \
+#define QEMU_FEAT_INITIALIZER(_name)                                       \
+    {                                                                      \
+        .name = "S390_FEAT_LIST_QEMU_" #_name,                             \
+        .bits = { .data = qemu_##_name, .len = ARRAY_SIZE(qemu_##_name) }, \
     }
 
 /*******************************
  * QEMU (CPU model) features
  *******************************/
 static FeatGroupDefSpec QemuFeatDef[] = {
-    QEMU_FEAT_INITIALIZER(V2_11),
-    QEMU_FEAT_INITIALIZER(V3_1),
-    QEMU_FEAT_INITIALIZER(V4_0),
-    QEMU_FEAT_INITIALIZER(V4_1),
-    QEMU_FEAT_INITIALIZER(V6_0),
-    QEMU_FEAT_INITIALIZER(V6_2),
-    QEMU_FEAT_INITIALIZER(V7_0),
-    QEMU_FEAT_INITIALIZER(V7_1),
+    QEMU_FEAT_INITIALIZER(V2_11), QEMU_FEAT_INITIALIZER(V3_1),
+    QEMU_FEAT_INITIALIZER(V4_0),  QEMU_FEAT_INITIALIZER(V4_1),
+    QEMU_FEAT_INITIALIZER(V6_0),  QEMU_FEAT_INITIALIZER(V6_2),
+    QEMU_FEAT_INITIALIZER(V7_0),  QEMU_FEAT_INITIALIZER(V7_1),
     QEMU_FEAT_INITIALIZER(MAX),
 };
 
@@ -925,7 +769,7 @@ static void print_feature_defs(void)
 
         printf("#define %s_BASE\t", CpuFeatDef[i].name);
         for (j = 0; j < ARRAY_SIZE(base_feat); j++) {
-            printf("0x%016"PRIx64"ULL", base_feat[j]);
+            printf("0x%016" PRIx64 "ULL", base_feat[j]);
             if (j < ARRAY_SIZE(base_feat) - 1) {
                 printf(",");
             } else {
@@ -934,7 +778,7 @@ static void print_feature_defs(void)
         }
         printf("#define %s_DEFAULT\t", CpuFeatDef[i].name);
         for (j = 0; j < ARRAY_SIZE(default_feat); j++) {
-            printf("0x%016"PRIx64"ULL", default_feat[j]);
+            printf("0x%016" PRIx64 "ULL", default_feat[j]);
             if (j < ARRAY_SIZE(default_feat) - 1) {
                 printf(",");
             } else {
@@ -943,7 +787,7 @@ static void print_feature_defs(void)
         }
         printf("#define %s_FULL\t\t", CpuFeatDef[i].name);
         for (j = 0; j < ARRAY_SIZE(full_feat); j++) {
-            printf("0x%016"PRIx64"ULL", full_feat[j]);
+            printf("0x%016" PRIx64 "ULL", full_feat[j]);
             if (j < ARRAY_SIZE(full_feat) - 1) {
                 printf(",");
             } else {
@@ -966,7 +810,7 @@ static void print_qemu_feature_defs(void)
 
         printf("#define %s\t", QemuFeatDef[i].name);
         for (j = 0; j < ARRAY_SIZE(feat); j++) {
-            printf("0x%016"PRIx64"ULL", feat[j]);
+            printf("0x%016" PRIx64 "ULL", feat[j]);
             if (j < ARRAY_SIZE(feat) - 1) {
                 printf(",");
             } else {
@@ -988,7 +832,7 @@ static void print_feature_group_defs(void)
         set_bits(feat, FeatGroupDef[i].bits);
         printf("#define %s\t", FeatGroupDef[i].name);
         for (j = 0; j < ARRAY_SIZE(feat); j++) {
-            printf("0x%016"PRIx64"ULL", feat[j]);
+            printf("0x%016" PRIx64 "ULL", feat[j]);
             if (j < ARRAY_SIZE(feat) - 1) {
                 printf(",");
             } else {
@@ -1023,7 +867,8 @@ int main(int argc, char *argv[])
            "version 2 or (at\n * your option) any later version. See "
            "the COPYING file in the top-level\n * directory.\n"
            " */\n\n"
-           "#ifndef %s\n#define %s\n", __FILE__, _YEARS, _NAME_H, _NAME_H);
+           "#ifndef %s\n#define %s\n",
+           __FILE__, _YEARS, _NAME_H, _NAME_H);
     print_feature_defs();
     print_feature_group_defs();
     print_qemu_feature_defs();

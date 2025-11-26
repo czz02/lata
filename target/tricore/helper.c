@@ -50,8 +50,8 @@ hwaddr tricore_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
     int prot;
     int mmu_idx = cpu_mmu_index(&cpu->env, false);
 
-    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr,
-                             MMU_DATA_LOAD, mmu_idx)) {
+    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, MMU_DATA_LOAD,
+                             mmu_idx)) {
         return -1;
     }
     return phys_addr;
@@ -64,8 +64,8 @@ static void raise_mmu_exception(CPUTriCoreState *env, target_ulong address,
 }
 
 bool tricore_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                          MMUAccessType rw, int mmu_idx,
-                          bool probe, uintptr_t retaddr)
+                          MMUAccessType rw, int mmu_idx, bool probe,
+                          uintptr_t retaddr)
 {
     TriCoreCPU *cpu = TRICORE_CPU(cs);
     CPUTriCoreState *env = &cpu->env;
@@ -74,17 +74,17 @@ bool tricore_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
     int ret = 0;
 
     rw &= 1;
-    ret = get_physical_address(env, &physical, &prot,
-                               address, rw, mmu_idx);
+    ret = get_physical_address(env, &physical, &prot, address, rw, mmu_idx);
 
-    qemu_log_mask(CPU_LOG_MMU, "%s address=" TARGET_FMT_lx " ret %d physical "
-                  HWADDR_FMT_plx " prot %d\n",
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s address=" TARGET_FMT_lx " ret %d physical " HWADDR_FMT_plx
+                  " prot %d\n",
                   __func__, (target_ulong)address, ret, physical, prot);
 
     if (ret == TLBRET_MATCH) {
         tlb_set_page(cs, address & TARGET_PAGE_MASK,
-                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
-                     mmu_idx, TARGET_PAGE_SIZE);
+                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC, mmu_idx,
+                     TARGET_PAGE_SIZE);
         return true;
     } else {
         assert(ret < 0);
@@ -132,10 +132,10 @@ uint32_t psw_read(CPUTriCoreState *env)
     env->PSW &= 0x6ffffff;
     /* now set them from the cache */
     env->PSW |= ((env->PSW_USB_C != 0) << 31);
-    env->PSW |= ((env->PSW_USB_V   & (1 << 31))  >> 1);
-    env->PSW |= ((env->PSW_USB_SV  & (1 << 31))  >> 2);
-    env->PSW |= ((env->PSW_USB_AV  & (1 << 31))  >> 3);
-    env->PSW |= ((env->PSW_USB_SAV & (1 << 31))  >> 4);
+    env->PSW |= ((env->PSW_USB_V & (1 << 31)) >> 1);
+    env->PSW |= ((env->PSW_USB_SV & (1 << 31)) >> 2);
+    env->PSW |= ((env->PSW_USB_AV & (1 << 31)) >> 3);
+    env->PSW |= ((env->PSW_USB_SAV & (1 << 31)) >> 4);
 
     return env->PSW;
 }
@@ -152,35 +152,35 @@ void psw_write(CPUTriCoreState *env, uint32_t val)
     fpu_set_state(env);
 }
 
-#define FIELD_GETTER_WITH_FEATURE(NAME, REG, FIELD, FEATURE)     \
-uint32_t NAME(CPUTriCoreState *env)                             \
-{                                                                \
-    if (tricore_has_feature(env, TRICORE_FEATURE_##FEATURE)) {   \
-        return FIELD_EX32(env->REG, REG, FIELD ## _ ## FEATURE); \
-    }                                                            \
-    return FIELD_EX32(env->REG, REG, FIELD ## _13);              \
-}
+#define FIELD_GETTER_WITH_FEATURE(NAME, REG, FIELD, FEATURE)       \
+    uint32_t NAME(CPUTriCoreState *env)                            \
+    {                                                              \
+        if (tricore_has_feature(env, TRICORE_FEATURE_##FEATURE)) { \
+            return FIELD_EX32(env->REG, REG, FIELD##_##FEATURE);   \
+        }                                                          \
+        return FIELD_EX32(env->REG, REG, FIELD##_13);              \
+    }
 
-#define FIELD_GETTER(NAME, REG, FIELD)       \
-uint32_t NAME(CPUTriCoreState *env)         \
-{                                            \
-    return FIELD_EX32(env->REG, REG, FIELD); \
-}
+#define FIELD_GETTER(NAME, REG, FIELD)           \
+    uint32_t NAME(CPUTriCoreState *env)          \
+    {                                            \
+        return FIELD_EX32(env->REG, REG, FIELD); \
+    }
 
 #define FIELD_SETTER_WITH_FEATURE(NAME, REG, FIELD, FEATURE)              \
-void NAME(CPUTriCoreState *env, uint32_t val)                            \
-{                                                                         \
-    if (tricore_has_feature(env, TRICORE_FEATURE_##FEATURE)) {            \
-        env->REG = FIELD_DP32(env->REG, REG, FIELD ## _ ## FEATURE, val); \
-    }                                                                     \
-    env->REG = FIELD_DP32(env->REG, REG, FIELD ## _13, val);              \
-}
+    void NAME(CPUTriCoreState *env, uint32_t val)                         \
+    {                                                                     \
+        if (tricore_has_feature(env, TRICORE_FEATURE_##FEATURE)) {        \
+            env->REG = FIELD_DP32(env->REG, REG, FIELD##_##FEATURE, val); \
+        }                                                                 \
+        env->REG = FIELD_DP32(env->REG, REG, FIELD##_13, val);            \
+    }
 
-#define FIELD_SETTER(NAME, REG, FIELD)                \
-void NAME(CPUTriCoreState *env, uint32_t val)        \
-{                                                     \
-    env->REG = FIELD_DP32(env->REG, REG, FIELD, val); \
-}
+#define FIELD_SETTER(NAME, REG, FIELD)                    \
+    void NAME(CPUTriCoreState *env, uint32_t val)         \
+    {                                                     \
+        env->REG = FIELD_DP32(env->REG, REG, FIELD, val); \
+    }
 
 FIELD_GETTER_WITH_FEATURE(pcxi_get_pcpn, PCXI, PCPN, 161)
 FIELD_SETTER_WITH_FEATURE(pcxi_set_pcpn, PCXI, PCPN, 161)

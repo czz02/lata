@@ -14,10 +14,10 @@ extern void qemu_log(const char *fmt, ...);
 static const char *ir2_name(int value)
 {
 #ifdef CONFIG_LATA
-    /*
-     * Todo: Add below defination:
-     */
-    #if 0
+/*
+ * Todo: Add below defination:
+ */
+#if 0
     static const char *ir2_scr_name[] = {
         "$scr0" , "$scr1" , "$scr2" , "$scr3",
     };
@@ -26,39 +26,43 @@ static const char *ir2_name(int value)
         "$cc0" , "$cc1" , "$cc2" , "$cc3" ,
         "$cc4" , "$cc5" , "$cc6" , "$cc7" ,
     };
-    #endif
+#endif
     const char *g_ir2_names[] = {
-        "$zero" , "$ra" , "$tp" , "$sp" , "$a0" , "$a1" , "$a2" , "$a3" ,
-        "$a4"   , "$a5" , "$a6" , "$a7" , "$t0" , "$t1" , "$t2" , "$t3" ,
-        "$t4"   , "$t5" , "$t6" , "$t7" , "$t8" , "$x"  , "$fp" , "$s0" ,
-        "$s1"   , "$s2" , "$s3" , "$s4" , "$s5" , "$s6" , "$s7" , "$s8" ,
-        "", "", "", "", "", "", "", "", /*  32-39 */
-        "$fa0"  , "$fa1"  , "$fa2"  , "$fa3"  ,
-        "$fa4"  , "$fa5"  , "$fa6"  , "$fa7"  ,
-        "$ft0"  , "$ft1"  , "$ft2"  , "$ft3"  ,
-        "$ft4"  , "$ft5"  , "$ft6"  , "$ft7"  ,
-        "$ft8"  , "$ft9"  , "$ft10" , "$ft11" ,
-        "$ft12" , "$ft13" , "$ft14" , "$ft15" ,
-        "$fs0"  , "$fs1"  , "$fs2"  , "$fs3"  ,
-        "$fs4"  , "$fs5"  , "$fs6"  , "$s7"   ,
-        "", "", "", "", "", "", "", "", /* 72-79 */
-        "NONE", "GPR", "SCR", "FPR", "FCSR", "IMMD", "IMMH", "LABEL",/* 80-87 */
-        "", "", "", "", "", "", "", "", /* 88-95 */
-        "ax", "sx", "zx", "bx", "AD", "AX", "", "",  /* 96-103 */
-        "", "", "", "", "", "", "", "", /* 104-111 */
-        "", "", "", "", "", "", "", "", /* 112-119 */
-        "", "", "", "", "", "", "", "", /* 120-127 */
-        /* clang-format on */
-        //"", "label", "", "", "", "", "", "", /* 128-135 */
-        //"", "", "", "", "", "", "", "", /* 136-143 */
-        //"", "", "", "", "", "", "", "", /* 144-151 */
+        "$zero", "$ra",   "$tp",   "$sp",  "$a0",   "$a1",   "$a2",
+        "$a3",   "$a4",   "$a5",   "$a6",  "$a7",   "$t0",   "$t1",
+        "$t2",   "$t3",   "$t4",   "$t5",  "$t6",   "$t7",   "$t8",
+        "$x",    "$fp",   "$s0",   "$s1",  "$s2",   "$s3",   "$s4",
+        "$s5",   "$s6",   "$s7",   "$s8",  "",      "",      "",
+        "",      "",      "",      "",     "", /*  32-39 */
+        "$fa0",  "$fa1",  "$fa2",  "$fa3", "$fa4",  "$fa5",  "$fa6",
+        "$fa7",  "$ft0",  "$ft1",  "$ft2", "$ft3",  "$ft4",  "$ft5",
+        "$ft6",  "$ft7",  "$ft8",  "$ft9", "$ft10", "$ft11", "$ft12",
+        "$ft13", "$ft14", "$ft15", "$fs0", "$fs1",  "$fs2",  "$fs3",
+        "$fs4",  "$fs5",  "$fs6",  "$s7",  "",      "",      "",
+        "",      "",      "",      "",     "", /* 72-79 */
+        "NONE",  "GPR",   "SCR",   "FPR",  "FCSR",  "IMMD",  "IMMH",
+        "LABEL", /* 80-87 */
+        "",      "",      "",      "",     "",      "",      "",
+        "", /* 88-95 */
+        "ax",    "sx",    "zx",    "bx",   "AD",    "AX",    "",
+        "", /* 96-103 */
+        "",      "",      "",      "",     "",      "",      "",
+        "", /* 104-111 */
+        "",      "",      "",      "",     "",      "",      "",
+        "", /* 112-119 */
+        "",      "",      "",      "",     "",      "",      "",
+        "", /* 120-127 */
+    /* clang-format on */
+    //"", "label", "", "", "", "", "", "", /* 128-135 */
+    //"", "", "", "", "", "", "", "", /* 136-143 */
+    //"", "", "", "", "", "", "", "", /* 144-151 */
 #include "ir2-name.h"
 
     };
     lsassert(value <= LISA_ENDING);
     return g_ir2_names[value];
 #else
-     return "undef";
+    return "undef";
 #endif
 }
 
@@ -92,8 +96,8 @@ IR2_OPND ir2_opnd_new_type(IR2_OPND_TYPE t)
 
 void ir2_opnd_build(IR2_OPND *opnd, IR2_OPND_TYPE t, int value)
 {
-    if (t == IR2_OPND_GPR || t == IR2_OPND_FPR ||
-        t == IR2_OPND_FCSR || t == IR2_OPND_SCR) {
+    if (t == IR2_OPND_GPR || t == IR2_OPND_FPR || t == IR2_OPND_FCSR ||
+        t == IR2_OPND_SCR) {
         opnd->_type = t;
         opnd->_reg_num = value;
     } else if (t == IR2_OPND_IMM) {
@@ -131,7 +135,10 @@ IR2_OPND ir2_opnd_new2(IR2_OPND_TYPE type, int base, int16 offset)
     return opnd;
 }
 
-int32 ir2_opnd_imm(const IR2_OPND *opnd) { return opnd->_imm32; }
+int32 ir2_opnd_imm(const IR2_OPND *opnd)
+{
+    return opnd->_imm32;
+}
 
 int32 ir2_opnd_offset(const IR2_OPND *opnd)
 {
@@ -140,33 +147,57 @@ int32 ir2_opnd_offset(const IR2_OPND *opnd)
 }
 
 
-int ir2_opnd_is_ireg(const IR2_OPND *opnd) { return opnd->_type == IR2_OPND_GPR; }
+int ir2_opnd_is_ireg(const IR2_OPND *opnd)
+{
+    return opnd->_type == IR2_OPND_GPR;
+}
 
-int ir2_opnd_is_freg(const IR2_OPND *opnd) { return opnd->_type == IR2_OPND_FPR; }
+int ir2_opnd_is_freg(const IR2_OPND *opnd)
+{
+    return opnd->_type == IR2_OPND_FPR;
+}
 
-int ir2_opnd_is_creg(const IR2_OPND *opnd) { return opnd->_type == IR2_OPND_FCSR; }
+int ir2_opnd_is_creg(const IR2_OPND *opnd)
+{
+    return opnd->_type == IR2_OPND_FCSR;
+}
 
-int32 ir2_opnd_label_id(const IR2_OPND *opnd) { return opnd->_label_id; }
+int32 ir2_opnd_label_id(const IR2_OPND *opnd)
+{
+    return opnd->_label_id;
+}
 
 int ir2_opnd_is_itemp(const IR2_OPND *opnd)
 {
     return (ir2_opnd_is_ireg(opnd) &&
-           (reg_itemp_reverse_map[ir2_opnd_base_reg_num(opnd)] >= 0));
+            (reg_itemp_reverse_map[ir2_opnd_base_reg_num(opnd)] >= 0));
 }
 
 int ir2_opnd_is_ftemp(const IR2_OPND *opnd)
 {
     return (ir2_opnd_is_freg(opnd) &&
-           (reg_ftemp_reverse_map[ir2_opnd_base_reg_num(opnd)] >= 0));
+            (reg_ftemp_reverse_map[ir2_opnd_base_reg_num(opnd)] >= 0));
 }
 
-int ir2_opnd_is_mem(const IR2_OPND *opnd) { return opnd->_type == IR2_OPND_MEM; }
+int ir2_opnd_is_mem(const IR2_OPND *opnd)
+{
+    return opnd->_type == IR2_OPND_MEM;
+}
 
-int ir2_opnd_is_imm(const IR2_OPND *opnd) { return opnd->_type == IR2_OPND_IMM; }
+int ir2_opnd_is_imm(const IR2_OPND *opnd)
+{
+    return opnd->_type == IR2_OPND_IMM;
+}
 
-int ir2_opnd_is_label(const IR2_OPND *opnd) { return opnd->_type == IR2_OPND_LABEL; }
+int ir2_opnd_is_label(const IR2_OPND *opnd)
+{
+    return opnd->_type == IR2_OPND_LABEL;
+}
 
-int ir2_opnd_base_reg_num(const IR2_OPND *opnd) { return opnd->_reg_num; }
+int ir2_opnd_base_reg_num(const IR2_OPND *opnd)
+{
+    return opnd->_reg_num;
+}
 
 IR2_OPND_TYPE ir2_opnd_type(const IR2_OPND *opnd)
 {
@@ -192,7 +223,6 @@ void ir2_opnd_convert_label_to_imm(IR2_OPND *opnd, int imm)
 
 int ir2_opnd_to_string(IR2_OPND *opnd, char *str, bool hex)
 {
-
     int base_reg_num = ir2_opnd_base_reg_num(opnd);
 
     switch (ir2_opnd_type(opnd)) {
@@ -308,13 +338,23 @@ bool ir2_opcode_is_fcmp(IR2_OPCODE opcode)
     return (opcode == LISA_FCMP_COND_S || opcode == LISA_FCMP_COND_D);
 }
 
-void ir2_set_id(IR2_INST *ir2, int id) { ir2->_id = id; }
+void ir2_set_id(IR2_INST *ir2, int id)
+{
+    ir2->_id = id;
+}
 
-int ir2_get_id(const IR2_INST *ir2) { return ir2->_id; }
+int ir2_get_id(const IR2_INST *ir2)
+{
+    return ir2->_id;
+}
 
-IR2_OPCODE ir2_opcode(const IR2_INST *ir2) { return (IR2_OPCODE)(ir2->_opcode); }
+IR2_OPCODE ir2_opcode(const IR2_INST *ir2)
+{
+    return (IR2_OPCODE)(ir2->_opcode);
+}
 
-void ir2_set_opcode(IR2_INST *ir2, IR2_OPCODE type) {
+void ir2_set_opcode(IR2_INST *ir2, IR2_OPCODE type)
+{
     ir2->_opcode = type;
 }
 
@@ -370,12 +410,12 @@ static int ir1_id;
 
 int ir2_dump(IR2_INST *ir2)
 {
-   char str[64];
+    char str[64];
     int size = 0;
 
     if (ir2_opcode(ir2) ==
         0) { /* an empty IR2_INST was inserted into the ir2 */
-             /* list, but not assigned yet. */
+        /* list, but not assigned yet. */
         return 0;
     }
 
@@ -384,7 +424,7 @@ int ir2_dump(IR2_INST *ir2)
         ir1_id = 0;
         qemu_log("[%d, %d] %s\n", ir2->_id, ir1_id, str);
     } else if (str[0] == '-') {
-        ir1_id ++;
+        ir1_id++;
         qemu_log("[%d, %d] %s\n", ir2->_id, ir1_id, str);
     } else {
         qemu_log("%s\n", str);
@@ -423,7 +463,7 @@ void ir2_append(IR2_INST *ir2)
         t->first_ir2 = ir2;
     }
 
-    if(ir2->_opcode >= LISA_GR2SCR)
+    if (ir2->_opcode >= LISA_GR2SCR)
         t->real_ir2_inst_num++;
 }
 
@@ -533,10 +573,10 @@ IR2_INST *ir2_allocate(void)
  ********************************************/
 bool la_ir2_opcode_is_load(IR2_OPCODE opcode)
 {
-    if (opcode >= LISA_LD_B && opcode <=  LISA_LD_D) {
+    if (opcode >= LISA_LD_B && opcode <= LISA_LD_D) {
         return true;
     }
-    if (opcode >=  LISA_LD_BU && opcode <=  LISA_LD_WU) {
+    if (opcode >= LISA_LD_BU && opcode <= LISA_LD_WU) {
         return true;
     }
     if (opcode == LISA_LL_W || opcode == LISA_LL_D) {
@@ -548,16 +588,16 @@ bool la_ir2_opcode_is_load(IR2_OPCODE opcode)
     if (opcode == LISA_FLD_S || opcode == LISA_FLD_D) {
         return true;
     }
-    if (opcode == LISA_VLD || opcode == LISA_XVLD){
+    if (opcode == LISA_VLD || opcode == LISA_XVLD) {
         return true;
     }
-    if (opcode >= LISA_LDL_W && opcode <= LISA_LDR_D){
+    if (opcode >= LISA_LDL_W && opcode <= LISA_LDR_D) {
         return true;
     }
-    if (opcode >= LISA_VLDREPL_D && opcode <= LISA_VLDREPL_B){
+    if (opcode >= LISA_VLDREPL_D && opcode <= LISA_VLDREPL_B) {
         return true;
     }
-    if (opcode >= LISA_XVLDREPL_D && opcode <= LISA_XVLDREPL_B){
+    if (opcode >= LISA_XVLDREPL_D && opcode <= LISA_XVLDREPL_B) {
         return true;
     }
     if (opcode == LISA_PRELD) {
@@ -583,7 +623,7 @@ bool la_ir2_opcode_is_store(IR2_OPCODE opcode)
     if (opcode == LISA_FST_S || opcode == LISA_FST_D) {
         return true;
     }
-    if (opcode == LISA_XVST || opcode == LISA_VST){
+    if (opcode == LISA_XVST || opcode == LISA_VST) {
         return true;
     }
     return false;

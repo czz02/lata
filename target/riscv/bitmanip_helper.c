@@ -65,12 +65,10 @@ target_ulong HELPER(brev8)(target_ulong rs1)
     return x;
 }
 
-static const uint64_t shuf_masks[] = {
-    dup_const(MO_8, 0x44),
-    dup_const(MO_8, 0x30),
-    dup_const(MO_16, 0x0f00),
-    dup_const(MO_32, 0xff0000)
-};
+static const uint64_t shuf_masks[] = { dup_const(MO_8, 0x44),
+                                       dup_const(MO_8, 0x30),
+                                       dup_const(MO_16, 0x0f00),
+                                       dup_const(MO_32, 0xff0000) };
 
 static inline target_ulong do_shuf_stage(target_ulong src, uint64_t maskL,
                                          uint64_t maskR, int shift)

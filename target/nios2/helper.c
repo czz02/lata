@@ -58,10 +58,8 @@ static void do_exception(Nios2CPU *cpu, uint32_t exception_addr,
              * There are 4 bits that are always written.
              * Explicitly clear them, to be set via the argument.
              */
-            env->ctrl[CR_TLBMISC] &= ~(CR_TLBMISC_D |
-                                       CR_TLBMISC_PERM |
-                                       CR_TLBMISC_BAD |
-                                       CR_TLBMISC_DBL);
+            env->ctrl[CR_TLBMISC] &= ~(CR_TLBMISC_D | CR_TLBMISC_PERM |
+                                       CR_TLBMISC_BAD | CR_TLBMISC_DBL);
             env->ctrl[CR_TLBMISC] |= tlbmisc_set;
         }
 
@@ -78,8 +76,8 @@ static void do_exception(Nios2CPU *cpu, uint32_t exception_addr,
 
     env->ctrl[CR_STATUS] = new_status;
     if (!is_break) {
-        env->ctrl[CR_EXCEPTION] = FIELD_DP32(0, CR_EXCEPTION, CAUSE,
-                                             cs->exception_index);
+        env->ctrl[CR_EXCEPTION] =
+            FIELD_DP32(0, CR_EXCEPTION, CAUSE, cs->exception_index);
     }
     env->pc = exception_addr;
 }
@@ -180,8 +178,8 @@ void nios2_cpu_do_interrupt(CPUState *cs)
         if (name) {
             qemu_log("%s at pc=0x%08x\n", name, env->pc);
         } else {
-            qemu_log("Unknown exception %d at pc=0x%08x\n",
-                     cs->exception_index, env->pc);
+            qemu_log("Unknown exception %d at pc=0x%08x\n", cs->exception_index,
+                     env->pc);
         }
     }
 
@@ -206,9 +204,8 @@ void nios2_cpu_do_interrupt(CPUState *cs)
              * Normally, we don't write to tlbmisc unless !EH,
              * so do it manually for the double-tlb miss exception.
              */
-            env->ctrl[CR_TLBMISC] &= ~(CR_TLBMISC_D |
-                                       CR_TLBMISC_PERM |
-                                       CR_TLBMISC_BAD);
+            env->ctrl[CR_TLBMISC] &=
+                ~(CR_TLBMISC_D | CR_TLBMISC_PERM | CR_TLBMISC_BAD);
             env->ctrl[CR_TLBMISC] |= tlbmisc_set;
             do_exception(cpu, cpu->exception_addr, 0, false);
         } else {
@@ -284,8 +281,8 @@ hwaddr nios2_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
 }
 
 void nios2_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                   MMUAccessType access_type,
-                                   int mmu_idx, uintptr_t retaddr)
+                                   MMUAccessType access_type, int mmu_idx,
+                                   uintptr_t retaddr)
 {
     Nios2CPU *cpu = NIOS2_CPU(cs);
     CPUNios2State *env = &cpu->env;
@@ -296,8 +293,8 @@ void nios2_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
 }
 
 bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                        MMUAccessType access_type, int mmu_idx,
-                        bool probe, uintptr_t retaddr)
+                        MMUAccessType access_type, int mmu_idx, bool probe,
+                        uintptr_t retaddr)
 {
     Nios2CPU *cpu = NIOS2_CPU(cs);
     CPUNios2State *env = &cpu->env;
@@ -309,8 +306,8 @@ bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
     if (!cpu->mmu_present) {
         /* No MMU */
         address &= TARGET_PAGE_MASK;
-        tlb_set_page(cs, address, address, PAGE_BITS,
-                     mmu_idx, TARGET_PAGE_SIZE);
+        tlb_set_page(cs, address, address, PAGE_BITS, mmu_idx,
+                     TARGET_PAGE_SIZE);
         return true;
     }
 
@@ -318,8 +315,8 @@ bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
         if (address >= 0xC0000000) {
             /* Kernel physical page - TLB bypassed */
             address &= TARGET_PAGE_MASK;
-            tlb_set_page(cs, address, address, PAGE_BITS,
-                         mmu_idx, TARGET_PAGE_SIZE);
+            tlb_set_page(cs, address, address, PAGE_BITS, mmu_idx,
+                         TARGET_PAGE_SIZE);
             return true;
         }
     } else {
@@ -328,8 +325,8 @@ bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
             if (probe) {
                 return false;
             }
-            cs->exception_index = (access_type == MMU_INST_FETCH
-                                   ? EXCP_SUPERA_X : EXCP_SUPERA_D);
+            cs->exception_index =
+                (access_type == MMU_INST_FETCH ? EXCP_SUPERA_X : EXCP_SUPERA_D);
             env->ctrl[CR_BADADDR] = address;
             nios2_cpu_loop_exit_advance(env, retaddr);
         }
@@ -344,16 +341,16 @@ bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
         if (((access_type == MMU_DATA_LOAD) && (lu.prot & PAGE_READ)) ||
             ((access_type == MMU_DATA_STORE) && (lu.prot & PAGE_WRITE)) ||
             ((access_type == MMU_INST_FETCH) && (lu.prot & PAGE_EXEC))) {
-            tlb_set_page(cs, vaddr, paddr, lu.prot,
-                         mmu_idx, TARGET_PAGE_SIZE);
+            tlb_set_page(cs, vaddr, paddr, lu.prot, mmu_idx, TARGET_PAGE_SIZE);
             return true;
         }
 
         /* Permission violation */
-        excp = (access_type == MMU_DATA_LOAD ? EXCP_PERM_R :
-                access_type == MMU_DATA_STORE ? EXCP_PERM_W : EXCP_PERM_X);
+        excp = (access_type == MMU_DATA_LOAD  ? EXCP_PERM_R :
+                access_type == MMU_DATA_STORE ? EXCP_PERM_W :
+                                                EXCP_PERM_X);
     } else {
-        excp = (access_type == MMU_INST_FETCH ? EXCP_TLB_X: EXCP_TLB_D);
+        excp = (access_type == MMU_INST_FETCH ? EXCP_TLB_X : EXCP_TLB_D);
     }
 
     if (probe) {

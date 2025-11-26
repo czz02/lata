@@ -34,7 +34,7 @@ static inline void tu_trees_reset(void)
 
 TranslationBlock *tu_tree_lookup(target_ulong pc)
 {
-    TranslationBlock key = {.pc = pc};
+    TranslationBlock key = { .pc = pc };
     return (TranslationBlock *)g_tree_lookup(tu_data->tree, &key);
 }
 
@@ -73,8 +73,8 @@ static inline void tu_push_back(TranslationBlock *tb)
     if (!tb) {
         return;
     }
-    TranslationBlock** tb_list = tu_data->tb_list;
-    uint32_t* tb_num_in_tu = &tu_data->tb_num;
+    TranslationBlock **tb_list = tu_data->tb_list;
+    uint32_t *tb_num_in_tu = &tu_data->tb_num;
     tu_data->ir1_num_in_tu += tb->icount;
 
     tb_list[(*tb_num_in_tu)++] = tb;
@@ -95,14 +95,17 @@ int translate_tb_in_tu(struct TranslationBlock *tb)
 
 static inline void tu_enough_space(CPUState *cpu)
 {
-    if (unlikely(tcg_ctx->code_gen_ptr + MAX_TU_SIZE >= tcg_ctx->code_gen_highwater)) {
+    if (unlikely(tcg_ctx->code_gen_ptr + MAX_TU_SIZE >=
+                 tcg_ctx->code_gen_highwater)) {
         tb_flush(cpu);
         mmap_unlock();
         /* Make the execution loop process the flush as soon as possible.  */
         cpu->exception_index = EXCP_INTERRUPT;
         cpu_loop_exit(cpu);
     }
-    tcg_ctx->gen_insn_data = tcg_malloc(sizeof(uint64_t) * MAX_TB_IN_TU * TCG_MAX_INSNS * TARGET_INSN_START_WORDS);
+    tcg_ctx->gen_insn_data =
+        tcg_malloc(sizeof(uint64_t) * MAX_TB_IN_TU * TCG_MAX_INSNS *
+                   TARGET_INSN_START_WORDS);
 }
 
 static void tu_reset_tb(TranslationBlock *tb)
@@ -122,7 +125,7 @@ static void tu_reset_tb(TranslationBlock *tb)
 #ifdef CONFIG_LATA_INSTS_PATTERN
     tb->nzcv_save[0] = TB_JMP_OFFSET_INVALID;
     tb->nzcv_save[1] = TB_JMP_OFFSET_INVALID;
-    tb->nzcv_use = true ;
+    tb->nzcv_use = true;
 #endif
     tb->tc.offset_in_tu = 0;
     tb->next_pc = 0;
@@ -134,15 +137,14 @@ static void tu_reset_tb(TranslationBlock *tb)
     tb->tu_jmp[TU_TB_INDEX_TARGET] = TB_JMP_OFFSET_INVALID;
     tb->tu_jmp[TU_TB_INDEX_NEXT] = TB_JMP_OFFSET_INVALID;
     tb->tu_unlink_stub_offset = TU_UNLINK_STUB_INVALID;
-
 }
 
 /* Create a TB and initialize it. */
-static TranslationBlock* tb_create(CPUState *cpu, uint64_t pc,
-        uint64_t cs_base, uint32_t flags, int cflags,
-        int max_insns, bool is_first_tb)
+static TranslationBlock *tb_create(CPUState *cpu, uint64_t pc, uint64_t cs_base,
+                                   uint32_t flags, int cflags, int max_insns,
+                                   bool is_first_tb)
 {
-    TranslationBlock* tb;
+    TranslationBlock *tb;
     tb = tcg_tb_alloc_full(tcg_ctx);
     if (unlikely(!tb)) {
         fprintf(stderr, "tb flush\n");
@@ -153,7 +155,7 @@ static TranslationBlock* tb_create(CPUState *cpu, uint64_t pc,
         /* Make the execution loop process the flush as soon as possible.  */
         cpu->exception_index = EXCP_INTERRUPT;
         cpu_loop_exit(cpu);
-    }        
+    }
     tu_reset_tb(tb);
     tb->pc = pc;
     tb->cs_base = cs_base;
@@ -163,9 +165,9 @@ static TranslationBlock* tb_create(CPUState *cpu, uint64_t pc,
     tb->env = cpu->env_ptr;
     target_disasm(tb, &max_insns, cpu);
 
-    if (tb->icount == 0 || tb->s_data->tu_tb_mode == TU_TB_MODE_BROKEN ) {
+    if (tb->icount == 0 || tb->s_data->tu_tb_mode == TU_TB_MODE_BROKEN) {
         return NULL;
-    }    
+    }
 
     tu_tree_insert(tb);
     return tb;
@@ -183,15 +185,15 @@ static inline uint32_t get_page(uint32_t pc)
     return pc & TARGET_PAGE_MASK;
 }
 
-static inline void get_tu_queue(CPUState *cpu,
-		 target_ulong cs_base, uint32_t flags,
-		 int cflags, int max_insns)
+static inline void get_tu_queue(CPUState *cpu, target_ulong cs_base,
+                                uint32_t flags, int cflags, int max_insns)
 {
     uint64_t ir1_next_pc, ir1_target_pc;
-    TranslationBlock** tb_list = tu_data->tb_list;
+    TranslationBlock **tb_list = tu_data->tb_list;
     uint32_t *tb_num_in_tu = &tu_data->tb_num;
     TranslationBlock *next_tb, *target_tb, *tb;
-    for (int i = 0; i <  *tb_num_in_tu && *tb_num_in_tu < MAX_TB_IN_TU - 1; i++) {
+    for (int i = 0; i < *tb_num_in_tu && *tb_num_in_tu < MAX_TB_IN_TU - 1;
+         i++) {
         tb = tb_list[i];
         ir1_next_pc = tb->next_pc;
         ir1_target_pc = tb->target_pc;
@@ -203,12 +205,12 @@ static inline void get_tu_queue(CPUState *cpu,
             if (get_page(tb->pc) == get_page(ir1_next_pc)) {
                 next_tb = tu_tree_lookup(ir1_next_pc);
                 if (!next_tb) {
-                    next_tb = tb_htable_lookup(cpu,
-                        ir1_next_pc, cs_base, flags, cflags);
+                    next_tb = tb_htable_lookup(cpu, ir1_next_pc, cs_base, flags,
+                                               cflags);
                 }
                 if (!next_tb) {
                     next_tb = tb_create(cpu, ir1_next_pc, cs_base, flags,
-                                   cflags, max_insns, 0);
+                                        cflags, max_insns, 0);
                     tu_push_back(next_tb);
                 }
                 if (next_tb && next_tb->tc.ptr != NULL) {
@@ -223,16 +225,17 @@ static inline void get_tu_queue(CPUState *cpu,
             }
 
             lsassert(ir1_target_pc);
-            /* Jcc target tb should not be translated if the distance is too far */
+            /* Jcc target tb should not be translated if the distance is too far
+             */
             if (get_page(tb->pc) == get_page(ir1_target_pc)) {
                 target_tb = tu_tree_lookup(ir1_target_pc);
                 if (!target_tb) {
-                    target_tb = tb_htable_lookup(cpu,
-                        ir1_target_pc, cs_base, flags, cflags);
+                    target_tb = tb_htable_lookup(cpu, ir1_target_pc, cs_base,
+                                                 flags, cflags);
                 }
                 if (!target_tb) {
                     target_tb = tb_create(cpu, ir1_target_pc, cs_base, flags,
-                                     cflags, max_insns, 0);
+                                          cflags, max_insns, 0);
                     tu_push_back(target_tb);
                 }
                 if (target_tb && target_tb->tc.ptr != NULL) {
@@ -248,16 +251,17 @@ static inline void get_tu_queue(CPUState *cpu,
             }
             break;
         case IR1_TYPE_JMP:
-            /* JMP target tb should not be translated if the distance is too far */
+            /* JMP target tb should not be translated if the distance is too far
+             */
             if (get_page(tb->pc) == get_page(ir1_target_pc)) {
                 target_tb = tu_tree_lookup(ir1_target_pc);
                 if (!target_tb) {
-                    target_tb = tb_htable_lookup(cpu,
-                        ir1_target_pc, cs_base, flags, cflags);
+                    target_tb = tb_htable_lookup(cpu, ir1_target_pc, cs_base,
+                                                 flags, cflags);
                 }
                 if (get_page(tb->pc) == get_page(ir1_target_pc) && !target_tb) {
                     target_tb = tb_create(cpu, ir1_target_pc, cs_base, flags,
-                                     cflags, max_insns, 0);
+                                          cflags, max_insns, 0);
                     tu_push_back(target_tb);
                 }
                 tb->next_tb[TU_TB_INDEX_TARGET] = target_tb;
@@ -272,12 +276,12 @@ static inline void get_tu_queue(CPUState *cpu,
             if (get_page(tb->pc) == get_page(ir1_next_pc)) {
                 next_tb = tu_tree_lookup(ir1_next_pc);
                 if (!next_tb) {
-                    next_tb = tb_htable_lookup(cpu,
-                        ir1_next_pc, cs_base, flags, cflags);
+                    next_tb = tb_htable_lookup(cpu, ir1_next_pc, cs_base, flags,
+                                               cflags);
                 }
                 if (!next_tb) {
                     next_tb = tb_create(cpu, ir1_next_pc, cs_base, flags,
-                                   cflags, max_insns, 0);
+                                        cflags, max_insns, 0);
                     tu_push_back(next_tb);
                 }
                 tb->next_tb[TU_TB_INDEX_NEXT] = next_tb;
@@ -293,7 +297,7 @@ static inline void get_tu_queue(CPUState *cpu,
         }
     }
 
-/* Note: *tb_num_in_tu maybe greater than MAX_TB_IN_TU. */
+    /* Note: *tb_num_in_tu maybe greater than MAX_TB_IN_TU. */
     if (*tb_num_in_tu > MAX_TB_IN_TU) {
         lsassert(0);
     }
@@ -384,10 +388,8 @@ void solve_tb_overlap(TranslationBlock **tb_list, int max_insns)
                 /* pre_tb dont link in TU */
                 pre_tb->next_tb[TU_TB_INDEX_NEXT] = NULL;
                 pre_tb->next_tb[TU_TB_INDEX_TARGET] = NULL;
-                pre_tb->tu_jmp[TU_TB_INDEX_TARGET] =
-                    TB_JMP_OFFSET_INVALID;
-                pre_tb->tu_jmp[TU_TB_INDEX_NEXT] =
-                    TB_JMP_OFFSET_INVALID;
+                pre_tb->tu_jmp[TU_TB_INDEX_TARGET] = TB_JMP_OFFSET_INVALID;
+                pre_tb->tu_jmp[TU_TB_INDEX_NEXT] = TB_JMP_OFFSET_INVALID;
                 pre_tb->s_data->tu_tb_mode = TU_TB_MODE_SWITCH_TO_TB;
                 pre_tb = tb;
                 continue;
@@ -403,12 +405,11 @@ void solve_tb_overlap(TranslationBlock **tb_list, int max_insns)
             pre_tb->next_tb[TU_TB_INDEX_NEXT] = NULL;
             pre_tb->next_tb[TU_TB_INDEX_TARGET] = NULL;
 
-            /*When pre_tb->icount achive max_insns, the end addresses of two TBS are different*/
+            /*When pre_tb->icount achive max_insns, the end addresses of two TBS
+             * are different*/
             if (pre_tb->icount == max_insns) {
-                pre_tb->tu_jmp[TU_TB_INDEX_TARGET] =
-                    TB_JMP_OFFSET_INVALID;
-                pre_tb->tu_jmp[TU_TB_INDEX_NEXT] =
-                    TB_JMP_OFFSET_INVALID;
+                pre_tb->tu_jmp[TU_TB_INDEX_TARGET] = TB_JMP_OFFSET_INVALID;
+                pre_tb->tu_jmp[TU_TB_INDEX_NEXT] = TB_JMP_OFFSET_INVALID;
             } else {
                 tu_split_tb(pre_tb, tb);
             }
@@ -421,11 +422,11 @@ void solve_tb_overlap(TranslationBlock **tb_list, int max_insns)
 }
 
 /*explore tbs in tu*/
-static TranslationBlock *tb_explore(CPUState *cpu,
-                              target_ulong pc, uint64_t cs_base,
-                              uint32_t flags, int cflags)
+static TranslationBlock *tb_explore(CPUState *cpu, target_ulong pc,
+                                    uint64_t cs_base, uint32_t flags,
+                                    int cflags)
 {
-    TranslationBlock** tb_list = tu_data->tb_list;
+    TranslationBlock **tb_list = tu_data->tb_list;
     uint32_t *tb_num_in_tu = &tu_data->tb_num;
     uint32_t *ir1_num_in_tu = &tu_data->ir1_num_in_tu;
     int max_insns;
@@ -446,9 +447,9 @@ static TranslationBlock *tb_explore(CPUState *cpu,
     tu_enough_space(cpu);
     /* the entry used as return value*/
 
-    TranslationBlock *entry = tb_create(cpu, pc, cs_base,
-            flags, cflags, max_insns, true);
-    tu_push_back(entry);            
+    TranslationBlock *entry =
+        tb_create(cpu, pc, cs_base, flags, cflags, max_insns, true);
+    tu_push_back(entry);
     /* search all tbs we can get */
     get_tu_queue(cpu, cs_base, flags, cflags, max_insns);
 
@@ -458,23 +459,22 @@ static TranslationBlock *tb_explore(CPUState *cpu,
     /* Some TBS may overlap. We split these overlapping TBS. */
     solve_tb_overlap(tb_list, max_insns);
 
-    for (int i = 0; i < *tb_num_in_tu; i++){
+    for (int i = 0; i < *tb_num_in_tu; i++) {
         /* record tu pc and tb_num */
         tb_list[i]->s_data->tu_id = tb_list[0]->pc;
     }
 
     return entry;
-
 }
 
 /*fix address if b jmp target has been translated*/
-void tu_relocat_branch(TranslationBlock * tb, int n)
+void tu_relocat_branch(TranslationBlock *tb, int n)
 {
     TranslationBlock *tb_next = tb->next_tb[n];
     uintptr_t fix_addr = (uintptr_t)tb->tc.ptr + tb->jmp_insn_offset[n];
     uint fix_insn = *(uint *)fix_addr;
 
-    if ((fix_insn & 0xFC000000) == 0x50000000) {/*b*/
+    if ((fix_insn & 0xFC000000) == 0x50000000) { /*b*/
         tb_set_jmp_target(tb, n, (uintptr_t)tb_next->tc.ptr);
     }
 }
@@ -490,8 +490,9 @@ void translate_tu(TranslationBlock **tb_list)
     uint32_t search_size = 0;
     TranslationBlock *tb;
 
-    qatomic_set(&tcg_ctx->code_gen_ptr, (void *)
-            ROUND_UP((uintptr_t)tcg_ctx->code_gen_ptr, CODE_GEN_ALIGN));
+    qatomic_set(
+        &tcg_ctx->code_gen_ptr,
+        (void *)ROUND_UP((uintptr_t)tcg_ctx->code_gen_ptr, CODE_GEN_ALIGN));
 
     for (uint32_t i = 0; i < tb_num_in_tu; i++) {
         tu_data->curr_num = i;
@@ -500,10 +501,14 @@ void translate_tu(TranslationBlock **tb_list)
         gen_code_size = translate_tb_in_tu(tb);
         lata_fast_jmp_cache_add(tb->env, tb->pc, (uint64_t)(tb->tc.ptr));
         tu_data->curr_insns = tb->icount;
-        qatomic_set(&tcg_ctx->code_gen_ptr, (void *)ROUND_UP((uintptr_t)tcg_ctx->code_gen_ptr + gen_code_size, CODE_GEN_ALIGN));
+        qatomic_set(
+            &tcg_ctx->code_gen_ptr,
+            (void *)ROUND_UP((uintptr_t)tcg_ctx->code_gen_ptr + gen_code_size,
+                             CODE_GEN_ALIGN));
         tb->tc.size = gen_code_size;
         tb->tc.offset_in_tu = tb->tc.ptr - tb_list[0]->tc.ptr;
-        /* init original jump addresses which have been set during tcg_gen_code() */
+        /* init original jump addresses which have been set during
+         * tcg_gen_code() */
         if (tb->jmp_reset_offset[0] != TB_JMP_OFFSET_INVALID) {
             tb_reset_jump(tb, 0);
         }
@@ -512,47 +517,51 @@ void translate_tu(TranslationBlock **tb_list)
         }
 
         search_buff_offset[i] = search_size;
-        search_size += encode_search(tb, (void *)(tcg_ctx->tb_gen_tail) + search_buff_offset[i]);
+        search_size += encode_search(tb, (void *)(tcg_ctx->tb_gen_tail) +
+                                             search_buff_offset[i]);
     }
 
     tb_list[0]->s_data->tu_size = tcg_ctx->code_gen_ptr - tb_list[0]->tc.ptr;
 
     for (int i = 0; i < tb_num_in_tu; i++) {
         tb = tb_list[i];
-        if (tb->last_ir1_type == IR1_TYPE_JMPIN || tb->last_ir1_type == IR1_TYPE_CALLIN || tb->last_ir1_type == IR1_TYPE_SYSCALL) {
+        if (tb->last_ir1_type == IR1_TYPE_JMPIN ||
+            tb->last_ir1_type == IR1_TYPE_CALLIN ||
+            tb->last_ir1_type == IR1_TYPE_SYSCALL) {
             continue;
         }
-        if (tb->next_tb[TU_TB_INDEX_NEXT] != NULL && tb->last_ir1_type != IR1_TYPE_CALL) {
+        if (tb->next_tb[TU_TB_INDEX_NEXT] != NULL &&
+            tb->last_ir1_type != IR1_TYPE_CALL) {
             tu_relocat_branch(tb, TU_TB_INDEX_NEXT);
-        }        
+        }
         if ((tb->next_tb[TU_TB_INDEX_TARGET] != NULL)) {
             tu_relocat_branch(tb, TU_TB_INDEX_TARGET);
-            tb->tu_link_ins = *(uint32_t *)(tb->tc.ptr +
-                    tb->tu_jmp[TU_TB_INDEX_TARGET]);
+            tb->tu_link_ins =
+                *(uint32_t *)(tb->tc.ptr + tb->tu_jmp[TU_TB_INDEX_TARGET]);
         }
     }
 
     /*search data*/
     for (int i = 0; i < tb_num_in_tu; i++) {
         tb = tb_list[i];
-        tb->tu_search_addr = (uint8_t *)
-            ((void *)(tcg_ctx->tb_gen_tail) + search_buff_offset[i]);
+        tb->tu_search_addr =
+            (uint8_t *)((void *)(tcg_ctx->tb_gen_tail) + search_buff_offset[i]);
     }
     tb_list[0]->s_data->tu_size = tcg_ctx->code_gen_ptr - tb_list[0]->tc.ptr;
-
 }
 
 /* print tu if open in_asm/out_asm debug mode */
-static void print_tu(CPUState *cpu, TranslationBlock **tb_list){
+static void print_tu(CPUState *cpu, TranslationBlock **tb_list)
+{
     uint32_t tb_num_in_tu = tu_data->tb_num;
-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-        && qemu_log_in_addr_range(tb_list[0]->pc)) {
+    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM) &&
+        qemu_log_in_addr_range(tb_list[0]->pc)) {
         FILE *logfile = qemu_log_trylock();
         fprintf(logfile, "TU IN: %s\n", lookup_symbol(tb_list[0]->pc));
-        fprintf(logfile, "-----------------------------------------\n");        
+        fprintf(logfile, "-----------------------------------------\n");
         for (int i = 0; i < tb_num_in_tu; i++) {
             target_disas(logfile, cpu, tb_list[i]->pc, tb_list[i]->size);
-            fprintf(logfile, "-----------------------------------------\n");            
+            fprintf(logfile, "-----------------------------------------\n");
         }
         qemu_log_unlock(logfile);
     }
@@ -569,11 +578,10 @@ static void print_tu(CPUState *cpu, TranslationBlock **tb_list){
             fprintf(logfile, "\n");
             fprintf(logfile, "TU OUT: [size=%d]\n", code_size);
             for (int i = 0; i < tb_num_in_tu; i++) {
-                fprintf(logfile, "  -- tb%d: guest addr 0x%016" PRIx64 " \n",
-                    i, (uint64_t)tb_list[i]->pc); 
+                fprintf(logfile, "  -- tb%d: guest addr 0x%016" PRIx64 " \n", i,
+                        (uint64_t)tb_list[i]->pc);
                 int gen_code_size = tb_list[i]->codesize;
-                disas(logfile, tb_list[i]->tc.ptr, gen_code_size);                    
-
+                disas(logfile, tb_list[i]->tc.ptr, gen_code_size);
             }
 
             fprintf(logfile, "\n");
@@ -582,8 +590,7 @@ static void print_tu(CPUState *cpu, TranslationBlock **tb_list){
     }
 }
 
-static void register_tu(TranslationBlock **tb_list,
-		CPUState *cpu, int cflags)
+static void register_tu(TranslationBlock **tb_list, CPUState *cpu, int cflags)
 {
     uint32_t tb_num_in_tu = tu_data->tb_num;
     for (int i = 0; i < tb_num_in_tu; i++) {
@@ -609,16 +616,14 @@ static void register_tu(TranslationBlock **tb_list,
             tcg_tb_insert(tb);
         }
     }
-
 }
 
 /* Called with mmap_lock held for user mode emulation.  */
-TranslationBlock *tu_gen_code(CPUState *cpu,
-                              target_ulong pc, uint64_t cs_base,
+TranslationBlock *tu_gen_code(CPUState *cpu, target_ulong pc, uint64_t cs_base,
                               uint32_t flags, int cflags)
 {
-    TranslationBlock* entry;
-    TranslationBlock** tb_list = tu_data->tb_list;
+    TranslationBlock *entry;
+    TranslationBlock **tb_list = tu_data->tb_list;
 
     assert_memory_lock();
     qemu_thread_jit_write();

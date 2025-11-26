@@ -33,8 +33,7 @@ void cpu_load_eflags(CPUX86State *env, int eflags, int update_mask)
     CC_SRC = eflags & (CC_O | CC_S | CC_Z | CC_A | CC_P | CC_C);
     CC_OP = CC_OP_EFLAGS;
     env->df = 1 - (2 * ((eflags >> 10) & 1));
-    env->eflags = (env->eflags & ~update_mask) |
-        (eflags & update_mask) | 0x2;
+    env->eflags = (env->eflags & ~update_mask) | (eflags & update_mask) | 0x2;
 }
 
 void helper_into(CPUX86State *env, int next_eip_addend)
@@ -77,7 +76,7 @@ void helper_rdtsc(CPUX86State *env)
 
 G_NORETURN void helper_rdpmc(CPUX86State *env)
 {
-    if (((env->cr[4] & CR4_PCE_MASK) == 0 ) &&
+    if (((env->cr[4] & CR4_PCE_MASK) == 0) &&
         ((env->hflags & HF_CPL_MASK) != 0)) {
         raise_exception_ra(env, EXCP0D_GPF, GETPC());
     }

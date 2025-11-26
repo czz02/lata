@@ -27,7 +27,7 @@ typedef struct DisasContext {
     DisasContextBase *base;
 #else
     DisasContextBase base;
-#endif 
+#endif
     const ARMISARegisters *isar;
 
     /* The address of the current instruction being translated. */
@@ -72,15 +72,15 @@ typedef struct DisasContext {
     int user;
 #endif
     ARMMMUIdx mmu_idx; /* MMU index to use for normal loads/stores */
-    uint8_t tbii;      /* TBI1|TBI0 for insns */
-    uint8_t tbid;      /* TBI1|TBI0 for data */
-    uint8_t tcma;      /* TCMA1|TCMA0 for MTE */
-    bool ns;        /* Use non-secure CPREG bank on access */
+    uint8_t tbii; /* TBI1|TBI0 for insns */
+    uint8_t tbid; /* TBI1|TBI0 for data */
+    uint8_t tcma; /* TCMA1|TCMA0 for MTE */
+    bool ns; /* Use non-secure CPREG bank on access */
     int fp_excp_el; /* FP exception EL or 0 if enabled */
     int sve_excp_el; /* SVE exception EL or 0 if enabled */
     int sme_excp_el; /* SME exception EL or 0 if enabled */
-    int vl;          /* current vector length in bytes */
-    int svl;         /* current streaming vector length in bytes */
+    int vl; /* current vector length in bytes */
+    int svl; /* current streaming vector length in bytes */
     bool vfp_enabled; /* FP enabled via FPSCR.EN */
     int vec_len;
     int vec_stride;
@@ -282,20 +282,20 @@ static inline int curr_insn_len(DisasContext *s)
 }
 
 /* is_jmp field values */
-#define DISAS_JUMP      DISAS_TARGET_0 /* only pc was modified dynamically */
+#define DISAS_JUMP DISAS_TARGET_0 /* only pc was modified dynamically */
 /* CPU state was modified dynamically; exit to main loop for interrupts. */
-#define DISAS_UPDATE_EXIT  DISAS_TARGET_1
+#define DISAS_UPDATE_EXIT DISAS_TARGET_1
 /* These instructions trap after executing, so the A32/T32 decoder must
  * defer them until after the conditional execution state has been updated.
  * WFI also needs special handling when single-stepping.
  */
-#define DISAS_WFI       DISAS_TARGET_2
-#define DISAS_SWI       DISAS_TARGET_3
+#define DISAS_WFI DISAS_TARGET_2
+#define DISAS_SWI DISAS_TARGET_3
 /* WFE */
-#define DISAS_WFE       DISAS_TARGET_4
-#define DISAS_HVC       DISAS_TARGET_5
-#define DISAS_SMC       DISAS_TARGET_6
-#define DISAS_YIELD     DISAS_TARGET_7
+#define DISAS_WFE DISAS_TARGET_4
+#define DISAS_HVC DISAS_TARGET_5
+#define DISAS_SMC DISAS_TARGET_6
+#define DISAS_YIELD DISAS_TARGET_7
 /* M profile branch which might be an exception return (and so needs
  * custom end-of-TB code)
  */
@@ -307,9 +307,9 @@ static inline int curr_insn_len(DisasContext *s)
  * something (gen_a64_update_pc or runtime helper) has done so before we reach
  * return from cpu_tb_exec.
  */
-#define DISAS_EXIT      DISAS_TARGET_9
+#define DISAS_EXIT DISAS_TARGET_9
 /* CPU state was modified dynamically; no need to exit, but do not chain. */
-#define DISAS_UPDATE_NOCHAIN  DISAS_TARGET_10
+#define DISAS_UPDATE_NOCHAIN DISAS_TARGET_10
 
 #ifdef TARGET_AARCH64
 void a64_translate_init(void);
@@ -332,8 +332,8 @@ MemOp pow2_align(unsigned i);
 void unallocated_encoding(DisasContext *s);
 void gen_exception_insn_el(DisasContext *s, target_long pc_diff, int excp,
                            uint32_t syn, uint32_t target_el);
-void gen_exception_insn(DisasContext *s, target_long pc_diff,
-                        int excp, uint32_t syn);
+void gen_exception_insn(DisasContext *s, target_long pc_diff, int excp,
+                        uint32_t syn);
 
 /* Return state of Alternate Half-precision flag, caller frees result */
 static inline TCGv_i32 get_ahp_flag(void)
@@ -471,25 +471,28 @@ void gen_gvec_uaba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
 /*
  * Forward to the isar_feature_* tests given a DisasContext pointer.
  */
-#define dc_isar_feature(name, ctx) \
-    ({ DisasContext *ctx_ = (ctx); isar_feature_##name(ctx_->isar); })
+#define dc_isar_feature(name, ctx)       \
+    ({                                   \
+        DisasContext *ctx_ = (ctx);      \
+        isar_feature_##name(ctx_->isar); \
+    })
 
 /* Note that the gvec expanders operate on offsets + sizes.  */
 typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
-typedef void GVecGen2iFn(unsigned, uint32_t, uint32_t, int64_t,
-                         uint32_t, uint32_t);
-typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
-                        uint32_t, uint32_t, uint32_t);
-typedef void GVecGen4Fn(unsigned, uint32_t, uint32_t, uint32_t,
-                        uint32_t, uint32_t, uint32_t);
+typedef void GVecGen2iFn(unsigned, uint32_t, uint32_t, int64_t, uint32_t,
+                         uint32_t);
+typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t,
+                        uint32_t);
+typedef void GVecGen4Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t,
+                        uint32_t, uint32_t);
 
 /* Function prototype for gen_ functions for calling Neon helpers */
 typedef void NeonGenOneOpFn(TCGv_i32, TCGv_i32);
 typedef void NeonGenOneOpEnvFn(TCGv_i32, TCGv_ptr, TCGv_i32);
 typedef void NeonGenTwoOpFn(TCGv_i32, TCGv_i32, TCGv_i32);
 typedef void NeonGenTwoOpEnvFn(TCGv_i32, TCGv_ptr, TCGv_i32, TCGv_i32);
-typedef void NeonGenThreeOpEnvFn(TCGv_i32, TCGv_env, TCGv_i32,
-                                 TCGv_i32, TCGv_i32);
+typedef void NeonGenThreeOpEnvFn(TCGv_i32, TCGv_env, TCGv_i32, TCGv_i32,
+                                 TCGv_i32);
 typedef void NeonGenTwo64OpFn(TCGv_i64, TCGv_i64, TCGv_i64);
 typedef void NeonGenTwo64OpEnvFn(TCGv_i64, TCGv_ptr, TCGv_i64, TCGv_i64);
 typedef void NeonGenNarrowFn(TCGv_i32, TCGv_i64);
@@ -715,25 +718,33 @@ static inline void gen_restore_rmode(TCGv_i32 old, TCGv_ptr fpst)
  * Helpers for implementing sets of trans_* functions.
  * Defer the implementation of NAME to FUNC, with optional extra arguments.
  */
-#define TRANS(NAME, FUNC, ...) \
+#define TRANS(NAME, FUNC, ...)                               \
     static bool trans_##NAME(DisasContext *s, arg_##NAME *a) \
-    { return FUNC(s, __VA_ARGS__); }
-#define TRANS_FEAT(NAME, FEAT, FUNC, ...) \
-    static bool trans_##NAME(DisasContext *s, arg_##NAME *a) \
-    { return dc_isar_feature(FEAT, s) && FUNC(s, __VA_ARGS__); }
-#define TRANS_FEAT_ATOMIC(NAME, FEAT, FUNC, ...) \
-    static bool trans_##NAME(DisasContext *s) \
-    { arg_##NAME *a = &(s->arg.f_atomic); \
-    return dc_isar_feature(FEAT, s) && FUNC(s, a, __VA_ARGS__); }
-#define TRANS_FEAT_LDST_TAG(NAME, FEAT, FUNC, ...) \
-    static bool trans_##NAME(DisasContext *s) \
-    { arg_##NAME *a = &(s->arg.f_ldst_tag); \
-    return dc_isar_feature(FEAT, s) && FUNC(s, a, __VA_ARGS__); }
-#define TRANS_FEAT_NONSTREAMING(NAME, FEAT, FUNC, ...)            \
-    static bool trans_##NAME(DisasContext *s, arg_##NAME *a)      \
-    {                                                             \
-        s->is_nonstreaming = true;                                \
-        return dc_isar_feature(FEAT, s) && FUNC(s, __VA_ARGS__);  \
+    {                                                        \
+        return FUNC(s, __VA_ARGS__);                         \
+    }
+#define TRANS_FEAT(NAME, FEAT, FUNC, ...)                        \
+    static bool trans_##NAME(DisasContext *s, arg_##NAME *a)     \
+    {                                                            \
+        return dc_isar_feature(FEAT, s) && FUNC(s, __VA_ARGS__); \
+    }
+#define TRANS_FEAT_ATOMIC(NAME, FEAT, FUNC, ...)                    \
+    static bool trans_##NAME(DisasContext *s)                       \
+    {                                                               \
+        arg_##NAME *a = &(s->arg.f_atomic);                         \
+        return dc_isar_feature(FEAT, s) && FUNC(s, a, __VA_ARGS__); \
+    }
+#define TRANS_FEAT_LDST_TAG(NAME, FEAT, FUNC, ...)                  \
+    static bool trans_##NAME(DisasContext *s)                       \
+    {                                                               \
+        arg_##NAME *a = &(s->arg.f_ldst_tag);                       \
+        return dc_isar_feature(FEAT, s) && FUNC(s, a, __VA_ARGS__); \
+    }
+#define TRANS_FEAT_NONSTREAMING(NAME, FEAT, FUNC, ...)           \
+    static bool trans_##NAME(DisasContext *s, arg_##NAME *a)     \
+    {                                                            \
+        s->is_nonstreaming = true;                               \
+        return dc_isar_feature(FEAT, s) && FUNC(s, __VA_ARGS__); \
     }
 
 #endif /* TARGET_ARM_TRANSLATE_H */

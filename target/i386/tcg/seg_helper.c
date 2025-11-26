@@ -66,8 +66,8 @@ int get_pg_mode(CPUX86State *env)
 
 /* return non zero if error */
 static inline int load_segment_ra(CPUX86State *env, uint32_t *e1_ptr,
-                               uint32_t *e2_ptr, int selector,
-                               uintptr_t retaddr)
+                                  uint32_t *e2_ptr, int selector,
+                                  uintptr_t retaddr)
 {
     SegmentCache *dt;
     int index;
@@ -125,7 +125,7 @@ static inline void load_seg_vm(CPUX86State *env, int seg, int selector)
 
     cpu_x86_load_seg_cache(env, seg, selector, (selector << 4), 0xffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_A_MASK | (3 << DESC_DPL_SHIFT));
+                               DESC_A_MASK | (3 << DESC_DPL_SHIFT));
 }
 
 static inline void get_ss_esp_from_tss(CPUX86State *env, uint32_t *ss_ptr,
@@ -159,7 +159,8 @@ static inline void get_ss_esp_from_tss(CPUX86State *env, uint32_t *ss_ptr,
     shift = type >> 3;
     index = (dpl * 4 + 2) << shift;
     if (index + (4 << shift) - 1 > env->tr.limit) {
-        raise_exception_err_ra(env, EXCP0A_TSS, env->tr.selector & 0xfffc, retaddr);
+        raise_exception_err_ra(env, EXCP0A_TSS, env->tr.selector & 0xfffc,
+                               retaddr);
     }
     if (shift == 0) {
         *esp_ptr = cpu_lduw_kernel_ra(env, env->tr.base + index, retaddr);
@@ -187,38 +188,43 @@ static void tss_load_seg(CPUX86State *env, X86Seg seg_reg, int selector,
         dpl = (e2 >> DESC_DPL_SHIFT) & 3;
         if (seg_reg == R_CS) {
             if (!(e2 & DESC_CS_MASK)) {
-                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc,
+                                       retaddr);
             }
             if (dpl != rpl) {
-                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc,
+                                       retaddr);
             }
         } else if (seg_reg == R_SS) {
             /* SS must be writable data */
             if ((e2 & DESC_CS_MASK) || !(e2 & DESC_W_MASK)) {
-                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc,
+                                       retaddr);
             }
             if (dpl != cpl || dpl != rpl) {
-                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc,
+                                       retaddr);
             }
         } else {
             /* not readable code */
             if ((e2 & DESC_CS_MASK) && !(e2 & DESC_R_MASK)) {
-                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc,
+                                       retaddr);
             }
             /* if data or non conforming code, checks the rights */
             if (((e2 >> DESC_TYPE_SHIFT) & 0xf) < 12) {
                 if (dpl < cpl || dpl < rpl) {
-                    raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc, retaddr);
+                    raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc,
+                                           retaddr);
                 }
             }
         }
         if (!(e2 & DESC_P_MASK)) {
-            raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc, retaddr);
+            raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc,
+                                   retaddr);
         }
-        cpu_x86_load_seg_cache(env, seg_reg, selector,
-                               get_seg_base(e1, e2),
-                               get_seg_limit(e1, e2),
-                               e2);
+        cpu_x86_load_seg_cache(env, seg_reg, selector, get_seg_base(e1, e2),
+                               get_seg_limit(e1, e2), e2);
     } else {
         if (seg_reg == R_SS || seg_reg == R_CS) {
             raise_exception_err_ra(env, EXCP0A_TSS, selector & 0xfffc, retaddr);
@@ -226,14 +232,14 @@ static void tss_load_seg(CPUX86State *env, X86Seg seg_reg, int selector,
     }
 }
 
-#define SWITCH_TSS_JMP  0
+#define SWITCH_TSS_JMP 0
 #define SWITCH_TSS_IRET 1
 #define SWITCH_TSS_CALL 2
 
 /* XXX: restore CPU state in registers (PowerPC case) */
-static void switch_tss_ra(CPUX86State *env, int tss_selector,
-                          uint32_t e1, uint32_t e2, int source,
-                          uint32_t next_eip, uintptr_t retaddr)
+static void switch_tss_ra(CPUX86State *env, int tss_selector, uint32_t e1,
+                          uint32_t e2, int source, uint32_t next_eip,
+                          uintptr_t retaddr)
 {
     int tss_limit, tss_limit_max, type, old_tss_limit_max, old_type, v1, v2, i;
     target_ulong tss_base;
@@ -251,26 +257,32 @@ static void switch_tss_ra(CPUX86State *env, int tss_selector,
     /* if task gate, we read the TSS segment and we load it */
     if (type == 5) {
         if (!(e2 & DESC_P_MASK)) {
-            raise_exception_err_ra(env, EXCP0B_NOSEG, tss_selector & 0xfffc, retaddr);
+            raise_exception_err_ra(env, EXCP0B_NOSEG, tss_selector & 0xfffc,
+                                   retaddr);
         }
         tss_selector = e1 >> 16;
         if (tss_selector & 4) {
-            raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc, retaddr);
+            raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc,
+                                   retaddr);
         }
         if (load_segment_ra(env, &e1, &e2, tss_selector, retaddr) != 0) {
-            raise_exception_err_ra(env, EXCP0D_GPF, tss_selector & 0xfffc, retaddr);
+            raise_exception_err_ra(env, EXCP0D_GPF, tss_selector & 0xfffc,
+                                   retaddr);
         }
         if (e2 & DESC_S_MASK) {
-            raise_exception_err_ra(env, EXCP0D_GPF, tss_selector & 0xfffc, retaddr);
+            raise_exception_err_ra(env, EXCP0D_GPF, tss_selector & 0xfffc,
+                                   retaddr);
         }
         type = (e2 >> DESC_TYPE_SHIFT) & 0xf;
         if ((type & 7) != 1) {
-            raise_exception_err_ra(env, EXCP0D_GPF, tss_selector & 0xfffc, retaddr);
+            raise_exception_err_ra(env, EXCP0D_GPF, tss_selector & 0xfffc,
+                                   retaddr);
         }
     }
 
     if (!(e2 & DESC_P_MASK)) {
-        raise_exception_err_ra(env, EXCP0B_NOSEG, tss_selector & 0xfffc, retaddr);
+        raise_exception_err_ra(env, EXCP0B_NOSEG, tss_selector & 0xfffc,
+                               retaddr);
     }
 
     if (type & 8) {
@@ -280,8 +292,7 @@ static void switch_tss_ra(CPUX86State *env, int tss_selector,
     }
     tss_limit = get_seg_limit(e1, e2);
     tss_base = get_seg_base(e1, e2);
-    if ((tss_selector & 4) != 0 ||
-        tss_limit < tss_limit_max) {
+    if ((tss_selector & 4) != 0 || tss_limit < tss_limit_max) {
         raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc, retaddr);
     }
     old_type = (env->tr.flags >> DESC_TYPE_SHIFT) & 0xf;
@@ -298,12 +309,12 @@ static void switch_tss_ra(CPUX86State *env, int tss_selector,
         new_eip = cpu_ldl_kernel_ra(env, tss_base + 0x20, retaddr);
         new_eflags = cpu_ldl_kernel_ra(env, tss_base + 0x24, retaddr);
         for (i = 0; i < 8; i++) {
-            new_regs[i] = cpu_ldl_kernel_ra(env, tss_base + (0x28 + i * 4),
-                                            retaddr);
+            new_regs[i] =
+                cpu_ldl_kernel_ra(env, tss_base + (0x28 + i * 4), retaddr);
         }
         for (i = 0; i < 6; i++) {
-            new_segs[i] = cpu_lduw_kernel_ra(env, tss_base + (0x48 + i * 4),
-                                             retaddr);
+            new_segs[i] =
+                cpu_lduw_kernel_ra(env, tss_base + (0x48 + i * 4), retaddr);
         }
         new_ldt = cpu_lduw_kernel_ra(env, tss_base + 0x60, retaddr);
         new_trap = cpu_ldl_kernel_ra(env, tss_base + 0x64, retaddr);
@@ -313,11 +324,12 @@ static void switch_tss_ra(CPUX86State *env, int tss_selector,
         new_eip = cpu_lduw_kernel_ra(env, tss_base + 0x0e, retaddr);
         new_eflags = cpu_lduw_kernel_ra(env, tss_base + 0x10, retaddr);
         for (i = 0; i < 8; i++) {
-            new_regs[i] = cpu_lduw_kernel_ra(env, tss_base + (0x12 + i * 2), retaddr);
+            new_regs[i] =
+                cpu_lduw_kernel_ra(env, tss_base + (0x12 + i * 2), retaddr);
         }
         for (i = 0; i < 4; i++) {
-            new_segs[i] = cpu_lduw_kernel_ra(env, tss_base + (0x22 + i * 2),
-                                             retaddr);
+            new_segs[i] =
+                cpu_lduw_kernel_ra(env, tss_base + (0x22 + i * 2), retaddr);
         }
         new_ldt = cpu_lduw_kernel_ra(env, tss_base + 0x2a, retaddr);
         new_segs[R_FS] = 0;
@@ -359,14 +371,22 @@ static void switch_tss_ra(CPUX86State *env, int tss_selector,
         /* 32 bit */
         cpu_stl_kernel_ra(env, env->tr.base + 0x20, next_eip, retaddr);
         cpu_stl_kernel_ra(env, env->tr.base + 0x24, old_eflags, retaddr);
-        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 0 * 4), env->regs[R_EAX], retaddr);
-        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 1 * 4), env->regs[R_ECX], retaddr);
-        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 2 * 4), env->regs[R_EDX], retaddr);
-        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 3 * 4), env->regs[R_EBX], retaddr);
-        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 4 * 4), env->regs[R_ESP], retaddr);
-        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 5 * 4), env->regs[R_EBP], retaddr);
-        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 6 * 4), env->regs[R_ESI], retaddr);
-        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 7 * 4), env->regs[R_EDI], retaddr);
+        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 0 * 4), env->regs[R_EAX],
+                          retaddr);
+        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 1 * 4), env->regs[R_ECX],
+                          retaddr);
+        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 2 * 4), env->regs[R_EDX],
+                          retaddr);
+        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 3 * 4), env->regs[R_EBX],
+                          retaddr);
+        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 4 * 4), env->regs[R_ESP],
+                          retaddr);
+        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 5 * 4), env->regs[R_EBP],
+                          retaddr);
+        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 6 * 4), env->regs[R_ESI],
+                          retaddr);
+        cpu_stl_kernel_ra(env, env->tr.base + (0x28 + 7 * 4), env->regs[R_EDI],
+                          retaddr);
         for (i = 0; i < 6; i++) {
             cpu_stw_kernel_ra(env, env->tr.base + (0x48 + i * 4),
                               env->segs[i].selector, retaddr);
@@ -375,14 +395,22 @@ static void switch_tss_ra(CPUX86State *env, int tss_selector,
         /* 16 bit */
         cpu_stw_kernel_ra(env, env->tr.base + 0x0e, next_eip, retaddr);
         cpu_stw_kernel_ra(env, env->tr.base + 0x10, old_eflags, retaddr);
-        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 0 * 2), env->regs[R_EAX], retaddr);
-        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 1 * 2), env->regs[R_ECX], retaddr);
-        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 2 * 2), env->regs[R_EDX], retaddr);
-        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 3 * 2), env->regs[R_EBX], retaddr);
-        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 4 * 2), env->regs[R_ESP], retaddr);
-        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 5 * 2), env->regs[R_EBP], retaddr);
-        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 6 * 2), env->regs[R_ESI], retaddr);
-        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 7 * 2), env->regs[R_EDI], retaddr);
+        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 0 * 2), env->regs[R_EAX],
+                          retaddr);
+        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 1 * 2), env->regs[R_ECX],
+                          retaddr);
+        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 2 * 2), env->regs[R_EDX],
+                          retaddr);
+        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 3 * 2), env->regs[R_EBX],
+                          retaddr);
+        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 4 * 2), env->regs[R_ESP],
+                          retaddr);
+        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 5 * 2), env->regs[R_EBP],
+                          retaddr);
+        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 6 * 2), env->regs[R_ESI],
+                          retaddr);
+        cpu_stw_kernel_ra(env, env->tr.base + (0x12 + 7 * 2), env->regs[R_EDI],
+                          retaddr);
         for (i = 0; i < 4; i++) {
             cpu_stw_kernel_ra(env, env->tr.base + (0x22 + i * 2),
                               env->segs[i].selector, retaddr);
@@ -424,8 +452,8 @@ static void switch_tss_ra(CPUX86State *env, int tss_selector,
     /* load all registers without an exception, then reload them with
        possible exception */
     env->eip = new_eip;
-    eflags_mask = TF_MASK | AC_MASK | ID_MASK |
-        IF_MASK | IOPL_MASK | VM_MASK | RF_MASK | NT_MASK;
+    eflags_mask = TF_MASK | AC_MASK | ID_MASK | IF_MASK | IOPL_MASK | VM_MASK |
+                  RF_MASK | NT_MASK;
     if (type & 8) {
         cpu_load_eflags(env, new_eflags, eflags_mask);
         for (i = 0; i < 8; i++) {
@@ -501,9 +529,8 @@ static void switch_tss_ra(CPUX86State *env, int tss_selector,
 #endif
 }
 
-static void switch_tss(CPUX86State *env, int tss_selector,
-                       uint32_t e1, uint32_t e2, int source,
-                        uint32_t next_eip)
+static void switch_tss(CPUX86State *env, int tss_selector, uint32_t e1,
+                       uint32_t e2, int source, uint32_t next_eip)
 {
     switch_tss_ra(env, tss_selector, e1, e2, source, next_eip, 0);
 }
@@ -515,7 +542,7 @@ static inline unsigned int get_sp_mask(unsigned int e2)
         return 0;
     } else
 #endif
-    if (e2 & DESC_B_MASK) {
+        if (e2 & DESC_B_MASK) {
         return 0xffffffff;
     } else {
         return 0xffff;
@@ -538,22 +565,22 @@ int exception_has_error_code(int intno)
 }
 
 #ifdef TARGET_X86_64
-#define SET_ESP(val, sp_mask)                                   \
-    do {                                                        \
-        if ((sp_mask) == 0xffff) {                              \
-            env->regs[R_ESP] = (env->regs[R_ESP] & ~0xffff) |   \
-                ((val) & 0xffff);                               \
-        } else if ((sp_mask) == 0xffffffffLL) {                 \
-            env->regs[R_ESP] = (uint32_t)(val);                 \
-        } else {                                                \
-            env->regs[R_ESP] = (val);                           \
-        }                                                       \
+#define SET_ESP(val, sp_mask)                                    \
+    do {                                                         \
+        if ((sp_mask) == 0xffff) {                               \
+            env->regs[R_ESP] =                                   \
+                (env->regs[R_ESP] & ~0xffff) | ((val) & 0xffff); \
+        } else if ((sp_mask) == 0xffffffffLL) {                  \
+            env->regs[R_ESP] = (uint32_t)(val);                  \
+        } else {                                                 \
+            env->regs[R_ESP] = (val);                            \
+        }                                                        \
     } while (0)
 #else
-#define SET_ESP(val, sp_mask)                                   \
-    do {                                                        \
-        env->regs[R_ESP] = (env->regs[R_ESP] & ~(sp_mask)) |    \
-            ((val) & (sp_mask));                                \
+#define SET_ESP(val, sp_mask)                                      \
+    do {                                                           \
+        env->regs[R_ESP] =                                         \
+            (env->regs[R_ESP] & ~(sp_mask)) | ((val) & (sp_mask)); \
     } while (0)
 #endif
 
@@ -562,28 +589,30 @@ int exception_has_error_code(int intno)
 #define SEG_ADDL(ssp, sp, sp_mask) ((uint32_t)((ssp) + (sp & (sp_mask))))
 
 /* XXX: add a is_user flag to have proper security support */
-#define PUSHW_RA(ssp, sp, sp_mask, val, ra)                      \
-    {                                                            \
-        sp -= 2;                                                 \
+#define PUSHW_RA(ssp, sp, sp_mask, val, ra)                          \
+    {                                                                \
+        sp -= 2;                                                     \
         cpu_stw_kernel_ra(env, (ssp) + (sp & (sp_mask)), (val), ra); \
     }
 
-#define PUSHL_RA(ssp, sp, sp_mask, val, ra)                             \
-    {                                                                   \
-        sp -= 4;                                                        \
-        cpu_stl_kernel_ra(env, SEG_ADDL(ssp, sp, sp_mask), (uint32_t)(val), ra); \
+#define PUSHL_RA(ssp, sp, sp_mask, val, ra)                                 \
+    {                                                                       \
+        sp -= 4;                                                            \
+        cpu_stl_kernel_ra(env, SEG_ADDL(ssp, sp, sp_mask), (uint32_t)(val), \
+                          ra);                                              \
     }
 
-#define POPW_RA(ssp, sp, sp_mask, val, ra)                       \
-    {                                                            \
+#define POPW_RA(ssp, sp, sp_mask, val, ra)                           \
+    {                                                                \
         val = cpu_lduw_kernel_ra(env, (ssp) + (sp & (sp_mask)), ra); \
-        sp += 2;                                                 \
+        sp += 2;                                                     \
     }
 
-#define POPL_RA(ssp, sp, sp_mask, val, ra)                              \
-    {                                                                   \
-        val = (uint32_t)cpu_ldl_kernel_ra(env, SEG_ADDL(ssp, sp, sp_mask), ra); \
-        sp += 4;                                                        \
+#define POPL_RA(ssp, sp, sp_mask, val, ra)                                    \
+    {                                                                         \
+        val =                                                                 \
+            (uint32_t)cpu_ldl_kernel_ra(env, SEG_ADDL(ssp, sp, sp_mask), ra); \
+        sp += 4;                                                              \
     }
 
 #define PUSHW(ssp, sp, sp_mask, val) PUSHW_RA(ssp, sp, sp_mask, val, 0)
@@ -715,8 +744,7 @@ static void do_interrupt_protected(CPUX86State *env, int intno, int is_int,
         if (ss_dpl != dpl) {
             raise_exception_err(env, EXCP0A_TSS, ss & 0xfffc);
         }
-        if (!(ss_e2 & DESC_S_MASK) ||
-            (ss_e2 & DESC_CS_MASK) ||
+        if (!(ss_e2 & DESC_S_MASK) || (ss_e2 & DESC_CS_MASK) ||
             !(ss_e2 & DESC_W_MASK)) {
             raise_exception_err(env, EXCP0A_TSS, ss & 0xfffc);
         }
@@ -726,7 +754,7 @@ static void do_interrupt_protected(CPUX86State *env, int intno, int is_int,
         new_stack = 1;
         sp_mask = get_sp_mask(ss_e2);
         ssp = get_seg_base(ss_e1, ss_e2);
-    } else  {
+    } else {
         /* to same privilege */
         if (vm86) {
             raise_exception_err(env, EXCP0D_GPF, selector & 0xfffc);
@@ -797,31 +825,29 @@ static void do_interrupt_protected(CPUX86State *env, int intno, int is_int,
             cpu_x86_load_seg_cache(env, R_GS, 0, 0, 0, 0);
         }
         ss = (ss & ~3) | dpl;
-        cpu_x86_load_seg_cache(env, R_SS, ss,
-                               ssp, get_seg_limit(ss_e1, ss_e2), ss_e2);
+        cpu_x86_load_seg_cache(env, R_SS, ss, ssp, get_seg_limit(ss_e1, ss_e2),
+                               ss_e2);
     }
     SET_ESP(esp, sp_mask);
 
     selector = (selector & ~3) | dpl;
-    cpu_x86_load_seg_cache(env, R_CS, selector,
-                   get_seg_base(e1, e2),
-                   get_seg_limit(e1, e2),
-                   e2);
+    cpu_x86_load_seg_cache(env, R_CS, selector, get_seg_base(e1, e2),
+                           get_seg_limit(e1, e2), e2);
     env->eip = offset;
 }
 
 #ifdef TARGET_X86_64
 
-#define PUSHQ_RA(sp, val, ra)                   \
-    {                                           \
-        sp -= 8;                                \
-        cpu_stq_kernel_ra(env, sp, (val), ra);  \
+#define PUSHQ_RA(sp, val, ra)                  \
+    {                                          \
+        sp -= 8;                               \
+        cpu_stq_kernel_ra(env, sp, (val), ra); \
     }
 
-#define POPQ_RA(sp, val, ra)                    \
-    {                                           \
-        val = cpu_ldq_kernel_ra(env, sp, ra);   \
-        sp += 8;                                \
+#define POPQ_RA(sp, val, ra)                  \
+    {                                         \
+        val = cpu_ldq_kernel_ra(env, sp, ra); \
+        sp += 8;                              \
     }
 
 #define PUSHQ(sp, val) PUSHQ_RA(sp, val, 0)
@@ -971,10 +997,8 @@ static void do_interrupt64(CPUX86State *env, int intno, int is_int,
     env->regs[R_ESP] = esp;
 
     selector = (selector & ~3) | dpl;
-    cpu_x86_load_seg_cache(env, R_CS, selector,
-                   get_seg_base(e1, e2),
-                   get_seg_limit(e1, e2),
-                   e2);
+    cpu_x86_load_seg_cache(env, R_CS, selector, get_seg_base(e1, e2),
+                           get_seg_limit(e1, e2), e2);
     env->eip = offset;
 }
 #endif /* TARGET_X86_64 */
@@ -993,45 +1017,41 @@ void helper_sysret(CPUX86State *env, int dflag)
     selector = (env->star >> 48) & 0xffff;
 #ifdef TARGET_X86_64
     if (env->hflags & HF_LMA_MASK) {
-        cpu_load_eflags(env, (uint32_t)(env->regs[11]), TF_MASK | AC_MASK
-                        | ID_MASK | IF_MASK | IOPL_MASK | VM_MASK | RF_MASK |
-                        NT_MASK);
+        cpu_load_eflags(env, (uint32_t)(env->regs[11]),
+                        TF_MASK | AC_MASK | ID_MASK | IF_MASK | IOPL_MASK |
+                            VM_MASK | RF_MASK | NT_MASK);
         if (dflag == 2) {
-            cpu_x86_load_seg_cache(env, R_CS, (selector + 16) | 3,
-                                   0, 0xffffffff,
-                                   DESC_G_MASK | DESC_P_MASK |
-                                   DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                                   DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK |
-                                   DESC_L_MASK);
+            cpu_x86_load_seg_cache(env, R_CS, (selector + 16) | 3, 0,
+                                   0xffffffff,
+                                   DESC_G_MASK | DESC_P_MASK | DESC_S_MASK |
+                                       (3 << DESC_DPL_SHIFT) | DESC_CS_MASK |
+                                       DESC_R_MASK | DESC_A_MASK | DESC_L_MASK);
             env->eip = env->regs[R_ECX];
         } else {
-            cpu_x86_load_seg_cache(env, R_CS, selector | 3,
-                                   0, 0xffffffff,
+            cpu_x86_load_seg_cache(env, R_CS, selector | 3, 0, 0xffffffff,
                                    DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                                   DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                                   DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK);
+                                       DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
+                                       DESC_CS_MASK | DESC_R_MASK |
+                                       DESC_A_MASK);
             env->eip = (uint32_t)env->regs[R_ECX];
         }
-        cpu_x86_load_seg_cache(env, R_SS, (selector + 8) | 3,
-                               0, 0xffffffff,
+        cpu_x86_load_seg_cache(env, R_SS, (selector + 8) | 3, 0, 0xffffffff,
                                DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                               DESC_W_MASK | DESC_A_MASK);
+                                   DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
+                                   DESC_W_MASK | DESC_A_MASK);
     } else
 #endif
     {
         env->eflags |= IF_MASK;
-        cpu_x86_load_seg_cache(env, R_CS, selector | 3,
-                               0, 0xffffffff,
+        cpu_x86_load_seg_cache(env, R_CS, selector | 3, 0, 0xffffffff,
                                DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                               DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK);
+                                   DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
+                                   DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK);
         env->eip = (uint32_t)env->regs[R_ECX];
-        cpu_x86_load_seg_cache(env, R_SS, (selector + 8) | 3,
-                               0, 0xffffffff,
+        cpu_x86_load_seg_cache(env, R_SS, (selector + 8) | 3, 0, 0xffffffff,
                                DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                               DESC_W_MASK | DESC_A_MASK);
+                                   DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
+                                   DESC_W_MASK | DESC_A_MASK);
     }
 }
 
@@ -1079,8 +1099,8 @@ static void do_interrupt_real(CPUX86State *env, int intno, int is_int,
  * the int instruction. next_eip is the env->eip value AFTER the interrupt
  * instruction. It is only relevant if is_int is TRUE.
  */
-void do_interrupt_all(X86CPU *cpu, int intno, int is_int,
-                      int error_code, target_ulong next_eip, int is_hw)
+void do_interrupt_all(X86CPU *cpu, int intno, int is_int, int error_code,
+                      target_ulong next_eip, int is_hw)
 {
     CPUX86State *env = &cpu->env;
 
@@ -1091,9 +1111,8 @@ void do_interrupt_all(X86CPU *cpu, int intno, int is_int,
             qemu_log("%6d: v=%02x e=%04x i=%d cpl=%d IP=%04x:" TARGET_FMT_lx
                      " pc=" TARGET_FMT_lx " SP=%04x:" TARGET_FMT_lx,
                      count, intno, error_code, is_int,
-                     env->hflags & HF_CPL_MASK,
-                     env->segs[R_CS].selector, env->eip,
-                     (int)env->segs[R_CS].base + env->eip,
+                     env->hflags & HF_CPL_MASK, env->segs[R_CS].selector,
+                     env->eip, (int)env->segs[R_CS].base + env->eip,
                      env->segs[R_SS].selector, env->regs[R_ESP]);
             if (intno == 0x0e) {
                 qemu_log(" CR2=" TARGET_FMT_lx, env->cr[2]);
@@ -1145,13 +1164,12 @@ void do_interrupt_all(X86CPU *cpu, int intno, int is_int,
 #if !defined(CONFIG_USER_ONLY)
     if (env->hflags & HF_GUEST_MASK) {
         CPUState *cs = CPU(cpu);
-        uint32_t event_inj = x86_ldl_phys(cs, env->vm_vmcb +
-                                      offsetof(struct vmcb,
-                                               control.event_inj));
+        uint32_t event_inj = x86_ldl_phys(
+            cs, env->vm_vmcb + offsetof(struct vmcb, control.event_inj));
 
         x86_stl_phys(cs,
-                 env->vm_vmcb + offsetof(struct vmcb, control.event_inj),
-                 event_inj & ~SVM_EVTINJ_VALID);
+                     env->vm_vmcb + offsetof(struct vmcb, control.event_inj),
+                     event_inj & ~SVM_EVTINJ_VALID);
     }
 #endif
 }
@@ -1197,7 +1215,8 @@ void helper_lldt(CPUX86State *env, int selector)
             raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
         }
         if (!(e2 & DESC_P_MASK)) {
-            raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc, GETPC());
+            raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc,
+                                   GETPC());
         }
 #ifdef TARGET_X86_64
         if (env->hflags & HF_LMA_MASK) {
@@ -1249,12 +1268,12 @@ void helper_ltr(CPUX86State *env, int selector)
         e1 = cpu_ldl_kernel_ra(env, ptr, GETPC());
         e2 = cpu_ldl_kernel_ra(env, ptr + 4, GETPC());
         type = (e2 >> DESC_TYPE_SHIFT) & 0xf;
-        if ((e2 & DESC_S_MASK) ||
-            (type != 1 && type != 9)) {
+        if ((e2 & DESC_S_MASK) || (type != 1 && type != 9)) {
             raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
         }
         if (!(e2 & DESC_P_MASK)) {
-            raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc, GETPC());
+            raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc,
+                                   GETPC());
         }
 #ifdef TARGET_X86_64
         if (env->hflags & HF_LMA_MASK) {
@@ -1263,7 +1282,8 @@ void helper_ltr(CPUX86State *env, int selector)
             e3 = cpu_ldl_kernel_ra(env, ptr + 8, GETPC());
             e4 = cpu_ldl_kernel_ra(env, ptr + 12, GETPC());
             if ((e4 >> DESC_TYPE_SHIFT) & 0xf) {
-                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc,
+                                       GETPC());
             }
             load_seg_cache_raw_dt(&env->tr, e1, e2);
             env->tr.base |= (target_ulong)e3 << 32;
@@ -1295,12 +1315,11 @@ void helper_load_seg(CPUX86State *env, int seg_reg, int selector)
 #ifdef TARGET_X86_64
             && (!(env->hflags & HF_CS64_MASK) || cpl == 3)
 #endif
-            ) {
+        ) {
             raise_exception_err_ra(env, EXCP0D_GPF, 0, GETPC());
         }
         cpu_x86_load_seg_cache(env, seg_reg, selector, 0, 0, 0);
     } else {
-
         if (selector & 0x4) {
             dt = &env->ldt;
         } else {
@@ -1322,30 +1341,36 @@ void helper_load_seg(CPUX86State *env, int seg_reg, int selector)
         if (seg_reg == R_SS) {
             /* must be writable segment */
             if ((e2 & DESC_CS_MASK) || !(e2 & DESC_W_MASK)) {
-                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc,
+                                       GETPC());
             }
             if (rpl != cpl || dpl != cpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc,
+                                       GETPC());
             }
         } else {
             /* must be readable segment */
             if ((e2 & (DESC_CS_MASK | DESC_R_MASK)) == DESC_CS_MASK) {
-                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc,
+                                       GETPC());
             }
 
             if (!(e2 & DESC_CS_MASK) || !(e2 & DESC_C_MASK)) {
                 /* if not conforming code, test rights */
                 if (dpl < cpl || dpl < rpl) {
-                    raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc,
+                                           GETPC());
                 }
             }
         }
 
         if (!(e2 & DESC_P_MASK)) {
             if (seg_reg == R_SS) {
-                raise_exception_err_ra(env, EXCP0C_STACK, selector & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0C_STACK, selector & 0xfffc,
+                                       GETPC());
             } else {
-                raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc,
+                                       GETPC());
             }
         }
 
@@ -1355,10 +1380,8 @@ void helper_load_seg(CPUX86State *env, int seg_reg, int selector)
             cpu_stl_kernel_ra(env, ptr + 4, e2, GETPC());
         }
 
-        cpu_x86_load_seg_cache(env, seg_reg, selector,
-                       get_seg_base(e1, e2),
-                       get_seg_limit(e1, e2),
-                       e2);
+        cpu_x86_load_seg_cache(env, seg_reg, selector, get_seg_base(e1, e2),
+                               get_seg_limit(e1, e2), e2);
 #if 0
         qemu_log("load_seg: sel=0x%04x base=0x%08lx limit=0x%08lx flags=%08x\n",
                 selector, (unsigned long)sc->base, sc->limit, sc->flags);
@@ -1388,16 +1411,19 @@ void helper_ljmp_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
         if (e2 & DESC_C_MASK) {
             /* conforming code segment */
             if (dpl > cpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
         } else {
             /* non conforming code segment */
             rpl = new_cs & 3;
             if (rpl > cpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
             if (dpl != cpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
         }
         if (!(e2 & DESC_P_MASK)) {
@@ -1409,7 +1435,7 @@ void helper_ljmp_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
             raise_exception_err_ra(env, EXCP0D_GPF, 0, GETPC());
         }
         cpu_x86_load_seg_cache(env, R_CS, (new_cs & 0xfffc) | cpl,
-                       get_seg_base(e1, e2), limit, e2);
+                               get_seg_base(e1, e2), limit, e2);
         env->eip = new_eip;
     } else {
         /* jump to call or task gate */
@@ -1421,7 +1447,8 @@ void helper_ljmp_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
 #ifdef TARGET_X86_64
         if (env->efer & MSR_EFER_LMA) {
             if (type != 12) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
         }
 #endif
@@ -1430,17 +1457,21 @@ void helper_ljmp_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
         case 9: /* 386 TSS */
         case 5: /* task gate */
             if (dpl < cpl || dpl < rpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
-            switch_tss_ra(env, new_cs, e1, e2, SWITCH_TSS_JMP, next_eip, GETPC());
+            switch_tss_ra(env, new_cs, e1, e2, SWITCH_TSS_JMP, next_eip,
+                          GETPC());
             break;
         case 4: /* 286 call gate */
         case 12: /* 386 call gate */
             if ((dpl < cpl) || (dpl < rpl)) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
             if (!(e2 & DESC_P_MASK)) {
-                raise_exception_err_ra(env, EXCP0B_NOSEG, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0B_NOSEG, new_cs & 0xfffc,
+                                       GETPC());
             }
             gate_cs = e1 >> 16;
             new_eip = (e1 & 0xffff);
@@ -1465,30 +1496,36 @@ void helper_ljmp_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
 #endif
 
             if (load_segment_ra(env, &e1, &e2, gate_cs, GETPC()) != 0) {
-                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+                                       GETPC());
             }
             dpl = (e2 >> DESC_DPL_SHIFT) & 3;
             /* must be code segment */
             if (((e2 & (DESC_S_MASK | DESC_CS_MASK)) !=
                  (DESC_S_MASK | DESC_CS_MASK))) {
-                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+                                       GETPC());
             }
             if (((e2 & DESC_C_MASK) && (dpl > cpl)) ||
                 (!(e2 & DESC_C_MASK) && (dpl != cpl))) {
-                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+                                       GETPC());
             }
 #ifdef TARGET_X86_64
             if (env->efer & MSR_EFER_LMA) {
                 if (!(e2 & DESC_L_MASK)) {
-                    raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+                                           GETPC());
                 }
                 if (e2 & DESC_B_MASK) {
-                    raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+                                           GETPC());
                 }
             }
 #endif
             if (!(e2 & DESC_P_MASK)) {
-                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+                                       GETPC());
             }
             limit = get_seg_limit(e1, e2);
             if (new_eip > limit &&
@@ -1558,16 +1595,19 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
         if (e2 & DESC_C_MASK) {
             /* conforming code segment */
             if (dpl > cpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
         } else {
             /* non conforming code segment */
             rpl = new_cs & 3;
             if (rpl > cpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
             if (dpl != cpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
         }
         if (!(e2 & DESC_P_MASK)) {
@@ -1586,8 +1626,8 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
             /* from this point, not restartable */
             env->regs[R_ESP] = rsp;
             cpu_x86_load_seg_cache(env, R_CS, (new_cs & 0xfffc) | cpl,
-                                   get_seg_base(e1, e2),
-                                   get_seg_limit(e1, e2), e2);
+                                   get_seg_base(e1, e2), get_seg_limit(e1, e2),
+                                   e2);
             env->eip = new_eip;
         } else
 #endif
@@ -1605,7 +1645,8 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
 
             limit = get_seg_limit(e1, e2);
             if (new_eip > limit) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
             /* from this point, not restartable */
             SET_ESP(sp, sp_mask);
@@ -1622,7 +1663,8 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
 #ifdef TARGET_X86_64
         if (env->efer & MSR_EFER_LMA) {
             if (type != 12) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
         }
 #endif
@@ -1632,9 +1674,11 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
         case 9: /* available 386 TSS */
         case 5: /* task gate */
             if (dpl < cpl || dpl < rpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
+                                       GETPC());
             }
-            switch_tss_ra(env, new_cs, e1, e2, SWITCH_TSS_CALL, next_eip, GETPC());
+            switch_tss_ra(env, new_cs, e1, e2, SWITCH_TSS_CALL, next_eip,
+                          GETPC());
             return;
         case 4: /* 286 call gate */
         case 12: /* 386 call gate */
@@ -1650,7 +1694,7 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
         }
         /* check valid bit */
         if (!(e2 & DESC_P_MASK)) {
-            raise_exception_err_ra(env, EXCP0B_NOSEG,  new_cs & 0xfffc, GETPC());
+            raise_exception_err_ra(env, EXCP0B_NOSEG, new_cs & 0xfffc, GETPC());
         }
         selector = e1 >> 16;
         param_count = e2 & 0x1f;
@@ -1687,16 +1731,19 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
 #ifdef TARGET_X86_64
         if (env->efer & MSR_EFER_LMA) {
             if (!(e2 & DESC_L_MASK)) {
-                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc,
+                                       GETPC());
             }
             if (e2 & DESC_B_MASK) {
-                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
+                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc,
+                                       GETPC());
             }
             shift++;
         }
 #endif
         if (!(e2 & DESC_P_MASK)) {
-            raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc, GETPC());
+            raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc,
+                                   GETPC());
         }
 
         if (!(e2 & DESC_C_MASK) && dpl < cpl) {
@@ -1704,41 +1751,48 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
 #ifdef TARGET_X86_64
             if (shift == 2) {
                 sp = get_rsp_from_tss(env, dpl);
-                ss = dpl;  /* SS = NULL selector with RPL = new CPL */
+                ss = dpl; /* SS = NULL selector with RPL = new CPL */
                 new_stack = 1;
                 sp_mask = 0;
-                ssp = 0;  /* SS base is always zero in IA-32e mode */
-                LOG_PCALL("new ss:rsp=%04x:%016llx env->regs[R_ESP]="
-                          TARGET_FMT_lx "\n", ss, sp, env->regs[R_ESP]);
+                ssp = 0; /* SS base is always zero in IA-32e mode */
+                LOG_PCALL(
+                    "new ss:rsp=%04x:%016llx env->regs[R_ESP]=" TARGET_FMT_lx
+                    "\n",
+                    ss, sp, env->regs[R_ESP]);
             } else
 #endif
             {
                 uint32_t sp32;
                 get_ss_esp_from_tss(env, &ss, &sp32, dpl, GETPC());
-                LOG_PCALL("new ss:esp=%04x:%08x param_count=%d env->regs[R_ESP]="
-                          TARGET_FMT_lx "\n", ss, sp32, param_count,
-                          env->regs[R_ESP]);
+                LOG_PCALL("new ss:esp=%04x:%08x param_count=%d "
+                          "env->regs[R_ESP]=" TARGET_FMT_lx "\n",
+                          ss, sp32, param_count, env->regs[R_ESP]);
                 sp = sp32;
                 if ((ss & 0xfffc) == 0) {
-                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc,
+                                           GETPC());
                 }
                 if ((ss & 3) != dpl) {
-                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc,
+                                           GETPC());
                 }
                 if (load_segment_ra(env, &ss_e1, &ss_e2, ss, GETPC()) != 0) {
-                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc,
+                                           GETPC());
                 }
                 ss_dpl = (ss_e2 >> DESC_DPL_SHIFT) & 3;
                 if (ss_dpl != dpl) {
-                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc,
+                                           GETPC());
                 }
-                if (!(ss_e2 & DESC_S_MASK) ||
-                    (ss_e2 & DESC_CS_MASK) ||
+                if (!(ss_e2 & DESC_S_MASK) || (ss_e2 & DESC_CS_MASK) ||
                     !(ss_e2 & DESC_W_MASK)) {
-                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc,
+                                           GETPC());
                 }
                 if (!(ss_e2 & DESC_P_MASK)) {
-                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc,
+                                           GETPC());
                 }
 
                 sp_mask = get_sp_mask(ss_e2);
@@ -1757,22 +1811,24 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
                 /* parameters aren't supported for 64-bit call gates */
             } else
 #endif
-            if (shift == 1) {
+                if (shift == 1) {
                 PUSHL_RA(ssp, sp, sp_mask, env->segs[R_SS].selector, GETPC());
                 PUSHL_RA(ssp, sp, sp_mask, env->regs[R_ESP], GETPC());
                 for (i = param_count - 1; i >= 0; i--) {
-                    val = cpu_ldl_kernel_ra(env, old_ssp +
-                                            ((env->regs[R_ESP] + i * 4) &
-                                             old_sp_mask), GETPC());
+                    val = cpu_ldl_kernel_ra(
+                        env,
+                        old_ssp + ((env->regs[R_ESP] + i * 4) & old_sp_mask),
+                        GETPC());
                     PUSHL_RA(ssp, sp, sp_mask, val, GETPC());
                 }
             } else {
                 PUSHW_RA(ssp, sp, sp_mask, env->segs[R_SS].selector, GETPC());
                 PUSHW_RA(ssp, sp, sp_mask, env->regs[R_ESP], GETPC());
                 for (i = param_count - 1; i >= 0; i--) {
-                    val = cpu_lduw_kernel_ra(env, old_ssp +
-                                             ((env->regs[R_ESP] + i * 2) &
-                                              old_sp_mask), GETPC());
+                    val = cpu_lduw_kernel_ra(
+                        env,
+                        old_ssp + ((env->regs[R_ESP] + i * 2) & old_sp_mask),
+                        GETPC());
                     PUSHW_RA(ssp, sp, sp_mask, val, GETPC());
                 }
             }
@@ -1792,7 +1848,7 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
             PUSHQ_RA(sp, next_eip, GETPC());
         } else
 #endif
-        if (shift == 1) {
+            if (shift == 1) {
             PUSHL_RA(ssp, sp, sp_mask, env->segs[R_CS].selector, GETPC());
             PUSHL_RA(ssp, sp, sp_mask, next_eip, GETPC());
         } else {
@@ -1810,18 +1866,14 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
 #endif
             {
                 ss = (ss & ~3) | dpl;
-                cpu_x86_load_seg_cache(env, R_SS, ss,
-                                       ssp,
-                                       get_seg_limit(ss_e1, ss_e2),
-                                       ss_e2);
+                cpu_x86_load_seg_cache(env, R_SS, ss, ssp,
+                                       get_seg_limit(ss_e1, ss_e2), ss_e2);
             }
         }
 
         selector = (selector & ~3) | dpl;
-        cpu_x86_load_seg_cache(env, R_CS, selector,
-                       get_seg_base(e1, e2),
-                       get_seg_limit(e1, e2),
-                       e2);
+        cpu_x86_load_seg_cache(env, R_CS, selector, get_seg_base(e1, e2),
+                               get_seg_limit(e1, e2), e2);
         SET_ESP(sp, sp_mask);
         env->eip = offset;
     }
@@ -1854,11 +1906,10 @@ void helper_iret_real(CPUX86State *env, int shift)
     env->segs[R_CS].base = (new_cs << 4);
     env->eip = new_eip;
     if (env->eflags & VM_MASK) {
-        eflags_mask = TF_MASK | AC_MASK | ID_MASK | IF_MASK | RF_MASK |
-            NT_MASK;
+        eflags_mask = TF_MASK | AC_MASK | ID_MASK | IF_MASK | RF_MASK | NT_MASK;
     } else {
         eflags_mask = TF_MASK | AC_MASK | ID_MASK | IF_MASK | IOPL_MASK |
-            RF_MASK | NT_MASK;
+                      RF_MASK | NT_MASK;
     }
     if (shift == 0) {
         eflags_mask &= 0xffff;
@@ -1885,8 +1936,7 @@ static inline void validate_seg(CPUX86State *env, X86Seg seg_reg, int cpl)
     if (!(e2 & DESC_CS_MASK) || !(e2 & DESC_C_MASK)) {
         /* data or non conforming code segment */
         if (dpl < cpl) {
-            cpu_x86_load_seg_cache(env, seg_reg, 0,
-                                   env->segs[seg_reg].base,
+            cpu_x86_load_seg_cache(env, seg_reg, 0, env->segs[seg_reg].base,
                                    env->segs[seg_reg].limit,
                                    env->segs[seg_reg].flags & ~DESC_P_MASK);
         }
@@ -1946,8 +1996,8 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
             }
         }
     }
-    LOG_PCALL("lret new %04x:" TARGET_FMT_lx " s=%d addend=0x%x\n",
-              new_cs, new_eip, shift, addend);
+    LOG_PCALL("lret new %04x:" TARGET_FMT_lx " s=%d addend=0x%x\n", new_cs,
+              new_eip, shift, addend);
     LOG_PCALL_STATE(env_cpu(env));
     if ((new_cs & 0xfffc) == 0) {
         raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, retaddr);
@@ -1955,8 +2005,7 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
     if (load_segment_ra(env, &e1, &e2, new_cs, retaddr) != 0) {
         raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, retaddr);
     }
-    if (!(e2 & DESC_S_MASK) ||
-        !(e2 & DESC_CS_MASK)) {
+    if (!(e2 & DESC_S_MASK) || !(e2 & DESC_CS_MASK)) {
         raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, retaddr);
     }
     cpl = env->hflags & HF_CPL_MASK;
@@ -1982,10 +2031,8 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
     if (rpl == cpl && (!(env->hflags & HF_CS64_MASK) ||
                        ((env->hflags & HF_CS64_MASK) && !is_iret))) {
         /* return to same privilege level */
-        cpu_x86_load_seg_cache(env, R_CS, new_cs,
-                       get_seg_base(e1, e2),
-                       get_seg_limit(e1, e2),
-                       e2);
+        cpu_x86_load_seg_cache(env, R_CS, new_cs, get_seg_base(e1, e2),
+                               get_seg_limit(e1, e2), e2);
     } else {
         /* return to different privilege level */
 #ifdef TARGET_X86_64
@@ -2007,18 +2054,16 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
                 POPW_RA(ssp, sp, sp_mask, new_ss, retaddr);
             }
         }
-        LOG_PCALL("new ss:esp=%04x:" TARGET_FMT_lx "\n",
-                  new_ss, new_esp);
+        LOG_PCALL("new ss:esp=%04x:" TARGET_FMT_lx "\n", new_ss, new_esp);
         if ((new_ss & 0xfffc) == 0) {
 #ifdef TARGET_X86_64
             /* NULL ss is allowed in long mode if cpl != 3 */
             /* XXX: test CS64? */
             if ((env->hflags & HF_LMA_MASK) && rpl != 3) {
-                cpu_x86_load_seg_cache(env, R_SS, new_ss,
-                                       0, 0xffffffff,
-                                       DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                                       DESC_S_MASK | (rpl << DESC_DPL_SHIFT) |
-                                       DESC_W_MASK | DESC_A_MASK);
+                cpu_x86_load_seg_cache(
+                    env, R_SS, new_ss, 0, 0xffffffff,
+                    DESC_G_MASK | DESC_B_MASK | DESC_P_MASK | DESC_S_MASK |
+                        (rpl << DESC_DPL_SHIFT) | DESC_W_MASK | DESC_A_MASK);
                 ss_e2 = DESC_B_MASK; /* XXX: should not be needed? */
             } else
 #endif
@@ -2027,33 +2072,34 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
             }
         } else {
             if ((new_ss & 3) != rpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_ss & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0D_GPF, new_ss & 0xfffc,
+                                       retaddr);
             }
             if (load_segment_ra(env, &ss_e1, &ss_e2, new_ss, retaddr) != 0) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_ss & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0D_GPF, new_ss & 0xfffc,
+                                       retaddr);
             }
-            if (!(ss_e2 & DESC_S_MASK) ||
-                (ss_e2 & DESC_CS_MASK) ||
+            if (!(ss_e2 & DESC_S_MASK) || (ss_e2 & DESC_CS_MASK) ||
                 !(ss_e2 & DESC_W_MASK)) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_ss & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0D_GPF, new_ss & 0xfffc,
+                                       retaddr);
             }
             dpl = (ss_e2 >> DESC_DPL_SHIFT) & 3;
             if (dpl != rpl) {
-                raise_exception_err_ra(env, EXCP0D_GPF, new_ss & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0D_GPF, new_ss & 0xfffc,
+                                       retaddr);
             }
             if (!(ss_e2 & DESC_P_MASK)) {
-                raise_exception_err_ra(env, EXCP0B_NOSEG, new_ss & 0xfffc, retaddr);
+                raise_exception_err_ra(env, EXCP0B_NOSEG, new_ss & 0xfffc,
+                                       retaddr);
             }
             cpu_x86_load_seg_cache(env, R_SS, new_ss,
                                    get_seg_base(ss_e1, ss_e2),
-                                   get_seg_limit(ss_e1, ss_e2),
-                                   ss_e2);
+                                   get_seg_limit(ss_e1, ss_e2), ss_e2);
         }
 
-        cpu_x86_load_seg_cache(env, R_CS, new_cs,
-                       get_seg_base(e1, e2),
-                       get_seg_limit(e1, e2),
-                       e2);
+        cpu_x86_load_seg_cache(env, R_CS, new_cs, get_seg_base(e1, e2),
+                               get_seg_limit(e1, e2), e2);
         sp = new_esp;
 #ifdef TARGET_X86_64
         if (env->hflags & HF_CS64_MASK) {
@@ -2091,7 +2137,7 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
     }
     return;
 
- return_to_vm86:
+return_to_vm86:
     POPL_RA(ssp, sp, sp_mask, new_esp, retaddr);
     POPL_RA(ssp, sp, sp_mask, new_ss, retaddr);
     POPL_RA(ssp, sp, sp_mask, new_es, retaddr);
@@ -2100,9 +2146,9 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
     POPL_RA(ssp, sp, sp_mask, new_gs, retaddr);
 
     /* modify processor state */
-    cpu_load_eflags(env, new_eflags, TF_MASK | AC_MASK | ID_MASK |
-                    IF_MASK | IOPL_MASK | VM_MASK | NT_MASK | VIF_MASK |
-                    VIP_MASK);
+    cpu_load_eflags(env, new_eflags,
+                    TF_MASK | AC_MASK | ID_MASK | IF_MASK | IOPL_MASK |
+                        VM_MASK | NT_MASK | VIF_MASK | VIP_MASK);
     load_seg_vm(env, R_CS, new_cs & 0xffff);
     load_seg_vm(env, R_SS, new_ss & 0xffff);
     load_seg_vm(env, R_ES, new_es & 0xffff);
@@ -2128,17 +2174,21 @@ void helper_iret_protected(CPUX86State *env, int shift, int next_eip)
 #endif
         tss_selector = cpu_lduw_kernel_ra(env, env->tr.base + 0, GETPC());
         if (tss_selector & 4) {
-            raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc, GETPC());
+            raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc,
+                                   GETPC());
         }
         if (load_segment_ra(env, &e1, &e2, tss_selector, GETPC()) != 0) {
-            raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc, GETPC());
+            raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc,
+                                   GETPC());
         }
         type = (e2 >> DESC_TYPE_SHIFT) & 0x17;
         /* NOTE: we check both segment and busy TSS */
         if (type != 3) {
-            raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc, GETPC());
+            raise_exception_err_ra(env, EXCP0A_TSS, tss_selector & 0xfffc,
+                                   GETPC());
         }
-        switch_tss_ra(env, tss_selector, e1, e2, SWITCH_TSS_IRET, next_eip, GETPC());
+        switch_tss_ra(env, tss_selector, e1, e2, SWITCH_TSS_IRET, next_eip,
+                      GETPC());
     } else {
         helper_ret_protected(env, shift, 1, 0, GETPC());
     }
@@ -2159,26 +2209,22 @@ void helper_sysenter(CPUX86State *env)
 
 #ifdef TARGET_X86_64
     if (env->hflags & HF_LMA_MASK) {
-        cpu_x86_load_seg_cache(env, R_CS, env->sysenter_cs & 0xfffc,
-                               0, 0xffffffff,
-                               DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK |
-                               DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK |
-                               DESC_L_MASK);
+        cpu_x86_load_seg_cache(
+            env, R_CS, env->sysenter_cs & 0xfffc, 0, 0xffffffff,
+            DESC_G_MASK | DESC_B_MASK | DESC_P_MASK | DESC_S_MASK |
+                DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK | DESC_L_MASK);
     } else
 #endif
     {
-        cpu_x86_load_seg_cache(env, R_CS, env->sysenter_cs & 0xfffc,
-                               0, 0xffffffff,
-                               DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK |
-                               DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK);
+        cpu_x86_load_seg_cache(
+            env, R_CS, env->sysenter_cs & 0xfffc, 0, 0xffffffff,
+            DESC_G_MASK | DESC_B_MASK | DESC_P_MASK | DESC_S_MASK |
+                DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK);
     }
-    cpu_x86_load_seg_cache(env, R_SS, (env->sysenter_cs + 8) & 0xfffc,
-                           0, 0xffffffff,
+    cpu_x86_load_seg_cache(env, R_SS, (env->sysenter_cs + 8) & 0xfffc, 0,
+                           0xffffffff,
                            DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                           DESC_S_MASK |
-                           DESC_W_MASK | DESC_A_MASK);
+                               DESC_S_MASK | DESC_W_MASK | DESC_A_MASK);
     env->regs[R_ESP] = env->sysenter_esp;
     env->eip = env->sysenter_eip;
 }
@@ -2193,30 +2239,27 @@ void helper_sysexit(CPUX86State *env, int dflag)
     }
 #ifdef TARGET_X86_64
     if (dflag == 2) {
-        cpu_x86_load_seg_cache(env, R_CS, ((env->sysenter_cs + 32) & 0xfffc) |
-                               3, 0, 0xffffffff,
-                               DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                               DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK |
-                               DESC_L_MASK);
-        cpu_x86_load_seg_cache(env, R_SS, ((env->sysenter_cs + 40) & 0xfffc) |
-                               3, 0, 0xffffffff,
-                               DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                               DESC_W_MASK | DESC_A_MASK);
+        cpu_x86_load_seg_cache(
+            env, R_CS, ((env->sysenter_cs + 32) & 0xfffc) | 3, 0, 0xffffffff,
+            DESC_G_MASK | DESC_B_MASK | DESC_P_MASK | DESC_S_MASK |
+                (3 << DESC_DPL_SHIFT) | DESC_CS_MASK | DESC_R_MASK |
+                DESC_A_MASK | DESC_L_MASK);
+        cpu_x86_load_seg_cache(
+            env, R_SS, ((env->sysenter_cs + 40) & 0xfffc) | 3, 0, 0xffffffff,
+            DESC_G_MASK | DESC_B_MASK | DESC_P_MASK | DESC_S_MASK |
+                (3 << DESC_DPL_SHIFT) | DESC_W_MASK | DESC_A_MASK);
     } else
 #endif
     {
-        cpu_x86_load_seg_cache(env, R_CS, ((env->sysenter_cs + 16) & 0xfffc) |
-                               3, 0, 0xffffffff,
-                               DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                               DESC_CS_MASK | DESC_R_MASK | DESC_A_MASK);
-        cpu_x86_load_seg_cache(env, R_SS, ((env->sysenter_cs + 24) & 0xfffc) |
-                               3, 0, 0xffffffff,
-                               DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
-                               DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
-                               DESC_W_MASK | DESC_A_MASK);
+        cpu_x86_load_seg_cache(
+            env, R_CS, ((env->sysenter_cs + 16) & 0xfffc) | 3, 0, 0xffffffff,
+            DESC_G_MASK | DESC_B_MASK | DESC_P_MASK | DESC_S_MASK |
+                (3 << DESC_DPL_SHIFT) | DESC_CS_MASK | DESC_R_MASK |
+                DESC_A_MASK);
+        cpu_x86_load_seg_cache(
+            env, R_SS, ((env->sysenter_cs + 24) & 0xfffc) | 3, 0, 0xffffffff,
+            DESC_G_MASK | DESC_B_MASK | DESC_P_MASK | DESC_S_MASK |
+                (3 << DESC_DPL_SHIFT) | DESC_W_MASK | DESC_A_MASK);
     }
     env->regs[R_ESP] = env->regs[R_ECX];
     env->eip = env->regs[R_EDX];

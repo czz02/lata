@@ -26,8 +26,8 @@
 #ifndef CONFIG_USER_ONLY
 
 void superh_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                    MMUAccessType access_type,
-                                    int mmu_idx, uintptr_t retaddr)
+                                    MMUAccessType access_type, int mmu_idx,
+                                    uintptr_t retaddr)
 {
     CPUSH4State *env = cs->env_ptr;
 
@@ -57,9 +57,8 @@ void helper_ldtlb(CPUSH4State *env)
 #endif
 }
 
-static inline G_NORETURN
-void raise_exception(CPUSH4State *env, int index,
-                     uintptr_t retaddr)
+static inline G_NORETURN void raise_exception(CPUSH4State *env, int index,
+                                              uintptr_t retaddr)
 {
     CPUState *cs = env_cpu(env);
 
@@ -110,16 +109,15 @@ void helper_exclusive(CPUSH4State *env)
 
 void helper_movcal(CPUSH4State *env, uint32_t address, uint32_t value)
 {
-    if (cpu_sh4_is_cached (env, address))
-    {
+    if (cpu_sh4_is_cached(env, address)) {
         memory_content *r = g_new(memory_content, 1);
 
-	r->address = address;
-	r->value = value;
-	r->next = NULL;
+        r->address = address;
+        r->value = value;
+        r->next = NULL;
 
-	*(env->movcal_backup_tail) = r;
-	env->movcal_backup_tail = &(r->next);
+        *(env->movcal_backup_tail) = r;
+        env->movcal_backup_tail = &(r->next);
     }
 }
 
@@ -127,36 +125,32 @@ void helper_discard_movcal_backup(CPUSH4State *env)
 {
     memory_content *current = env->movcal_backup;
 
-    while(current)
-    {
-	memory_content *next = current->next;
+    while (current) {
+        memory_content *next = current->next;
         g_free(current);
-	env->movcal_backup = current = next;
-	if (current == NULL)
-	    env->movcal_backup_tail = &(env->movcal_backup);
-    } 
+        env->movcal_backup = current = next;
+        if (current == NULL)
+            env->movcal_backup_tail = &(env->movcal_backup);
+    }
 }
 
 void helper_ocbi(CPUSH4State *env, uint32_t address)
 {
     memory_content **current = &(env->movcal_backup);
-    while (*current)
-    {
-	uint32_t a = (*current)->address;
-	if ((a & ~0x1F) == (address & ~0x1F))
-	{
-	    memory_content *next = (*current)->next;
+    while (*current) {
+        uint32_t a = (*current)->address;
+        if ((a & ~0x1F) == (address & ~0x1F)) {
+            memory_content *next = (*current)->next;
             cpu_stl_data(env, a, (*current)->value);
-	    
-	    if (next == NULL)
-	    {
-		env->movcal_backup_tail = current;
-	    }
+
+            if (next == NULL) {
+                env->movcal_backup_tail = current;
+            }
 
             g_free(*current);
-	    *current = next;
-	    break;
-	}
+            *current = next;
+            break;
+        }
     }
 }
 
@@ -164,15 +158,15 @@ void helper_macl(CPUSH4State *env, uint32_t arg0, uint32_t arg1)
 {
     int64_t res;
 
-    res = ((uint64_t) env->mach << 32) | env->macl;
-    res += (int64_t) (int32_t) arg0 *(int64_t) (int32_t) arg1;
+    res = ((uint64_t)env->mach << 32) | env->macl;
+    res += (int64_t)(int32_t)arg0 * (int64_t)(int32_t)arg1;
     env->mach = (res >> 32) & 0xffffffff;
     env->macl = res & 0xffffffff;
     if (env->sr & (1u << SR_S)) {
-	if (res < 0)
-	    env->mach |= 0xffff0000;
-	else
-	    env->mach &= 0x00007fff;
+        if (res < 0)
+            env->mach |= 0xffff0000;
+        else
+            env->mach &= 0x00007fff;
     }
 }
 
@@ -180,18 +174,18 @@ void helper_macw(CPUSH4State *env, uint32_t arg0, uint32_t arg1)
 {
     int64_t res;
 
-    res = ((uint64_t) env->mach << 32) | env->macl;
-    res += (int64_t) (int16_t) arg0 *(int64_t) (int16_t) arg1;
+    res = ((uint64_t)env->mach << 32) | env->macl;
+    res += (int64_t)(int16_t)arg0 * (int64_t)(int16_t)arg1;
     env->mach = (res >> 32) & 0xffffffff;
     env->macl = res & 0xffffffff;
     if (env->sr & (1u << SR_S)) {
-	if (res < -0x80000000) {
-	    env->mach = 1;
-	    env->macl = 0x80000000;
-	} else if (res > 0x000000007fffffff) {
-	    env->mach = 1;
-	    env->macl = 0x7fffffff;
-	}
+        if (res < -0x80000000) {
+            env->mach = 1;
+            env->macl = 0x80000000;
+        } else if (res > 0x000000007fffffff) {
+            env->mach = 1;
+            env->macl = 0x7fffffff;
+        }
     }
 }
 
@@ -199,9 +193,9 @@ void helper_ld_fpscr(CPUSH4State *env, uint32_t val)
 {
     env->fpscr = val & FPSCR_MASK;
     if ((val & FPSCR_RM_MASK) == FPSCR_RM_ZERO) {
-	set_float_rounding_mode(float_round_to_zero, &env->fp_status);
+        set_float_rounding_mode(float_round_to_zero, &env->fp_status);
     } else {
-	set_float_rounding_mode(float_round_nearest_even, &env->fp_status);
+        set_float_rounding_mode(float_round_nearest_even, &env->fp_status);
     }
     set_flush_to_zero((val & FPSCR_DN) != 0, &env->fp_status);
 }
@@ -233,8 +227,8 @@ static void update_fpscr(CPUSH4State *env, uintptr_t retaddr)
         }
 
         /* Accumulate in flag entries */
-        env->fpscr |= (env->fpscr & FPSCR_CAUSE_MASK)
-                      >> (FPSCR_CAUSE_SHIFT - FPSCR_FLAG_SHIFT);
+        env->fpscr |= (env->fpscr & FPSCR_CAUSE_MASK) >>
+                      (FPSCR_CAUSE_SHIFT - FPSCR_FLAG_SHIFT);
 
         /* Generate an exception if enabled */
         cause = (env->fpscr & FPSCR_CAUSE_MASK) >> FPSCR_CAUSE_SHIFT;
@@ -454,9 +448,8 @@ void helper_fipr(CPUSH4State *env, uint32_t m, uint32_t n)
     r = float32_zero;
     set_float_exception_flags(0, &env->fp_status);
 
-    for (i = 0 ; i < 4 ; i++) {
-        p = float32_mul(env->fregs[bank + m + i],
-                        env->fregs[bank + n + i],
+    for (i = 0; i < 4; i++) {
+        p = float32_mul(env->fregs[bank + m + i], env->fregs[bank + n + i],
                         &env->fp_status);
         r = float32_add(r, p, &env->fp_status);
     }
@@ -475,18 +468,17 @@ void helper_ftrv(CPUSH4State *env, uint32_t n)
     bank_matrix = (env->sr & FPSCR_FR) ? 0 : 16;
     bank_vector = (env->sr & FPSCR_FR) ? 16 : 0;
     set_float_exception_flags(0, &env->fp_status);
-    for (i = 0 ; i < 4 ; i++) {
+    for (i = 0; i < 4; i++) {
         r[i] = float32_zero;
-        for (j = 0 ; j < 4 ; j++) {
+        for (j = 0; j < 4; j++) {
             p = float32_mul(env->fregs[bank_matrix + 4 * j + i],
-                            env->fregs[bank_vector + j],
-                            &env->fp_status);
+                            env->fregs[bank_vector + j], &env->fp_status);
             r[i] = float32_add(r[i], p, &env->fp_status);
         }
     }
     update_fpscr(env, GETPC());
 
-    for (i = 0 ; i < 4 ; i++) {
+    for (i = 0; i < 4; i++) {
         env->fregs[bank_vector + i] = r[i];
     }
 }

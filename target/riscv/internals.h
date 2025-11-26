@@ -31,11 +31,11 @@
  *  - S+2STAGE          0b101
  *  - S+SUM+2STAGE      0b110
  */
-#define MMUIdx_U            0
-#define MMUIdx_S            1
-#define MMUIdx_S_SUM        2
-#define MMUIdx_M            3
-#define MMU_2STAGE_BIT      (1 << 2)
+#define MMUIdx_U 0
+#define MMUIdx_S 1
+#define MMUIdx_S_SUM 2
+#define MMUIdx_M 3
+#define MMU_2STAGE_BIT (1 << 2)
 
 static inline int mmuidx_priv(int mmu_idx)
 {
@@ -75,13 +75,13 @@ extern const VMStateDescription vmstate_riscv_cpu;
 #endif
 
 enum {
-    RISCV_FRM_RNE = 0,  /* Round to Nearest, ties to Even */
-    RISCV_FRM_RTZ = 1,  /* Round towards Zero */
-    RISCV_FRM_RDN = 2,  /* Round Down */
-    RISCV_FRM_RUP = 3,  /* Round Up */
-    RISCV_FRM_RMM = 4,  /* Round to Nearest, ties to Max Magnitude */
-    RISCV_FRM_DYN = 7,  /* Dynamic rounding mode */
-    RISCV_FRM_ROD = 8,  /* Round to Odd */
+    RISCV_FRM_RNE = 0, /* Round to Nearest, ties to Even */
+    RISCV_FRM_RTZ = 1, /* Round towards Zero */
+    RISCV_FRM_RDN = 2, /* Round Down */
+    RISCV_FRM_RUP = 3, /* Round Up */
+    RISCV_FRM_RMM = 4, /* Round to Nearest, ties to Max Magnitude */
+    RISCV_FRM_DYN = 7, /* Dynamic rounding mode */
+    RISCV_FRM_ROD = 8, /* Round to Odd */
 };
 
 static inline uint64_t nanbox_s(CPURISCVState *env, float32 f)

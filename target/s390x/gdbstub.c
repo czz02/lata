@@ -202,9 +202,9 @@ static int cpu_write_c_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
 }
 
 /* the values represent the positions in s390-virt.xml */
-#define S390_VIRT_CKC_REGNUM    0
-#define S390_VIRT_CPUTM_REGNUM  1
-#define S390_VIRT_BEA_REGNUM    2
+#define S390_VIRT_CKC_REGNUM 0
+#define S390_VIRT_CPUTM_REGNUM 1
+#define S390_VIRT_BEA_REGNUM 2
 #define S390_VIRT_PREFIX_REGNUM 3
 /* total number of registers in s390-virt.xml */
 #define S390_NUM_VIRT_REGS 4
@@ -250,10 +250,10 @@ static int cpu_write_virt_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
 }
 
 /* the values represent the positions in s390-virt-kvm.xml */
-#define S390_VIRT_KVM_PP_REGNUM     0
-#define S390_VIRT_KVM_PFT_REGNUM    1
-#define S390_VIRT_KVM_PFS_REGNUM    2
-#define S390_VIRT_KVM_PFC_REGNUM    3
+#define S390_VIRT_KVM_PP_REGNUM 0
+#define S390_VIRT_KVM_PFT_REGNUM 1
+#define S390_VIRT_KVM_PFS_REGNUM 2
+#define S390_VIRT_KVM_PFC_REGNUM 3
 /* total number of registers in s390-virt-kvm.xml */
 #define S390_NUM_VIRT_KVM_REGS 4
 
@@ -300,9 +300,9 @@ static int cpu_write_virt_kvm_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
 
 /* the values represent the positions in s390-gs.xml */
 #define S390_GS_RESERVED_REGNUM 0
-#define S390_GS_GSD_REGNUM      1
-#define S390_GS_GSSM_REGNUM     2
-#define S390_GS_GSEPLA_REGNUM   3
+#define S390_GS_GSD_REGNUM 1
+#define S390_GS_GSSM_REGNUM 2
+#define S390_GS_GSEPLA_REGNUM 3
 /* total number of registers in s390-gs.xml */
 #define S390_NUM_GS_REGS 4
 
@@ -320,36 +320,29 @@ static int cpu_write_gs_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
 
 void s390_cpu_gdb_init(CPUState *cs)
 {
-    gdb_register_coprocessor(cs, cpu_read_ac_reg,
-                             cpu_write_ac_reg,
+    gdb_register_coprocessor(cs, cpu_read_ac_reg, cpu_write_ac_reg,
                              S390_NUM_AC_REGS, "s390-acr.xml", 0);
 
-    gdb_register_coprocessor(cs, cpu_read_fp_reg,
-                             cpu_write_fp_reg,
+    gdb_register_coprocessor(cs, cpu_read_fp_reg, cpu_write_fp_reg,
                              S390_NUM_FP_REGS, "s390-fpr.xml", 0);
 
-    gdb_register_coprocessor(cs, cpu_read_vreg,
-                             cpu_write_vreg,
-                             S390_NUM_VREGS, "s390-vx.xml", 0);
+    gdb_register_coprocessor(cs, cpu_read_vreg, cpu_write_vreg, S390_NUM_VREGS,
+                             "s390-vx.xml", 0);
 
-    gdb_register_coprocessor(cs, cpu_read_gs_reg,
-                             cpu_write_gs_reg,
+    gdb_register_coprocessor(cs, cpu_read_gs_reg, cpu_write_gs_reg,
                              S390_NUM_GS_REGS, "s390-gs.xml", 0);
 
 #ifndef CONFIG_USER_ONLY
-    gdb_register_coprocessor(cs, cpu_read_c_reg,
-                             cpu_write_c_reg,
+    gdb_register_coprocessor(cs, cpu_read_c_reg, cpu_write_c_reg,
                              S390_NUM_C_REGS, "s390-cr.xml", 0);
 
-    gdb_register_coprocessor(cs, cpu_read_virt_reg,
-                             cpu_write_virt_reg,
+    gdb_register_coprocessor(cs, cpu_read_virt_reg, cpu_write_virt_reg,
                              S390_NUM_VIRT_REGS, "s390-virt.xml", 0);
 
     if (kvm_enabled()) {
         gdb_register_coprocessor(cs, cpu_read_virt_kvm_reg,
-                                 cpu_write_virt_kvm_reg,
-                                 S390_NUM_VIRT_KVM_REGS, "s390-virt-kvm.xml",
-                                 0);
+                                 cpu_write_virt_kvm_reg, S390_NUM_VIRT_KVM_REGS,
+                                 "s390-virt-kvm.xml", 0);
     }
 #endif
 }

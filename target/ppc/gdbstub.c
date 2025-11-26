@@ -143,12 +143,11 @@ int ppc_cpu_gdb_read_register(CPUState *cs, GByteArray *buf, int n)
         case 65:
             gdb_get_regl(buf, env->msr);
             break;
-        case 66:
-            {
-                uint32_t cr = ppc_get_cr(env);
-                gdb_get_reg32(buf, cr);
-                break;
-            }
+        case 66: {
+            uint32_t cr = ppc_get_cr(env);
+            gdb_get_reg32(buf, cr);
+            break;
+        }
         case 67:
             gdb_get_regl(buf, env->lr);
             break;
@@ -197,12 +196,11 @@ int ppc_cpu_gdb_read_register_apple(CPUState *cs, GByteArray *buf, int n)
         case 65 + 32:
             gdb_get_reg64(buf, env->msr);
             break;
-        case 66 + 32:
-            {
-                uint32_t cr = ppc_get_cr(env);
-                gdb_get_reg32(buf, cr);
-                break;
-            }
+        case 66 + 32: {
+            uint32_t cr = ppc_get_cr(env);
+            gdb_get_reg32(buf, cr);
+            break;
+        }
         case 67 + 32:
             gdb_get_reg64(buf, env->lr);
             break;
@@ -246,12 +244,11 @@ int ppc_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
         case 65:
             ppc_store_msr(env, ldtul_p(mem_buf));
             break;
-        case 66:
-            {
-                uint32_t cr = ldl_p(mem_buf);
-                ppc_set_cr(env, cr);
-                break;
-            }
+        case 66: {
+            uint32_t cr = ldl_p(mem_buf);
+            ppc_set_cr(env, cr);
+            break;
+        }
         case 67:
             env->lr = ldtul_p(mem_buf);
             break;
@@ -293,12 +290,11 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cs, uint8_t *mem_buf, int n)
         case 65 + 32:
             ppc_store_msr(env, ldq_p(mem_buf));
             break;
-        case 66 + 32:
-            {
-                uint32_t cr = ldl_p(mem_buf);
-                ppc_set_cr(env, cr);
-                break;
-            }
+        case 66 + 32: {
+            uint32_t cr = ldl_p(mem_buf);
+            ppc_set_cr(env, cr);
+            break;
+        }
         case 67 + 32:
             env->lr = ldq_p(mem_buf);
             break;
@@ -601,20 +597,20 @@ gchar *ppc_gdb_arch_name(CPUState *cs)
 void ppc_gdb_init(CPUState *cs, PowerPCCPUClass *pcc)
 {
     if (pcc->insns_flags & PPC_FLOAT) {
-        gdb_register_coprocessor(cs, gdb_get_float_reg, gdb_set_float_reg,
-                                 33, "power-fpu.xml", 0);
+        gdb_register_coprocessor(cs, gdb_get_float_reg, gdb_set_float_reg, 33,
+                                 "power-fpu.xml", 0);
     }
     if (pcc->insns_flags & PPC_ALTIVEC) {
-        gdb_register_coprocessor(cs, gdb_get_avr_reg, gdb_set_avr_reg,
-                                 34, "power-altivec.xml", 0);
+        gdb_register_coprocessor(cs, gdb_get_avr_reg, gdb_set_avr_reg, 34,
+                                 "power-altivec.xml", 0);
     }
     if (pcc->insns_flags & PPC_SPE) {
-        gdb_register_coprocessor(cs, gdb_get_spe_reg, gdb_set_spe_reg,
-                                 34, "power-spe.xml", 0);
+        gdb_register_coprocessor(cs, gdb_get_spe_reg, gdb_set_spe_reg, 34,
+                                 "power-spe.xml", 0);
     }
     if (pcc->insns_flags2 & PPC2_VSX) {
-        gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
-                                 32, "power-vsx.xml", 0);
+        gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg, 32,
+                                 "power-vsx.xml", 0);
     }
 #ifndef CONFIG_USER_ONLY
     gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,

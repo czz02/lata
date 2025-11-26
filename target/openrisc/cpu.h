@@ -55,17 +55,18 @@ enum {
     MMU_USER_IDX = 2,
 };
 
-#define SET_FP_CAUSE(reg, v)    do {\
-                                    (reg) = ((reg) & ~(0x3f << 12)) | \
-                                            ((v & 0x3f) << 12);\
-                                } while (0)
-#define GET_FP_ENABLE(reg)       (((reg) >>  7) & 0x1f)
-#define UPDATE_FP_FLAGS(reg, v)   do {\
-                                      (reg) |= ((v & 0x1f) << 2);\
-                                  } while (0)
+#define SET_FP_CAUSE(reg, v)                                  \
+    do {                                                      \
+        (reg) = ((reg) & ~(0x3f << 12)) | ((v & 0x3f) << 12); \
+    } while (0)
+#define GET_FP_ENABLE(reg) (((reg) >> 7) & 0x1f)
+#define UPDATE_FP_FLAGS(reg, v)     \
+    do {                            \
+        (reg) |= ((v & 0x1f) << 2); \
+    } while (0)
 
 /* Interrupt */
-#define NR_IRQS  32
+#define NR_IRQS 32
 
 /* Unit presece register */
 enum {
@@ -148,20 +149,20 @@ enum {
 
 /* Exceptions indices */
 enum {
-    EXCP_RESET    = 0x1,
-    EXCP_BUSERR   = 0x2,
-    EXCP_DPF      = 0x3,
-    EXCP_IPF      = 0x4,
-    EXCP_TICK     = 0x5,
-    EXCP_ALIGN    = 0x6,
-    EXCP_ILLEGAL  = 0x7,
-    EXCP_INT      = 0x8,
+    EXCP_RESET = 0x1,
+    EXCP_BUSERR = 0x2,
+    EXCP_DPF = 0x3,
+    EXCP_IPF = 0x4,
+    EXCP_TICK = 0x5,
+    EXCP_ALIGN = 0x6,
+    EXCP_ILLEGAL = 0x7,
+    EXCP_INT = 0x8,
     EXCP_DTLBMISS = 0x9,
     EXCP_ITLBMISS = 0xa,
-    EXCP_RANGE    = 0xb,
-    EXCP_SYSCALL  = 0xc,
-    EXCP_FPE      = 0xd,
-    EXCP_TRAP     = 0xe,
+    EXCP_RANGE = 0xb,
+    EXCP_SYSCALL = 0xc,
+    EXCP_FPE = 0xd,
+    EXCP_TRAP = 0xe,
     EXCP_NR,
 };
 
@@ -175,14 +176,14 @@ enum {
     SR_DME = (1 << 5),
     SR_IME = (1 << 6),
     SR_LEE = (1 << 7),
-    SR_CE  = (1 << 8),
-    SR_F   = (1 << 9),
-    SR_CY  = (1 << 10),
-    SR_OV  = (1 << 11),
+    SR_CE = (1 << 8),
+    SR_F = (1 << 9),
+    SR_CY = (1 << 10),
+    SR_OV = (1 << 11),
     SR_OVE = (1 << 12),
     SR_DSX = (1 << 13),
     SR_EPH = (1 << 14),
-    SR_FO  = (1 << 15),
+    SR_FO = (1 << 15),
     SR_SUMRA = (1 << 16),
     SR_SCE = (1 << 17),
 };
@@ -192,7 +193,7 @@ enum {
     TTMR_TP = (0xfffffff),
     TTMR_IP = (1 << 28),
     TTMR_IE = (1 << 29),
-    TTMR_M  = (3 << 30),
+    TTMR_M = (3 << 30),
 };
 
 /* Timer Mode */
@@ -230,67 +231,66 @@ typedef struct CPUOpenRISCTLBContext {
     OpenRISCTLBEntry itlb[TLB_SIZE];
     OpenRISCTLBEntry dtlb[TLB_SIZE];
 
-    int (*cpu_openrisc_map_address_code)(OpenRISCCPU *cpu,
-                                         hwaddr *physical,
-                                         int *prot,
-                                         target_ulong address, int rw);
-    int (*cpu_openrisc_map_address_data)(OpenRISCCPU *cpu,
-                                         hwaddr *physical,
-                                         int *prot,
-                                         target_ulong address, int rw);
+    int (*cpu_openrisc_map_address_code)(OpenRISCCPU *cpu, hwaddr *physical,
+                                         int *prot, target_ulong address,
+                                         int rw);
+    int (*cpu_openrisc_map_address_data)(OpenRISCCPU *cpu, hwaddr *physical,
+                                         int *prot, target_ulong address,
+                                         int rw);
 } CPUOpenRISCTLBContext;
 #endif
 
 typedef struct CPUArchState {
     target_ulong shadow_gpr[16][32]; /* Shadow registers */
 
-    target_ulong pc;          /* Program counter */
-    target_ulong ppc;         /* Prev PC */
-    target_ulong jmp_pc;      /* Jump PC */
+    target_ulong pc; /* Program counter */
+    target_ulong ppc; /* Prev PC */
+    target_ulong jmp_pc; /* Jump PC */
 
-    uint64_t mac;             /* Multiply registers MACHI:MACLO */
+    uint64_t mac; /* Multiply registers MACHI:MACLO */
 
-    target_ulong epcr;        /* Exception PC register */
-    target_ulong eear;        /* Exception EA register */
+    target_ulong epcr; /* Exception PC register */
+    target_ulong eear; /* Exception EA register */
 
-    target_ulong sr_f;        /* the SR_F bit, values 0, 1.  */
-    target_ulong sr_cy;       /* the SR_CY bit, values 0, 1.  */
-    target_long  sr_ov;       /* the SR_OV bit (in the sign bit only) */
-    uint32_t sr;              /* Supervisor register, without SR_{F,CY,OV} */
-    uint32_t esr;             /* Exception supervisor register */
-    uint32_t evbar;           /* Exception vector base address register */
-    uint32_t pmr;             /* Power Management Register */
-    uint32_t fpcsr;           /* Float register */
+    target_ulong sr_f; /* the SR_F bit, values 0, 1.  */
+    target_ulong sr_cy; /* the SR_CY bit, values 0, 1.  */
+    target_long sr_ov; /* the SR_OV bit (in the sign bit only) */
+    uint32_t sr; /* Supervisor register, without SR_{F,CY,OV} */
+    uint32_t esr; /* Exception supervisor register */
+    uint32_t evbar; /* Exception vector base address register */
+    uint32_t pmr; /* Power Management Register */
+    uint32_t fpcsr; /* Float register */
     float_status fp_status;
 
     target_ulong lock_addr;
     target_ulong lock_value;
 
-    uint32_t dflag;           /* In delay slot (boolean) */
+    uint32_t dflag; /* In delay slot (boolean) */
 
 #ifndef CONFIG_USER_ONLY
     CPUOpenRISCTLBContext tlb;
 #endif
 
     /* Fields up to this point are cleared by a CPU reset */
-    struct {} end_reset_fields;
+    struct {
+    } end_reset_fields;
 
     /* Fields from here on are preserved across CPU reset. */
-    uint32_t vr;              /* Version register */
-    uint32_t vr2;             /* Version register 2 */
-    uint32_t avr;             /* Architecture version register */
-    uint32_t upr;             /* Unit presence register */
-    uint32_t cpucfgr;         /* CPU configure register */
-    uint32_t dmmucfgr;        /* DMMU configure register */
-    uint32_t immucfgr;        /* IMMU configure register */
+    uint32_t vr; /* Version register */
+    uint32_t vr2; /* Version register 2 */
+    uint32_t avr; /* Architecture version register */
+    uint32_t upr; /* Unit presence register */
+    uint32_t cpucfgr; /* CPU configure register */
+    uint32_t dmmucfgr; /* DMMU configure register */
+    uint32_t immucfgr; /* IMMU configure register */
 
 #ifndef CONFIG_USER_ONLY
     QEMUTimer *timer;
-    uint32_t ttmr;          /* Timer tick mode register */
+    uint32_t ttmr; /* Timer tick mode register */
     int is_counting;
 
-    uint32_t picmr;         /* Interrupt mask register */
-    uint32_t picsr;         /* Interrupt control register */
+    uint32_t picmr; /* Interrupt mask register */
+    uint32_t picsr; /* Interrupt control register */
 #endif
 } CPUOpenRISCState;
 
@@ -323,8 +323,8 @@ int print_insn_or1k(bfd_vma addr, disassemble_info *info);
 hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
 
 bool openrisc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                           MMUAccessType access_type, int mmu_idx,
-                           bool probe, uintptr_t retaddr);
+                           MMUAccessType access_type, int mmu_idx, bool probe,
+                           uintptr_t retaddr);
 
 extern const VMStateDescription vmstate_openrisc_cpu;
 
@@ -350,12 +350,12 @@ void cpu_openrisc_count_stop(OpenRISCCPU *cpu);
 
 #include "exec/cpu-all.h"
 
-#define TB_FLAGS_SM    SR_SM
-#define TB_FLAGS_DME   SR_DME
-#define TB_FLAGS_IME   SR_IME
-#define TB_FLAGS_OVE   SR_OVE
-#define TB_FLAGS_DFLAG 2      /* reuse SR_TEE */
-#define TB_FLAGS_R0_0  4      /* reuse SR_IEE */
+#define TB_FLAGS_SM SR_SM
+#define TB_FLAGS_DME SR_DME
+#define TB_FLAGS_IME SR_IME
+#define TB_FLAGS_OVE SR_OVE
+#define TB_FLAGS_DFLAG 2 /* reuse SR_TEE */
+#define TB_FLAGS_R0_0 4 /* reuse SR_IEE */
 
 static inline uint32_t cpu_get_gpr(const CPUOpenRISCState *env, int i)
 {
@@ -372,14 +372,14 @@ static inline void cpu_get_tb_cpu_state(CPUOpenRISCState *env, vaddr *pc,
 {
     *pc = env->pc;
     *cs_base = 0;
-    *flags = (env->dflag ? TB_FLAGS_DFLAG : 0)
-           | (cpu_get_gpr(env, 0) ? 0 : TB_FLAGS_R0_0)
-           | (env->sr & (SR_SM | SR_DME | SR_IME | SR_OVE));
+    *flags = (env->dflag ? TB_FLAGS_DFLAG : 0) |
+             (cpu_get_gpr(env, 0) ? 0 : TB_FLAGS_R0_0) |
+             (env->sr & (SR_SM | SR_DME | SR_IME | SR_OVE));
 }
 
 static inline int cpu_mmu_index(CPUOpenRISCState *env, bool ifetch)
 {
-    int ret = MMU_NOMMU_IDX;  /* mmu is disabled */
+    int ret = MMU_NOMMU_IDX; /* mmu is disabled */
 
     if (env->sr & (ifetch ? SR_IME : SR_DME)) {
         /* The mmu is enabled; test supervisor state.  */
@@ -391,10 +391,8 @@ static inline int cpu_mmu_index(CPUOpenRISCState *env, bool ifetch)
 
 static inline uint32_t cpu_get_sr(const CPUOpenRISCState *env)
 {
-    return (env->sr
-            + env->sr_f * SR_F
-            + env->sr_cy * SR_CY
-            + (env->sr_ov < 0) * SR_OV);
+    return (env->sr + env->sr_f * SR_F + env->sr_cy * SR_CY +
+            (env->sr_ov < 0) * SR_OV);
 }
 
 static inline void cpu_set_sr(CPUOpenRISCState *env, uint32_t val)
@@ -407,6 +405,6 @@ static inline void cpu_set_sr(CPUOpenRISCState *env, uint32_t val)
 
 void cpu_set_fpcsr(CPUOpenRISCState *env, uint32_t val);
 
-#define CPU_INTERRUPT_TIMER   CPU_INTERRUPT_TGT_INT_0
+#define CPU_INTERRUPT_TIMER CPU_INTERRUPT_TGT_INT_0
 
 #endif /* OPENRISC_CPU_H */

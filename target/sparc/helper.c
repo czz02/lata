@@ -81,14 +81,14 @@ void helper_tick_set_limit(void *opaque, uint64_t limit)
 }
 #endif
 
-static target_ulong do_udiv(CPUSPARCState *env, target_ulong a,
-                            target_ulong b, int cc, uintptr_t ra)
+static target_ulong do_udiv(CPUSPARCState *env, target_ulong a, target_ulong b,
+                            int cc, uintptr_t ra)
 {
     int overflow = 0;
     uint64_t x0;
     uint32_t x1;
 
-    x0 = (a & 0xffffffff) | ((int64_t) (env->y) << 32);
+    x0 = (a & 0xffffffff) | ((int64_t)(env->y) << 32);
     x1 = (b & 0xffffffff);
 
     if (x1 == 0) {
@@ -119,14 +119,14 @@ target_ulong helper_udiv_cc(CPUSPARCState *env, target_ulong a, target_ulong b)
     return do_udiv(env, a, b, 1, GETPC());
 }
 
-static target_ulong do_sdiv(CPUSPARCState *env, target_ulong a,
-                            target_ulong b, int cc, uintptr_t ra)
+static target_ulong do_sdiv(CPUSPARCState *env, target_ulong a, target_ulong b,
+                            int cc, uintptr_t ra)
 {
     int overflow = 0;
     int64_t x0;
     int32_t x1;
 
-    x0 = (a & 0xffffffff) | ((int64_t) (env->y) << 32);
+    x0 = (a & 0xffffffff) | ((int64_t)(env->y) << 32);
     x1 = (b & 0xffffffff);
 
     if (x1 == 0) {
@@ -136,7 +136,7 @@ static target_ulong do_sdiv(CPUSPARCState *env, target_ulong a,
         overflow = 1;
     } else {
         x0 = x0 / x1;
-        if ((int32_t) x0 != x0) {
+        if ((int32_t)x0 != x0) {
             x0 = x0 < 0 ? INT32_MIN : INT32_MAX;
             overflow = 1;
         }
@@ -208,7 +208,7 @@ target_ulong helper_taddcctv(CPUSPARCState *env, target_ulong src1,
     env->cc_dst = dst;
     return dst;
 
- tag_overflow:
+tag_overflow:
     cpu_raise_exception_ra(env, TT_TOVF, GETPC());
 }
 
@@ -236,7 +236,7 @@ target_ulong helper_tsubcctv(CPUSPARCState *env, target_ulong src1,
     env->cc_dst = dst;
     return dst;
 
- tag_overflow:
+tag_overflow:
     cpu_raise_exception_ra(env, TT_TOVF, GETPC());
 }
 

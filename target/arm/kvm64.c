@@ -36,21 +36,19 @@ static bool have_guest_debug;
 
 void kvm_arm_init_debug(KVMState *s)
 {
-    have_guest_debug = kvm_check_extension(s,
-                                           KVM_CAP_SET_GUEST_DEBUG);
+    have_guest_debug = kvm_check_extension(s, KVM_CAP_SET_GUEST_DEBUG);
 
     max_hw_wps = kvm_check_extension(s, KVM_CAP_GUEST_DEBUG_HW_WPS);
-    hw_watchpoints = g_array_sized_new(true, true,
-                                       sizeof(HWWatchpoint), max_hw_wps);
+    hw_watchpoints =
+        g_array_sized_new(true, true, sizeof(HWWatchpoint), max_hw_wps);
 
     max_hw_bps = kvm_check_extension(s, KVM_CAP_GUEST_DEBUG_HW_BPS);
-    hw_breakpoints = g_array_sized_new(true, true,
-                                       sizeof(HWBreakpoint), max_hw_bps);
+    hw_breakpoints =
+        g_array_sized_new(true, true, sizeof(HWBreakpoint), max_hw_bps);
     return;
 }
 
-int kvm_arch_insert_hw_breakpoint(target_ulong addr,
-                                  target_ulong len, int type)
+int kvm_arch_insert_hw_breakpoint(target_ulong addr, target_ulong len, int type)
 {
     switch (type) {
     case GDB_BREAKPOINT_HW:
@@ -65,8 +63,7 @@ int kvm_arch_insert_hw_breakpoint(target_ulong addr,
     }
 }
 
-int kvm_arch_remove_hw_breakpoint(target_ulong addr,
-                                  target_ulong len, int type)
+int kvm_arch_remove_hw_breakpoint(target_ulong addr, target_ulong len, int type)
 {
     switch (type) {
     case GDB_BREAKPOINT_HW:
@@ -230,17 +227,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
      * which is its preferred CPU type. Fortunately these old kernels
      * support only a very limited number of CPUs.
      */
-    static const uint32_t cpus_to_try[] = {
-        KVM_ARM_TARGET_AEM_V8,
-        KVM_ARM_TARGET_FOUNDATION_V8,
-        KVM_ARM_TARGET_CORTEX_A57,
-        QEMU_KVM_ARM_TARGET_NONE
-    };
+    static const uint32_t cpus_to_try[] = { KVM_ARM_TARGET_AEM_V8,
+                                            KVM_ARM_TARGET_FOUNDATION_V8,
+                                            KVM_ARM_TARGET_CORTEX_A57,
+                                            QEMU_KVM_ARM_TARGET_NONE };
     /*
      * target = -1 informs kvm_arm_create_scratch_host_vcpu()
      * to use the preferred target
      */
-    struct kvm_vcpu_init init = { .target = -1, };
+    struct kvm_vcpu_init init = {
+        .target = -1,
+    };
 
     /*
      * Ask for SVE if supported, so that we can query ID_AA64ZFR0,
@@ -550,7 +547,7 @@ static int kvm_arm_sve_set_vls(CPUState *cs)
     return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
 }
 
-#define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
+#define ARM_CPU_ID_MPIDR 3, 0, 0, 0, 5
 
 int kvm_arch_init_vcpu(CPUState *cs)
 {
@@ -713,14 +710,17 @@ static void kvm_inject_arm_sea(CPUState *c)
     arm_cpu_do_interrupt(c);
 }
 
-#define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-                 KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+#define AARCH64_CORE_REG(x)                                \
+    (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | \
+     KVM_REG_ARM_CORE_REG(x))
 
-#define AARCH64_SIMD_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U128 | \
-                 KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+#define AARCH64_SIMD_CORE_REG(x)                            \
+    (KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | \
+     KVM_REG_ARM_CORE_REG(x))
 
-#define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | \
-                 KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+#define AARCH64_SIMD_CTRL_REG(x)                           \
+    (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_CORE | \
+     KVM_REG_ARM_CORE_REG(x))
 
 static int kvm_arch_put_fpsimd(CPUState *cs)
 {
@@ -814,7 +814,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
 
     for (i = 0; i < 31; i++) {
         reg.id = AARCH64_CORE_REG(regs.regs[i]);
-        reg.addr = (uintptr_t) &env->xregs[i];
+        reg.addr = (uintptr_t)&env->xregs[i];
         ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
         if (ret) {
             return ret;
@@ -827,14 +827,14 @@ int kvm_arch_put_registers(CPUState *cs, int level)
     aarch64_save_sp(env, 1);
 
     reg.id = AARCH64_CORE_REG(regs.sp);
-    reg.addr = (uintptr_t) &env->sp_el[0];
+    reg.addr = (uintptr_t)&env->sp_el[0];
     ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
     if (ret) {
         return ret;
     }
 
     reg.id = AARCH64_CORE_REG(sp_el1);
-    reg.addr = (uintptr_t) &env->sp_el[1];
+    reg.addr = (uintptr_t)&env->sp_el[1];
     ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
     if (ret) {
         return ret;
@@ -847,21 +847,21 @@ int kvm_arch_put_registers(CPUState *cs, int level)
         val = cpsr_read(env);
     }
     reg.id = AARCH64_CORE_REG(regs.pstate);
-    reg.addr = (uintptr_t) &val;
+    reg.addr = (uintptr_t)&val;
     ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
     if (ret) {
         return ret;
     }
 
     reg.id = AARCH64_CORE_REG(regs.pc);
-    reg.addr = (uintptr_t) &env->pc;
+    reg.addr = (uintptr_t)&env->pc;
     ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
     if (ret) {
         return ret;
     }
 
     reg.id = AARCH64_CORE_REG(elr_el1);
-    reg.addr = (uintptr_t) &env->elr_el[1];
+    reg.addr = (uintptr_t)&env->elr_el[1];
     ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
     if (ret) {
         return ret;
@@ -882,7 +882,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
     /* KVM 0-4 map to QEMU banks 1-5 */
     for (i = 0; i < KVM_NR_SPSR; i++) {
         reg.id = AARCH64_CORE_REG(spsr[i]);
-        reg.addr = (uintptr_t) &env->banked_spsr[i + 1];
+        reg.addr = (uintptr_t)&env->banked_spsr[i + 1];
         ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
         if (ret) {
             return ret;
@@ -920,11 +920,11 @@ int kvm_arch_put_registers(CPUState *cs, int level)
         return -EINVAL;
     }
 
-   /*
-    * Setting VCPU events should be triggered after syncing the registers
-    * to avoid overwriting potential changes made by KVM upon calling
-    * KVM_SET_VCPU_EVENTS ioctl
-    */
+    /*
+     * Setting VCPU events should be triggered after syncing the registers
+     * to avoid overwriting potential changes made by KVM upon calling
+     * KVM_SET_VCPU_EVENTS ioctl
+     */
     ret = kvm_put_vcpu_events(cpu);
     if (ret) {
         return ret;
@@ -1020,7 +1020,7 @@ int kvm_arch_get_registers(CPUState *cs)
 
     for (i = 0; i < 31; i++) {
         reg.id = AARCH64_CORE_REG(regs.regs[i]);
-        reg.addr = (uintptr_t) &env->xregs[i];
+        reg.addr = (uintptr_t)&env->xregs[i];
         ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
         if (ret) {
             return ret;
@@ -1028,21 +1028,21 @@ int kvm_arch_get_registers(CPUState *cs)
     }
 
     reg.id = AARCH64_CORE_REG(regs.sp);
-    reg.addr = (uintptr_t) &env->sp_el[0];
+    reg.addr = (uintptr_t)&env->sp_el[0];
     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
     if (ret) {
         return ret;
     }
 
     reg.id = AARCH64_CORE_REG(sp_el1);
-    reg.addr = (uintptr_t) &env->sp_el[1];
+    reg.addr = (uintptr_t)&env->sp_el[1];
     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
     if (ret) {
         return ret;
     }
 
     reg.id = AARCH64_CORE_REG(regs.pstate);
-    reg.addr = (uintptr_t) &val;
+    reg.addr = (uintptr_t)&val;
     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
     if (ret) {
         return ret;
@@ -1061,7 +1061,7 @@ int kvm_arch_get_registers(CPUState *cs)
     aarch64_restore_sp(env, 1);
 
     reg.id = AARCH64_CORE_REG(regs.pc);
-    reg.addr = (uintptr_t) &env->pc;
+    reg.addr = (uintptr_t)&env->pc;
     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
     if (ret) {
         return ret;
@@ -1077,7 +1077,7 @@ int kvm_arch_get_registers(CPUState *cs)
     }
 
     reg.id = AARCH64_CORE_REG(elr_el1);
-    reg.addr = (uintptr_t) &env->elr_el[1];
+    reg.addr = (uintptr_t)&env->elr_el[1];
     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
     if (ret) {
         return ret;
@@ -1089,7 +1089,7 @@ int kvm_arch_get_registers(CPUState *cs)
      */
     for (i = 0; i < KVM_NR_SPSR; i++) {
         reg.id = AARCH64_CORE_REG(spsr[i]);
-        reg.addr = (uintptr_t) &env->banked_spsr[i + 1];
+        reg.addr = (uintptr_t)&env->banked_spsr[i + 1];
         ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
         if (ret) {
             return ret;
@@ -1182,7 +1182,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
         }
         if (code == BUS_MCEERR_AO) {
             error_report("Hardware memory error at addr %p for memory used by "
-                "QEMU itself instead of guest system!", addr);
+                         "QEMU itself instead of guest system!",
+                         addr);
         }
     }
 
@@ -1252,7 +1253,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
              * single step at this point so something has gone wrong.
              */
             error_report("%s: guest single-step while debugging unsupported"
-                         " (%"PRIx64", %"PRIx32")",
+                         " (%" PRIx64 ", %" PRIx32 ")",
                          __func__, env->pc, debug_exit->hsr);
             return false;
         }
@@ -1267,8 +1268,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
             return true;
         }
         break;
-    case EC_WATCHPOINT:
-    {
+    case EC_WATCHPOINT: {
         CPUWatchpoint *wp = find_hw_watchpoint(cs, debug_exit->far);
         if (wp) {
             cs->watchpoint_hit = wp;
@@ -1277,7 +1277,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
         break;
     }
     default:
-        error_report("%s: unhandled debug exit (%"PRIx32", %"PRIx64")",
+        error_report("%s: unhandled debug exit (%" PRIx32 ", %" PRIx64 ")",
                      __func__, debug_exit->hsr, env->pc);
     }
 
@@ -1310,12 +1310,10 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
  *      TTBCR.EAE == 1
  *          FS, bits [5:0]
  */
-#define ESR_DFSC(aarch64, lpae, v)        \
-    ((aarch64 || (lpae)) ? ((v) & 0x3F)   \
-               : (((v) >> 6) | ((v) & 0x1F)))
+#define ESR_DFSC(aarch64, lpae, v) \
+    ((aarch64 || (lpae)) ? ((v) & 0x3F) : (((v) >> 6) | ((v) & 0x1F)))
 
-#define ESR_DFSC_EXTABT(aarch64, lpae) \
-    ((aarch64) ? 0x10 : (lpae) ? 0x10 : 0x8)
+#define ESR_DFSC_EXTABT(aarch64, lpae) ((aarch64) ? 0x10 : (lpae) ? 0x10 : 0x8)
 
 bool kvm_arm_verify_ext_dabt_pending(CPUState *cs)
 {
@@ -1331,15 +1329,15 @@ bool kvm_arm_verify_ext_dabt_pending(CPUState *cs)
             uint64_t ttbcr;
 
             if (!kvm_get_one_reg(cs, ARM64_REG_TCR_EL1, &ttbcr)) {
-                lpae = arm_feature(env, ARM_FEATURE_LPAE)
-                        && (ttbcr & TTBCR_EAE);
+                lpae =
+                    arm_feature(env, ARM_FEATURE_LPAE) && (ttbcr & TTBCR_EAE);
             }
         }
         /*
          * The verification here is based on the DFSC bits
          * of the ESR_EL1 reg only
          */
-         return (ESR_DFSC(aarch64_mode, lpae, dfsr_val) ==
+        return (ESR_DFSC(aarch64_mode, lpae, dfsr_val) ==
                 ESR_DFSC_EXTABT(aarch64_mode, lpae));
     }
     return false;

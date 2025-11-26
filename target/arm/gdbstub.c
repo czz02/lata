@@ -286,7 +286,7 @@ static void arm_register_sysreg_for_xml(gpointer key, gpointer value,
     if (!(ri->type & (ARM_CP_NO_RAW | ARM_CP_NO_GDB))) {
         if (arm_feature(env, ARM_FEATURE_AARCH64)) {
             if (ri->state == ARM_CP_STATE_AA64) {
-                arm_gen_one_xml_sysreg_tag(s , dyn_xml, ri, ri_key, 64,
+                arm_gen_one_xml_sysreg_tag(s, dyn_xml, ri, ri_key, 64,
                                            param->n++);
             }
         } else {
@@ -296,10 +296,10 @@ static void arm_register_sysreg_for_xml(gpointer key, gpointer value,
                     return;
                 }
                 if (ri->type & ARM_CP_64BIT) {
-                    arm_gen_one_xml_sysreg_tag(s , dyn_xml, ri, ri_key, 64,
+                    arm_gen_one_xml_sysreg_tag(s, dyn_xml, ri, ri_key, 64,
                                                param->n++);
                 } else {
-                    arm_gen_one_xml_sysreg_tag(s , dyn_xml, ri, ri_key, 32,
+                    arm_gen_one_xml_sysreg_tag(s, dyn_xml, ri, ri_key, 32,
                                                param->n++);
                 }
             }
@@ -311,10 +311,11 @@ static int arm_gen_dynamic_sysreg_xml(CPUState *cs, int base_reg)
 {
     ARMCPU *cpu = ARM_CPU(cs);
     GString *s = g_string_new(NULL);
-    RegisterSysregXmlParam param = {cs, s, base_reg};
+    RegisterSysregXmlParam param = { cs, s, base_reg };
 
     cpu->dyn_sysreg_xml.num = 0;
-    cpu->dyn_sysreg_xml.data.cpregs.keys = g_new(uint32_t, g_hash_table_size(cpu->cp_regs));
+    cpu->dyn_sysreg_xml.data.cpregs.keys =
+        g_new(uint32_t, g_hash_table_size(cpu->cp_regs));
     g_string_printf(s, "<?xml version=\"1.0\"?>");
     g_string_append_printf(s, "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">");
     g_string_append_printf(s, "<feature name=\"org.qemu.gdb.arm.sys.regs\">");
@@ -385,8 +386,8 @@ static uint32_t *m_sysreg_ptr(CPUARMState *env, MProfileSysreg reg, bool sec)
     return arm_feature(env, m_sysreg_def[reg].feature) ? ptr : NULL;
 }
 
-static int m_sysreg_get(CPUARMState *env, GByteArray *buf,
-                        MProfileSysreg reg, bool secure)
+static int m_sysreg_get(CPUARMState *env, GByteArray *buf, MProfileSysreg reg,
+                        bool secure)
 {
     uint32_t *ptr = m_sysreg_ptr(env, reg, secure);
 
@@ -427,8 +428,8 @@ static int arm_gen_dynamic_m_systemreg_xml(CPUState *cs, int orig_base_reg)
 
     for (i = 0; i < ARRAY_SIZE(m_sysreg_def); i++) {
         if (arm_feature(env, m_sysreg_def[i].feature)) {
-            g_string_append_printf(s,
-                "<reg name=\"%s\" bitsize=\"32\" regnum=\"%d\"/>\n",
+            g_string_append_printf(
+                s, "<reg name=\"%s\" bitsize=\"32\" regnum=\"%d\"/>\n",
                 m_sysreg_def[i].name, base_reg++);
         }
     }
@@ -467,11 +468,11 @@ static int arm_gen_dynamic_m_secextreg_xml(CPUState *cs, int orig_base_reg)
     g_string_append_printf(s, "<feature name=\"org.gnu.gdb.arm.secext\">\n");
 
     for (i = 0; i < ARRAY_SIZE(m_sysreg_def); i++) {
-        g_string_append_printf(s,
-            "<reg name=\"%s_ns\" bitsize=\"32\" regnum=\"%d\"/>\n",
+        g_string_append_printf(
+            s, "<reg name=\"%s_ns\" bitsize=\"32\" regnum=\"%d\"/>\n",
             m_sysreg_def[i].name, base_reg++);
-        g_string_append_printf(s,
-            "<reg name=\"%s_s\" bitsize=\"32\" regnum=\"%d\"/>\n",
+        g_string_append_printf(
+            s, "<reg name=\"%s_s\" bitsize=\"32\" regnum=\"%d\"/>\n",
             m_sysreg_def[i].name, base_reg++);
     }
 
@@ -520,8 +521,8 @@ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
                                      "sve-registers.xml", 0);
         } else {
             gdb_register_coprocessor(cs, aarch64_gdb_get_fpu_reg,
-                                     aarch64_gdb_set_fpu_reg,
-                                     34, "aarch64-fpu.xml", 0);
+                                     aarch64_gdb_set_fpu_reg, 34,
+                                     "aarch64-fpu.xml", 0);
         }
         /*
          * Note that we report pauth information via the feature name
@@ -531,20 +532,20 @@ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
          */
         if (isar_feature_aa64_pauth(&cpu->isar)) {
             gdb_register_coprocessor(cs, aarch64_gdb_get_pauth_reg,
-                                     aarch64_gdb_set_pauth_reg,
-                                     4, "aarch64-pauth.xml", 0);
+                                     aarch64_gdb_set_pauth_reg, 4,
+                                     "aarch64-pauth.xml", 0);
         }
 #endif
     } else {
         if (arm_feature(env, ARM_FEATURE_NEON)) {
-            gdb_register_coprocessor(cs, vfp_gdb_get_reg, vfp_gdb_set_reg,
-                                     49, "arm-neon.xml", 0);
+            gdb_register_coprocessor(cs, vfp_gdb_get_reg, vfp_gdb_set_reg, 49,
+                                     "arm-neon.xml", 0);
         } else if (cpu_isar_feature(aa32_simd_r32, cpu)) {
-            gdb_register_coprocessor(cs, vfp_gdb_get_reg, vfp_gdb_set_reg,
-                                     33, "arm-vfp3.xml", 0);
+            gdb_register_coprocessor(cs, vfp_gdb_get_reg, vfp_gdb_set_reg, 33,
+                                     "arm-vfp3.xml", 0);
         } else if (cpu_isar_feature(aa32_vfp_simd, cpu)) {
-            gdb_register_coprocessor(cs, vfp_gdb_get_reg, vfp_gdb_set_reg,
-                                     17, "arm-vfp.xml", 0);
+            gdb_register_coprocessor(cs, vfp_gdb_get_reg, vfp_gdb_set_reg, 17,
+                                     "arm-vfp.xml", 0);
         }
         if (!arm_feature(env, ARM_FEATURE_M)) {
             /*
@@ -556,8 +557,8 @@ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
         }
     }
     if (cpu_isar_feature(aa32_mve, cpu) && tcg_enabled()) {
-        gdb_register_coprocessor(cs, mve_gdb_get_reg, mve_gdb_set_reg,
-                                 1, "arm-m-profile-mve.xml", 0);
+        gdb_register_coprocessor(cs, mve_gdb_get_reg, mve_gdb_set_reg, 1,
+                                 "arm-m-profile-mve.xml", 0);
     }
     gdb_register_coprocessor(cs, arm_gdb_get_sysreg, arm_gdb_set_sysreg,
                              arm_gen_dynamic_sysreg_xml(cs, cs->gdb_num_regs),
@@ -565,14 +566,14 @@ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
 
 #ifdef CONFIG_TCG
     if (arm_feature(env, ARM_FEATURE_M) && tcg_enabled()) {
-        gdb_register_coprocessor(cs,
-            arm_gdb_get_m_systemreg, arm_gdb_set_m_systemreg,
+        gdb_register_coprocessor(
+            cs, arm_gdb_get_m_systemreg, arm_gdb_set_m_systemreg,
             arm_gen_dynamic_m_systemreg_xml(cs, cs->gdb_num_regs),
             "arm-m-system.xml", 0);
 #ifndef CONFIG_USER_ONLY
         if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-            gdb_register_coprocessor(cs,
-                arm_gdb_get_m_secextreg, arm_gdb_set_m_secextreg,
+            gdb_register_coprocessor(
+                cs, arm_gdb_get_m_secextreg, arm_gdb_set_m_secextreg,
                 arm_gen_dynamic_m_secextreg_xml(cs, cs->gdb_num_regs),
                 "arm-m-secext.xml", 0);
         }

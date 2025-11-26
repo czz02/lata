@@ -42,8 +42,7 @@ static vaddr nios2_cpu_get_pc(CPUState *cs)
     return env->pc;
 }
 
-static void nios2_restore_state_to_opc(CPUState *cs,
-                                       const TranslationBlock *tb,
+static void nios2_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                        const uint64_t *data)
 {
     Nios2CPU *cpu = NIOS2_CPU(cs);
@@ -139,10 +138,10 @@ static void realize_cr_status(CPUState *cs)
      * non-reserved fields.  We apply writable as a mask to bits,
      * and merge in existing readonly bits, before storing.
      */
-#define WR_REG(C)       cpu->cr_state[C].writable = -1
-#define RO_REG(C)       cpu->cr_state[C].readonly = -1
-#define WR_FIELD(C, F)  cpu->cr_state[C].writable |= R_##C##_##F##_MASK
-#define RO_FIELD(C, F)  cpu->cr_state[C].readonly |= R_##C##_##F##_MASK
+#define WR_REG(C) cpu->cr_state[C].writable = -1
+#define RO_REG(C) cpu->cr_state[C].readonly = -1
+#define WR_FIELD(C, F) cpu->cr_state[C].writable |= R_##C##_##F##_MASK
+#define RO_FIELD(C, F) cpu->cr_state[C].readonly |= R_##C##_##F##_MASK
 
     WR_FIELD(CR_STATUS, PIE);
     WR_REG(CR_ESTATUS);
@@ -261,9 +260,8 @@ static bool nios2_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
     Nios2CPU *cpu = NIOS2_CPU(cs);
 
     if (interrupt_request & CPU_INTERRUPT_HARD) {
-        if (cpu->eic_present
-            ? eic_take_interrupt(cpu)
-            : iic_take_interrupt(cpu)) {
+        if (cpu->eic_present ? eic_take_interrupt(cpu) :
+                               iic_take_interrupt(cpu)) {
             cs->exception_index = EXCP_IRQ;
             nios2_cpu_do_interrupt(cs);
             return true;
@@ -286,11 +284,11 @@ static int nios2_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
     CPUNios2State *env = &cpu->env;
     uint32_t val;
 
-    if (n < 32) {          /* GP regs */
+    if (n < 32) { /* GP regs */
         val = env->regs[n];
-    } else if (n == 32) {    /* PC */
+    } else if (n == 32) { /* PC */
         val = env->pc;
-    } else if (n < 49) {     /* Status regs */
+    } else if (n < 49) { /* Status regs */
         unsigned cr = n - 33;
         if (nios2_cr_reserved(&cpu->cr_state[cr])) {
             val = 0;
@@ -317,11 +315,11 @@ static int nios2_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
     }
     val = ldl_p(mem_buf);
 
-    if (n < 32) {            /* GP regs */
+    if (n < 32) { /* GP regs */
         env->regs[n] = val;
-    } else if (n == 32) {    /* PC */
+    } else if (n == 32) { /* PC */
         env->pc = val;
-    } else if (n < 49) {     /* Status regs */
+    } else if (n < 49) { /* Status regs */
         unsigned cr = n - 33;
         /* ??? Maybe allow the debugger to write to readonly fields. */
         val &= cpu->cr_state[cr].writable;

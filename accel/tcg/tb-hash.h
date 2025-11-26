@@ -46,8 +46,9 @@ static inline unsigned int tb_jmp_cache_hash_func(vaddr pc)
 {
     vaddr tmp;
     tmp = pc ^ (pc >> (TARGET_PAGE_BITS - TB_JMP_PAGE_BITS));
-    return (((tmp >> (TARGET_PAGE_BITS - TB_JMP_PAGE_BITS)) & TB_JMP_PAGE_MASK)
-           | (tmp & TB_JMP_ADDR_MASK));
+    return (
+        ((tmp >> (TARGET_PAGE_BITS - TB_JMP_PAGE_BITS)) & TB_JMP_PAGE_MASK) |
+        (tmp & TB_JMP_ADDR_MASK));
 }
 
 #else
@@ -60,9 +61,9 @@ static inline unsigned int tb_jmp_cache_hash_func(vaddr pc)
 
 #endif /* CONFIG_SOFTMMU */
 
-static inline
-uint32_t tb_hash_func(tb_page_addr_t phys_pc, vaddr pc,
-                      uint32_t flags, uint64_t flags2, uint32_t cf_mask)
+static inline uint32_t tb_hash_func(tb_page_addr_t phys_pc, vaddr pc,
+                                    uint32_t flags, uint64_t flags2,
+                                    uint32_t cf_mask)
 {
     return qemu_xxhash8(phys_pc, pc, flags2, flags, cf_mask);
 }

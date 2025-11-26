@@ -19,21 +19,19 @@
 #include "sysemu/reset.h"
 #include "tcg/tcg.h"
 
-const char * const regnames[32] = {
-    "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
-    "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",
-    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
-    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
+const char *const regnames[32] = {
+    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",  "r8",  "r9",  "r10",
+    "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20", "r21",
+    "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
 };
 
-const char * const fregnames[32] = {
-    "f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7",
-    "f8", "f9", "f10", "f11", "f12", "f13", "f14", "f15",
-    "f16", "f17", "f18", "f19", "f20", "f21", "f22", "f23",
-    "f24", "f25", "f26", "f27", "f28", "f29", "f30", "f31",
+const char *const fregnames[32] = {
+    "f0",  "f1",  "f2",  "f3",  "f4",  "f5",  "f6",  "f7",  "f8",  "f9",  "f10",
+    "f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20", "f21",
+    "f22", "f23", "f24", "f25", "f26", "f27", "f28", "f29", "f30", "f31",
 };
 
-static const char * const excp_names[] = {
+static const char *const excp_names[] = {
     [EXCCODE_INT] = "Interrupt",
     [EXCCODE_PIL] = "Page invalid exception for load",
     [EXCCODE_PIS] = "Page invalid exception for store",
@@ -61,15 +59,12 @@ const char *loongarch_exception_name(int32_t exception)
     return excp_names[exception];
 }
 
-void G_NORETURN do_raise_exception(CPULoongArchState *env,
-                                   uint32_t exception,
+void G_NORETURN do_raise_exception(CPULoongArchState *env, uint32_t exception,
                                    uintptr_t pc)
 {
     CPUState *cs = env_cpu(env);
 
-    qemu_log_mask(CPU_LOG_INT, "%s: %d (%s)\n",
-                  __func__,
-                  exception,
+    qemu_log_mask(CPU_LOG_INT, "%s: %d (%s)\n", __func__, exception,
                   loongarch_exception_name(exception));
     cs->exception_index = exception;
 
@@ -119,7 +114,7 @@ static inline bool cpu_loongarch_hw_interrupts_enabled(CPULoongArchState *env)
     bool ret = 0;
 
     ret = (FIELD_EX64(env->CSR_CRMD, CSR_CRMD, IE) &&
-          !(FIELD_EX64(env->CSR_DBG, CSR_DBG, DST)));
+           !(FIELD_EX64(env->CSR_DBG, CSR_DBG, DST)));
 
     return ret;
 }
@@ -131,7 +126,7 @@ static inline bool cpu_loongarch_hw_interrupts_pending(CPULoongArchState *env)
     uint32_t status;
 
     pending = FIELD_EX64(env->CSR_ESTAT, CSR_ESTAT, IS);
-    status  = FIELD_EX64(env->CSR_ECFG, CSR_ECFG, LIE);
+    status = FIELD_EX64(env->CSR_ECFG, CSR_ECFG, LIE);
 
     return (pending & status) != 0;
 }
@@ -155,9 +150,9 @@ static void loongarch_cpu_do_interrupt(CPUState *cs)
         }
 
         qemu_log_mask(CPU_LOG_INT,
-                     "%s enter: pc " TARGET_FMT_lx " ERA " TARGET_FMT_lx
-                     " TLBRERA " TARGET_FMT_lx " %s exception\n", __func__,
-                     env->pc, env->CSR_ERA, env->CSR_TLBRERA, name);
+                      "%s enter: pc " TARGET_FMT_lx " ERA " TARGET_FMT_lx
+                      " TLBRERA " TARGET_FMT_lx " %s exception\n",
+                      __func__, env->pc, env->CSR_ERA, env->CSR_TLBRERA, name);
     }
 
     switch (cs->exception_index) {
@@ -212,19 +207,19 @@ static void loongarch_cpu_do_interrupt(CPUState *cs)
 
     /* Save PLV and IE */
     if (tlbfill) {
-        env->CSR_TLBRPRMD = FIELD_DP64(env->CSR_TLBRPRMD, CSR_TLBRPRMD, PPLV,
-                                       FIELD_EX64(env->CSR_CRMD,
-                                       CSR_CRMD, PLV));
+        env->CSR_TLBRPRMD =
+            FIELD_DP64(env->CSR_TLBRPRMD, CSR_TLBRPRMD, PPLV,
+                       FIELD_EX64(env->CSR_CRMD, CSR_CRMD, PLV));
         env->CSR_TLBRPRMD = FIELD_DP64(env->CSR_TLBRPRMD, CSR_TLBRPRMD, PIE,
                                        FIELD_EX64(env->CSR_CRMD, CSR_CRMD, IE));
         /* set the DA mode */
         env->CSR_CRMD = FIELD_DP64(env->CSR_CRMD, CSR_CRMD, DA, 1);
         env->CSR_CRMD = FIELD_DP64(env->CSR_CRMD, CSR_CRMD, PG, 0);
-        env->CSR_TLBRERA = FIELD_DP64(env->CSR_TLBRERA, CSR_TLBRERA,
-                                      PC, (env->pc >> 2));
+        env->CSR_TLBRERA =
+            FIELD_DP64(env->CSR_TLBRERA, CSR_TLBRERA, PC, (env->pc >> 2));
     } else {
-        env->CSR_ESTAT = FIELD_DP64(env->CSR_ESTAT, CSR_ESTAT, ECODE,
-                                    EXCODE_MCODE(cause));
+        env->CSR_ESTAT =
+            FIELD_DP64(env->CSR_ESTAT, CSR_ESTAT, ECODE, EXCODE_MCODE(cause));
         env->CSR_ESTAT = FIELD_DP64(env->CSR_ESTAT, CSR_ESTAT, ESUBCODE,
                                     EXCODE_SUBCODE(cause));
         env->CSR_PRMD = FIELD_DP64(env->CSR_PRMD, CSR_PRMD, PPLV,
@@ -241,7 +236,7 @@ static void loongarch_cpu_do_interrupt(CPUState *cs)
         vec_size = (1 << vec_size) * 4;
     }
 
-    if  (cs->exception_index == EXCCODE_INT) {
+    if (cs->exception_index == EXCCODE_INT) {
         /* Interrupt */
         uint32_t vector = 0;
         uint32_t pending = FIELD_EX64(env->CSR_ESTAT, CSR_ESTAT, IS);
@@ -250,14 +245,13 @@ static void loongarch_cpu_do_interrupt(CPUState *cs)
         /* Find the highest-priority interrupt. */
         vector = 31 - clz32(pending);
         env->pc = env->CSR_EENTRY + (EXCCODE_EXTERNAL_INT + vector) * vec_size;
-        qemu_log_mask(CPU_LOG_INT,
-                      "%s: PC " TARGET_FMT_lx " ERA " TARGET_FMT_lx
-                      " cause %d\n" "    A " TARGET_FMT_lx " D "
-                      TARGET_FMT_lx " vector = %d ExC " TARGET_FMT_lx "ExS"
-                      TARGET_FMT_lx "\n",
-                      __func__, env->pc, env->CSR_ERA,
-                      cause, env->CSR_BADV, env->CSR_DERA, vector,
-                      env->CSR_ECFG, env->CSR_ESTAT);
+        qemu_log_mask(
+            CPU_LOG_INT,
+            "%s: PC " TARGET_FMT_lx " ERA " TARGET_FMT_lx " cause %d\n"
+            "    A " TARGET_FMT_lx " D " TARGET_FMT_lx
+            " vector = %d ExC " TARGET_FMT_lx "ExS" TARGET_FMT_lx "\n",
+            __func__, env->pc, env->CSR_ERA, cause, env->CSR_BADV,
+            env->CSR_DERA, vector, env->CSR_ECFG, env->CSR_ESTAT);
     } else {
         if (tlbfill) {
             env->pc = env->CSR_TLBRENTRY;
@@ -265,18 +259,16 @@ static void loongarch_cpu_do_interrupt(CPUState *cs)
             env->pc = env->CSR_EENTRY;
             env->pc += EXCODE_MCODE(cause) * vec_size;
         }
-        qemu_log_mask(CPU_LOG_INT,
-                      "%s: PC " TARGET_FMT_lx " ERA " TARGET_FMT_lx
-                      " cause %d%s\n, ESTAT " TARGET_FMT_lx
-                      " EXCFG " TARGET_FMT_lx " BADVA " TARGET_FMT_lx
-                      "BADI " TARGET_FMT_lx " SYS_NUM " TARGET_FMT_lu
-                      " cpu %d asid " TARGET_FMT_lx "\n", __func__, env->pc,
-                      tlbfill ? env->CSR_TLBRERA : env->CSR_ERA,
-                      cause, tlbfill ? "(refill)" : "", env->CSR_ESTAT,
-                      env->CSR_ECFG,
-                      tlbfill ? env->CSR_TLBRBADV : env->CSR_BADV,
-                      env->CSR_BADI, env->gpr[11], cs->cpu_index,
-                      env->CSR_ASID);
+        qemu_log_mask(
+            CPU_LOG_INT,
+            "%s: PC " TARGET_FMT_lx " ERA " TARGET_FMT_lx
+            " cause %d%s\n, ESTAT " TARGET_FMT_lx " EXCFG " TARGET_FMT_lx
+            " BADVA " TARGET_FMT_lx "BADI " TARGET_FMT_lx
+            " SYS_NUM " TARGET_FMT_lu " cpu %d asid " TARGET_FMT_lx "\n",
+            __func__, env->pc, tlbfill ? env->CSR_TLBRERA : env->CSR_ERA, cause,
+            tlbfill ? "(refill)" : "", env->CSR_ESTAT, env->CSR_ECFG,
+            tlbfill ? env->CSR_TLBRBADV : env->CSR_BADV, env->CSR_BADI,
+            env->gpr[11], cs->cpu_index, env->CSR_ASID);
     }
     cs->exception_index = -1;
 }
@@ -367,7 +359,7 @@ static void loongarch_la464_initfn(Object *obj)
     }
 
     cpu->dtb_compatible = "loongarch,Loongson-3A5000";
-    env->cpucfg[0] = 0x14c010;  /* PRID */
+    env->cpucfg[0] = 0x14c010; /* PRID */
 
     uint32_t data = 0;
     data = FIELD_DP32(data, CPUCFG1, ARCH, 2);
@@ -541,8 +533,8 @@ static void loongarch_cpu_realizefn(DeviceState *dev, Error **errp)
 }
 
 #ifndef CONFIG_USER_ONLY
-static void loongarch_qemu_write(void *opaque, hwaddr addr,
-                                 uint64_t val, unsigned size)
+static void loongarch_qemu_write(void *opaque, hwaddr addr, uint64_t val,
+                                 unsigned size)
 {
 }
 
@@ -557,7 +549,7 @@ static uint64_t loongarch_qemu_read(void *opaque, hwaddr addr, unsigned size)
     case VENDOR_REG:
         return 0x6e6f73676e6f6f4cULL; /* "Loongson" */
     case CPUNAME_REG:
-        return 0x303030354133ULL;     /* "3A5000" */
+        return 0x303030354133ULL; /* "3A5000" */
     case MISC_FUNC_REG:
         return 1ULL << IOCSRM_EXTIOI_EN;
     }
@@ -588,10 +580,10 @@ static void loongarch_cpu_init(Object *obj)
 #ifndef CONFIG_USER_ONLY
     CPULoongArchState *env = &cpu->env;
     qdev_init_gpio_in(DEVICE(cpu), loongarch_cpu_set_irq, N_IRQS);
-    timer_init_ns(&cpu->timer, QEMU_CLOCK_VIRTUAL,
-                  &loongarch_constant_timer_cb, cpu);
-    memory_region_init_io(&env->system_iocsr, OBJECT(cpu), NULL,
-                      env, "iocsr", UINT64_MAX);
+    timer_init_ns(&cpu->timer, QEMU_CLOCK_VIRTUAL, &loongarch_constant_timer_cb,
+                  cpu);
+    memory_region_init_io(&env->system_iocsr, OBJECT(cpu), NULL, env, "iocsr",
+                          UINT64_MAX);
     address_space_init(&env->address_space_iocsr, &env->system_iocsr, "IOCSR");
     memory_region_init_io(&env->iocsr_mem, OBJECT(cpu), &loongarch_qemu_ops,
                           NULL, "iocsr_misc", 0x428);
@@ -605,16 +597,16 @@ static ObjectClass *loongarch_cpu_class_by_name(const char *cpu_model)
 
     oc = object_class_by_name(cpu_model);
     if (!oc) {
-        g_autofree char *typename
-            = g_strdup_printf(LOONGARCH_CPU_TYPE_NAME("%s"), cpu_model);
+        g_autofree char *typename =
+            g_strdup_printf(LOONGARCH_CPU_TYPE_NAME("%s"), cpu_model);
         oc = object_class_by_name(typename);
         if (!oc) {
             return NULL;
         }
     }
 
-    if (object_class_dynamic_cast(oc, TYPE_LOONGARCH_CPU)
-        && !object_class_is_abstract(oc)) {
+    if (object_class_dynamic_cast(oc, TYPE_LOONGARCH_CPU) &&
+        !object_class_is_abstract(oc)) {
         return oc;
     }
     return NULL;
@@ -649,7 +641,8 @@ void loongarch_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     qemu_fprintf(f, "BADV=%016" PRIx64 "\n", env->CSR_BADV);
     qemu_fprintf(f, "BADI=%016" PRIx64 "\n", env->CSR_BADI);
     qemu_fprintf(f, "EENTRY=%016" PRIx64 "\n", env->CSR_EENTRY);
-    qemu_fprintf(f, "PRCFG1=%016" PRIx64 ", PRCFG2=%016" PRIx64 ","
+    qemu_fprintf(f,
+                 "PRCFG1=%016" PRIx64 ", PRCFG2=%016" PRIx64 ","
                  " PRCFG3=%016" PRIx64 "\n",
                  env->CSR_PRCFG1, env->CSR_PRCFG3, env->CSR_PRCFG3);
     qemu_fprintf(f, "TLBRENTRY=%016" PRIx64 "\n", env->CSR_TLBRENTRY);
@@ -659,7 +652,8 @@ void loongarch_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     /* fpr */
     if (flags & CPU_DUMP_FPU) {
         for (i = 0; i < 32; i++) {
-            qemu_fprintf(f, " %s %016" PRIx64, fregnames[i], env->fpr[i].vreg.D(0));
+            qemu_fprintf(f, " %s %016" PRIx64, fregnames[i],
+                         env->fpr[i].vreg.D(0));
             if ((i & 3) == 3) {
                 qemu_fprintf(f, "\n");
             }
@@ -732,11 +726,10 @@ static void loongarch_cpu_class_init(ObjectClass *c, void *data)
 #endif
 }
 
-#define DEFINE_LOONGARCH_CPU_TYPE(model, initfn) \
-    { \
-        .parent = TYPE_LOONGARCH_CPU, \
-        .instance_init = initfn, \
-        .name = LOONGARCH_CPU_TYPE_NAME(model), \
+#define DEFINE_LOONGARCH_CPU_TYPE(model, initfn)               \
+    {                                                          \
+        .parent = TYPE_LOONGARCH_CPU, .instance_init = initfn, \
+        .name = LOONGARCH_CPU_TYPE_NAME(model),                \
     }
 
 static const TypeInfo loongarch_cpu_type_infos[] = {

@@ -38,8 +38,7 @@ static void check_unavailable_features(const S390CPUModel *max_model,
     }
 
     /* detect missing features if any to properly report them */
-    bitmap_andnot(missing, model->features, max_model->features,
-                  S390_FEAT_MAX);
+    bitmap_andnot(missing, model->features, max_model->features, S390_FEAT_MAX);
     if (!bitmap_empty(missing, S390_FEAT_MAX)) {
         s390_feat_bitmap_to_ascii(missing, unavailable, list_add_feat);
     }
@@ -214,8 +213,8 @@ static void cpu_info_from_model(CpuModelInfo *info, const S390CPUModel *model,
 }
 
 CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-                                                      CpuModelInfo *model,
-                                                      Error **errp)
+                                                     CpuModelInfo *model,
+                                                     Error **errp)
 {
     Error *err = NULL;
     CpuModelExpansionInfo *expansion_info = NULL;
@@ -245,14 +244,14 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
 
 static void list_add_feat(const char *name, void *opaque)
 {
-    strList **last = (strList **) opaque;
+    strList **last = (strList **)opaque;
 
     QAPI_LIST_PREPEND(*last, g_strdup(name));
 }
 
 CpuModelCompareInfo *qmp_query_cpu_model_comparison(CpuModelInfo *infoa,
-                                                     CpuModelInfo *infob,
-                                                     Error **errp)
+                                                    CpuModelInfo *infob,
+                                                    Error **errp)
 {
     Error *err = NULL;
     CpuModelCompareResult feat_result, gen_result;
@@ -298,9 +297,8 @@ CpuModelCompareInfo *qmp_query_cpu_model_comparison(CpuModelInfo *infoa,
         feat_result = CPU_MODEL_COMPARE_RESULT_IDENTICAL;
     } else {
         bitmap_andnot(missing, modela.features, modelb.features, S390_FEAT_MAX);
-        s390_feat_bitmap_to_ascii(missing,
-                                  &compare_info->responsible_properties,
-                                  list_add_feat);
+        s390_feat_bitmap_to_ascii(
+            missing, &compare_info->responsible_properties, list_add_feat);
         bitmap_andnot(added, modelb.features, modela.features, S390_FEAT_MAX);
         s390_feat_bitmap_to_ascii(added, &compare_info->responsible_properties,
                                   list_add_feat);
@@ -327,8 +325,8 @@ CpuModelCompareInfo *qmp_query_cpu_model_comparison(CpuModelInfo *infoa,
 }
 
 CpuModelBaselineInfo *qmp_query_cpu_model_baseline(CpuModelInfo *infoa,
-                                                    CpuModelInfo *infob,
-                                                    Error **errp)
+                                                   CpuModelInfo *infob,
+                                                   Error **errp)
 {
     Error *err = NULL;
     CpuModelBaselineInfo *baseline_info;
@@ -372,13 +370,13 @@ CpuModelBaselineInfo *qmp_query_cpu_model_baseline(CpuModelInfo *infoa,
         max_gen_ga = modela.def->ec_ga;
     }
 
-    model.def = s390_find_cpu_def(cpu_type, max_gen, max_gen_ga,
-                                  model.features);
+    model.def =
+        s390_find_cpu_def(cpu_type, max_gen, max_gen_ga, model.features);
 
     /* models without early base features (esan3) are bad */
     if (!model.def) {
         error_setg(errp, "No compatible CPU model could be created as"
-                   " important base features are disabled");
+                         " important base features are disabled");
         return NULL;
     }
 

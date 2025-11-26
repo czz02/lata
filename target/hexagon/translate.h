@@ -126,14 +126,13 @@ static inline void ctx_log_reg_read_pair(DisasContext *ctx, int rnum)
     ctx_log_reg_read(ctx, rnum + 1);
 }
 
-intptr_t ctx_future_vreg_off(DisasContext *ctx, int regnum,
-                             int num, bool alloc_ok);
-intptr_t ctx_tmp_vreg_off(DisasContext *ctx, int regnum,
-                          int num, bool alloc_ok);
+intptr_t ctx_future_vreg_off(DisasContext *ctx, int regnum, int num,
+                             bool alloc_ok);
+intptr_t ctx_tmp_vreg_off(DisasContext *ctx, int regnum, int num,
+                          bool alloc_ok);
 
-static inline void ctx_log_vreg_write(DisasContext *ctx,
-                                      int rnum, VRegWriteType type,
-                                      bool is_predicated)
+static inline void ctx_log_vreg_write(DisasContext *ctx, int rnum,
+                                      VRegWriteType type, bool is_predicated)
 {
     if (type != EXT_TMP) {
         if (!test_bit(rnum, ctx->vregs_updated)) {
@@ -158,8 +157,8 @@ static inline void ctx_log_vreg_write(DisasContext *ctx,
     }
 }
 
-static inline void ctx_log_vreg_write_pair(DisasContext *ctx,
-                                           int rnum, VRegWriteType type,
+static inline void ctx_log_vreg_write_pair(DisasContext *ctx, int rnum,
+                                           VRegWriteType type,
                                            bool is_predicated)
 {
     ctx_log_vreg_write(ctx, rnum ^ 0, type, is_predicated);
@@ -177,8 +176,7 @@ static inline void ctx_log_vreg_read_pair(DisasContext *ctx, int rnum)
     ctx_log_vreg_read(ctx, rnum ^ 1);
 }
 
-static inline void ctx_log_qreg_write(DisasContext *ctx,
-                                      int rnum)
+static inline void ctx_log_qreg_write(DisasContext *ctx, int rnum)
 {
     ctx->qreg_log[ctx->qreg_log_idx] = rnum;
     ctx->qreg_log_idx++;
@@ -208,14 +206,14 @@ extern TCGv hex_vstore_pending[VSTORES_MAX];
 bool is_gather_store_insn(DisasContext *ctx);
 void process_store(DisasContext *ctx, int slot_num);
 
-FIELD(PROBE_PKT_SCALAR_STORE_S0, MMU_IDX,       0, 2)
+FIELD(PROBE_PKT_SCALAR_STORE_S0, MMU_IDX, 0, 2)
 FIELD(PROBE_PKT_SCALAR_STORE_S0, IS_PREDICATED, 2, 1)
 
-FIELD(PROBE_PKT_SCALAR_HVX_STORES, HAS_ST0,        0, 1)
-FIELD(PROBE_PKT_SCALAR_HVX_STORES, HAS_ST1,        1, 1)
+FIELD(PROBE_PKT_SCALAR_HVX_STORES, HAS_ST0, 0, 1)
+FIELD(PROBE_PKT_SCALAR_HVX_STORES, HAS_ST1, 1, 1)
 FIELD(PROBE_PKT_SCALAR_HVX_STORES, HAS_HVX_STORES, 2, 1)
-FIELD(PROBE_PKT_SCALAR_HVX_STORES, S0_IS_PRED,     3, 1)
-FIELD(PROBE_PKT_SCALAR_HVX_STORES, S1_IS_PRED,     4, 1)
-FIELD(PROBE_PKT_SCALAR_HVX_STORES, MMU_IDX,        5, 2)
+FIELD(PROBE_PKT_SCALAR_HVX_STORES, S0_IS_PRED, 3, 1)
+FIELD(PROBE_PKT_SCALAR_HVX_STORES, S1_IS_PRED, 4, 1)
+FIELD(PROBE_PKT_SCALAR_HVX_STORES, MMU_IDX, 5, 2)
 
 #endif

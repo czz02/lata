@@ -32,8 +32,7 @@
 
 static struct target_sigaction sigact_table[TARGET_NSIG];
 
-static void host_signal_handler(int host_signum, siginfo_t *info,
-                                void *puc);
+static void host_signal_handler(int host_signum, siginfo_t *info, void *puc);
 
 /* Fallback addresses into sigtramp page. */
 abi_ulong default_sigreturn;
@@ -50,8 +49,8 @@ abi_ulong default_rt_sigreturn;
 QEMU_BUILD_BUG_ON(__SIGRTMAX + 1 != _NSIG);
 #endif
 static uint8_t host_to_target_signal_table[_NSIG] = {
-#define MAKE_SIG_ENTRY(sig)     [sig] = TARGET_##sig,
-        MAKE_SIGNAL_LIST
+#define MAKE_SIG_ENTRY(sig) [sig] = TARGET_##sig,
+    MAKE_SIGNAL_LIST
 #undef MAKE_SIG_ENTRY
     /* next signals stay the same */
 };
@@ -90,8 +89,7 @@ static inline int target_sigismember(const target_sigset_t *set, int signum)
     return ((set->sig[signum / TARGET_NSIG_BPW] & mask) != 0);
 }
 
-void host_to_target_sigset_internal(target_sigset_t *d,
-                                    const sigset_t *s)
+void host_to_target_sigset_internal(target_sigset_t *d, const sigset_t *s)
 {
     int host_sig, target_sig;
     target_sigemptyset(d);
@@ -112,12 +110,11 @@ void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
     int i;
 
     host_to_target_sigset_internal(&d1, s);
-    for(i = 0;i < TARGET_NSIG_WORDS; i++)
+    for (i = 0; i < TARGET_NSIG_WORDS; i++)
         d->sig[i] = tswapal(d1.sig[i]);
 }
 
-void target_to_host_sigset_internal(sigset_t *d,
-                                    const target_sigset_t *s)
+void target_to_host_sigset_internal(sigset_t *d, const target_sigset_t *s)
 {
     int host_sig, target_sig;
     sigemptyset(d);
@@ -137,27 +134,25 @@ void target_to_host_sigset(sigset_t *d, const target_sigset_t *s)
     target_sigset_t s1;
     int i;
 
-    for(i = 0;i < TARGET_NSIG_WORDS; i++)
+    for (i = 0; i < TARGET_NSIG_WORDS; i++)
         s1.sig[i] = tswapal(s->sig[i]);
     target_to_host_sigset_internal(d, &s1);
 }
 
-void host_to_target_old_sigset(abi_ulong *old_sigset,
-                               const sigset_t *sigset)
+void host_to_target_old_sigset(abi_ulong *old_sigset, const sigset_t *sigset)
 {
     target_sigset_t d;
     host_to_target_sigset(&d, sigset);
     *old_sigset = d.sig[0];
 }
 
-void target_to_host_old_sigset(sigset_t *sigset,
-                               const abi_ulong *old_sigset)
+void target_to_host_old_sigset(sigset_t *sigset, const abi_ulong *old_sigset)
 {
     target_sigset_t d;
     int i;
 
     d.sig[0] = *old_sigset;
-    for(i = 1;i < TARGET_NSIG_WORDS; i++)
+    for (i = 1; i < TARGET_NSIG_WORDS; i++)
         d.sig[i] = 0;
     target_to_host_sigset(sigset, &d);
 }
@@ -181,7 +176,8 @@ int block_signals(void)
 // borrow from musl-libc : src/signal/sigorset.c
 #define SST_SIZE (_NSIG / 8 / sizeof(long))
 
-static inline int sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
+static inline int sigorset(sigset_t *dest, const sigset_t *left,
+                           const sigset_t *right)
 {
     unsigned long i = 0, *d = (void *)dest, *l = (void *)left,
                   *r = (void *)right;
@@ -253,16 +249,16 @@ int on_sig_stack(unsigned long sp)
 {
     TaskState *ts = (TaskState *)thread_cpu->opaque;
 
-    return (sp - ts->sigaltstack_used.ss_sp
-            < ts->sigaltstack_used.ss_size);
+    return (sp - ts->sigaltstack_used.ss_sp < ts->sigaltstack_used.ss_size);
 }
 
 int sas_ss_flags(unsigned long sp)
 {
     TaskState *ts = (TaskState *)thread_cpu->opaque;
 
-    return (ts->sigaltstack_used.ss_size == 0 ? SS_DISABLE
-            : on_sig_stack(sp) ? SS_ONSTACK : 0);
+    return (ts->sigaltstack_used.ss_size == 0 ? SS_DISABLE :
+            on_sig_stack(sp)                  ? SS_ONSTACK :
+                                                0);
 }
 
 abi_ulong target_sigsp(abi_ulong sp, struct target_sigaction *ka)
@@ -386,9 +382,9 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
             if (si_code == CLD_EXITED)
                 tinfo->_sifields._sigchld._status = info->si_status;
             else
-                tinfo->_sifields._sigchld._status
-                    = host_to_target_signal(info->si_status & 0x7f)
-                        | (info->si_status & ~0x7f);
+                tinfo->_sifields._sigchld._status =
+                    host_to_target_signal(info->si_status & 0x7f) |
+                    (info->si_status & ~0x7f);
             tinfo->_sifields._sigchld._utime = info->si_utime;
             tinfo->_sifields._sigchld._stime = info->si_stime;
             si_type = QEMU_SI_CHLD;
@@ -403,8 +399,8 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
             tinfo->_sifields._rt._pid = info->si_pid;
             tinfo->_sifields._rt._uid = info->si_uid;
             /* XXX: potential problem if 64 bit */
-            tinfo->_sifields._rt._sigval.sival_ptr
-                = (abi_ulong)(unsigned long)info->si_value.sival_ptr;
+            tinfo->_sifields._rt._sigval.sival_ptr =
+                (abi_ulong)(unsigned long)info->si_value.sival_ptr;
             si_type = QEMU_SI_RT;
             break;
         }
@@ -414,8 +410,7 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
     tinfo->si_code = deposit32(si_code, 16, 16, si_type);
 }
 
-void tswap_siginfo(target_siginfo_t *tinfo,
-                   const target_siginfo_t *info)
+void tswap_siginfo(target_siginfo_t *tinfo, const target_siginfo_t *info)
 {
     int si_type = extract32(info->si_code, 16, 16);
     int si_code = sextract32(info->si_code, 0, 16);
@@ -497,7 +492,7 @@ void target_to_host_siginfo(siginfo_t *info, const target_siginfo_t *tinfo)
     info->si_value.sival_ptr = (void *)(long)sival_ptr;
 }
 
-static int fatal_signal (int sig)
+static int fatal_signal(int sig)
 {
     switch (sig) {
     case TARGET_SIGCHLD:
@@ -588,7 +583,7 @@ void signal_init(void)
     sigfillset(&act.sa_mask);
     act.sa_flags = SA_SIGINFO;
     act.sa_sigaction = host_signal_handler;
-    for(i = 1; i <= TARGET_NSIG; i++) {
+    for (i = 1; i <= TARGET_NSIG; i++) {
 #ifdef CONFIG_GPROF
         if (i == TARGET_SIGPROF) {
             continue;
@@ -607,7 +602,7 @@ void signal_init(void)
            SIGSEGV and SIGBUS, to detect exceptions.  We can not just
            trap all signals because it affects syscall interrupt
            behavior.  But do trap all default-fatal signals.  */
-        if (fatal_signal (i))
+        if (fatal_signal(i))
             sigaction(host_sig, &act, NULL);
     }
 }
@@ -674,8 +669,7 @@ void cpu_loop_exit_sigsegv(CPUState *cpu, target_ulong addr,
     }
 
     force_sig_fault(TARGET_SIGSEGV,
-                    maperr ? TARGET_SEGV_MAPERR : TARGET_SEGV_ACCERR,
-                    addr);
+                    maperr ? TARGET_SEGV_MAPERR : TARGET_SEGV_ACCERR, addr);
     cpu->exception_index = EXCP_INTERRUPT;
     cpu_loop_exit_restore(cpu, ra);
 }
@@ -695,8 +689,8 @@ void cpu_loop_exit_sigbus(CPUState *cpu, target_ulong addr,
 }
 
 /* abort execution with signal */
-static G_NORETURN
-void dump_core_and_abort(CPUArchState *cpu_env, int target_sig)
+static G_NORETURN void dump_core_and_abort(CPUArchState *cpu_env,
+                                           int target_sig)
 {
     int host_sig = 0;
     struct sigaction act;
@@ -754,8 +748,8 @@ static inline void rewind_if_in_safe_syscall(void *puc)
     host_sigcontext *uc = (host_sigcontext *)puc;
     uintptr_t pcreg = host_signal_pc(uc);
 
-    if (pcreg > (uintptr_t)safe_syscall_start
-        && pcreg < (uintptr_t)safe_syscall_end) {
+    if (pcreg > (uintptr_t)safe_syscall_start &&
+        pcreg < (uintptr_t)safe_syscall_end) {
         host_signal_set_pc(uc, (uintptr_t)safe_syscall_start);
     }
 }
@@ -909,7 +903,7 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr,
     }
     ret = 0;
 
- out:
+out:
     if (uoss) {
         unlock_user_struct(uoss, uoss_addr, 0);
     }
@@ -991,7 +985,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
             if (k->_sa_handler == TARGET_SIG_IGN) {
                 act1.sa_sigaction = (void *)SIG_IGN;
             } else if (k->_sa_handler == TARGET_SIG_DFL) {
-                if (fatal_signal (sig))
+                if (fatal_signal(sig))
                     act1.sa_sigaction = host_signal_handler;
                 else
                     act1.sa_sigaction = (void *)SIG_DFL;
@@ -1028,13 +1022,13 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
     }
 
     if (handler == TARGET_SIG_DFL) {
-        /* default handler : ignore some signal. The other are job control or fatal */
-        if (sig == TARGET_SIGTSTP || sig == TARGET_SIGTTIN || sig == TARGET_SIGTTOU) {
-            kill(getpid(),SIGSTOP);
-        } else if (sig != TARGET_SIGCHLD &&
-                   sig != TARGET_SIGURG &&
-                   sig != TARGET_SIGWINCH &&
-                   sig != TARGET_SIGCONT) {
+        /* default handler : ignore some signal. The other are job control or
+         * fatal */
+        if (sig == TARGET_SIGTSTP || sig == TARGET_SIGTTIN ||
+            sig == TARGET_SIGTTOU) {
+            kill(getpid(), SIGSTOP);
+        } else if (sig != TARGET_SIGCHLD && sig != TARGET_SIGURG &&
+                   sig != TARGET_SIGWINCH && sig != TARGET_SIGCONT) {
             dump_core_and_abort(cpu_env, sig);
         }
     } else if (handler == TARGET_SIG_IGN) {
@@ -1056,8 +1050,8 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
         host_to_target_sigset_internal(&target_old_set, &ts->signal_mask);
 
         /* block signals in the handler */
-        blocked_set = ts->in_sigsuspend ?
-            &ts->sigsuspend_mask : &ts->signal_mask;
+        blocked_set =
+            ts->in_sigsuspend ? &ts->sigsuspend_mask : &ts->signal_mask;
         sigorset(&ts->signal_mask, blocked_set, &set);
         ts->in_sigsuspend = 0;
 
@@ -1109,8 +1103,9 @@ void process_pending_signals(CPUArchState *cpu_env)
              * to block a synchronous signal since it could then just end up
              * looping round and round indefinitely.
              */
-            if (sigismember(&ts->signal_mask, target_to_host_signal_table[sig])
-                || sigact_table[sig - 1]._sa_handler == TARGET_SIG_IGN) {
+            if (sigismember(&ts->signal_mask,
+                            target_to_host_signal_table[sig]) ||
+                sigact_table[sig - 1]._sa_handler == TARGET_SIG_IGN) {
                 sigdelset(&ts->signal_mask, target_to_host_signal_table[sig]);
                 sigact_table[sig - 1]._sa_handler = TARGET_SIG_DFL;
             }
@@ -1119,12 +1114,11 @@ void process_pending_signals(CPUArchState *cpu_env)
         }
 
         for (sig = 1; sig <= TARGET_NSIG; sig++) {
-            blocked_set = ts->in_sigsuspend ?
-                &ts->sigsuspend_mask : &ts->signal_mask;
+            blocked_set =
+                ts->in_sigsuspend ? &ts->sigsuspend_mask : &ts->signal_mask;
 
             if (ts->sigtab[sig - 1].pending &&
-                (!sigismember(blocked_set,
-                              target_to_host_signal_table[sig]))) {
+                (!sigismember(blocked_set, target_to_host_signal_table[sig]))) {
                 handle_pending_signal(cpu_env, sig, &ts->sigtab[sig - 1]);
                 /* Restart scan from the beginning, as handle_pending_signal
                  * might have resulted in a new synchronous signal (eg SIGSEGV).

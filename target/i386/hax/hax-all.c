@@ -36,11 +36,11 @@
 
 #define DEBUG_HAX 0
 
-#define DPRINTF(fmt, ...) \
-    do { \
-        if (DEBUG_HAX) { \
-            fprintf(stdout, fmt, ## __VA_ARGS__); \
-        } \
+#define DPRINTF(fmt, ...)                        \
+    do {                                         \
+        if (DEBUG_HAX) {                         \
+            fprintf(stdout, fmt, ##__VA_ARGS__); \
+        }                                        \
     } while (0)
 
 /* Current version */
@@ -81,14 +81,11 @@ static int hax_get_capability(struct hax_state *hax)
 
     if ((cap->wstatus & HAX_CAP_WORKSTATUS_MASK) == HAX_CAP_STATUS_NOTWORKING) {
         if (cap->winfo & HAX_CAP_FAILREASON_VT) {
-            DPRINTF
-                ("VTX feature is not enabled, HAX driver will not work.\n");
+            DPRINTF("VTX feature is not enabled, HAX driver will not work.\n");
         } else if (cap->winfo & HAX_CAP_FAILREASON_NX) {
-            DPRINTF
-                ("NX feature is not enabled, HAX driver will not work.\n");
+            DPRINTF("NX feature is not enabled, HAX driver will not work.\n");
         }
         return -ENXIO;
-
     }
 
     if (!(cap->winfo & HAX_CAP_UG)) {
@@ -175,7 +172,7 @@ int hax_vcpu_create(int id)
     }
     return 0;
 
-  error:
+error:
     /* vcpu and tunnel will be closed automatically */
     if (vcpu && !hax_invalid_fd(vcpu->fd)) {
         hax_close_fd(vcpu->fd);
@@ -244,7 +241,8 @@ struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus)
     }
 
     if (max_cpus > HAX_MAX_VCPU) {
-        fprintf(stderr, "Maximum VCPU number QEMU supported is %d\n", HAX_MAX_VCPU);
+        fprintf(stderr, "Maximum VCPU number QEMU supported is %d\n",
+                HAX_MAX_VCPU);
         return NULL;
     }
 
@@ -271,7 +269,7 @@ struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus)
     hax->vm = vm;
     return vm;
 
-  error:
+error:
     g_free(vm);
     hax->vm = NULL;
     return NULL;
@@ -340,7 +338,7 @@ static int hax_init(ram_addr_t ram_size, int max_cpus)
     hax_notify_qemu_version(hax->vm->fd, &qversion);
 
     return ret;
-  error:
+error:
     if (hax->vm) {
         hax_vm_destroy(hax->vm);
     }
@@ -361,9 +359,10 @@ static int hax_accel_init(MachineState *ms)
         fprintf(stdout, "HAX is %s and emulator runs in %s mode.\n",
                 !ret ? "working" : "not working",
                 !ret ? "fast virt" : "emulation");
-        fprintf(stdout,
-                "NOTE: HAX is deprecated and will be removed in a future release.\n"
-                "      Use 'whpx' (on Windows) or 'hvf' (on macOS) instead.\n");
+        fprintf(
+            stdout,
+            "NOTE: HAX is deprecated and will be removed in a future release.\n"
+            "      Use 'whpx' (on Windows) or 'hvf' (on macOS) instead.\n");
     }
     return ret;
 }
@@ -400,8 +399,8 @@ static int hax_handle_io(CPUArchState *env, uint32_t df, uint16_t port,
         ptr = buffer + size * count - size;
     }
     for (i = 0; i < count; i++) {
-        address_space_rw(&address_space_io, port, attrs,
-                         ptr, size, direction == HAX_EXIT_IO_OUT);
+        address_space_rw(&address_space_io, port, attrs, ptr, size,
+                         direction == HAX_EXIT_IO_OUT);
         if (!df) {
             ptr += size;
         } else {
@@ -506,15 +505,13 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
     }
 
     if (cpu->interrupt_request & CPU_INTERRUPT_INIT) {
-        DPRINTF("\nhax_vcpu_hax_exec: handling INIT for %d\n",
-                cpu->cpu_index);
+        DPRINTF("\nhax_vcpu_hax_exec: handling INIT for %d\n", cpu->cpu_index);
         do_cpu_init(x86_cpu);
         hax_vcpu_sync_state(env, 1);
     }
 
     if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
-        DPRINTF("hax_vcpu_hax_exec: handling SIPI for %d\n",
-                cpu->cpu_index);
+        DPRINTF("hax_vcpu_hax_exec: handling SIPI for %d\n", cpu->cpu_index);
         hax_vcpu_sync_state(env, 0);
         do_cpu_sipi(x86_cpu);
         hax_vcpu_sync_state(env, 1);
@@ -559,11 +556,11 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
         switch (ht->_exit_status) {
         case HAX_EXIT_IO:
             ret = hax_handle_io(env, ht->pio._df, ht->pio._port,
-                            ht->pio._direction,
-                            ht->pio._size, ht->pio._count, vcpu->iobuf);
+                                ht->pio._direction, ht->pio._size,
+                                ht->pio._count, vcpu->iobuf);
             break;
         case HAX_EXIT_FAST_MMIO:
-            ret = hax_handle_fastmmio(env, (struct hax_fastmmio *) vcpu->iobuf);
+            ret = hax_handle_fastmmio(env, (struct hax_fastmmio *)vcpu->iobuf);
             break;
         /* Guest state changed, currently only for shutdown */
         case HAX_EXIT_STATECHANGE:
@@ -663,7 +660,8 @@ void hax_cpu_synchronize_post_init(CPUState *cpu)
     run_on_cpu(cpu, do_hax_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
 }
 
-static void do_hax_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
+static void do_hax_cpu_synchronize_pre_loadvm(CPUState *cpu,
+                                              run_on_cpu_data arg)
 {
     cpu->vcpu_dirty = true;
 }
@@ -718,13 +716,11 @@ static void get_seg(SegmentCache *lhs, const struct segment_desc_t *rhs)
     lhs->selector = rhs->selector;
     lhs->base = rhs->base;
     lhs->limit = rhs->limit;
-    lhs->flags = (rhs->type << DESC_TYPE_SHIFT)
-        | (rhs->present * DESC_P_MASK)
-        | (rhs->dpl << DESC_DPL_SHIFT)
-        | (rhs->operand_size << DESC_B_SHIFT)
-        | (rhs->desc * DESC_S_MASK)
-        | (rhs->long_mode << DESC_L_SHIFT)
-        | (rhs->granularity * DESC_G_MASK) | (rhs->available * DESC_AVL_MASK);
+    lhs->flags =
+        (rhs->type << DESC_TYPE_SHIFT) | (rhs->present * DESC_P_MASK) |
+        (rhs->dpl << DESC_DPL_SHIFT) | (rhs->operand_size << DESC_B_SHIFT) |
+        (rhs->desc * DESC_S_MASK) | (rhs->long_mode << DESC_L_SHIFT) |
+        (rhs->granularity * DESC_G_MASK) | (rhs->available * DESC_AVL_MASK);
 }
 
 static void set_seg(struct segment_desc_t *lhs, const SegmentCache *rhs)
@@ -794,8 +790,8 @@ static int hax_set_segments(CPUArchState *env, struct vcpu_state_t *sregs)
 
         if (env->cr[0] & CR0_PE_MASK) {
             /* force ss cpl to cs cpl */
-            sregs->_ss.selector = (sregs->_ss.selector & ~3) |
-                                  (sregs->_cs.selector & 3);
+            sregs->_ss.selector =
+                (sregs->_ss.selector & ~3) | (sregs->_cs.selector & 3);
             sregs->_ss.dpl = sregs->_ss.selector & 3;
         }
     }

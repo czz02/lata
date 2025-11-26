@@ -100,20 +100,19 @@ const VMStateDescription vms_avr_cpu = {
     .name = "cpu",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT32(env.pc_w, AVRCPU),
-        VMSTATE_UINT32(env.sp, AVRCPU),
-        VMSTATE_UINT32(env.skip, AVRCPU),
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINT32(env.pc_w, AVRCPU), VMSTATE_UINT32(env.sp, AVRCPU),
+            VMSTATE_UINT32(env.skip, AVRCPU),
 
-        VMSTATE_UINT32_ARRAY(env.r, AVRCPU, NUMBER_OF_CPU_REGISTERS),
+            VMSTATE_UINT32_ARRAY(env.r, AVRCPU, NUMBER_OF_CPU_REGISTERS),
 
-        VMSTATE_SINGLE(env, AVRCPU, 0, vms_sreg, CPUAVRState),
-        VMSTATE_SINGLE(env.rampD, AVRCPU, 0, vms_rampD, uint32_t),
-        VMSTATE_SINGLE(env.rampX, AVRCPU, 0, vms_rampX, uint32_t),
-        VMSTATE_SINGLE(env.rampY, AVRCPU, 0, vms_rampY, uint32_t),
-        VMSTATE_SINGLE(env.rampZ, AVRCPU, 0, vms_rampZ, uint32_t),
-        VMSTATE_SINGLE(env.eind, AVRCPU, 0, vms_eind, uint32_t),
+            VMSTATE_SINGLE(env, AVRCPU, 0, vms_sreg, CPUAVRState),
+            VMSTATE_SINGLE(env.rampD, AVRCPU, 0, vms_rampD, uint32_t),
+            VMSTATE_SINGLE(env.rampX, AVRCPU, 0, vms_rampX, uint32_t),
+            VMSTATE_SINGLE(env.rampY, AVRCPU, 0, vms_rampY, uint32_t),
+            VMSTATE_SINGLE(env.rampZ, AVRCPU, 0, vms_rampZ, uint32_t),
+            VMSTATE_SINGLE(env.eind, AVRCPU, 0, vms_eind, uint32_t),
 
-        VMSTATE_END_OF_LIST()
-    }
+            VMSTATE_END_OF_LIST() }
 };

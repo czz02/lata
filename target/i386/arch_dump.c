@@ -17,10 +17,10 @@
 #include "elf.h"
 #include "sysemu/memory_mapping.h"
 
-#define ELF_NOTE_SIZE(hdr_size, name_size, desc_size)   \
-    ((DIV_ROUND_UP((hdr_size), 4)                       \
-      + DIV_ROUND_UP((name_size), 4)                    \
-      + DIV_ROUND_UP((desc_size), 4)) * 4)
+#define ELF_NOTE_SIZE(hdr_size, name_size, desc_size)              \
+    ((DIV_ROUND_UP((hdr_size), 4) + DIV_ROUND_UP((name_size), 4) + \
+      DIV_ROUND_UP((desc_size), 4)) *                              \
+     4)
 
 #ifdef TARGET_X86_64
 typedef struct {
@@ -40,9 +40,8 @@ typedef struct {
     char pad3[8];
 } x86_64_elf_prstatus;
 
-static int x86_64_write_elf64_note(WriteCoreDumpFunction f,
-                                   CPUX86State *env, int id,
-                                   DumpState *s)
+static int x86_64_write_elf64_note(WriteCoreDumpFunction f, CPUX86State *env,
+                                   int id, DumpState *s)
 {
     x86_64_user_regs_struct regs;
     Elf64_Nhdr *note;
@@ -57,8 +56,8 @@ static int x86_64_write_elf64_note(WriteCoreDumpFunction f,
     regs.r12 = env->regs[12];
     regs.r11 = env->regs[11];
     regs.r10 = env->regs[10];
-    regs.r9  = env->regs[9];
-    regs.r8  = env->regs[8];
+    regs.r9 = env->regs[9];
+    regs.r8 = env->regs[8];
     regs.rbp = env->regs[R_EBP];
     regs.rsp = env->regs[R_ESP];
     regs.rdi = env->regs[R_EDI];
@@ -91,7 +90,7 @@ static int x86_64_write_elf64_note(WriteCoreDumpFunction f,
     memcpy(buf, name, name_size);
     buf += ROUND_UP(name_size, 4);
     memcpy(buf + 32, &id, 4); /* pr_pid */
-    buf += descsz - sizeof(x86_64_user_regs_struct)-sizeof(target_ulong);
+    buf += descsz - sizeof(x86_64_user_regs_struct) - sizeof(target_ulong);
     memcpy(buf, &regs, sizeof(x86_64_user_regs_struct));
 
     ret = f(note, note_size, s);
@@ -179,8 +178,8 @@ static int x86_write_elf64_note(WriteCoreDumpFunction f, CPUX86State *env,
     return 0;
 }
 
-int x86_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                             int cpuid, DumpState *s)
+int x86_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                             DumpState *s)
 {
     X86CPU *cpu = X86_CPU(cs);
     int ret;
@@ -200,8 +199,8 @@ int x86_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
     return ret;
 }
 
-int x86_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-                             int cpuid, DumpState *s)
+int x86_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                             DumpState *s)
 {
     X86CPU *cpu = X86_CPU(cs);
     x86_elf_prstatus prstatus;
@@ -293,8 +292,8 @@ static void qemu_get_cpustate(QEMUCPUState *s, CPUX86State *env)
     s->rsp = env->regs[R_ESP];
     s->rbp = env->regs[R_EBP];
 #ifdef TARGET_X86_64
-    s->r8  = env->regs[8];
-    s->r9  = env->regs[9];
+    s->r8 = env->regs[8];
+    s->r9 = env->regs[9];
     s->r10 = env->regs[10];
     s->r11 = env->regs[11];
     s->r12 = env->regs[12];
@@ -327,10 +326,8 @@ static void qemu_get_cpustate(QEMUCPUState *s, CPUX86State *env)
 #endif
 }
 
-static inline int cpu_write_qemu_note(WriteCoreDumpFunction f,
-                                      CPUX86State *env,
-                                      DumpState *s,
-                                      int type)
+static inline int cpu_write_qemu_note(WriteCoreDumpFunction f, CPUX86State *env,
+                                      DumpState *s, int type)
 {
     QEMUCPUState state;
     Elf64_Nhdr *note64;
@@ -350,7 +347,8 @@ static inline int cpu_write_qemu_note(WriteCoreDumpFunction f,
         note_head_size = sizeof(Elf64_Nhdr);
     }
     note_size = (DIV_ROUND_UP(note_head_size, 4) + DIV_ROUND_UP(name_size, 4) +
-                DIV_ROUND_UP(descsz, 4)) * 4;
+                 DIV_ROUND_UP(descsz, 4)) *
+                4;
     note = g_malloc0(note_size);
     if (type == 0) {
         note32 = note;
@@ -417,7 +415,7 @@ int cpu_get_dump_info(ArchDumpInfo *info,
     } else {
         info->d_class = ELFCLASS32;
 
-        QTAILQ_FOREACH(block, &guest_phys_blocks->head, next) {
+        QTAILQ_FOREACH (block, &guest_phys_blocks->head, next) {
             if (block->target_end > UINT_MAX) {
                 /* The memory size is greater than 4G */
                 info->d_class = ELFCLASS64;

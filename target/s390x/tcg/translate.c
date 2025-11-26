@@ -23,9 +23,11 @@
 /* #define S390X_DEBUG_DISAS_VERBOSE */
 
 #ifdef S390X_DEBUG_DISAS_VERBOSE
-#  define LOG_DISAS(...) qemu_log(__VA_ARGS__)
+#define LOG_DISAS(...) qemu_log(__VA_ARGS__)
 #else
-#  define LOG_DISAS(...) do { } while (0)
+#define LOG_DISAS(...) \
+    do {               \
+    } while (0)
 #endif
 
 #include "qemu/osdep.h"
@@ -47,7 +49,7 @@
 
 #define HELPER_H "helper.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
 
 /* Information that (most) every instruction needs to manipulate.  */
@@ -131,9 +133,9 @@ enum DisasFieldIndexC {
 
 struct DisasFields {
     uint64_t raw_insn;
-    unsigned op:8;
-    unsigned op2:8;
-    unsigned presentC:16;
+    unsigned op : 8;
+    unsigned op2 : 8;
+    unsigned presentC : 16;
     unsigned int presentO;
     int c[NUM_C_FIELD];
 };
@@ -157,11 +159,15 @@ struct DisasContext {
 
 /* Information carried about a condition to be evaluated.  */
 typedef struct {
-    TCGCond cond:8;
+    TCGCond cond : 8;
     bool is_64;
     union {
-        struct { TCGv_i64 a, b; } s64;
-        struct { TCGv_i32 a, b; } s32;
+        struct {
+            TCGv_i64 a, b;
+        } s64;
+        struct {
+            TCGv_i32 a, b;
+        } s32;
     } u;
 } DisasCompare;
 
@@ -199,15 +205,12 @@ void s390x_translate_init(void)
 {
     int i;
 
-    psw_addr = tcg_global_mem_new_i64(cpu_env,
-                                      offsetof(CPUS390XState, psw.addr),
-                                      "psw_addr");
-    psw_mask = tcg_global_mem_new_i64(cpu_env,
-                                      offsetof(CPUS390XState, psw.mask),
-                                      "psw_mask");
-    gbea = tcg_global_mem_new_i64(cpu_env,
-                                  offsetof(CPUS390XState, gbea),
-                                  "gbea");
+    psw_addr = tcg_global_mem_new_i64(
+        cpu_env, offsetof(CPUS390XState, psw.addr), "psw_addr");
+    psw_mask = tcg_global_mem_new_i64(
+        cpu_env, offsetof(CPUS390XState, psw.mask), "psw_mask");
+    gbea =
+        tcg_global_mem_new_i64(cpu_env, offsetof(CPUS390XState, gbea), "gbea");
 
     cc_op = tcg_global_mem_new_i32(cpu_env, offsetof(CPUS390XState, cc_op),
                                    "cc_op");
@@ -220,8 +223,7 @@ void s390x_translate_init(void)
 
     for (i = 0; i < 16; i++) {
         snprintf(cpu_reg_names[i], sizeof(cpu_reg_names[0]), "r%d", i);
-        regs[i] = tcg_global_mem_new(cpu_env,
-                                     offsetof(CPUS390XState, regs[i]),
+        regs[i] = tcg_global_mem_new(cpu_env, offsetof(CPUS390XState, regs[i]),
                                      cpu_reg_names[i]);
     }
 }
@@ -356,8 +358,8 @@ static void per_branch(DisasContext *s, bool to_next)
 #endif
 }
 
-static void per_branch_cond(DisasContext *s, TCGCond cond,
-                            TCGv_i64 arg1, TCGv_i64 arg2)
+static void per_branch_cond(DisasContext *s, TCGCond cond, TCGv_i64 arg1,
+                            TCGv_i64 arg2)
 {
 #ifndef CONFIG_USER_ONLY
     if (s->base.tb->flags & FLAG_MASK_PER) {
@@ -505,9 +507,8 @@ static TCGv_i64 get_address(DisasContext *s, int x2, int b2, int d2)
 
 static inline bool live_cc_data(DisasContext *s)
 {
-    return (s->cc_op != CC_OP_DYNAMIC
-            && s->cc_op != CC_OP_STATIC
-            && s->cc_op > 3);
+    return (s->cc_op != CC_OP_DYNAMIC && s->cc_op != CC_OP_STATIC &&
+            s->cc_op > 3);
 }
 
 static inline void gen_op_movi_cc(DisasContext *s, uint32_t val)
@@ -682,26 +683,26 @@ static void account_inline_branch(DisasContext *s, int cc_op)
 /* Table of mask values to comparison codes, given a comparison as input.
    For such, CC=3 should not be possible.  */
 static const TCGCond ltgt_cond[16] = {
-    TCG_COND_NEVER,  TCG_COND_NEVER,     /*    |    |    | x */
-    TCG_COND_GT,     TCG_COND_GT,        /*    |    | GT | x */
-    TCG_COND_LT,     TCG_COND_LT,        /*    | LT |    | x */
-    TCG_COND_NE,     TCG_COND_NE,        /*    | LT | GT | x */
-    TCG_COND_EQ,     TCG_COND_EQ,        /* EQ |    |    | x */
-    TCG_COND_GE,     TCG_COND_GE,        /* EQ |    | GT | x */
-    TCG_COND_LE,     TCG_COND_LE,        /* EQ | LT |    | x */
-    TCG_COND_ALWAYS, TCG_COND_ALWAYS,    /* EQ | LT | GT | x */
+    TCG_COND_NEVER,  TCG_COND_NEVER, /*    |    |    | x */
+    TCG_COND_GT,     TCG_COND_GT, /*    |    | GT | x */
+    TCG_COND_LT,     TCG_COND_LT, /*    | LT |    | x */
+    TCG_COND_NE,     TCG_COND_NE, /*    | LT | GT | x */
+    TCG_COND_EQ,     TCG_COND_EQ, /* EQ |    |    | x */
+    TCG_COND_GE,     TCG_COND_GE, /* EQ |    | GT | x */
+    TCG_COND_LE,     TCG_COND_LE, /* EQ | LT |    | x */
+    TCG_COND_ALWAYS, TCG_COND_ALWAYS, /* EQ | LT | GT | x */
 };
 
 /* Table of mask values to comparison codes, given a logic op as input.
    For such, only CC=0 and CC=1 should be possible.  */
 static const TCGCond nz_cond[16] = {
-    TCG_COND_NEVER, TCG_COND_NEVER,      /*    |    | x | x */
-    TCG_COND_NEVER, TCG_COND_NEVER,
-    TCG_COND_NE, TCG_COND_NE,            /*    | NE | x | x */
-    TCG_COND_NE, TCG_COND_NE,
-    TCG_COND_EQ, TCG_COND_EQ,            /* EQ |    | x | x */
-    TCG_COND_EQ, TCG_COND_EQ,
-    TCG_COND_ALWAYS, TCG_COND_ALWAYS,    /* EQ | NE | x | x */
+    TCG_COND_NEVER,  TCG_COND_NEVER, /*    |    | x | x */
+    TCG_COND_NEVER,  TCG_COND_NEVER,
+    TCG_COND_NE,     TCG_COND_NE, /*    | NE | x | x */
+    TCG_COND_NE,     TCG_COND_NE,
+    TCG_COND_EQ,     TCG_COND_EQ, /* EQ |    | x | x */
+    TCG_COND_EQ,     TCG_COND_EQ,
+    TCG_COND_ALWAYS, TCG_COND_ALWAYS, /* EQ | NE | x | x */
     TCG_COND_ALWAYS, TCG_COND_ALWAYS,
 };
 
@@ -961,12 +962,12 @@ static void disas_jcc(DisasContext *s, DisasCompare *c, uint32_t mask)
 
 /* ====================================================================== */
 /* Define the insn format enumeration.  */
-#define F0(N)                         FMT_##N,
-#define F1(N, X1)                     F0(N)
-#define F2(N, X1, X2)                 F0(N)
-#define F3(N, X1, X2, X3)             F0(N)
-#define F4(N, X1, X2, X3, X4)         F0(N)
-#define F5(N, X1, X2, X3, X4, X5)     F0(N)
+#define F0(N) FMT_##N,
+#define F1(N, X1) F0(N)
+#define F2(N, X1, X2) F0(N)
+#define F3(N, X1, X2, X3) F0(N)
+#define F4(N, X1, X2, X3, X4) F0(N)
+#define F5(N, X1, X2, X3, X4, X5) F0(N)
 #define F6(N, X1, X2, X3, X4, X5, X6) F0(N)
 
 typedef enum {
@@ -982,8 +983,8 @@ typedef enum {
 #undef F6
 
 /* This is the way fields are to be accessed out of DisasFields.  */
-#define have_field(S, F)  have_field1((S), FLD_O_##F)
-#define get_field(S, F)   get_field1((S), FLD_O_##F, FLD_C_##F)
+#define have_field(S, F) have_field1((S), FLD_O_##F)
+#define get_field(S, F) get_field1((S), FLD_O_##F, FLD_C_##F)
 
 static bool have_field1(const DisasContext *s, enum DisasFieldIndexO c)
 {
@@ -999,40 +1000,67 @@ static int get_field1(const DisasContext *s, enum DisasFieldIndexO o,
 
 /* Describe the layout of each field in each format.  */
 typedef struct DisasField {
-    unsigned int beg:8;
-    unsigned int size:8;
-    unsigned int type:2;
-    unsigned int indexC:6;
-    enum DisasFieldIndexO indexO:8;
+    unsigned int beg : 8;
+    unsigned int size : 8;
+    unsigned int type : 2;
+    unsigned int indexC : 6;
+    enum DisasFieldIndexO indexO : 8;
 } DisasField;
 
 typedef struct DisasFormatInfo {
     DisasField op[NUM_C_FIELD];
 } DisasFormatInfo;
 
-#define R(N, B)       {  B,  4, 0, FLD_C_r##N, FLD_O_r##N }
-#define M(N, B)       {  B,  4, 0, FLD_C_m##N, FLD_O_m##N }
-#define V(N, B)       {  B,  4, 3, FLD_C_v##N, FLD_O_v##N }
-#define BD(N, BB, BD) { BB,  4, 0, FLD_C_b##N, FLD_O_b##N }, \
-                      { BD, 12, 0, FLD_C_d##N, FLD_O_d##N }
-#define BXD(N)        { 16,  4, 0, FLD_C_b##N, FLD_O_b##N }, \
-                      { 12,  4, 0, FLD_C_x##N, FLD_O_x##N }, \
-                      { 20, 12, 0, FLD_C_d##N, FLD_O_d##N }
-#define BDL(N)        { 16,  4, 0, FLD_C_b##N, FLD_O_b##N }, \
-                      { 20, 20, 2, FLD_C_d##N, FLD_O_d##N }
-#define BXDL(N)       { 16,  4, 0, FLD_C_b##N, FLD_O_b##N }, \
-                      { 12,  4, 0, FLD_C_x##N, FLD_O_x##N }, \
-                      { 20, 20, 2, FLD_C_d##N, FLD_O_d##N }
-#define I(N, B, S)    {  B,  S, 1, FLD_C_i##N, FLD_O_i##N }
-#define L(N, B, S)    {  B,  S, 0, FLD_C_l##N, FLD_O_l##N }
+#define R(N, B)                         \
+    {                                   \
+        B, 4, 0, FLD_C_r##N, FLD_O_r##N \
+    }
+#define M(N, B)                         \
+    {                                   \
+        B, 4, 0, FLD_C_m##N, FLD_O_m##N \
+    }
+#define V(N, B)                         \
+    {                                   \
+        B, 4, 3, FLD_C_v##N, FLD_O_v##N \
+    }
+#define BD(N, BB, BD)                     \
+    { BB, 4, 0, FLD_C_b##N, FLD_O_b##N }, \
+    {                                     \
+        BD, 12, 0, FLD_C_d##N, FLD_O_d##N \
+    }
+#define BXD(N)                                \
+    { 16, 4, 0, FLD_C_b##N, FLD_O_b##N },     \
+        { 12, 4, 0, FLD_C_x##N, FLD_O_x##N }, \
+    {                                         \
+        20, 12, 0, FLD_C_d##N, FLD_O_d##N     \
+    }
+#define BDL(N)                            \
+    { 16, 4, 0, FLD_C_b##N, FLD_O_b##N }, \
+    {                                     \
+        20, 20, 2, FLD_C_d##N, FLD_O_d##N \
+    }
+#define BXDL(N)                               \
+    { 16, 4, 0, FLD_C_b##N, FLD_O_b##N },     \
+        { 12, 4, 0, FLD_C_x##N, FLD_O_x##N }, \
+    {                                         \
+        20, 20, 2, FLD_C_d##N, FLD_O_d##N     \
+    }
+#define I(N, B, S)                      \
+    {                                   \
+        B, S, 1, FLD_C_i##N, FLD_O_i##N \
+    }
+#define L(N, B, S)                      \
+    {                                   \
+        B, S, 0, FLD_C_l##N, FLD_O_l##N \
+    }
 
-#define F0(N)                     { { } },
-#define F1(N, X1)                 { { X1 } },
-#define F2(N, X1, X2)             { { X1, X2 } },
-#define F3(N, X1, X2, X3)         { { X1, X2, X3 } },
-#define F4(N, X1, X2, X3, X4)     { { X1, X2, X3, X4 } },
+#define F0(N) { {} },
+#define F1(N, X1) { { X1 } },
+#define F2(N, X1, X2) { { X1, X2 } },
+#define F3(N, X1, X2, X3) { { X1, X2, X3 } },
+#define F4(N, X1, X2, X3, X4) { { X1, X2, X3, X4 } },
 #define F5(N, X1, X2, X3, X4, X5) { { X1, X2, X3, X4, X5 } },
-#define F6(N, X1, X2, X3, X4, X5, X6)       { { X1, X2, X3, X4, X5, X6 } },
+#define F6(N, X1, X2, X3, X4, X5, X6) { { X1, X2, X3, X4, X5, X6 } },
 
 static const DisasFormatInfo format_info[] = {
 #include "insn-format.h.inc"
@@ -1070,39 +1098,39 @@ typedef struct {
    of the following, or 0.  To make this easy to document, we'll put the
    SPEC_<name> defines next to <name>.  */
 
-#define SPEC_r1_even    1
-#define SPEC_r2_even    2
-#define SPEC_r3_even    4
-#define SPEC_r1_f128    8
-#define SPEC_r2_f128    16
+#define SPEC_r1_even 1
+#define SPEC_r2_even 2
+#define SPEC_r3_even 4
+#define SPEC_r1_f128 8
+#define SPEC_r2_f128 16
 
 /* Return values from translate_one, indicating the state of the TB.  */
 
 /* We are not using a goto_tb (for whatever reason), but have updated
    the PC (for whatever reason), so there's no need to do it again on
    exiting the TB.  */
-#define DISAS_PC_UPDATED        DISAS_TARGET_0
+#define DISAS_PC_UPDATED DISAS_TARGET_0
 
 /* We have updated the PC and CC values.  */
-#define DISAS_PC_CC_UPDATED     DISAS_TARGET_2
+#define DISAS_PC_CC_UPDATED DISAS_TARGET_2
 
 
 /* Instruction flags */
-#define IF_AFP1     0x0001      /* r1 is a fp reg for HFP/FPS instructions */
-#define IF_AFP2     0x0002      /* r2 is a fp reg for HFP/FPS instructions */
-#define IF_AFP3     0x0004      /* r3 is a fp reg for HFP/FPS instructions */
-#define IF_BFP      0x0008      /* binary floating point instruction */
-#define IF_DFP      0x0010      /* decimal floating point instruction */
-#define IF_PRIV     0x0020      /* privileged instruction */
-#define IF_VEC      0x0040      /* vector instruction */
-#define IF_IO       0x0080      /* input/output instruction */
+#define IF_AFP1 0x0001 /* r1 is a fp reg for HFP/FPS instructions */
+#define IF_AFP2 0x0002 /* r2 is a fp reg for HFP/FPS instructions */
+#define IF_AFP3 0x0004 /* r3 is a fp reg for HFP/FPS instructions */
+#define IF_BFP 0x0008 /* binary floating point instruction */
+#define IF_DFP 0x0010 /* decimal floating point instruction */
+#define IF_PRIV 0x0020 /* privileged instruction */
+#define IF_VEC 0x0040 /* vector instruction */
+#define IF_IO 0x0080 /* input/output instruction */
 
 struct DisasInsn {
-    unsigned opc:16;
-    unsigned flags:16;
-    DisasFormat fmt:8;
-    unsigned fac:8;
-    unsigned spec:8;
+    unsigned opc : 16;
+    unsigned flags : 16;
+    DisasFormat fmt : 8;
+    unsigned fac : 8;
+    unsigned spec : 8;
 
     const char *name;
 
@@ -1147,8 +1175,8 @@ static DisasJumpType help_goto_direct(DisasContext *s, uint64_t dest)
     }
 }
 
-static DisasJumpType help_branch(DisasContext *s, DisasCompare *c,
-                                 bool is_imm, int imm, TCGv_i64 cdest)
+static DisasJumpType help_branch(DisasContext *s, DisasCompare *c, bool is_imm,
+                                 int imm, TCGv_i64 cdest)
 {
     DisasJumpType ret;
     uint64_t dest = s->base.pc_next + (int64_t)imm * 2;
@@ -1265,7 +1293,7 @@ static DisasJumpType help_branch(DisasContext *s, DisasCompare *c,
         ret = DISAS_PC_UPDATED;
     }
 
- egress:
+egress:
     return ret;
 }
 
@@ -1542,21 +1570,23 @@ static DisasJumpType op_bal(DisasContext *s, DisasOps *o)
  * - int IMM is the value of RI.
  * - TCGv_i64 CDEST is the address of the computed target.
  */
-#define disas_jdest(s, ri, is_imm, imm, cdest) do {                            \
-    if (have_field(s, ri)) {                                                   \
-        if (unlikely(s->ex_value)) {                                           \
-            cdest = tcg_temp_new_i64();                                        \
-            tcg_gen_ld_i64(cdest, cpu_env, offsetof(CPUS390XState, ex_target));\
-            tcg_gen_addi_i64(cdest, cdest, (int64_t)get_field(s, ri) * 2);     \
-            is_imm = false;                                                    \
+#define disas_jdest(s, ri, is_imm, imm, cdest)                                 \
+    do {                                                                       \
+        if (have_field(s, ri)) {                                               \
+            if (unlikely(s->ex_value)) {                                       \
+                cdest = tcg_temp_new_i64();                                    \
+                tcg_gen_ld_i64(cdest, cpu_env,                                 \
+                               offsetof(CPUS390XState, ex_target));            \
+                tcg_gen_addi_i64(cdest, cdest, (int64_t)get_field(s, ri) * 2); \
+                is_imm = false;                                                \
+            } else {                                                           \
+                is_imm = true;                                                 \
+            }                                                                  \
         } else {                                                               \
-            is_imm = true;                                                     \
+            is_imm = false;                                                    \
         }                                                                      \
-    } else {                                                                   \
-        is_imm = false;                                                        \
-    }                                                                          \
-    imm = is_imm ? get_field(s, ri) : 0;                                       \
-} while (false)
+        imm = is_imm ? get_field(s, ri) : 0;                                   \
+    } while (false)
 
 static DisasJumpType op_basi(DisasContext *s, DisasOps *o)
 {
@@ -1725,8 +1755,7 @@ static DisasJumpType op_cj(DisasContext *s, DisasOps *o)
     disas_jdest(s, i4, is_imm, imm, o->out);
     if (!is_imm && !o->out) {
         imm = 0;
-        o->out = get_address(s, 0, get_field(s, b4),
-                             get_field(s, d4));
+        o->out = get_address(s, 0, get_field(s, b4), get_field(s, d4));
     }
 
     return help_branch(s, &c, is_imm, imm, o->out);
@@ -2126,8 +2155,8 @@ static DisasJumpType op_cs(DisasContext *s, DisasOps *o)
        in2 = (zero-extended) R1 (expected value).  */
 
     addr = get_address(s, 0, b2, d2);
-    tcg_gen_atomic_cmpxchg_i64(o->out, addr, o->in2, o->in1,
-                               get_mem_index(s), s->insn->data | MO_ALIGN);
+    tcg_gen_atomic_cmpxchg_i64(o->out, addr, o->in2, o->in1, get_mem_index(s),
+                               s->insn->data | MO_ALIGN);
 
     /* Are the memory and expected values (un)equal?  Note that this setcond
        produces the output CC value, thus the NE sense of the test.  */
@@ -2191,8 +2220,8 @@ static DisasJumpType op_csp(DisasContext *s, DisasOps *o)
     addr = tcg_temp_new_i64();
     old = tcg_temp_new_i64();
     tcg_gen_andi_i64(addr, o->in2, -1ULL << (mop & MO_SIZE));
-    tcg_gen_atomic_cmpxchg_i64(old, addr, o->in1, o->out2,
-                               get_mem_index(s), mop | MO_ALIGN);
+    tcg_gen_atomic_cmpxchg_i64(old, addr, o->in1, o->out2, get_mem_index(s),
+                               mop | MO_ALIGN);
 
     /* Are the memory and expected values (un)equal?  */
     cc = tcg_temp_new_i64();
@@ -2895,8 +2924,8 @@ static DisasJumpType op_loc(DisasContext *s, DisasOps *o)
     }
 
     if (c.is_64) {
-        tcg_gen_movcond_i64(c.cond, o->out, c.u.s64.a, c.u.s64.b,
-                            o->in2, o->in1);
+        tcg_gen_movcond_i64(c.cond, o->out, c.u.s64.a, c.u.s64.b, o->in2,
+                            o->in1);
     } else {
         TCGv_i32 t32 = tcg_temp_new_i32();
         TCGv_i64 t, z;
@@ -2977,8 +3006,7 @@ static DisasJumpType op_lpswe(DisasContext *s, DisasOps *o)
 
     t1 = tcg_temp_new_i64();
     t2 = tcg_temp_new_i64();
-    tcg_gen_qemu_ld_i64(t1, o->in2, get_mem_index(s),
-                        MO_TEUQ | MO_ALIGN_8);
+    tcg_gen_qemu_ld_i64(t1, o->in2, get_mem_index(s), MO_TEUQ | MO_ALIGN_8);
     tcg_gen_addi_i64(o->in2, o->in2, 8);
     tcg_gen_qemu_ld_i64(t2, o->in2, get_mem_index(s), MO_TEUQ);
     gen_helper_load_psw(cpu_env, t1, t2);
@@ -3185,8 +3213,7 @@ static DisasJumpType op_mc(DisasContext *s, DisasOps *o)
     }
 
 #if !defined(CONFIG_USER_ONLY)
-    gen_helper_monitor_call(cpu_env, o->addr1,
-                            tcg_constant_i32(monitor_class));
+    gen_helper_monitor_call(cpu_env, o->addr1, tcg_constant_i32(monitor_class));
 #endif
     /* Defaults to a NOP. */
     return DISAS_NEXT;
@@ -6000,36 +6027,35 @@ static void in2_insn(DisasContext *s, DisasOps *o)
 #define F(OPC, NM, FT, FC, I1, I2, P, W, OP, CC, FL) \
     E(OPC, NM, FT, FC, I1, I2, P, W, OP, CC, 0, FL)
 
-#define E(OPC, NM, FT, FC, I1, I2, P, W, OP, CC, D, FL) insn_ ## NM,
+#define E(OPC, NM, FT, FC, I1, I2, P, W, OP, CC, D, FL) insn_##NM,
 
 enum DisasInsnEnum {
 #include "insn-data.h.inc"
 };
 
 #undef E
-#define E(OPC, NM, FT, FC, I1, I2, P, W, OP, CC, D, FL) {                   \
-    .opc = OPC,                                                             \
-    .flags = FL,                                                            \
-    .fmt = FMT_##FT,                                                        \
-    .fac = FAC_##FC,                                                        \
-    .spec = SPEC_in1_##I1 | SPEC_in2_##I2 | SPEC_prep_##P | SPEC_wout_##W,  \
-    .name = #NM,                                                            \
-    .help_in1 = in1_##I1,                                                   \
-    .help_in2 = in2_##I2,                                                   \
-    .help_prep = prep_##P,                                                  \
-    .help_wout = wout_##W,                                                  \
-    .help_cout = cout_##CC,                                                 \
-    .help_op = op_##OP,                                                     \
-    .data = D                                                               \
- },
+#define E(OPC, NM, FT, FC, I1, I2, P, W, OP, CC, D, FL)                      \
+    { .opc = OPC,                                                            \
+      .flags = FL,                                                           \
+      .fmt = FMT_##FT,                                                       \
+      .fac = FAC_##FC,                                                       \
+      .spec = SPEC_in1_##I1 | SPEC_in2_##I2 | SPEC_prep_##P | SPEC_wout_##W, \
+      .name = #NM,                                                           \
+      .help_in1 = in1_##I1,                                                  \
+      .help_in2 = in2_##I2,                                                  \
+      .help_prep = prep_##P,                                                 \
+      .help_wout = wout_##W,                                                 \
+      .help_cout = cout_##CC,                                                \
+      .help_op = op_##OP,                                                    \
+      .data = D },
 
 /* Allow 0 to be used for NULL in the table below.  */
-#define in1_0  NULL
-#define in2_0  NULL
-#define prep_0  NULL
-#define wout_0  NULL
-#define cout_0  NULL
-#define op_0  NULL
+#define in1_0 NULL
+#define in2_0 NULL
+#define prep_0 NULL
+#define wout_0 NULL
+#define cout_0 NULL
+#define op_0 NULL
 
 #define SPEC_in1_0 0
 #define SPEC_in2_0 0
@@ -6037,50 +6063,55 @@ enum DisasInsnEnum {
 #define SPEC_wout_0 0
 
 /* Give smaller names to the various facilities.  */
-#define FAC_Z           S390_FEAT_ZARCH
-#define FAC_CASS        S390_FEAT_COMPARE_AND_SWAP_AND_STORE
-#define FAC_DFP         S390_FEAT_DFP
-#define FAC_DFPR        S390_FEAT_FLOATING_POINT_SUPPORT_ENH /* DFP-rounding */
-#define FAC_DO          S390_FEAT_STFLE_45 /* distinct-operands */
-#define FAC_EE          S390_FEAT_EXECUTE_EXT
-#define FAC_EI          S390_FEAT_EXTENDED_IMMEDIATE
-#define FAC_FPE         S390_FEAT_FLOATING_POINT_EXT
-#define FAC_FPSSH       S390_FEAT_FLOATING_POINT_SUPPORT_ENH /* FPS-sign-handling */
-#define FAC_FPRGR       S390_FEAT_FLOATING_POINT_SUPPORT_ENH /* FPR-GR-transfer */
-#define FAC_GIE         S390_FEAT_GENERAL_INSTRUCTIONS_EXT
-#define FAC_HFP_MA      S390_FEAT_HFP_MADDSUB
-#define FAC_HW          S390_FEAT_STFLE_45 /* high-word */
-#define FAC_IEEEE_SIM   S390_FEAT_FLOATING_POINT_SUPPORT_ENH /* IEEE-exception-simulation */
-#define FAC_MIE         S390_FEAT_STFLE_49 /* misc-instruction-extensions */
-#define FAC_LAT         S390_FEAT_STFLE_49 /* load-and-trap */
-#define FAC_LOC         S390_FEAT_STFLE_45 /* load/store on condition 1 */
-#define FAC_LOC2        S390_FEAT_STFLE_53 /* load/store on condition 2 */
-#define FAC_LD          S390_FEAT_LONG_DISPLACEMENT
-#define FAC_PC          S390_FEAT_STFLE_45 /* population count */
-#define FAC_SCF         S390_FEAT_STORE_CLOCK_FAST
-#define FAC_SFLE        S390_FEAT_STFLE
-#define FAC_ILA         S390_FEAT_STFLE_45 /* interlocked-access-facility 1 */
-#define FAC_MVCOS       S390_FEAT_MOVE_WITH_OPTIONAL_SPEC
-#define FAC_LPP         S390_FEAT_SET_PROGRAM_PARAMETERS /* load-program-parameter */
-#define FAC_DAT_ENH     S390_FEAT_DAT_ENH
-#define FAC_E2          S390_FEAT_EXTENDED_TRANSLATION_2
-#define FAC_EH          S390_FEAT_STFLE_49 /* execution-hint */
-#define FAC_PPA         S390_FEAT_STFLE_49 /* processor-assist */
-#define FAC_LZRB        S390_FEAT_STFLE_53 /* load-and-zero-rightmost-byte */
-#define FAC_ETF3        S390_FEAT_EXTENDED_TRANSLATION_3
-#define FAC_MSA         S390_FEAT_MSA /* message-security-assist facility */
-#define FAC_MSA3        S390_FEAT_MSA_EXT_3 /* msa-extension-3 facility */
-#define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
-#define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
-#define FAC_MSA8        S390_FEAT_MSA_EXT_8 /* msa-extension-8 facility */
-#define FAC_ECT         S390_FEAT_EXTRACT_CPU_TIME
-#define FAC_PCI         S390_FEAT_ZPCI /* z/PCI facility */
-#define FAC_AIS         S390_FEAT_ADAPTER_INT_SUPPRESSION
-#define FAC_V           S390_FEAT_VECTOR /* vector facility */
-#define FAC_VE          S390_FEAT_VECTOR_ENH  /* vector enhancements facility 1 */
-#define FAC_VE2         S390_FEAT_VECTOR_ENH2 /* vector enhancements facility 2 */
-#define FAC_MIE2        S390_FEAT_MISC_INSTRUCTION_EXT2 /* miscellaneous-instruction-extensions facility 2 */
-#define FAC_MIE3        S390_FEAT_MISC_INSTRUCTION_EXT3 /* miscellaneous-instruction-extensions facility 3 */
+#define FAC_Z S390_FEAT_ZARCH
+#define FAC_CASS S390_FEAT_COMPARE_AND_SWAP_AND_STORE
+#define FAC_DFP S390_FEAT_DFP
+#define FAC_DFPR S390_FEAT_FLOATING_POINT_SUPPORT_ENH /* DFP-rounding */
+#define FAC_DO S390_FEAT_STFLE_45 /* distinct-operands */
+#define FAC_EE S390_FEAT_EXECUTE_EXT
+#define FAC_EI S390_FEAT_EXTENDED_IMMEDIATE
+#define FAC_FPE S390_FEAT_FLOATING_POINT_EXT
+#define FAC_FPSSH S390_FEAT_FLOATING_POINT_SUPPORT_ENH /* FPS-sign-handling */
+#define FAC_FPRGR S390_FEAT_FLOATING_POINT_SUPPORT_ENH /* FPR-GR-transfer */
+#define FAC_GIE S390_FEAT_GENERAL_INSTRUCTIONS_EXT
+#define FAC_HFP_MA S390_FEAT_HFP_MADDSUB
+#define FAC_HW S390_FEAT_STFLE_45 /* high-word */
+#define FAC_IEEEE_SIM \
+    S390_FEAT_FLOATING_POINT_SUPPORT_ENH /* IEEE-exception-simulation */
+#define FAC_MIE S390_FEAT_STFLE_49 /* misc-instruction-extensions */
+#define FAC_LAT S390_FEAT_STFLE_49 /* load-and-trap */
+#define FAC_LOC S390_FEAT_STFLE_45 /* load/store on condition 1 */
+#define FAC_LOC2 S390_FEAT_STFLE_53 /* load/store on condition 2 */
+#define FAC_LD S390_FEAT_LONG_DISPLACEMENT
+#define FAC_PC S390_FEAT_STFLE_45 /* population count */
+#define FAC_SCF S390_FEAT_STORE_CLOCK_FAST
+#define FAC_SFLE S390_FEAT_STFLE
+#define FAC_ILA S390_FEAT_STFLE_45 /* interlocked-access-facility 1 */
+#define FAC_MVCOS S390_FEAT_MOVE_WITH_OPTIONAL_SPEC
+#define FAC_LPP S390_FEAT_SET_PROGRAM_PARAMETERS /* load-program-parameter */
+#define FAC_DAT_ENH S390_FEAT_DAT_ENH
+#define FAC_E2 S390_FEAT_EXTENDED_TRANSLATION_2
+#define FAC_EH S390_FEAT_STFLE_49 /* execution-hint */
+#define FAC_PPA S390_FEAT_STFLE_49 /* processor-assist */
+#define FAC_LZRB S390_FEAT_STFLE_53 /* load-and-zero-rightmost-byte */
+#define FAC_ETF3 S390_FEAT_EXTENDED_TRANSLATION_3
+#define FAC_MSA S390_FEAT_MSA /* message-security-assist facility */
+#define FAC_MSA3 S390_FEAT_MSA_EXT_3 /* msa-extension-3 facility */
+#define FAC_MSA4 S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
+#define FAC_MSA5 S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
+#define FAC_MSA8 S390_FEAT_MSA_EXT_8 /* msa-extension-8 facility */
+#define FAC_ECT S390_FEAT_EXTRACT_CPU_TIME
+#define FAC_PCI S390_FEAT_ZPCI /* z/PCI facility */
+#define FAC_AIS S390_FEAT_ADAPTER_INT_SUPPRESSION
+#define FAC_V S390_FEAT_VECTOR /* vector facility */
+#define FAC_VE S390_FEAT_VECTOR_ENH /* vector enhancements facility 1 */
+#define FAC_VE2 S390_FEAT_VECTOR_ENH2 /* vector enhancements facility 2 */
+#define FAC_MIE2                                                            \
+    S390_FEAT_MISC_INSTRUCTION_EXT2 /* miscellaneous-instruction-extensions \
+                                       facility 2 */
+#define FAC_MIE3                                                            \
+    S390_FEAT_MISC_INSTRUCTION_EXT3 /* miscellaneous-instruction-extensions \
+                                       facility 3 */
 
 static const DisasInsn insn_info[] = {
 #include "insn-data.h.inc"
@@ -6088,7 +6119,8 @@ static const DisasInsn insn_info[] = {
 
 #undef E
 #define E(OPC, NM, FT, FC, I1, I2, P, W, OP, CC, D, FL) \
-    case OPC: return &insn_info[insn_ ## NM];
+    case OPC:                                           \
+        return &insn_info[insn_##NM];
 
 static const DisasInsn *lookup_opc(uint16_t opc)
 {
@@ -6468,8 +6500,7 @@ static void s390x_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
 
     dc->base.is_jmp = translate_one(env, dc);
     if (dc->base.is_jmp == DISAS_NEXT) {
-        if (dc->ex_value ||
-            !is_same_page(dcbase, dc->base.pc_next) ||
+        if (dc->ex_value || !is_same_page(dcbase, dc->base.pc_next) ||
             !is_same_page(dcbase, get_next_pc(env, dc, dc->base.pc_next))) {
             dc->base.is_jmp = DISAS_TOO_MANY;
         }
@@ -6504,8 +6535,8 @@ static void s390x_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
     }
 }
 
-static void s390x_tr_disas_log(const DisasContextBase *dcbase,
-                               CPUState *cs, FILE *logfile)
+static void s390x_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs,
+                               FILE *logfile)
 {
     DisasContext *dc = container_of(dcbase, DisasContext, base);
 
@@ -6520,11 +6551,11 @@ static void s390x_tr_disas_log(const DisasContextBase *dcbase,
 
 static const TranslatorOps s390x_tr_ops = {
     .init_disas_context = s390x_tr_init_disas_context,
-    .tb_start           = s390x_tr_tb_start,
-    .insn_start         = s390x_tr_insn_start,
-    .translate_insn     = s390x_tr_translate_insn,
-    .tb_stop            = s390x_tr_tb_stop,
-    .disas_log          = s390x_tr_disas_log,
+    .tb_start = s390x_tr_tb_start,
+    .insn_start = s390x_tr_insn_start,
+    .translate_insn = s390x_tr_translate_insn,
+    .tb_stop = s390x_tr_tb_stop,
+    .disas_log = s390x_tr_disas_log,
 };
 
 void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
@@ -6535,8 +6566,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
     translator_loop(cs, tb, max_insns, pc, host_pc, &s390x_tr_ops, &dc.base);
 }
 
-void s390x_restore_state_to_opc(CPUState *cs,
-                                const TranslationBlock *tb,
+void s390x_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                 const uint64_t *data)
 {
     S390CPU *cpu = S390_CPU(cs);

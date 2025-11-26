@@ -39,13 +39,13 @@ typedef union S390Vector {
  * DW: [                             0] - [                             1]
  */
 #if !HOST_BIG_ENDIAN
-#define H1(x)  ((x) ^ 7)
-#define H2(x)  ((x) ^ 3)
-#define H4(x)  ((x) ^ 1)
+#define H1(x) ((x) ^ 7)
+#define H2(x) ((x) ^ 3)
+#define H4(x) ((x) ^ 1)
 #else
-#define H1(x)  (x)
-#define H2(x)  (x)
-#define H4(x)  (x)
+#define H1(x) (x)
+#define H2(x) (x)
+#define H4(x) (x)
 #endif
 
 static inline uint8_t s390_vec_read_element8(const S390Vector *v, uint8_t enr)

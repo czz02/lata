@@ -29,13 +29,10 @@ void sync_c0_status(CPUMIPSState *env, CPUMIPSState *cpu, int tc)
     int32_t tcstatus, *tcst;
     uint32_t v = cpu->CP0_Status;
     uint32_t cu, mx, asid, ksu;
-    uint32_t mask = ((1 << CP0TCSt_TCU3)
-                       | (1 << CP0TCSt_TCU2)
-                       | (1 << CP0TCSt_TCU1)
-                       | (1 << CP0TCSt_TCU0)
-                       | (1 << CP0TCSt_TMX)
-                       | (3 << CP0TCSt_TKSU)
-                       | (0xff << CP0TCSt_TASID));
+    uint32_t mask =
+        ((1 << CP0TCSt_TCU3) | (1 << CP0TCSt_TCU2) | (1 << CP0TCSt_TCU1) |
+         (1 << CP0TCSt_TCU0) | (1 << CP0TCSt_TMX) | (3 << CP0TCSt_TKSU) |
+         (0xff << CP0TCSt_TASID));
 
     cu = (v >> CP0St_CU0) & 0xf;
     mx = (v >> CP0St_MX) & 0x1;
@@ -115,7 +112,7 @@ void cpu_mips_store_cause(CPUMIPSState *env, target_ulong val)
     }
 
     /* Set/reset software interrupts */
-    for (i = 0 ; i < 2 ; i++) {
+    for (i = 0; i < 2; i++) {
         if ((old ^ env->CP0_Cause) & (1 << (CP0Ca_IP + i))) {
             cpu_mips_soft_irq(env, i, env->CP0_Cause & (1 << (CP0Ca_IP + i)));
         }

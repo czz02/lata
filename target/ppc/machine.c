@@ -46,15 +46,14 @@ static int put_avr(QEMUFile *f, void *pv, size_t size,
 
 static const VMStateInfo vmstate_info_avr = {
     .name = "avr",
-    .get  = get_avr,
-    .put  = put_avr,
+    .get = get_avr,
+    .put = put_avr,
 };
 
-#define VMSTATE_AVR_ARRAY_V(_f, _s, _n, _v)                       \
+#define VMSTATE_AVR_ARRAY_V(_f, _s, _n, _v) \
     VMSTATE_SUB_ARRAY(_f, _s, 32, _n, _v, vmstate_info_avr, ppc_avr_t)
 
-#define VMSTATE_AVR_ARRAY(_f, _s, _n)                             \
-    VMSTATE_AVR_ARRAY_V(_f, _s, _n, 0)
+#define VMSTATE_AVR_ARRAY(_f, _s, _n) VMSTATE_AVR_ARRAY_V(_f, _s, _n, 0)
 
 static int get_fpr(QEMUFile *f, void *pv, size_t size,
                    const VMStateField *field)
@@ -77,15 +76,14 @@ static int put_fpr(QEMUFile *f, void *pv, size_t size,
 
 static const VMStateInfo vmstate_info_fpr = {
     .name = "fpr",
-    .get  = get_fpr,
-    .put  = put_fpr,
+    .get = get_fpr,
+    .put = put_fpr,
 };
 
-#define VMSTATE_FPR_ARRAY_V(_f, _s, _n, _v)                       \
+#define VMSTATE_FPR_ARRAY_V(_f, _s, _n, _v) \
     VMSTATE_SUB_ARRAY(_f, _s, 0, _n, _v, vmstate_info_fpr, ppc_vsr_t)
 
-#define VMSTATE_FPR_ARRAY(_f, _s, _n)                             \
-    VMSTATE_FPR_ARRAY_V(_f, _s, _n, 0)
+#define VMSTATE_FPR_ARRAY(_f, _s, _n) VMSTATE_FPR_ARRAY_V(_f, _s, _n, 0)
 
 static int get_vsr(QEMUFile *f, void *pv, size_t size,
                    const VMStateField *field)
@@ -108,15 +106,14 @@ static int put_vsr(QEMUFile *f, void *pv, size_t size,
 
 static const VMStateInfo vmstate_info_vsr = {
     .name = "vsr",
-    .get  = get_vsr,
-    .put  = put_vsr,
+    .get = get_vsr,
+    .put = put_vsr,
 };
 
-#define VMSTATE_VSR_ARRAY_V(_f, _s, _n, _v)                       \
+#define VMSTATE_VSR_ARRAY_V(_f, _s, _n, _v) \
     VMSTATE_SUB_ARRAY(_f, _s, 0, _n, _v, vmstate_info_vsr, ppc_vsr_t)
 
-#define VMSTATE_VSR_ARRAY(_f, _s, _n)                             \
-    VMSTATE_VSR_ARRAY_V(_f, _s, _n, 0)
+#define VMSTATE_VSR_ARRAY(_f, _s, _n) VMSTATE_VSR_ARRAY_V(_f, _s, _n, 0)
 
 static bool cpu_pre_2_8_migration(void *opaque, int version_id)
 {
@@ -140,21 +137,18 @@ static int cpu_pre_save(void *opaque)
     CPUPPCState *env = &cpu->env;
     int i;
     uint64_t insns_compat_mask =
-        PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB
-        | PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES
-        | PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE | PPC_FLOAT_FRSQRTES
-        | PPC_FLOAT_STFIWX | PPC_FLOAT_EXT
-        | PPC_CACHE | PPC_CACHE_ICBI | PPC_CACHE_DCBZ
-        | PPC_MEM_SYNC | PPC_MEM_EIEIO | PPC_MEM_TLBIE | PPC_MEM_TLBSYNC
-        | PPC_64B | PPC_64BX | PPC_ALTIVEC
-        | PPC_SEGMENT_64B | PPC_SLBI | PPC_POPCNTB | PPC_POPCNTWD;
-    uint64_t insns_compat_mask2 = PPC2_VSX | PPC2_VSX207 | PPC2_DFP | PPC2_DBRX
-        | PPC2_PERM_ISA206 | PPC2_DIVE_ISA206
-        | PPC2_ATOMIC_ISA206 | PPC2_FP_CVT_ISA206
-        | PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207
-        | PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207
-        | PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 | PPC2_TM
-        | PPC2_MEM_LWSYNC;
+        PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB | PPC_FLOAT |
+        PPC_FLOAT_FSEL | PPC_FLOAT_FRES | PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+        PPC_FLOAT_FRSQRTES | PPC_FLOAT_STFIWX | PPC_FLOAT_EXT | PPC_CACHE |
+        PPC_CACHE_ICBI | PPC_CACHE_DCBZ | PPC_MEM_SYNC | PPC_MEM_EIEIO |
+        PPC_MEM_TLBIE | PPC_MEM_TLBSYNC | PPC_64B | PPC_64BX | PPC_ALTIVEC |
+        PPC_SEGMENT_64B | PPC_SLBI | PPC_POPCNTB | PPC_POPCNTWD;
+    uint64_t insns_compat_mask2 =
+        PPC2_VSX | PPC2_VSX207 | PPC2_DFP | PPC2_DBRX | PPC2_PERM_ISA206 |
+        PPC2_DIVE_ISA206 | PPC2_ATOMIC_ISA206 | PPC2_FP_CVT_ISA206 |
+        PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 | PPC2_LSQ_ISA207 |
+        PPC2_ALTIVEC_207 | PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
+        PPC2_TM | PPC2_MEM_LWSYNC;
 
     env->spr[SPR_LR] = env->lr;
     env->spr[SPR_CTR] = env->ctr;
@@ -185,8 +179,7 @@ static int cpu_pre_save(void *opaque)
          */
         target_ulong metamask = 0
 #if defined(TARGET_PPC64)
-            | (1ULL << MSR_TS0)
-            | (1ULL << MSR_TS1)
+                                | (1ULL << MSR_TS0) | (1ULL << MSR_TS1)
 #endif
             ;
         cpu->mig_msr_mask = env->msr_mask & ~metamask;
@@ -332,11 +325,9 @@ static const VMStateDescription vmstate_fpu = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = fpu_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_FPR_ARRAY(env.vsr, PowerPCCPU, 32),
-        VMSTATE_UINTTL(env.fpscr, PowerPCCPU),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields = (VMStateField[]){ VMSTATE_FPR_ARRAY(env.vsr, PowerPCCPU, 32),
+                                VMSTATE_UINTTL(env.fpscr, PowerPCCPU),
+                                VMSTATE_END_OF_LIST() },
 };
 
 static bool altivec_needed(void *opaque)
@@ -373,25 +364,23 @@ static const VMStateDescription vmstate_altivec = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = altivec_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_AVR_ARRAY(env.vsr, PowerPCCPU, 32),
-        /*
-         * Save the architecture value of the vscr, not the internally
-         * expanded version.  Since this architecture value does not
-         * exist in memory to be stored, this requires a but of hoop
-         * jumping.  We want OFFSET=0 so that we effectively pass CPU
-         * to the helper functions.
-         */
-        {
-            .name = "vscr",
-            .version_id = 0,
-            .size = sizeof(uint32_t),
-            .info = &vmstate_vscr,
-            .flags = VMS_SINGLE,
-            .offset = 0
-        },
-        VMSTATE_END_OF_LIST()
-    },
+    .fields =
+        (VMStateField[]){
+            VMSTATE_AVR_ARRAY(env.vsr, PowerPCCPU, 32),
+            /*
+             * Save the architecture value of the vscr, not the internally
+             * expanded version.  Since this architecture value does not
+             * exist in memory to be stored, this requires a but of hoop
+             * jumping.  We want OFFSET=0 so that we effectively pass CPU
+             * to the helper functions.
+             */
+            { .name = "vscr",
+              .version_id = 0,
+              .size = sizeof(uint32_t),
+              .info = &vmstate_vscr,
+              .flags = VMS_SINGLE,
+              .offset = 0 },
+            VMSTATE_END_OF_LIST() },
 };
 
 static bool vsx_needed(void *opaque)
@@ -406,10 +395,8 @@ static const VMStateDescription vmstate_vsx = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = vsx_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_VSR_ARRAY(env.vsr, PowerPCCPU, 32),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields = (VMStateField[]){ VMSTATE_VSR_ARRAY(env.vsr, PowerPCCPU, 32),
+                                VMSTATE_END_OF_LIST() },
 };
 
 #ifdef TARGET_PPC64
@@ -426,21 +413,20 @@ static const VMStateDescription vmstate_tm = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = tm_needed,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINTTL_ARRAY(env.tm_gpr, PowerPCCPU, 32),
-        VMSTATE_AVR_ARRAY(env.tm_vsr, PowerPCCPU, 64),
-        VMSTATE_UINT64(env.tm_cr, PowerPCCPU),
-        VMSTATE_UINT64(env.tm_lr, PowerPCCPU),
-        VMSTATE_UINT64(env.tm_ctr, PowerPCCPU),
-        VMSTATE_UINT64(env.tm_fpscr, PowerPCCPU),
-        VMSTATE_UINT64(env.tm_amr, PowerPCCPU),
-        VMSTATE_UINT64(env.tm_ppr, PowerPCCPU),
-        VMSTATE_UINT64(env.tm_vrsave, PowerPCCPU),
-        VMSTATE_UINT32(env.tm_vscr, PowerPCCPU),
-        VMSTATE_UINT64(env.tm_dscr, PowerPCCPU),
-        VMSTATE_UINT64(env.tm_tar, PowerPCCPU),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields =
+        (VMStateField[]){ VMSTATE_UINTTL_ARRAY(env.tm_gpr, PowerPCCPU, 32),
+                          VMSTATE_AVR_ARRAY(env.tm_vsr, PowerPCCPU, 64),
+                          VMSTATE_UINT64(env.tm_cr, PowerPCCPU),
+                          VMSTATE_UINT64(env.tm_lr, PowerPCCPU),
+                          VMSTATE_UINT64(env.tm_ctr, PowerPCCPU),
+                          VMSTATE_UINT64(env.tm_fpscr, PowerPCCPU),
+                          VMSTATE_UINT64(env.tm_amr, PowerPCCPU),
+                          VMSTATE_UINT64(env.tm_ppr, PowerPCCPU),
+                          VMSTATE_UINT64(env.tm_vrsave, PowerPCCPU),
+                          VMSTATE_UINT32(env.tm_vscr, PowerPCCPU),
+                          VMSTATE_UINT64(env.tm_dscr, PowerPCCPU),
+                          VMSTATE_UINT64(env.tm_tar, PowerPCCPU),
+                          VMSTATE_END_OF_LIST() },
 };
 #endif
 
@@ -460,10 +446,8 @@ static const VMStateDescription vmstate_sr = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = sr_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINTTL_ARRAY(env.sr, PowerPCCPU, 32),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields = (VMStateField[]){ VMSTATE_UINTTL_ARRAY(env.sr, PowerPCCPU, 32),
+                                VMSTATE_END_OF_LIST() },
 };
 
 #ifdef TARGET_PPC64
@@ -490,15 +474,14 @@ static int put_slbe(QEMUFile *f, void *pv, size_t size,
 
 static const VMStateInfo vmstate_info_slbe = {
     .name = "slbe",
-    .get  = get_slbe,
-    .put  = put_slbe,
+    .get = get_slbe,
+    .put = put_slbe,
 };
 
-#define VMSTATE_SLB_ARRAY_V(_f, _s, _n, _v)                       \
+#define VMSTATE_SLB_ARRAY_V(_f, _s, _n, _v) \
     VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_slbe, ppc_slb_t)
 
-#define VMSTATE_SLB_ARRAY(_f, _s, _n)                             \
-    VMSTATE_SLB_ARRAY_V(_f, _s, _n, 0)
+#define VMSTATE_SLB_ARRAY(_f, _s, _n) VMSTATE_SLB_ARRAY_V(_f, _s, _n, 0)
 
 static bool slb_needed(void *opaque)
 {
@@ -534,11 +517,11 @@ static const VMStateDescription vmstate_slb = {
     .minimum_version_id = 1,
     .needed = slb_needed,
     .post_load = slb_post_load,
-    .fields = (VMStateField[]) {
-        VMSTATE_INT32_TEST(mig_slb_nr, PowerPCCPU, cpu_pre_3_0_migration),
-        VMSTATE_SLB_ARRAY(env.slb, PowerPCCPU, MAX_SLB_ENTRIES),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_INT32_TEST(mig_slb_nr, PowerPCCPU, cpu_pre_3_0_migration),
+            VMSTATE_SLB_ARRAY(env.slb, PowerPCCPU, MAX_SLB_ENTRIES),
+            VMSTATE_END_OF_LIST() }
 };
 #endif /* TARGET_PPC64 */
 
@@ -546,12 +529,10 @@ static const VMStateDescription vmstate_tlb6xx_entry = {
     .name = "cpu/tlb6xx_entry",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINTTL(pte0, ppc6xx_tlb_t),
-        VMSTATE_UINTTL(pte1, ppc6xx_tlb_t),
-        VMSTATE_UINTTL(EPN, ppc6xx_tlb_t),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields = (VMStateField[]){ VMSTATE_UINTTL(pte0, ppc6xx_tlb_t),
+                                VMSTATE_UINTTL(pte1, ppc6xx_tlb_t),
+                                VMSTATE_UINTTL(EPN, ppc6xx_tlb_t),
+                                VMSTATE_END_OF_LIST() },
 };
 
 static bool tlb6xx_needed(void *opaque)
@@ -567,30 +548,26 @@ static const VMStateDescription vmstate_tlb6xx = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = tlb6xx_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
-        VMSTATE_STRUCT_VARRAY_POINTER_INT32(env.tlb.tlb6, PowerPCCPU,
-                                            env.nb_tlb,
-                                            vmstate_tlb6xx_entry,
-                                            ppc6xx_tlb_t),
-        VMSTATE_UINTTL_ARRAY(env.tgpr, PowerPCCPU, 4),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
+                          VMSTATE_STRUCT_VARRAY_POINTER_INT32(
+                              env.tlb.tlb6, PowerPCCPU, env.nb_tlb,
+                              vmstate_tlb6xx_entry, ppc6xx_tlb_t),
+                          VMSTATE_UINTTL_ARRAY(env.tgpr, PowerPCCPU, 4),
+                          VMSTATE_END_OF_LIST() }
 };
 
 static const VMStateDescription vmstate_tlbemb_entry = {
     .name = "cpu/tlbemb_entry",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT64(RPN, ppcemb_tlb_t),
-        VMSTATE_UINTTL(EPN, ppcemb_tlb_t),
-        VMSTATE_UINTTL(PID, ppcemb_tlb_t),
-        VMSTATE_UINTTL(size, ppcemb_tlb_t),
-        VMSTATE_UINT32(prot, ppcemb_tlb_t),
-        VMSTATE_UINT32(attr, ppcemb_tlb_t),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields = (VMStateField[]){ VMSTATE_UINT64(RPN, ppcemb_tlb_t),
+                                VMSTATE_UINTTL(EPN, ppcemb_tlb_t),
+                                VMSTATE_UINTTL(PID, ppcemb_tlb_t),
+                                VMSTATE_UINTTL(size, ppcemb_tlb_t),
+                                VMSTATE_UINT32(prot, ppcemb_tlb_t),
+                                VMSTATE_UINT32(attr, ppcemb_tlb_t),
+                                VMSTATE_END_OF_LIST() },
 };
 
 static bool tlbemb_needed(void *opaque)
@@ -606,27 +583,23 @@ static const VMStateDescription vmstate_tlbemb = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = tlbemb_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
-        VMSTATE_STRUCT_VARRAY_POINTER_INT32(env.tlb.tlbe, PowerPCCPU,
-                                            env.nb_tlb,
-                                            vmstate_tlbemb_entry,
-                                            ppcemb_tlb_t),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields =
+        (VMStateField[]){ VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
+                          VMSTATE_STRUCT_VARRAY_POINTER_INT32(
+                              env.tlb.tlbe, PowerPCCPU, env.nb_tlb,
+                              vmstate_tlbemb_entry, ppcemb_tlb_t),
+                          VMSTATE_END_OF_LIST() },
 };
 
 static const VMStateDescription vmstate_tlbmas_entry = {
     .name = "cpu/tlbmas_entry",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT32(mas8, ppcmas_tlb_t),
-        VMSTATE_UINT32(mas1, ppcmas_tlb_t),
-        VMSTATE_UINT64(mas2, ppcmas_tlb_t),
-        VMSTATE_UINT64(mas7_3, ppcmas_tlb_t),
-        VMSTATE_END_OF_LIST()
-    },
+    .fields = (VMStateField[]){ VMSTATE_UINT32(mas8, ppcmas_tlb_t),
+                                VMSTATE_UINT32(mas1, ppcmas_tlb_t),
+                                VMSTATE_UINT64(mas2, ppcmas_tlb_t),
+                                VMSTATE_UINT64(mas7_3, ppcmas_tlb_t),
+                                VMSTATE_END_OF_LIST() },
 };
 
 static bool tlbmas_needed(void *opaque)
@@ -642,14 +615,12 @@ static const VMStateDescription vmstate_tlbmas = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = tlbmas_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
-        VMSTATE_STRUCT_VARRAY_POINTER_INT32(env.tlb.tlbm, PowerPCCPU,
-                                            env.nb_tlb,
-                                            vmstate_tlbmas_entry,
-                                            ppcmas_tlb_t),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){ VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
+                          VMSTATE_STRUCT_VARRAY_POINTER_INT32(
+                              env.tlb.tlbm, PowerPCCPU, env.nb_tlb,
+                              vmstate_tlbmas_entry, ppcmas_tlb_t),
+                          VMSTATE_END_OF_LIST() }
 };
 
 static bool compat_needed(void *opaque)
@@ -665,10 +636,8 @@ static const VMStateDescription vmstate_compat = {
     .version_id = 1,
     .minimum_version_id = 1,
     .needed = compat_needed,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINT32(compat_pvr, PowerPCCPU),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINT32(compat_pvr, PowerPCCPU),
+                                VMSTATE_END_OF_LIST() }
 };
 
 const VMStateDescription vmstate_ppc_cpu = {
@@ -677,51 +646,47 @@ const VMStateDescription vmstate_ppc_cpu = {
     .minimum_version_id = 5,
     .pre_save = cpu_pre_save,
     .post_load = cpu_post_load,
-    .fields = (VMStateField[]) {
-        VMSTATE_UNUSED(sizeof(target_ulong)), /* was _EQUAL(env.spr[SPR_PVR]) */
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UNUSED(
+                sizeof(target_ulong)), /* was _EQUAL(env.spr[SPR_PVR]) */
 
-        /* User mode architected state */
-        VMSTATE_UINTTL_ARRAY(env.gpr, PowerPCCPU, 32),
+            /* User mode architected state */
+            VMSTATE_UINTTL_ARRAY(env.gpr, PowerPCCPU, 32),
 #if !defined(TARGET_PPC64)
-        VMSTATE_UINTTL_ARRAY(env.gprh, PowerPCCPU, 32),
+            VMSTATE_UINTTL_ARRAY(env.gprh, PowerPCCPU, 32),
 #endif
-        VMSTATE_UINT32_ARRAY(env.crf, PowerPCCPU, 8),
-        VMSTATE_UINTTL(env.nip, PowerPCCPU),
+            VMSTATE_UINT32_ARRAY(env.crf, PowerPCCPU, 8),
+            VMSTATE_UINTTL(env.nip, PowerPCCPU),
 
-        /* SPRs */
-        VMSTATE_UINTTL_ARRAY(env.spr, PowerPCCPU, 1024),
-        VMSTATE_UINT64(env.spe_acc, PowerPCCPU),
+            /* SPRs */
+            VMSTATE_UINTTL_ARRAY(env.spr, PowerPCCPU, 1024),
+            VMSTATE_UINT64(env.spe_acc, PowerPCCPU),
 
-        /* Reservation */
-        VMSTATE_UINTTL(env.reserve_addr, PowerPCCPU),
+            /* Reservation */
+            VMSTATE_UINTTL(env.reserve_addr, PowerPCCPU),
 
-        /* Supervisor mode architected state */
-        VMSTATE_UINTTL(env.msr, PowerPCCPU),
+            /* Supervisor mode architected state */
+            VMSTATE_UINTTL(env.msr, PowerPCCPU),
 
-        /* Backward compatible internal state */
-        VMSTATE_UINTTL(env.hflags_compat_nmsr, PowerPCCPU),
+            /* Backward compatible internal state */
+            VMSTATE_UINTTL(env.hflags_compat_nmsr, PowerPCCPU),
 
-        /* Sanity checking */
-        VMSTATE_UINTTL_TEST(mig_msr_mask, PowerPCCPU, cpu_pre_2_8_migration),
-        VMSTATE_UINT64_TEST(mig_insns_flags, PowerPCCPU, cpu_pre_2_8_migration),
-        VMSTATE_UINT64_TEST(mig_insns_flags2, PowerPCCPU,
-                            cpu_pre_2_8_migration),
-        VMSTATE_UINT32_TEST(mig_nb_BATs, PowerPCCPU, cpu_pre_2_8_migration),
-        VMSTATE_END_OF_LIST()
-    },
-    .subsections = (const VMStateDescription*[]) {
-        &vmstate_fpu,
-        &vmstate_altivec,
-        &vmstate_vsx,
-        &vmstate_sr,
+            /* Sanity checking */
+            VMSTATE_UINTTL_TEST(mig_msr_mask, PowerPCCPU,
+                                cpu_pre_2_8_migration),
+            VMSTATE_UINT64_TEST(mig_insns_flags, PowerPCCPU,
+                                cpu_pre_2_8_migration),
+            VMSTATE_UINT64_TEST(mig_insns_flags2, PowerPCCPU,
+                                cpu_pre_2_8_migration),
+            VMSTATE_UINT32_TEST(mig_nb_BATs, PowerPCCPU, cpu_pre_2_8_migration),
+            VMSTATE_END_OF_LIST() },
+    .subsections =
+        (const VMStateDescription *[]){ &vmstate_fpu, &vmstate_altivec,
+                                        &vmstate_vsx, &vmstate_sr,
 #ifdef TARGET_PPC64
-        &vmstate_tm,
-        &vmstate_slb,
+                                        &vmstate_tm, &vmstate_slb,
 #endif /* TARGET_PPC64 */
-        &vmstate_tlb6xx,
-        &vmstate_tlbemb,
-        &vmstate_tlbmas,
-        &vmstate_compat,
-        NULL
-    }
+                                        &vmstate_tlb6xx, &vmstate_tlbemb,
+                                        &vmstate_tlbmas, &vmstate_compat, NULL }
 };

@@ -23,25 +23,25 @@
 #include "qemu/log.h"
 
 enum {
-  xtRegisterTypeArRegfile = 1,  /* Register File ar0..arXX.  */
-  xtRegisterTypeSpecialReg,     /* CPU states, such as PS, Booleans, (rsr).  */
-  xtRegisterTypeUserReg,        /* User defined registers (rur).  */
-  xtRegisterTypeTieRegfile,     /* User define register files.  */
-  xtRegisterTypeTieState,       /* TIE States (mapped on user regs).  */
-  xtRegisterTypeMapped,         /* Mapped on Special Registers.  */
-  xtRegisterTypeUnmapped,       /* Special case of masked registers.  */
-  xtRegisterTypeWindow,         /* Live window registers (a0..a15).  */
-  xtRegisterTypeVirtual,        /* PC, FP.  */
-  xtRegisterTypeUnknown
+    xtRegisterTypeArRegfile = 1, /* Register File ar0..arXX.  */
+    xtRegisterTypeSpecialReg, /* CPU states, such as PS, Booleans, (rsr).  */
+    xtRegisterTypeUserReg, /* User defined registers (rur).  */
+    xtRegisterTypeTieRegfile, /* User define register files.  */
+    xtRegisterTypeTieState, /* TIE States (mapped on user regs).  */
+    xtRegisterTypeMapped, /* Mapped on Special Registers.  */
+    xtRegisterTypeUnmapped, /* Special case of masked registers.  */
+    xtRegisterTypeWindow, /* Live window registers (a0..a15).  */
+    xtRegisterTypeVirtual, /* PC, FP.  */
+    xtRegisterTypeUnknown
 };
 
-#define XTENSA_REGISTER_FLAGS_PRIVILEGED        0x0001
-#define XTENSA_REGISTER_FLAGS_READABLE          0x0002
-#define XTENSA_REGISTER_FLAGS_WRITABLE          0x0004
-#define XTENSA_REGISTER_FLAGS_VOLATILE          0x0008
+#define XTENSA_REGISTER_FLAGS_PRIVILEGED 0x0001
+#define XTENSA_REGISTER_FLAGS_READABLE 0x0002
+#define XTENSA_REGISTER_FLAGS_WRITABLE 0x0004
+#define XTENSA_REGISTER_FLAGS_VOLATILE 0x0008
 
-void xtensa_count_regs(const XtensaConfig *config,
-                       unsigned *n_regs, unsigned *n_core_regs)
+void xtensa_count_regs(const XtensaConfig *config, unsigned *n_regs,
+                       unsigned *n_core_regs)
 {
     unsigned i;
     bool count_core_regs = true;
@@ -85,8 +85,8 @@ int xtensa_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
 
     case xtRegisterTypeArRegfile: /*ar*/
         xtensa_sync_phys_from_window(env);
-        return gdb_get_reg32(mem_buf, env->phys_regs[(reg->targno & 0xff)
-                                                     % env->config->nareg]);
+        return gdb_get_reg32(
+            mem_buf, env->phys_regs[(reg->targno & 0xff) % env->config->nareg]);
 
     case xtRegisterTypeSpecialReg: /*SR*/
         return gdb_get_reg32(mem_buf, env->sregs[reg->targno & 0xff]);

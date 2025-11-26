@@ -77,7 +77,7 @@ static void pmu_update_summaries(CPUPPCState *env)
     ins_cnt |= !(mmcr0 & MMCR0_FC56) << 5;
     cyc_cnt |= !(mmcr0 & MMCR0_FC56) << 6;
 
- out:
+out:
     env->pmc_ins_cnt = ins_cnt;
     env->pmc_cyc_cnt = cyc_cnt;
 }
@@ -357,9 +357,8 @@ void cpu_ppc_pmu_init(CPUPPCState *env)
 
         i = sprn - SPR_POWER_PMC1;
 
-        env->pmu_cyc_overflow_timers[i] = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                                       &cpu_ppc_pmu_timer_cb,
-                                                       cpu);
+        env->pmu_cyc_overflow_timers[i] =
+            timer_new_ns(QEMU_CLOCK_VIRTUAL, &cpu_ppc_pmu_timer_cb, cpu);
     }
 }
 #endif /* defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY) */

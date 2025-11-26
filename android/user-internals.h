@@ -31,8 +31,8 @@ extern unsigned long mmap_min_addr;
 
 typedef struct IOCTLEntry IOCTLEntry;
 
-typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp,
-                             int fd, int cmd, abi_long arg);
+typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
+                             int cmd, abi_long arg);
 
 struct IOCTLEntry {
     int target_cmd;
@@ -60,9 +60,8 @@ int info_is_fdpic(struct image_info *info);
 void target_set_brk(abi_ulong new_brk);
 void syscall_init(void);
 abi_long do_syscall(CPUArchState *cpu_env, int num, abi_long arg1,
-                    abi_long arg2, abi_long arg3, abi_long arg4,
-                    abi_long arg5, abi_long arg6, abi_long arg7,
-                    abi_long arg8);
+                    abi_long arg2, abi_long arg3, abi_long arg4, abi_long arg5,
+                    abi_long arg6, abi_long arg7, abi_long arg8);
 extern __thread CPUState *thread_cpu;
 // extern CPUState *thread_cpu;
 // G_NORETURN void cpu_loop(CPUArchState *env);
@@ -93,8 +92,8 @@ void fork_end(int child);
  *
  * to succeed.
  */
-void probe_guest_base(const char *image_name,
-                      abi_ulong loaddr, abi_ulong hiaddr);
+void probe_guest_base(const char *image_name, abi_ulong loaddr,
+                      abi_ulong hiaddr);
 
 /* syscall.c */
 int host_to_target_waitstatus(int status);
@@ -140,14 +139,20 @@ static inline int regpairs_aligned(CPUArchState *cpu_env, int num)
     return cpu_env->eabi;
 }
 #elif defined(TARGET_MIPS) && defined(TARGET_ABI_MIPSO32)
-static inline int regpairs_aligned(CPUArchState *cpu_env, int num) { return 1; }
+static inline int regpairs_aligned(CPUArchState *cpu_env, int num)
+{
+    return 1;
+}
 #elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
 /*
  * SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
  * of registers which translates to the same as ARM/MIPS, because we start with
  * r3 as arg1
  */
-static inline int regpairs_aligned(CPUArchState *cpu_env, int num) { return 1; }
+static inline int regpairs_aligned(CPUArchState *cpu_env, int num)
+{
+    return 1;
+}
 #elif defined(TARGET_SH4)
 /* SH4 doesn't align register pairs, except for p{read,write}64 */
 static inline int regpairs_aligned(CPUArchState *cpu_env, int num)
@@ -162,11 +167,20 @@ static inline int regpairs_aligned(CPUArchState *cpu_env, int num)
     }
 }
 #elif defined(TARGET_XTENSA)
-static inline int regpairs_aligned(CPUArchState *cpu_env, int num) { return 1; }
+static inline int regpairs_aligned(CPUArchState *cpu_env, int num)
+{
+    return 1;
+}
 #elif defined(TARGET_HEXAGON)
-static inline int regpairs_aligned(CPUArchState *cpu_env, int num) { return 1; }
+static inline int regpairs_aligned(CPUArchState *cpu_env, int num)
+{
+    return 1;
+}
 #else
-static inline int regpairs_aligned(CPUArchState *cpu_env, int num) { return 0; }
+static inline int regpairs_aligned(CPUArchState *cpu_env, int num)
+{
+    return 0;
+}
 #endif
 
 /**

@@ -35,24 +35,24 @@ extern CPUARMState *user_registers;
 #define GET_USERREG() (user_registers)
 
 /* Need task_struct */
-//#include <linux/sched.h>
+// #include <linux/sched.h>
 
 /* includes */
-#include "fpsr.h"		/* FP control and status register definitions */
+#include "fpsr.h" /* FP control and status register definitions */
 #include "fpu/softfloat.h"
 
-#define		typeNone		0x00
-#define		typeSingle		0x01
-#define		typeDouble		0x02
-#define		typeExtended		0x03
+#define typeNone 0x00
+#define typeSingle 0x01
+#define typeDouble 0x02
+#define typeExtended 0x03
 
 /*
  * This must be no more and no less than 12 bytes.
  */
 typedef union tagFPREG {
-   floatx80 fExtended;
-   float64  fDouble;
-   float32  fSingle;
+    floatx80 fExtended;
+    float64 fDouble;
+    float32 fSingle;
 } FPREG;
 
 /*
@@ -69,21 +69,21 @@ typedef union tagFPREG {
  * not initialise.
  */
 typedef struct tagFPA11 {
-/*   0 */  FPREG fpreg[8];		/* 8 floating point registers */
-/*  96 */  FPSR fpsr;			/* floating point status register */
-/* 100 */  FPCR fpcr;			/* floating point control register */
-/* 104 */  unsigned char fType[8];	/* type of floating point value held in
-					   floating point registers.  One of none
-					   single, double or extended. */
-/* 112 */  int initflag;		/* this is special.  The kernel guarantees
-					   to set it to 0 when a thread is launched,
-					   so we can use it to detect whether this
-					   instance of the emulator needs to be
-					   initialised. */
-    float_status fp_status;      /* QEMU float emulator status */
+    /*   0 */ FPREG fpreg[8]; /* 8 floating point registers */
+    /*  96 */ FPSR fpsr; /* floating point status register */
+    /* 100 */ FPCR fpcr; /* floating point control register */
+    /* 104 */ unsigned char fType[8]; /* type of floating point value held in
+                                         floating point registers.  One of none
+                                         single, double or extended. */
+    /* 112 */ int initflag; /* this is special.  The kernel guarantees
+                               to set it to 0 when a thread is launched,
+                               so we can use it to detect whether this
+                               instance of the emulator needs to be
+                               initialised. */
+    float_status fp_status; /* QEMU float emulator status */
 } FPA11;
 
-extern FPA11* qemufpa;
+extern FPA11 *qemufpa;
 
 void resetFPA11(void);
 void SetRoundingMode(const unsigned int);
@@ -99,7 +99,7 @@ static inline void writeRegister(unsigned int x, unsigned int y)
 #if 0
 	printf("writing %d to r%d\n",y,x);
 #endif
-        user_registers->regs[(x)]=(y);
+    user_registers->regs[(x)] = (y);
 }
 
 static inline void writeConditionCodes(unsigned int x)
@@ -109,7 +109,7 @@ static inline void writeConditionCodes(unsigned int x)
 
 #define ARM_REG_PC 15
 
-unsigned int EmulateAll(unsigned int opcode, FPA11* qfpa, CPUARMState* qregs);
+unsigned int EmulateAll(unsigned int opcode, FPA11 *qfpa, CPUARMState *qregs);
 
 unsigned int EmulateCPDO(const unsigned int);
 unsigned int EmulateCPDT(const unsigned int);

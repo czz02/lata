@@ -66,15 +66,15 @@ void HELPER(msr_i_spsel)(CPUARMState *env, uint32_t imm)
     update_spsel(env, imm);
 }
 
-static void daif_check(CPUARMState *env, uint32_t op,
-                       uint32_t imm, uintptr_t ra)
+static void daif_check(CPUARMState *env, uint32_t op, uint32_t imm,
+                       uintptr_t ra)
 {
     /* DAIF update to PSTATE. This is OK from EL0 only if UMA is set.  */
     if (arm_current_el(env) == 0 && !(arm_sctlr(env, 0) & SCTLR_UMA)) {
         raise_exception_ra(env, EXCP_UDEF,
                            syn_aa64_sysregtrap(0, extract32(op, 0, 3),
-                                               extract32(op, 3, 3), 4,
-                                               imm, 0x1f, 0),
+                                               extract32(op, 3, 3), 4, imm,
+                                               0x1f, 0),
                            exception_target_el(env), ra);
     }
 }
@@ -511,12 +511,12 @@ uint64_t HELPER(crc32c_64)(uint64_t acc, uint64_t val, uint32_t bytes)
 
 #define ADVSIMD_HELPER(name, suffix) HELPER(glue(glue(advsimd_, name), suffix))
 
-#define ADVSIMD_HALFOP(name) \
-uint32_t ADVSIMD_HELPER(name, h)(uint32_t a, uint32_t b, void *fpstp) \
-{ \
-    float_status *fpst = fpstp; \
-    return float16_ ## name(a, b, fpst);    \
-}
+#define ADVSIMD_HALFOP(name)                                              \
+    uint32_t ADVSIMD_HELPER(name, h)(uint32_t a, uint32_t b, void *fpstp) \
+    {                                                                     \
+        float_status *fpst = fpstp;                                       \
+        return float16_##name(a, b, fpst);                                \
+    }
 
 ADVSIMD_HALFOP(add)
 ADVSIMD_HALFOP(sub)
@@ -527,20 +527,21 @@ ADVSIMD_HALFOP(max)
 ADVSIMD_HALFOP(minnum)
 ADVSIMD_HALFOP(maxnum)
 
-#define ADVSIMD_TWOHALFOP(name)                                         \
-uint32_t ADVSIMD_HELPER(name, 2h)(uint32_t two_a, uint32_t two_b, void *fpstp) \
-{ \
-    float16  a1, a2, b1, b2;                        \
-    uint32_t r1, r2;                                \
-    float_status *fpst = fpstp;                     \
-    a1 = extract32(two_a, 0, 16);                   \
-    a2 = extract32(two_a, 16, 16);                  \
-    b1 = extract32(two_b, 0, 16);                   \
-    b2 = extract32(two_b, 16, 16);                  \
-    r1 = float16_ ## name(a1, b1, fpst);            \
-    r2 = float16_ ## name(a2, b2, fpst);            \
-    return deposit32(r1, 16, 16, r2);               \
-}
+#define ADVSIMD_TWOHALFOP(name)                                       \
+    uint32_t ADVSIMD_HELPER(name, 2h)(uint32_t two_a, uint32_t two_b, \
+                                      void *fpstp)                    \
+    {                                                                 \
+        float16 a1, a2, b1, b2;                                       \
+        uint32_t r1, r2;                                              \
+        float_status *fpst = fpstp;                                   \
+        a1 = extract32(two_a, 0, 16);                                 \
+        a2 = extract32(two_a, 16, 16);                                \
+        b1 = extract32(two_b, 0, 16);                                 \
+        b2 = extract32(two_b, 16, 16);                                \
+        r1 = float16_##name(a1, b1, fpst);                            \
+        r2 = float16_##name(a2, b2, fpst);                            \
+        return deposit32(r1, 16, 16, r2);                             \
+    }
 
 ADVSIMD_TWOHALFOP(add)
 ADVSIMD_TWOHALFOP(sub)
@@ -583,7 +584,7 @@ uint32_t HELPER(advsimd_muladd2h)(uint32_t two_a, uint32_t two_b,
                                   uint32_t two_c, void *fpstp)
 {
     float_status *fpst = fpstp;
-    float16  a1, a2, b1, b2, c1, c2;
+    float16 a1, a2, b1, b2, c1, c2;
     uint32_t r1, r2;
     a1 = extract32(two_a, 0, 16);
     a2 = extract32(two_a, 16, 16);
@@ -737,8 +738,7 @@ static int el_from_spsr(uint32_t spsr)
     }
 }
 
-static void cpsr_write_from_spsr_elx(CPUARMState *env,
-                                     uint32_t val)
+static void cpsr_write_from_spsr_elx(CPUARMState *env, uint32_t val)
 {
     uint32_t mask;
 
@@ -752,8 +752,7 @@ static void cpsr_write_from_spsr_elx(CPUARMState *env,
         val |= CPSR_DIT;
     }
 
-    mask = aarch32_cpsr_valid_mask(env->features, \
-        &env_archcpu(env)->isar);
+    mask = aarch32_cpsr_valid_mask(env->features, &env_archcpu(env)->isar);
     cpsr_write(env, val, mask, CPSRWriteRaw);
 }
 
@@ -822,7 +821,8 @@ void HELPER(exception_return)(CPUARMState *env, uint64_t new_pc)
             env->regs[15] = new_pc & ~0x3;
         }
         helper_rebuild_hflags_a32(env, new_el);
-        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+        qemu_log_mask(CPU_LOG_INT,
+                      "Exception return from AArch64 EL%d to "
                       "AArch32 EL%d PC 0x%" PRIx32 "\n",
                       cur_el, new_el, env->regs[15]);
     } else {
@@ -856,7 +856,8 @@ void HELPER(exception_return)(CPUARMState *env, uint64_t new_pc)
         }
         env->pc = new_pc;
 
-        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+        qemu_log_mask(CPU_LOG_INT,
+                      "Exception return from AArch64 EL%d to "
                       "AArch64 EL%d PC 0x%" PRIx64 "\n",
                       cur_el, new_el, env->pc);
     }
@@ -890,8 +891,10 @@ illegal_return:
         env->pstate &= ~PSTATE_SS;
     }
     helper_rebuild_hflags_a64(env, cur_el);
-    qemu_log_mask(LOG_GUEST_ERROR, "Illegal exception return at EL%d: "
-                  "resuming execution at 0x%" PRIx64 "\n", cur_el, env->pc);
+    qemu_log_mask(LOG_GUEST_ERROR,
+                  "Illegal exception return at EL%d: "
+                  "resuming execution at 0x%" PRIx64 "\n",
+                  cur_el, env->pc);
 }
 
 /*
@@ -934,7 +937,7 @@ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
          * the original pointer for an invalid page.  But watchpoints require
          * that we probe the actual space.  So do both.
          */
-        (void) probe_write(env, vaddr_in, 1, mmu_idx, ra);
+        (void)probe_write(env, vaddr_in, 1, mmu_idx, ra);
         mem = probe_write(env, vaddr, blocklen, mmu_idx, ra);
 
         if (unlikely(!mem)) {
@@ -956,6 +959,6 @@ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
 void HELPER(unaligned_access)(CPUARMState *env, uint64_t addr,
                               uint32_t access_type, uint32_t mmu_idx)
 {
-    arm_cpu_do_unaligned_access(env_cpu(env), addr, access_type,
-                                mmu_idx, GETPC());
+    arm_cpu_do_unaligned_access(env_cpu(env), addr, access_type, mmu_idx,
+                                GETPC());
 }

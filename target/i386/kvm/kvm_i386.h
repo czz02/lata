@@ -17,20 +17,18 @@
 
 #ifdef CONFIG_KVM
 
-#define kvm_pit_in_kernel() \
-    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
-#define kvm_pic_in_kernel()  \
-    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+#define kvm_pit_in_kernel() (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+#define kvm_pic_in_kernel() (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
 #define kvm_ioapic_in_kernel() \
     (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
 
 #else
 
-#define kvm_pit_in_kernel()      0
-#define kvm_pic_in_kernel()      0
-#define kvm_ioapic_in_kernel()   0
+#define kvm_pit_in_kernel() 0
+#define kvm_pic_in_kernel() 0
+#define kvm_ioapic_in_kernel() 0
 
-#endif  /* CONFIG_KVM */
+#endif /* CONFIG_KVM */
 
 bool kvm_has_smm(void);
 bool kvm_has_adjust_clock(void);
@@ -51,8 +49,8 @@ bool kvm_hv_vpindex_settable(void);
 bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp);
 
 uint64_t kvm_swizzle_msi_ext_dest_id(uint64_t address);
-void kvm_update_msi_routes_all(void *private, bool global,
-                               uint32_t index, uint32_t mask);
+void kvm_update_msi_routes_all(void *private, bool global, uint32_t index,
+                               uint32_t mask);
 
 bool kvm_enable_sgx_provisioning(KVMState *s);
 void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask);

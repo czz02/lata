@@ -25,24 +25,22 @@ static const VMStateDescription vmstate_tlb_entry = {
     .name = "tlb_entry",
     .version_id = 1,
     .minimum_version_id = 1,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINTTL(mr, OpenRISCTLBEntry),
-        VMSTATE_UINTTL(tr, OpenRISCTLBEntry),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_UINTTL(mr, OpenRISCTLBEntry),
+                                VMSTATE_UINTTL(tr, OpenRISCTLBEntry),
+                                VMSTATE_END_OF_LIST() }
 };
 
 static const VMStateDescription vmstate_cpu_tlb = {
     .name = "cpu_tlb",
     .version_id = 2,
     .minimum_version_id = 2,
-    .fields = (VMStateField[]) {
-        VMSTATE_STRUCT_ARRAY(itlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
-                             vmstate_tlb_entry, OpenRISCTLBEntry),
-        VMSTATE_STRUCT_ARRAY(dtlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
-                             vmstate_tlb_entry, OpenRISCTLBEntry),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields =
+        (VMStateField[]){
+            VMSTATE_STRUCT_ARRAY(itlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
+                                 vmstate_tlb_entry, OpenRISCTLBEntry),
+            VMSTATE_STRUCT_ARRAY(dtlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
+                                 vmstate_tlb_entry, OpenRISCTLBEntry),
+            VMSTATE_END_OF_LIST() }
 };
 
 static int get_sr(QEMUFile *f, void *opaque, size_t size,
@@ -71,53 +69,51 @@ static const VMStateDescription vmstate_env = {
     .name = "env",
     .version_id = 6,
     .minimum_version_id = 6,
-    .fields = (VMStateField[]) {
-        VMSTATE_UINTTL_2DARRAY(shadow_gpr, CPUOpenRISCState, 16, 32),
-        VMSTATE_UINTTL(pc, CPUOpenRISCState),
-        VMSTATE_UINTTL(ppc, CPUOpenRISCState),
-        VMSTATE_UINTTL(jmp_pc, CPUOpenRISCState),
-        VMSTATE_UINTTL(lock_addr, CPUOpenRISCState),
-        VMSTATE_UINTTL(lock_value, CPUOpenRISCState),
-        VMSTATE_UINTTL(epcr, CPUOpenRISCState),
-        VMSTATE_UINTTL(eear, CPUOpenRISCState),
+    .fields =
+        (VMStateField[]){
+            VMSTATE_UINTTL_2DARRAY(shadow_gpr, CPUOpenRISCState, 16, 32),
+            VMSTATE_UINTTL(pc, CPUOpenRISCState),
+            VMSTATE_UINTTL(ppc, CPUOpenRISCState),
+            VMSTATE_UINTTL(jmp_pc, CPUOpenRISCState),
+            VMSTATE_UINTTL(lock_addr, CPUOpenRISCState),
+            VMSTATE_UINTTL(lock_value, CPUOpenRISCState),
+            VMSTATE_UINTTL(epcr, CPUOpenRISCState),
+            VMSTATE_UINTTL(eear, CPUOpenRISCState),
 
-        /* Save the architecture value of the SR, not the internally
-           expanded version.  Since this architecture value does not
-           exist in memory to be stored, this requires a but of hoop
-           jumping.  We want OFFSET=0 so that we effectively pass ENV
-           to the helper functions, and we need to fill in the name by
-           hand since there's no field of that name.  */
-        {
-            .name = "sr",
-            .version_id = 0,
-            .size = sizeof(uint32_t),
-            .info = &vmstate_sr,
-            .flags = VMS_SINGLE,
-            .offset = 0
-        },
+            /* Save the architecture value of the SR, not the internally
+               expanded version.  Since this architecture value does not
+               exist in memory to be stored, this requires a but of hoop
+               jumping.  We want OFFSET=0 so that we effectively pass ENV
+               to the helper functions, and we need to fill in the name by
+               hand since there's no field of that name.  */
+            { .name = "sr",
+              .version_id = 0,
+              .size = sizeof(uint32_t),
+              .info = &vmstate_sr,
+              .flags = VMS_SINGLE,
+              .offset = 0 },
 
-        VMSTATE_UINT32(vr, CPUOpenRISCState),
-        VMSTATE_UINT32(upr, CPUOpenRISCState),
-        VMSTATE_UINT32(cpucfgr, CPUOpenRISCState),
-        VMSTATE_UINT32(dmmucfgr, CPUOpenRISCState),
-        VMSTATE_UINT32(immucfgr, CPUOpenRISCState),
-        VMSTATE_UINT32(evbar, CPUOpenRISCState),
-        VMSTATE_UINT32(pmr, CPUOpenRISCState),
-        VMSTATE_UINT32(esr, CPUOpenRISCState),
-        VMSTATE_UINT32(fpcsr, CPUOpenRISCState),
-        VMSTATE_UINT64(mac, CPUOpenRISCState),
+            VMSTATE_UINT32(vr, CPUOpenRISCState),
+            VMSTATE_UINT32(upr, CPUOpenRISCState),
+            VMSTATE_UINT32(cpucfgr, CPUOpenRISCState),
+            VMSTATE_UINT32(dmmucfgr, CPUOpenRISCState),
+            VMSTATE_UINT32(immucfgr, CPUOpenRISCState),
+            VMSTATE_UINT32(evbar, CPUOpenRISCState),
+            VMSTATE_UINT32(pmr, CPUOpenRISCState),
+            VMSTATE_UINT32(esr, CPUOpenRISCState),
+            VMSTATE_UINT32(fpcsr, CPUOpenRISCState),
+            VMSTATE_UINT64(mac, CPUOpenRISCState),
 
-        VMSTATE_STRUCT(tlb, CPUOpenRISCState, 1,
-                       vmstate_cpu_tlb, CPUOpenRISCTLBContext),
+            VMSTATE_STRUCT(tlb, CPUOpenRISCState, 1, vmstate_cpu_tlb,
+                           CPUOpenRISCTLBContext),
 
-        VMSTATE_TIMER_PTR(timer, CPUOpenRISCState),
-        VMSTATE_UINT32(ttmr, CPUOpenRISCState),
+            VMSTATE_TIMER_PTR(timer, CPUOpenRISCState),
+            VMSTATE_UINT32(ttmr, CPUOpenRISCState),
 
-        VMSTATE_UINT32(picmr, CPUOpenRISCState),
-        VMSTATE_UINT32(picsr, CPUOpenRISCState),
+            VMSTATE_UINT32(picmr, CPUOpenRISCState),
+            VMSTATE_UINT32(picsr, CPUOpenRISCState),
 
-        VMSTATE_END_OF_LIST()
-    }
+            VMSTATE_END_OF_LIST() }
 };
 
 static int cpu_post_load(void *opaque, int version_id)
@@ -135,9 +131,8 @@ const VMStateDescription vmstate_openrisc_cpu = {
     .version_id = 1,
     .minimum_version_id = 1,
     .post_load = cpu_post_load,
-    .fields = (VMStateField[]) {
-        VMSTATE_CPU(),
-        VMSTATE_STRUCT(env, OpenRISCCPU, 1, vmstate_env, CPUOpenRISCState),
-        VMSTATE_END_OF_LIST()
-    }
+    .fields = (VMStateField[]){ VMSTATE_CPU(),
+                                VMSTATE_STRUCT(env, OpenRISCCPU, 1, vmstate_env,
+                                               CPUOpenRISCState),
+                                VMSTATE_END_OF_LIST() }
 };

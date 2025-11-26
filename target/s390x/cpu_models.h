@@ -19,13 +19,13 @@
 
 /* static CPU definition */
 struct S390CPUDef {
-    const char *name;       /* name exposed to the user */
-    const char *desc;       /* description exposed to the user */
-    uint8_t gen;            /* hw generation identification */
-    uint16_t type;          /* cpu type identification */
-    uint8_t ec_ga;          /* EC GA version (on which also the BC is based) */
-    uint8_t mha_pow;        /* maximum host address power, mha = 2^pow-1 */
-    uint32_t hmfai;         /* hypervisor-managed facilities */
+    const char *name; /* name exposed to the user */
+    const char *desc; /* description exposed to the user */
+    uint8_t gen; /* hw generation identification */
+    uint16_t type; /* cpu type identification */
+    uint8_t ec_ga; /* EC GA version (on which also the BC is based) */
+    uint8_t mha_pow; /* maximum host address power, mha = 2^pow-1 */
+    uint32_t hmfai; /* hypervisor-managed facilities */
     /* base/min features, must never be changed between QEMU versions */
     S390FeatBitmap base_feat;
     /* used to init base_feat from generated data */
@@ -45,10 +45,10 @@ struct S390CPUModel {
     const S390CPUDef *def;
     S390FeatBitmap features;
     /* values copied from the "host" model, can change during migration */
-    uint16_t lowest_ibc;    /* lowest IBC that the hardware supports */
-    uint32_t cpu_id;        /* CPU id */
-    uint8_t cpu_id_format;  /* CPU id format bit */
-    uint8_t cpu_ver;        /* CPU version, usually "ff" for kvm */
+    uint16_t lowest_ibc; /* lowest IBC that the hardware supports */
+    uint32_t cpu_id; /* CPU id */
+    uint8_t cpu_id_format; /* CPU id format bit */
+    uint8_t cpu_ver; /* CPU version, usually "ff" for kvm */
 };
 
 /*
@@ -60,18 +60,18 @@ struct S390CPUModel {
  * bit  48: CPU ID format
  * bits 49-63: Zeroes
  */
-#define cpuid_type(x)     (((x) >> 16) & 0xffff)
-#define cpuid_id(x)       (((x) >> 32) & 0xffffff)
-#define cpuid_ver(x)      (((x) >> 56) & 0xff)
-#define cpuid_format(x)   (((x) >> 15) & 0x1)
+#define cpuid_type(x) (((x) >> 16) & 0xffff)
+#define cpuid_id(x) (((x) >> 32) & 0xffffff)
+#define cpuid_ver(x) (((x) >> 56) & 0xff)
+#define cpuid_format(x) (((x) >> 15) & 0x1)
 
-#define lowest_ibc(x)     (((uint32_t)(x) >> 16) & 0xfff)
-#define unblocked_ibc(x)  ((uint32_t)(x) & 0xfff)
-#define has_ibc(x)        (lowest_ibc(x) != 0)
+#define lowest_ibc(x) (((uint32_t)(x) >> 16) & 0xfff)
+#define unblocked_ibc(x) ((uint32_t)(x) & 0xfff)
+#define has_ibc(x) (lowest_ibc(x) != 0)
 
 #define S390_GEN_Z10 0xa
-#define ibc_gen(x)        (x == 0 ? 0 : ((x >> 4) + S390_GEN_Z10))
-#define ibc_ec_ga(x)      (x & 0xf)
+#define ibc_gen(x) (x == 0 ? 0 : ((x >> 4) + S390_GEN_Z10))
+#define ibc_ec_ga(x) (x & 0xf)
 
 void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat);
 void s390_cpudef_featoff_greater(uint8_t gen, uint8_t ec_ga, S390Feat feat);
@@ -117,7 +117,7 @@ S390CPUDef const *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
 #ifdef CONFIG_KVM
 bool kvm_s390_cpu_models_supported(void);
 void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp);
-void kvm_s390_apply_cpu_model(const S390CPUModel *model,  Error **errp);
+void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp);
 #else
 static inline void kvm_s390_get_host_cpu_model(S390CPUModel *model,
                                                Error **errp)

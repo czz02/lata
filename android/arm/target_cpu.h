@@ -39,7 +39,7 @@ static inline unsigned long arm_max_reserved_va(CPUState *cs)
         return 0xfffffffful;
     }
 }
-#define MAX_RESERVED_VA  arm_max_reserved_va
+#define MAX_RESERVED_VA arm_max_reserved_va
 
 static inline void cpu_clone_regs_child(CPUARMState *env, target_ulong newsp,
                                         unsigned flags)
@@ -74,6 +74,6 @@ static inline target_ulong cpu_get_tls(CPUARMState *env)
 
 static inline abi_ulong get_sp_from_cpustate(CPUARMState *state)
 {
-   return state->regs[13];
+    return state->regs[13];
 }
 #endif

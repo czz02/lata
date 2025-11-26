@@ -375,7 +375,7 @@ typedef arg_ldst_tag arg_LDGM;
 typedef arg_ldst_tag arg_STZ2G;
 
 /* arguments for translation function*/
-union a64_u{
+union a64_u {
     arg_atomic f_atomic;
     arg_bitfield f_bitfield;
     arg_bra f_bra;
@@ -410,6 +410,6 @@ union a64_u{
     arg_stlr f_stlr;
     arg_stxr f_stxr;
     arg_tbz f_tbz;
-} ;
+};
 
 #endif

@@ -48,8 +48,8 @@ static uint64_t io_eir_read(void *opaque, hwaddr addr, unsigned size)
     return cpu->env.cr[CR_EIRR];
 }
 
-static void io_eir_write(void *opaque, hwaddr addr,
-                         uint64_t data, unsigned size)
+static void io_eir_write(void *opaque, hwaddr addr, uint64_t data,
+                         unsigned size)
 {
     HPPACPU *cpu = opaque;
     int le_bit = ~data & (TARGET_REGISTER_BITS - 1);
@@ -138,32 +138,30 @@ void hppa_cpu_do_interrupt(CPUState *cs)
         case EXCP_DMB:
         case EXCP_TLB_DIRTY:
         case EXCP_PAGE_REF:
-        case EXCP_ASSIST_EMU:
-            {
-                /* Avoid reading directly from the virtual address, lest we
-                   raise another exception from some sort of TLB issue.  */
-                /* ??? An alternate fool-proof method would be to store the
-                   instruction data into the unwind info.  That's probably
-                   a bit too much in the way of extra storage required.  */
-                vaddr vaddr;
-                hwaddr paddr;
+        case EXCP_ASSIST_EMU: {
+            /* Avoid reading directly from the virtual address, lest we
+               raise another exception from some sort of TLB issue.  */
+            /* ??? An alternate fool-proof method would be to store the
+               instruction data into the unwind info.  That's probably
+               a bit too much in the way of extra storage required.  */
+            vaddr vaddr;
+            hwaddr paddr;
 
-                paddr = vaddr = iaoq_f & -4;
-                if (old_psw & PSW_C) {
-                    int prot, t;
+            paddr = vaddr = iaoq_f & -4;
+            if (old_psw & PSW_C) {
+                int prot, t;
 
-                    vaddr = hppa_form_gva_psw(old_psw, iasq_f, vaddr);
-                    t = hppa_get_physical_address(env, vaddr, MMU_KERNEL_IDX,
-                                                  0, &paddr, &prot);
-                    if (t >= 0) {
-                        /* We can't re-load the instruction.  */
-                        env->cr[CR_IIR] = 0;
-                        break;
-                    }
+                vaddr = hppa_form_gva_psw(old_psw, iasq_f, vaddr);
+                t = hppa_get_physical_address(env, vaddr, MMU_KERNEL_IDX, 0,
+                                              &paddr, &prot);
+                if (t >= 0) {
+                    /* We can't re-load the instruction.  */
+                    env->cr[CR_IIR] = 0;
+                    break;
                 }
-                env->cr[CR_IIR] = ldl_phys(cs->as, paddr);
             }
-            break;
+            env->cr[CR_IIR] = ldl_phys(cs->as, paddr);
+        } break;
 
         default:
             /* Other exceptions do not set IIR.  */
@@ -194,39 +192,39 @@ void hppa_cpu_do_interrupt(CPUState *cs)
     env->iasq_b = 0;
 
     if (qemu_loglevel_mask(CPU_LOG_INT)) {
-        static const char * const names[] = {
-            [EXCP_HPMC]          = "high priority machine check",
-            [EXCP_POWER_FAIL]    = "power fail interrupt",
-            [EXCP_RC]            = "recovery counter trap",
+        static const char *const names[] = {
+            [EXCP_HPMC] = "high priority machine check",
+            [EXCP_POWER_FAIL] = "power fail interrupt",
+            [EXCP_RC] = "recovery counter trap",
             [EXCP_EXT_INTERRUPT] = "external interrupt",
-            [EXCP_LPMC]          = "low priority machine check",
-            [EXCP_ITLB_MISS]     = "instruction tlb miss fault",
-            [EXCP_IMP]           = "instruction memory protection trap",
-            [EXCP_ILL]           = "illegal instruction trap",
-            [EXCP_BREAK]         = "break instruction trap",
-            [EXCP_PRIV_OPR]      = "privileged operation trap",
-            [EXCP_PRIV_REG]      = "privileged register trap",
-            [EXCP_OVERFLOW]      = "overflow trap",
-            [EXCP_COND]          = "conditional trap",
-            [EXCP_ASSIST]        = "assist exception trap",
-            [EXCP_DTLB_MISS]     = "data tlb miss fault",
-            [EXCP_NA_ITLB_MISS]  = "non-access instruction tlb miss",
-            [EXCP_NA_DTLB_MISS]  = "non-access data tlb miss",
-            [EXCP_DMP]           = "data memory protection trap",
-            [EXCP_DMB]           = "data memory break trap",
-            [EXCP_TLB_DIRTY]     = "tlb dirty bit trap",
-            [EXCP_PAGE_REF]      = "page reference trap",
-            [EXCP_ASSIST_EMU]    = "assist emulation trap",
-            [EXCP_HPT]           = "high-privilege transfer trap",
-            [EXCP_LPT]           = "low-privilege transfer trap",
-            [EXCP_TB]            = "taken branch trap",
-            [EXCP_DMAR]          = "data memory access rights trap",
-            [EXCP_DMPI]          = "data memory protection id trap",
-            [EXCP_UNALIGN]       = "unaligned data reference trap",
+            [EXCP_LPMC] = "low priority machine check",
+            [EXCP_ITLB_MISS] = "instruction tlb miss fault",
+            [EXCP_IMP] = "instruction memory protection trap",
+            [EXCP_ILL] = "illegal instruction trap",
+            [EXCP_BREAK] = "break instruction trap",
+            [EXCP_PRIV_OPR] = "privileged operation trap",
+            [EXCP_PRIV_REG] = "privileged register trap",
+            [EXCP_OVERFLOW] = "overflow trap",
+            [EXCP_COND] = "conditional trap",
+            [EXCP_ASSIST] = "assist exception trap",
+            [EXCP_DTLB_MISS] = "data tlb miss fault",
+            [EXCP_NA_ITLB_MISS] = "non-access instruction tlb miss",
+            [EXCP_NA_DTLB_MISS] = "non-access data tlb miss",
+            [EXCP_DMP] = "data memory protection trap",
+            [EXCP_DMB] = "data memory break trap",
+            [EXCP_TLB_DIRTY] = "tlb dirty bit trap",
+            [EXCP_PAGE_REF] = "page reference trap",
+            [EXCP_ASSIST_EMU] = "assist emulation trap",
+            [EXCP_HPT] = "high-privilege transfer trap",
+            [EXCP_LPT] = "low-privilege transfer trap",
+            [EXCP_TB] = "taken branch trap",
+            [EXCP_DMAR] = "data memory access rights trap",
+            [EXCP_DMPI] = "data memory protection id trap",
+            [EXCP_UNALIGN] = "unaligned data reference trap",
             [EXCP_PER_INTERRUPT] = "performance monitor interrupt",
-            [EXCP_SYSCALL]       = "syscall",
-            [EXCP_SYSCALL_LWS]   = "syscall-lws",
-            [EXCP_TOC]           = "TOC (transfer of control)",
+            [EXCP_SYSCALL] = "syscall",
+            [EXCP_SYSCALL_LWS] = "syscall-lws",
+            [EXCP_TOC] = "TOC (transfer of control)",
         };
         static int count;
         const char *name = NULL;
@@ -241,10 +239,8 @@ void hppa_cpu_do_interrupt(CPUState *cs)
         }
         qemu_log("INT %6d: %s @ " TARGET_FMT_lx "," TARGET_FMT_lx
                  " -> " TREG_FMT_lx " " TARGET_FMT_lx "\n",
-                 ++count, name,
-                 hppa_form_gva(env, iasq_f, iaoq_f),
-                 hppa_form_gva(env, iasq_b, iaoq_b),
-                 env->iaoq_f,
+                 ++count, name, hppa_form_gva(env, iasq_f, iaoq_f),
+                 hppa_form_gva(env, iasq_b, iaoq_b), env->iaoq_f,
                  hppa_form_gva(env, (uint64_t)env->cr[CR_ISR] << 32,
                                env->cr[CR_IOR]));
     }

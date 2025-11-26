@@ -84,10 +84,8 @@ void x86_cpu_do_interrupt(CPUState *cs)
     /* if user mode only, we simulate a fake exception
        which will be handled outside the cpu execution
        loop */
-    do_interrupt_user(env, cs->exception_index,
-                      env->exception_is_int,
-                      env->error_code,
-                      env->exception_next_eip);
+    do_interrupt_user(env, cs->exception_index, env->exception_is_int,
+                      env->error_code, env->exception_next_eip);
     /* successfully delivered */
     env->old_exception = -1;
 }
@@ -97,10 +95,9 @@ void cpu_x86_load_seg(CPUX86State *env, X86Seg seg_reg, int selector)
     if (!(env->cr[0] & CR0_PE_MASK) || (env->eflags & VM_MASK)) {
         int dpl = (env->eflags & VM_MASK) ? 3 : 0;
         selector &= 0xffff;
-        cpu_x86_load_seg_cache(env, seg_reg, selector,
-                               (selector << 4), 0xffff,
+        cpu_x86_load_seg_cache(env, seg_reg, selector, (selector << 4), 0xffff,
                                DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                               DESC_A_MASK | (dpl << DESC_DPL_SHIFT));
+                                   DESC_A_MASK | (dpl << DESC_DPL_SHIFT));
     } else {
         helper_load_seg(env, seg_reg, selector);
     }

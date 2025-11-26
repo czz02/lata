@@ -24,7 +24,6 @@
 
 target_ulong HELPER(cm_jalt)(CPURISCVState *env, uint32_t index)
 {
-
 #if !defined(CONFIG_USER_ONLY)
     RISCVException ret = smstateen_acc_ok(env, 0, SMSTATEEN0_JVT);
     if (ret != RISCV_EXCP_NONE) {

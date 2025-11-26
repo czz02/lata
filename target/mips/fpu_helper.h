@@ -46,12 +46,7 @@ static inline void restore_fp_status(CPUMIPSState *env)
 
 /* MSA */
 
-enum CPUMIPSMSADataFormat {
-    DF_BYTE = 0,
-    DF_HALF,
-    DF_WORD,
-    DF_DOUBLE
-};
+enum CPUMIPSMSADataFormat { DF_BYTE = 0, DF_HALF, DF_WORD, DF_DOUBLE };
 
 static inline void restore_msa_fp_status(CPUMIPSState *env)
 {

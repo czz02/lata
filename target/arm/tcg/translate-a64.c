@@ -37,10 +37,9 @@ static TCGv_i64 cpu_pc;
 static TCGv_i64 cpu_exclusive_high;
 
 static const char *regnames[] = {
-    "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7",
-    "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15",
-    "x16", "x17", "x18", "x19", "x20", "x21", "x22", "x23",
-    "x24", "x25", "x26", "x27", "x28", "x29", "lr", "sp"
+    "x0",  "x1",  "x2",  "x3",  "x4",  "x5",  "x6",  "x7",  "x8",  "x9",  "x10",
+    "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x18", "x19", "x20", "x21",
+    "x22", "x23", "x24", "x25", "x26", "x27", "x28", "x29", "lr",  "sp"
 };
 
 enum a64_shift_type {
@@ -95,17 +94,14 @@ void a64_translate_init(void)
 {
     int i;
 
-    cpu_pc = tcg_global_mem_new_i64(cpu_env,
-                                    offsetof(CPUARMState, pc),
-                                    "pc");
+    cpu_pc = tcg_global_mem_new_i64(cpu_env, offsetof(CPUARMState, pc), "pc");
     for (i = 0; i < 32; i++) {
-        cpu_X[i] = tcg_global_mem_new_i64(cpu_env,
-                                          offsetof(CPUARMState, xregs[i]),
-                                          regnames[i]);
+        cpu_X[i] = tcg_global_mem_new_i64(
+            cpu_env, offsetof(CPUARMState, xregs[i]), regnames[i]);
     }
 
-    cpu_exclusive_high = tcg_global_mem_new_i64(cpu_env,
-        offsetof(CPUARMState, exclusive_high), "exclusive_high");
+    cpu_exclusive_high = tcg_global_mem_new_i64(
+        cpu_env, offsetof(CPUARMState, exclusive_high), "exclusive_high");
 }
 
 /*
@@ -192,8 +188,8 @@ void gen_a64_update_pc(DisasContext *s, target_long diff)
  *
  * Here We have concatenated TBI{1,0} into tbi.
  */
-static void gen_top_byte_ignore(DisasContext *s, TCGv_i64 dst,
-                                TCGv_i64 src, int tbi)
+static void gen_top_byte_ignore(DisasContext *s, TCGv_i64 dst, TCGv_i64 src,
+                                int tbi)
 {
     if (tbi == 0) {
         /* Load unmodified address */
@@ -262,11 +258,10 @@ static void gen_address_with_allocation_tag0(TCGv_i64 dst, TCGv_i64 src)
     tcg_gen_andi_i64(dst, src, ~MAKE_64BIT_MASK(56, 4));
 }
 
-static void gen_probe_access(DisasContext *s, TCGv_i64 ptr,
-                             MMUAccessType acc, int log2_size)
+static void gen_probe_access(DisasContext *s, TCGv_i64 ptr, MMUAccessType acc,
+                             int log2_size)
 {
-    gen_helper_probe_access(cpu_env, ptr,
-                            tcg_constant_i32(acc),
+    gen_helper_probe_access(cpu_env, ptr, tcg_constant_i32(acc),
                             tcg_constant_i32(get_mem_index(s)),
                             tcg_constant_i32(1 << log2_size));
 }
@@ -279,8 +274,7 @@ static void gen_probe_access(DisasContext *s, TCGv_i64 ptr,
  */
 static TCGv_i64 gen_mte_check1_mmuidx(DisasContext *s, TCGv_i64 addr,
                                       bool is_write, bool tag_checked,
-                                      MemOp memop, bool is_unpriv,
-                                      int core_idx)
+                                      MemOp memop, bool is_unpriv, int core_idx)
 {
     if (tag_checked && s->mte_active[is_unpriv]) {
         TCGv_i64 ret;
@@ -304,8 +298,8 @@ static TCGv_i64 gen_mte_check1_mmuidx(DisasContext *s, TCGv_i64 addr,
 TCGv_i64 gen_mte_check1(DisasContext *s, TCGv_i64 addr, bool is_write,
                         bool tag_checked, MemOp memop)
 {
-    return gen_mte_check1_mmuidx(s, addr, is_write, tag_checked, memop,
-                                 false, get_mem_index(s));
+    return gen_mte_check1_mmuidx(s, addr, is_write, tag_checked, memop, false,
+                                 get_mem_index(s));
 }
 
 /*
@@ -339,8 +333,8 @@ TCGv_i64 gen_mte_checkN(DisasContext *s, TCGv_i64 addr, bool is_write,
  * naturally aligned, but it must not cross a 16-byte boundary.
  * See AArch64.CheckAlignment().
  */
-static void check_lse2_align(DisasContext *s, int rn, int imm,
-                             bool is_write, MemOp mop)
+static void check_lse2_align(DisasContext *s, int rn, int imm, bool is_write,
+                             MemOp mop)
 {
     TCGv_i32 tmp;
     TCGv_i64 addr;
@@ -366,7 +360,6 @@ static void check_lse2_align(DisasContext *s, int rn, int imm,
                                 tcg_constant_i32(mmu_idx));
 
     gen_set_label(over_label);
-
 }
 
 /* Handle the alignment check for AccType_ATOMIC instructions. */
@@ -384,8 +377,7 @@ static MemOp check_atomic_align(DisasContext *s, int rn, MemOp mop)
      * be quadword aligned.
      */
     if (size == MO_128) {
-        return finalize_memop_atom(s, MO_128 | MO_ALIGN,
-                                   MO_ATOM_IFALIGN_PAIR);
+        return finalize_memop_atom(s, MO_128 | MO_ALIGN, MO_ATOM_IFALIGN_PAIR);
     }
     if (dc_isar_feature(aa64_lse2, s)) {
         check_lse2_align(s, rn, 0, true, mop);
@@ -405,8 +397,7 @@ static MemOp check_ordered_align(DisasContext *s, int rn, int imm,
         return mop;
     }
     if (size == MO_128) {
-        return finalize_memop_atom(s, MO_128 | MO_ALIGN,
-                                   MO_ATOM_IFALIGN_PAIR);
+        return finalize_memop_atom(s, MO_128 | MO_ALIGN, MO_ATOM_IFALIGN_PAIR);
     }
     if (!dc_isar_feature(aa64_lse2, s)) {
         mop |= MO_ALIGN;
@@ -430,7 +421,7 @@ static void a64_test_cc(DisasCompare64 *c64, int cc)
     /*
      * Sign-extend the 32-bit value so that the GE/LT comparisons work
      * properly.  The NE/EQ comparisons are also fine with this choice.
-      */
+     */
     c64->cond = c32.cond;
     c64->value = tcg_temp_new_i64();
     tcg_gen_ext_i32_i64(c64->value, c32.value);
@@ -666,8 +657,8 @@ static void gen_gvec_fn2(DisasContext *s, bool is_q, int rd, int rn,
 static void gen_gvec_fn2i(DisasContext *s, bool is_q, int rd, int rn,
                           int64_t imm, GVecGen2iFn *gvec_fn, int vece)
 {
-    gvec_fn(vece, vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
-            imm, is_q ? 16 : 8, vec_full_reg_size(s));
+    gvec_fn(vece, vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn), imm,
+            is_q ? 16 : 8, vec_full_reg_size(s));
 }
 
 /* Expand a 3-operand AdvSIMD vector operation using an expander function.  */
@@ -688,22 +679,20 @@ static void gen_gvec_fn4(DisasContext *s, bool is_q, int rd, int rn, int rm,
 }
 
 /* Expand a 2-operand operation using an out-of-line helper.  */
-static void gen_gvec_op2_ool(DisasContext *s, bool is_q, int rd,
-                             int rn, int data, gen_helper_gvec_2 *fn)
+static void gen_gvec_op2_ool(DisasContext *s, bool is_q, int rd, int rn,
+                             int data, gen_helper_gvec_2 *fn)
 {
-    tcg_gen_gvec_2_ool(vec_full_reg_offset(s, rd),
-                       vec_full_reg_offset(s, rn),
+    tcg_gen_gvec_2_ool(vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
                        is_q ? 16 : 8, vec_full_reg_size(s), data, fn);
 }
 
 /* Expand a 3-operand operation using an out-of-line helper.  */
-static void gen_gvec_op3_ool(DisasContext *s, bool is_q, int rd,
-                             int rn, int rm, int data, gen_helper_gvec_3 *fn)
+static void gen_gvec_op3_ool(DisasContext *s, bool is_q, int rd, int rn, int rm,
+                             int data, gen_helper_gvec_3 *fn)
 {
-    tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
-                       vec_full_reg_offset(s, rn),
-                       vec_full_reg_offset(s, rm),
-                       is_q ? 16 : 8, vec_full_reg_size(s), data, fn);
+    tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                       vec_full_reg_offset(s, rm), is_q ? 16 : 8,
+                       vec_full_reg_size(s), data, fn);
 }
 
 /* Expand a 3-operand + fpstatus pointer + simd data value operation using
@@ -714,33 +703,29 @@ static void gen_gvec_op3_fpst(DisasContext *s, bool is_q, int rd, int rn,
                               gen_helper_gvec_3_ptr *fn)
 {
     TCGv_ptr fpst = fpstatus_ptr(is_fp16 ? FPST_FPCR_F16 : FPST_FPCR);
-    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-                       vec_full_reg_offset(s, rn),
-                       vec_full_reg_offset(s, rm), fpst,
-                       is_q ? 16 : 8, vec_full_reg_size(s), data, fn);
+    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                       vec_full_reg_offset(s, rm), fpst, is_q ? 16 : 8,
+                       vec_full_reg_size(s), data, fn);
 }
 
 /* Expand a 3-operand + qc + operation using an out-of-line helper.  */
-static void gen_gvec_op3_qc(DisasContext *s, bool is_q, int rd, int rn,
-                            int rm, gen_helper_gvec_3_ptr *fn)
+static void gen_gvec_op3_qc(DisasContext *s, bool is_q, int rd, int rn, int rm,
+                            gen_helper_gvec_3_ptr *fn)
 {
     TCGv_ptr qc_ptr = tcg_temp_new_ptr();
 
     tcg_gen_addi_ptr(qc_ptr, cpu_env, offsetof(CPUARMState, vfp.qc));
-    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-                       vec_full_reg_offset(s, rn),
-                       vec_full_reg_offset(s, rm), qc_ptr,
-                       is_q ? 16 : 8, vec_full_reg_size(s), 0, fn);
+    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                       vec_full_reg_offset(s, rm), qc_ptr, is_q ? 16 : 8,
+                       vec_full_reg_size(s), 0, fn);
 }
 
 /* Expand a 4-operand operation using an out-of-line helper.  */
-static void gen_gvec_op4_ool(DisasContext *s, bool is_q, int rd, int rn,
-                             int rm, int ra, int data, gen_helper_gvec_4 *fn)
+static void gen_gvec_op4_ool(DisasContext *s, bool is_q, int rd, int rn, int rm,
+                             int ra, int data, gen_helper_gvec_4 *fn)
 {
-    tcg_gen_gvec_4_ool(vec_full_reg_offset(s, rd),
-                       vec_full_reg_offset(s, rn),
-                       vec_full_reg_offset(s, rm),
-                       vec_full_reg_offset(s, ra),
+    tcg_gen_gvec_4_ool(vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                       vec_full_reg_offset(s, rm), vec_full_reg_offset(s, ra),
                        is_q ? 16 : 8, vec_full_reg_size(s), data, fn);
 }
 
@@ -753,11 +738,9 @@ static void gen_gvec_op4_fpst(DisasContext *s, bool is_q, int rd, int rn,
                               gen_helper_gvec_4_ptr *fn)
 {
     TCGv_ptr fpst = fpstatus_ptr(is_fp16 ? FPST_FPCR_F16 : FPST_FPCR);
-    tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, rd),
-                       vec_full_reg_offset(s, rn),
-                       vec_full_reg_offset(s, rm),
-                       vec_full_reg_offset(s, ra), fpst,
-                       is_q ? 16 : 8, vec_full_reg_size(s), data, fn);
+    tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                       vec_full_reg_offset(s, rm), vec_full_reg_offset(s, ra),
+                       fpst, is_q ? 16 : 8, vec_full_reg_size(s), data, fn);
 }
 
 /* Set ZF and NF based on a 64 bit result. This is alas fiddlier
@@ -945,34 +928,26 @@ static void gen_adc_CC(int sf, TCGv_i64 dest, TCGv_i64 t0, TCGv_i64 t1)
  */
 static void do_gpr_st_memidx(DisasContext *s, TCGv_i64 source,
                              TCGv_i64 tcg_addr, MemOp memop, int memidx,
-                             bool iss_valid,
-                             unsigned int iss_srt,
-                             bool iss_sf, bool iss_ar)
+                             bool iss_valid, unsigned int iss_srt, bool iss_sf,
+                             bool iss_ar)
 {
     tcg_gen_qemu_st_i64(source, tcg_addr, memidx, memop);
 
     if (iss_valid) {
         uint32_t syn;
 
-        syn = syn_data_abort_with_iss(0,
-                                      (memop & MO_SIZE),
-                                      false,
-                                      iss_srt,
-                                      iss_sf,
-                                      iss_ar,
-                                      0, 0, 0, 0, 0, false);
+        syn = syn_data_abort_with_iss(0, (memop & MO_SIZE), false, iss_srt,
+                                      iss_sf, iss_ar, 0, 0, 0, 0, 0, false);
         disas_set_insn_syndrome(s, syn);
     }
 }
 
-static void do_gpr_st(DisasContext *s, TCGv_i64 source,
-                      TCGv_i64 tcg_addr, MemOp memop,
-                      bool iss_valid,
-                      unsigned int iss_srt,
+static void do_gpr_st(DisasContext *s, TCGv_i64 source, TCGv_i64 tcg_addr,
+                      MemOp memop, bool iss_valid, unsigned int iss_srt,
                       bool iss_sf, bool iss_ar)
 {
-    do_gpr_st_memidx(s, source, tcg_addr, memop, get_mem_index(s),
-                     iss_valid, iss_srt, iss_sf, iss_ar);
+    do_gpr_st_memidx(s, source, tcg_addr, memop, get_mem_index(s), iss_valid,
+                     iss_srt, iss_sf, iss_ar);
 }
 
 /*
@@ -980,8 +955,8 @@ static void do_gpr_st(DisasContext *s, TCGv_i64 source,
  */
 static void do_gpr_ld_memidx(DisasContext *s, TCGv_i64 dest, TCGv_i64 tcg_addr,
                              MemOp memop, bool extend, int memidx,
-                             bool iss_valid, unsigned int iss_srt,
-                             bool iss_sf, bool iss_ar)
+                             bool iss_valid, unsigned int iss_srt, bool iss_sf,
+                             bool iss_ar)
 {
     tcg_gen_qemu_ld_i64(dest, tcg_addr, memidx, memop);
 
@@ -993,21 +968,16 @@ static void do_gpr_ld_memidx(DisasContext *s, TCGv_i64 dest, TCGv_i64 tcg_addr,
     if (iss_valid) {
         uint32_t syn;
 
-        syn = syn_data_abort_with_iss(0,
-                                      (memop & MO_SIZE),
-                                      (memop & MO_SIGN) != 0,
-                                      iss_srt,
-                                      iss_sf,
-                                      iss_ar,
-                                      0, 0, 0, 0, 0, false);
+        syn = syn_data_abort_with_iss(0, (memop & MO_SIZE),
+                                      (memop & MO_SIGN) != 0, iss_srt, iss_sf,
+                                      iss_ar, 0, 0, 0, 0, 0, false);
         disas_set_insn_syndrome(s, syn);
     }
 }
 
 static void do_gpr_ld(DisasContext *s, TCGv_i64 dest, TCGv_i64 tcg_addr,
-                      MemOp memop, bool extend,
-                      bool iss_valid, unsigned int iss_srt,
-                      bool iss_sf, bool iss_ar)
+                      MemOp memop, bool extend, bool iss_valid,
+                      unsigned int iss_srt, bool iss_sf, bool iss_ar)
 {
     do_gpr_ld_memidx(s, dest, tcg_addr, memop, extend, get_mem_index(s),
                      iss_valid, iss_srt, iss_sf, iss_ar);
@@ -1091,17 +1061,17 @@ static void read_vec_element(DisasContext *s, TCGv_i64 tcg_dest, int srcidx,
     case MO_32:
         tcg_gen_ld32u_i64(tcg_dest, cpu_env, vect_off);
         break;
-    case MO_8|MO_SIGN:
+    case MO_8 | MO_SIGN:
         tcg_gen_ld8s_i64(tcg_dest, cpu_env, vect_off);
         break;
-    case MO_16|MO_SIGN:
+    case MO_16 | MO_SIGN:
         tcg_gen_ld16s_i64(tcg_dest, cpu_env, vect_off);
         break;
-    case MO_32|MO_SIGN:
+    case MO_32 | MO_SIGN:
         tcg_gen_ld32s_i64(tcg_dest, cpu_env, vect_off);
         break;
     case MO_64:
-    case MO_64|MO_SIGN:
+    case MO_64 | MO_SIGN:
         tcg_gen_ld_i64(tcg_dest, cpu_env, vect_off);
         break;
     default:
@@ -1120,14 +1090,14 @@ static void read_vec_element_i32(DisasContext *s, TCGv_i32 tcg_dest, int srcidx,
     case MO_16:
         tcg_gen_ld16u_i32(tcg_dest, cpu_env, vect_off);
         break;
-    case MO_8|MO_SIGN:
+    case MO_8 | MO_SIGN:
         tcg_gen_ld8s_i32(tcg_dest, cpu_env, vect_off);
         break;
-    case MO_16|MO_SIGN:
+    case MO_16 | MO_SIGN:
         tcg_gen_ld16s_i32(tcg_dest, cpu_env, vect_off);
         break;
     case MO_32:
-    case MO_32|MO_SIGN:
+    case MO_32 | MO_SIGN:
         tcg_gen_ld_i32(tcg_dest, cpu_env, vect_off);
         break;
     default:
@@ -1245,14 +1215,14 @@ bool sve_access_check(DisasContext *s)
             goto fail_exit;
         }
     } else if (s->sve_excp_el) {
-        gen_exception_insn_el(s, 0, EXCP_UDEF,
-                              syn_sve_access_trap(), s->sve_excp_el);
+        gen_exception_insn_el(s, 0, EXCP_UDEF, syn_sve_access_trap(),
+                              s->sve_excp_el);
         goto fail_exit;
     }
     s->sve_access_checked = true;
     return fp_access_check(s);
 
- fail_exit:
+fail_exit:
     /* Assert that we only raise one exception per instruction. */
     assert(!s->sve_access_checked);
     s->sve_access_checked = true;
@@ -1314,8 +1284,8 @@ bool sme_enabled_check_with_svcr(DisasContext *s, unsigned req)
  * optional shift. You will likely want to pass a temporary for the
  * destination register. See DecodeRegExtend() in the ARM ARM.
  */
-static void ext_and_shift_reg(TCGv_i64 tcg_out, TCGv_i64 tcg_in,
-                              int option, unsigned int shift)
+static void ext_and_shift_reg(TCGv_i64 tcg_out, TCGv_i64 tcg_in, int option,
+                              unsigned int shift)
 {
     int extsize = extract32(option, 0, 2);
     bool is_signed = extract32(option, 2, 1);
@@ -1428,8 +1398,8 @@ static bool trans_CBZ(DisasContext *s, arg_cbz *a)
     reset_btype(s);
 
     match = gen_disas_label(s);
-    tcg_gen_brcondi_i64(a->nz ? TCG_COND_NE : TCG_COND_EQ,
-                        tcg_cmp, 0, match.label);
+    tcg_gen_brcondi_i64(a->nz ? TCG_COND_NE : TCG_COND_EQ, tcg_cmp, 0,
+                        match.label);
     gen_goto_tb(s, 0, 4);
     set_disas_label(s, match);
     gen_goto_tb(s, 1, a->imm);
@@ -1447,8 +1417,8 @@ static bool trans_TBZ(DisasContext *s, arg_tbz *a)
     reset_btype(s);
 
     match = gen_disas_label(s);
-    tcg_gen_brcondi_i64(a->nz ? TCG_COND_NE : TCG_COND_EQ,
-                        tcg_cmp, 0, match.label);
+    tcg_gen_brcondi_i64(a->nz ? TCG_COND_NE : TCG_COND_EQ, tcg_cmp, 0,
+                        match.label);
     gen_goto_tb(s, 0, 4);
     set_disas_label(s, match);
     gen_goto_tb(s, 1, a->imm);
@@ -1595,7 +1565,7 @@ static bool trans_BRA(DisasContext *s, arg_bra *a)
     if (!dc_isar_feature(aa64_pauth, s)) {
         return false;
     }
-    dst = auth_branch_target(s, cpu_reg(s,a->rn), cpu_reg_sp(s, a->rm), !a->m);
+    dst = auth_branch_target(s, cpu_reg(s, a->rn), cpu_reg_sp(s, a->rm), !a->m);
     gen_a64_set_pc(s, dst);
     set_btype_for_br(s, a->rn);
     s->base.is_jmp = DISAS_JUMP;
@@ -1635,8 +1605,7 @@ static bool trans_ERET(DisasContext *s, arg_ERET *a)
         return true;
     }
     dst = tcg_temp_new_i64();
-    tcg_gen_ld_i64(dst, cpu_env,
-                   offsetof(CPUARMState, elr_el[s->current_el]));
+    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUARMState, elr_el[s->current_el]));
 
     translator_io_start(&s->base);
 
@@ -1662,8 +1631,7 @@ static bool trans_ERETA(DisasContext *s, arg_reta *a)
         return true;
     }
     dst = tcg_temp_new_i64();
-    tcg_gen_ld_i64(dst, cpu_env,
-                   offsetof(CPUARMState, elr_el[s->current_el]));
+    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUARMState, elr_el[s->current_el]));
 
     dst = auth_branch_target(s, dst, cpu_X[31], !a->m);
 
@@ -1941,8 +1909,8 @@ static bool trans_AXFLAG(DisasContext *s, arg_AXFLAG *a)
         return false;
     }
 
-    tcg_gen_sari_i32(cpu_VF, cpu_VF, 31);         /* V ? -1 : 0 */
-    tcg_gen_andc_i32(cpu_CF, cpu_CF, cpu_VF);     /* C & !V */
+    tcg_gen_sari_i32(cpu_VF, cpu_VF, 31); /* V ? -1 : 0 */
+    tcg_gen_andc_i32(cpu_CF, cpu_CF, cpu_VF); /* C & !V */
 
     /* !(Z | V) -> !(!ZF | V) -> ZF & !V -> ZF & ~VF */
     tcg_gen_andc_i32(cpu_ZF, cpu_ZF, cpu_VF);
@@ -2118,9 +2086,9 @@ static void gen_set_nzcv(TCGv_i64 tcg_rt)
     tcg_gen_shli_i32(cpu_VF, cpu_VF, 3);
 }
 
-static void gen_sysreg_undef(DisasContext *s, bool isread,
-                             uint8_t op0, uint8_t op1, uint8_t op2,
-                             uint8_t crn, uint8_t crm, uint8_t rt)
+static void gen_sysreg_undef(DisasContext *s, bool isread, uint8_t op0,
+                             uint8_t op1, uint8_t op2, uint8_t crn, uint8_t crm,
+                             uint8_t rt)
 {
     /*
      * Generate code to emit an UNDEF with correct syndrome
@@ -2148,12 +2116,12 @@ static void gen_sysreg_undef(DisasContext *s, bool isread,
  * These are all essentially the same insn in 'read' and 'write'
  * versions, with varying op0 fields.
  */
-static void handle_sys(DisasContext *s, bool isread,
-                       unsigned int op0, unsigned int op1, unsigned int op2,
-                       unsigned int crn, unsigned int crm, unsigned int rt)
+static void handle_sys(DisasContext *s, bool isread, unsigned int op0,
+                       unsigned int op1, unsigned int op2, unsigned int crn,
+                       unsigned int crm, unsigned int rt)
 {
-    uint32_t key = ENCODE_AA64_CP_REG(CP_REG_ARM64_SYSREG_CP,
-                                      crn, crm, op0, op1, op2);
+    uint32_t key =
+        ENCODE_AA64_CP_REG(CP_REG_ARM64_SYSREG_CP, crn, crm, op0, op1, op2);
     const ARMCPRegInfo *ri = get_arm_cp_reginfo(s->cp_regs, key);
     bool need_exit_tb = false;
     TCGv_ptr tcg_ri = NULL;
@@ -2163,7 +2131,8 @@ static void handle_sys(DisasContext *s, bool isread,
         /* Unknown register; this might be a guest error or a QEMU
          * unimplemented feature.
          */
-        qemu_log_mask(LOG_UNIMP, "%s access to unsupported AArch64 "
+        qemu_log_mask(LOG_UNIMP,
+                      "%s access to unsupported AArch64 "
                       "system register op0:%d op1:%d crn:%d crm:%d op2:%d\n",
                       isread ? "read" : "write", op0, op1, crn, crm, op2);
         gen_sysreg_undef(s, isread, op0, op1, op2, crn, crm, rt);
@@ -2185,8 +2154,7 @@ static void handle_sys(DisasContext *s, bool isread,
         syndrome = syn_aa64_sysregtrap(op0, op1, op2, crn, crm, rt, isread);
         gen_a64_update_pc(s, 0);
         tcg_ri = tcg_temp_new_ptr();
-        gen_helper_access_check_cp_reg(tcg_ri, cpu_env,
-                                       tcg_constant_i32(key),
+        gen_helper_access_check_cp_reg(tcg_ri, cpu_env, tcg_constant_i32(key),
                                        tcg_constant_i32(syndrome),
                                        tcg_constant_i32(isread));
     } else if (ri->type & ARM_CP_RAISES_EXC) {
@@ -2228,49 +2196,47 @@ static void handle_sys(DisasContext *s, bool isread,
             desc = FIELD_DP32(desc, MTEDESC, TCMA, s->tcma);
 
             tcg_rt = tcg_temp_new_i64();
-            gen_helper_mte_check_zva(tcg_rt, cpu_env,
-                                     tcg_constant_i32(desc), cpu_reg(s, rt));
+            gen_helper_mte_check_zva(tcg_rt, cpu_env, tcg_constant_i32(desc),
+                                     cpu_reg(s, rt));
         } else {
             tcg_rt = clean_data_tbi(s, cpu_reg(s, rt));
         }
         gen_helper_dc_zva(cpu_env, tcg_rt);
         return;
-    case ARM_CP_DC_GVA:
-        {
-            TCGv_i64 clean_addr, tag;
+    case ARM_CP_DC_GVA: {
+        TCGv_i64 clean_addr, tag;
 
-            /*
-             * DC_GVA, like DC_ZVA, requires that we supply the original
-             * pointer for an invalid page.  Probe that address first.
-             */
-            tcg_rt = cpu_reg(s, rt);
-            clean_addr = clean_data_tbi(s, tcg_rt);
-            gen_probe_access(s, clean_addr, MMU_DATA_STORE, MO_8);
+        /*
+         * DC_GVA, like DC_ZVA, requires that we supply the original
+         * pointer for an invalid page.  Probe that address first.
+         */
+        tcg_rt = cpu_reg(s, rt);
+        clean_addr = clean_data_tbi(s, tcg_rt);
+        gen_probe_access(s, clean_addr, MMU_DATA_STORE, MO_8);
 
-            if (s->ata) {
-                /* Extract the tag from the register to match STZGM.  */
-                tag = tcg_temp_new_i64();
-                tcg_gen_shri_i64(tag, tcg_rt, 56);
-                gen_helper_stzgm_tags(cpu_env, clean_addr, tag);
-            }
+        if (s->ata) {
+            /* Extract the tag from the register to match STZGM.  */
+            tag = tcg_temp_new_i64();
+            tcg_gen_shri_i64(tag, tcg_rt, 56);
+            gen_helper_stzgm_tags(cpu_env, clean_addr, tag);
         }
+    }
         return;
-    case ARM_CP_DC_GZVA:
-        {
-            TCGv_i64 clean_addr, tag;
+    case ARM_CP_DC_GZVA: {
+        TCGv_i64 clean_addr, tag;
 
-            /* For DC_GZVA, we can rely on DC_ZVA for the proper fault. */
-            tcg_rt = cpu_reg(s, rt);
-            clean_addr = clean_data_tbi(s, tcg_rt);
-            gen_helper_dc_zva(cpu_env, clean_addr);
+        /* For DC_GZVA, we can rely on DC_ZVA for the proper fault. */
+        tcg_rt = cpu_reg(s, rt);
+        clean_addr = clean_data_tbi(s, tcg_rt);
+        gen_helper_dc_zva(cpu_env, clean_addr);
 
-            if (s->ata) {
-                /* Extract the tag from the register to match STZGM.  */
-                tag = tcg_temp_new_i64();
-                tcg_gen_shri_i64(tag, tcg_rt, 56);
-                gen_helper_stzgm_tags(cpu_env, clean_addr, tag);
-            }
+        if (s->ata) {
+            /* Extract the tag from the register to match STZGM.  */
+            tag = tcg_temp_new_i64();
+            tcg_gen_shri_i64(tag, tcg_rt, 56);
+            gen_helper_stzgm_tags(cpu_env, clean_addr, tag);
         }
+    }
         return;
     default:
         g_assert_not_reached();
@@ -2452,11 +2418,11 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2, int rn,
             tcg_gen_qemu_ld_i128(t16, clean_addr, idx, memop);
 
             if (s->be_data == MO_LE) {
-                tcg_gen_extr_i128_i64(cpu_exclusive_val,
-                                      cpu_exclusive_high, t16);
+                tcg_gen_extr_i128_i64(cpu_exclusive_val, cpu_exclusive_high,
+                                      t16);
             } else {
-                tcg_gen_extr_i128_i64(cpu_exclusive_high,
-                                      cpu_exclusive_val, t16);
+                tcg_gen_extr_i128_i64(cpu_exclusive_high, cpu_exclusive_val,
+                                      t16);
             }
             tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
             tcg_gen_mov_i64(cpu_reg(s, rt2), cpu_exclusive_high);
@@ -2535,8 +2501,8 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
                 tcg_gen_concat32_i64(tmp, cpu_reg(s, rt2), cpu_reg(s, rt));
             }
             tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr,
-                                       cpu_exclusive_val, tmp,
-                                       get_mem_index(s), memop);
+                                       cpu_exclusive_val, tmp, get_mem_index(s),
+                                       memop);
             tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
         } else {
             TCGv_i128 t16 = tcg_temp_new_i128();
@@ -2584,8 +2550,8 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
     tcg_gen_movi_i64(cpu_exclusive_addr, -1);
 }
 
-static void gen_compare_and_swap(DisasContext *s, int rs, int rt,
-                                 int rn, int size)
+static void gen_compare_and_swap(DisasContext *s, int rs, int rt, int rn,
+                                 int size)
 {
     TCGv_i64 tcg_rs = cpu_reg(s, rs);
     TCGv_i64 tcg_rt = cpu_reg(s, rt);
@@ -2598,12 +2564,12 @@ static void gen_compare_and_swap(DisasContext *s, int rs, int rt,
     }
     memop = check_atomic_align(s, rn, size);
     clean_addr = gen_mte_check1(s, cpu_reg_sp(s, rn), true, rn != 31, memop);
-    tcg_gen_atomic_cmpxchg_i64(tcg_rs, clean_addr, tcg_rs, tcg_rt,
-                               memidx, memop);
+    tcg_gen_atomic_cmpxchg_i64(tcg_rs, clean_addr, tcg_rs, tcg_rt, memidx,
+                               memop);
 }
 
-static void gen_compare_and_swap_pair(DisasContext *s, int rs, int rt,
-                                      int rn, int size)
+static void gen_compare_and_swap_pair(DisasContext *s, int rs, int rt, int rn,
+                                      int size)
 {
     TCGv_i64 s1 = cpu_reg(s, rs);
     TCGv_i64 s2 = cpu_reg(s, rs + 1);
@@ -2670,7 +2636,6 @@ static void gen_compare_and_swap_pair(DisasContext *s, int rs, int rt,
  */
 static bool ldst_iss_sf(int size, bool sign, bool ext)
 {
-
     if (sign) {
         /*
          * Signed loads are 64 bit results if we are not going to
@@ -2727,10 +2692,10 @@ static bool trans_STLR(DisasContext *s, arg_stlr *a)
     }
     tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
     memop = check_ordered_align(s, a->rn, 0, true, a->sz);
-    clean_addr = gen_mte_check1(s, cpu_reg_sp(s, a->rn),
-                                true, a->rn != 31, memop);
-    do_gpr_st(s, cpu_reg(s, a->rt), clean_addr, memop, true, a->rt,
-              iss_sf, a->lasr);
+    clean_addr =
+        gen_mte_check1(s, cpu_reg_sp(s, a->rn), true, a->rn != 31, memop);
+    do_gpr_st(s, cpu_reg(s, a->rt), clean_addr, memop, true, a->rt, iss_sf,
+              a->lasr);
     return true;
 }
 
@@ -2749,10 +2714,10 @@ static bool trans_LDAR(DisasContext *s, arg_stlr *a)
         gen_check_sp_alignment(s);
     }
     memop = check_ordered_align(s, a->rn, 0, false, a->sz);
-    clean_addr = gen_mte_check1(s, cpu_reg_sp(s, a->rn),
-                                false, a->rn != 31, memop);
-    do_gpr_ld(s, cpu_reg(s, a->rt), clean_addr, memop, false, true,
-              a->rt, iss_sf, a->lasr);
+    clean_addr =
+        gen_mte_check1(s, cpu_reg_sp(s, a->rn), false, a->rn != 31, memop);
+    do_gpr_ld(s, cpu_reg(s, a->rt), clean_addr, memop, false, true, a->rt,
+              iss_sf, a->lasr);
     tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
     return true;
 }
@@ -2811,8 +2776,7 @@ static bool trans_LD_lit(DisasContext *s, arg_ldlit *a)
     MemOp memop = finalize_memop(s, a->sz + a->sign * MO_SIGN);
 
     gen_pc_plus_diff(s, clean_addr, a->imm);
-    do_gpr_ld(s, tcg_rt, clean_addr, memop,
-              false, true, a->rt, iss_sf, false);
+    do_gpr_ld(s, tcg_rt, clean_addr, memop, false, true, a->rt, iss_sf, false);
     return true;
 }
 
@@ -3083,9 +3047,8 @@ static void op_addr_ldst_imm_pre(DisasContext *s, arg_ldst_imm *a,
         tcg_gen_addi_i64(*dirty_addr, *dirty_addr, offset);
     }
     memidx = a->unpriv ? get_a64_user_mem_index(s) : get_mem_index(s);
-    *clean_addr = gen_mte_check1_mmuidx(s, *dirty_addr, is_store,
-                                        a->w || a->rn != 31,
-                                        mop, a->unpriv, memidx);
+    *clean_addr = gen_mte_check1_mmuidx(
+        s, *dirty_addr, is_store, a->w || a->rn != 31, mop, a->unpriv, memidx);
 }
 
 static void op_addr_ldst_imm_post(DisasContext *s, arg_ldst_imm *a,
@@ -3111,8 +3074,8 @@ static bool trans_STR_i(DisasContext *s, arg_ldst_imm *a)
     tcg_rt = cpu_reg(s, a->rt);
     iss_sf = ldst_iss_sf(a->sz, a->sign, a->ext);
 
-    do_gpr_st_memidx(s, tcg_rt, clean_addr, mop, memidx,
-                     iss_valid, a->rt, iss_sf, false);
+    do_gpr_st_memidx(s, tcg_rt, clean_addr, mop, memidx, iss_valid, a->rt,
+                     iss_sf, false);
     op_addr_ldst_imm_post(s, a, dirty_addr, a->imm);
     return true;
 }
@@ -3129,8 +3092,8 @@ static bool trans_LDR_i(DisasContext *s, arg_ldst_imm *a)
     tcg_rt = cpu_reg(s, a->rt);
     iss_sf = ldst_iss_sf(a->sz, a->sign, a->ext);
 
-    do_gpr_ld_memidx(s, tcg_rt, clean_addr, mop,
-                     a->ext, memidx, iss_valid, a->rt, iss_sf, false);
+    do_gpr_ld_memidx(s, tcg_rt, clean_addr, mop, a->ext, memidx, iss_valid,
+                     a->rt, iss_sf, false);
     op_addr_ldst_imm_post(s, a, dirty_addr, a->imm);
     return true;
 }
@@ -3165,9 +3128,8 @@ static bool trans_LDR_v_i(DisasContext *s, arg_ldst_imm *a)
     return true;
 }
 
-static void op_addr_ldst_pre(DisasContext *s, arg_ldst *a,
-                             TCGv_i64 *clean_addr, TCGv_i64 *dirty_addr,
-                             bool is_store, MemOp memop)
+static void op_addr_ldst_pre(DisasContext *s, arg_ldst *a, TCGv_i64 *clean_addr,
+                             TCGv_i64 *dirty_addr, bool is_store, MemOp memop)
 {
     TCGv_i64 tcg_rm;
 
@@ -3196,8 +3158,7 @@ static bool trans_LDR(DisasContext *s, arg_ldst *a)
     memop = finalize_memop(s, a->sz + a->sign * MO_SIGN);
     op_addr_ldst_pre(s, a, &clean_addr, &dirty_addr, false, memop);
     tcg_rt = cpu_reg(s, a->rt);
-    do_gpr_ld(s, tcg_rt, clean_addr, memop,
-              a->ext, true, a->rt, iss_sf, false);
+    do_gpr_ld(s, tcg_rt, clean_addr, memop, a->ext, true, a->rt, iss_sf, false);
     return true;
 }
 
@@ -3267,8 +3228,8 @@ static bool do_atomic_ld(DisasContext *s, arg_atomic *a, AtomicThreeOpFn *fn,
         gen_check_sp_alignment(s);
     }
     mop = check_atomic_align(s, a->rn, mop);
-    clean_addr = gen_mte_check1(s, cpu_reg_sp(s, a->rn), false,
-                                a->rn != 31, mop);
+    clean_addr =
+        gen_mte_check1(s, cpu_reg_sp(s, a->rn), false, a->rn != 31, mop);
     tcg_rs = read_cpu_reg(s, a->rs, true);
     tcg_rt = cpu_reg(s, a->rt);
     if (invert) {
@@ -3300,15 +3261,24 @@ static bool do_atomic_ld(DisasContext *s, arg_atomic *a, AtomicThreeOpFn *fn,
     return true;
 }
 
-TRANS_FEAT(LDADD, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_add_i64, 0, false)
-TRANS_FEAT(LDCLR, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_and_i64, 0, true)
-TRANS_FEAT(LDEOR, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_xor_i64, 0, false)
-TRANS_FEAT(LDSET, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_or_i64, 0, false)
-TRANS_FEAT(LDSMAX, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_smax_i64, MO_SIGN, false)
-TRANS_FEAT(LDSMIN, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_smin_i64, MO_SIGN, false)
-TRANS_FEAT(LDUMAX, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_umax_i64, 0, false)
-TRANS_FEAT(LDUMIN, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_umin_i64, 0, false)
-TRANS_FEAT(SWP, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_xchg_i64, 0, false)
+TRANS_FEAT(LDADD, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_add_i64,
+           0, false)
+TRANS_FEAT(LDCLR, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_and_i64,
+           0, true)
+TRANS_FEAT(LDEOR, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_xor_i64,
+           0, false)
+TRANS_FEAT(LDSET, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_or_i64, 0,
+           false)
+TRANS_FEAT(LDSMAX, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_smax_i64,
+           MO_SIGN, false)
+TRANS_FEAT(LDSMIN, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_smin_i64,
+           MO_SIGN, false)
+TRANS_FEAT(LDUMAX, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_umax_i64,
+           0, false)
+TRANS_FEAT(LDUMIN, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_fetch_umin_i64,
+           0, false)
+TRANS_FEAT(SWP, aa64_atomics, do_atomic_ld, a, tcg_gen_atomic_xchg_i64, 0,
+           false)
 
 static bool trans_LDAPR(DisasContext *s, arg_LDAPR *a)
 {
@@ -3324,8 +3294,8 @@ static bool trans_LDAPR(DisasContext *s, arg_LDAPR *a)
         gen_check_sp_alignment(s);
     }
     mop = check_atomic_align(s, a->rn, a->sz);
-    clean_addr = gen_mte_check1(s, cpu_reg_sp(s, a->rn), false,
-                                a->rn != 31, mop);
+    clean_addr =
+        gen_mte_check1(s, cpu_reg_sp(s, a->rn), false, a->rn != 31, mop);
     /*
      * LDAPR* are a special case because they are a simple load, not a
      * fetch-and-do-something op.
@@ -3333,8 +3303,8 @@ static bool trans_LDAPR(DisasContext *s, arg_LDAPR *a)
      * full load-acquire (we only need "load-acquire processor consistent"),
      * but we choose to implement them as full LDAQ.
      */
-    do_gpr_ld(s, cpu_reg(s, a->rt), clean_addr, mop, false,
-              true, a->rt, iss_sf, true);
+    do_gpr_ld(s, cpu_reg(s, a->rt), clean_addr, mop, false, true, a->rt, iss_sf,
+              true);
     tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
     return true;
 }
@@ -3369,8 +3339,8 @@ static bool trans_LDRA(DisasContext *s, arg_LDRA *a)
     memop = finalize_memop(s, MO_64);
 
     /* Note that "clean" and "dirty" here refer to TBI not PAC.  */
-    clean_addr = gen_mte_check1(s, dirty_addr, false,
-                                a->w || a->rn != 31, memop);
+    clean_addr =
+        gen_mte_check1(s, dirty_addr, false, a->w || a->rn != 31, memop);
 
     tcg_rt = cpu_reg(s, a->rt);
     do_gpr_ld(s, tcg_rt, clean_addr, memop,
@@ -3406,8 +3376,8 @@ static bool trans_LDAPR_i(DisasContext *s, arg_ldapr_stlr_i *a)
      * Load-AcquirePC semantics; we implement as the slightly more
      * restrictive Load-Acquire.
      */
-    do_gpr_ld(s, cpu_reg(s, a->rt), clean_addr, mop, a->ext, true,
-              a->rt, iss_sf, true);
+    do_gpr_ld(s, cpu_reg(s, a->rt), clean_addr, mop, a->ext, true, a->rt,
+              iss_sf, true);
     tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
     return true;
 }
@@ -3444,7 +3414,7 @@ static bool trans_LD_mult(DisasContext *s, arg_ldst_mult *a)
     TCGv_i64 clean_addr, tcg_rn, tcg_ebytes;
     MemOp endian, align, mop;
 
-    int total;    /* total bytes */
+    int total; /* total bytes */
     int elements; /* elements per vector */
     int r;
     int size = a->sz;
@@ -3535,7 +3505,7 @@ static bool trans_ST_mult(DisasContext *s, arg_ldst_mult *a)
     TCGv_i64 clean_addr, tcg_rn, tcg_ebytes;
     MemOp endian, align, mop;
 
-    int total;    /* total bytes */
+    int total; /* total bytes */
     int elements; /* elements per vector */
     int r;
     int size = a->sz;
@@ -3630,8 +3600,8 @@ static bool trans_ST_single(DisasContext *s, arg_ldst_single *a)
     tcg_rn = cpu_reg_sp(s, a->rn);
 
     mop = finalize_memop_asimd(s, a->scale);
-    clean_addr = gen_mte_checkN(s, tcg_rn, true, a->p || a->rn != 31,
-                                total, mop);
+    clean_addr =
+        gen_mte_checkN(s, tcg_rn, true, a->p || a->rn != 31, total, mop);
 
     tcg_ebytes = tcg_constant_i64(1 << a->scale);
     for (xs = 0, rt = a->rt; xs < a->selem; xs++, rt = (rt + 1) % 32) {
@@ -3670,8 +3640,8 @@ static bool trans_LD_single(DisasContext *s, arg_ldst_single *a)
     tcg_rn = cpu_reg_sp(s, a->rn);
 
     mop = finalize_memop_asimd(s, a->scale);
-    clean_addr = gen_mte_checkN(s, tcg_rn, false, a->p || a->rn != 31,
-                                total, mop);
+    clean_addr =
+        gen_mte_checkN(s, tcg_rn, false, a->p || a->rn != 31, total, mop);
 
     tcg_ebytes = tcg_constant_i64(1 << a->scale);
     for (xs = 0, rt = a->rt; xs < a->selem; xs++, rt = (rt + 1) % 32) {
@@ -3710,8 +3680,8 @@ static bool trans_LD_single_repl(DisasContext *s, arg_LD_single_repl *a)
     tcg_rn = cpu_reg_sp(s, a->rn);
 
     mop = finalize_memop_asimd(s, a->scale);
-    clean_addr = gen_mte_checkN(s, tcg_rn, false, a->p || a->rn != 31,
-                                total, mop);
+    clean_addr =
+        gen_mte_checkN(s, tcg_rn, false, a->p || a->rn != 31, total, mop);
 
     tcg_ebytes = tcg_constant_i64(1 << a->scale);
     for (xs = 0, rt = a->rt; xs < a->selem; xs++, rt = (rt + 1) % 32) {
@@ -3950,8 +3920,8 @@ TRANS_FEAT(STZ2G, aa64_mte_insn_reg, do_STG, a, true, true)
 
 typedef void ArithTwoOp(TCGv_i64, TCGv_i64, TCGv_i64);
 
-static bool gen_rri(DisasContext *s, arg_rri_sf *a,
-                    bool rd_sp, bool rn_sp, ArithTwoOp *fn)
+static bool gen_rri(DisasContext *s, arg_rri_sf *a, bool rd_sp, bool rn_sp,
+                    ArithTwoOp *fn)
 {
     TCGv_i64 tcg_rn = rn_sp ? cpu_reg_sp(s, a->rn) : cpu_reg(s, a->rn);
     TCGv_i64 tcg_rd = rd_sp ? cpu_reg_sp(s, a->rd) : cpu_reg(s, a->rd);
@@ -4011,8 +3981,7 @@ static bool gen_add_sub_imm_with_tags(DisasContext *s, arg_rri_tag *a,
     tcg_rd = cpu_reg_sp(s, a->rd);
 
     if (s->ata) {
-        gen_helper_addsubg(tcg_rd, cpu_env, tcg_rn,
-                           tcg_constant_i32(imm),
+        gen_helper_addsubg(tcg_rd, cpu_env, tcg_rn, tcg_constant_i32(imm),
                            tcg_constant_i32(a->uimm4));
     } else {
         tcg_gen_addi_i64(tcg_rd, tcg_rn, imm);
@@ -4617,9 +4586,8 @@ static void disas_data_proc_3src(DisasContext *s, uint32_t insn)
     int rn = extract32(insn, 5, 5);
     int ra = extract32(insn, 10, 5);
     int rm = extract32(insn, 16, 5);
-    int op_id = (extract32(insn, 29, 3) << 4) |
-        (extract32(insn, 21, 3) << 1) |
-        extract32(insn, 15, 1);
+    int op_id = (extract32(insn, 29, 3) << 4) | (extract32(insn, 21, 3) << 1) |
+                extract32(insn, 15, 1);
     bool sf = extract32(insn, 31, 1);
     bool is_sub = extract32(op_id, 0, 1);
     bool is_high = extract32(op_id, 2, 1);
@@ -4797,7 +4765,7 @@ static void disas_evaluate_into_flags(DisasContext *s, uint32_t insn)
         unallocated_encoding(s);
         return;
     }
-    shift = sz ? 16 : 24;  /* SETF16 or SETF8 */
+    shift = sz ? 16 : 24; /* SETF16 or SETF8 */
 
     tmp = tcg_temp_new_i32();
     tcg_gen_extrl_i64_i32(tmp, cpu_reg(s, rn));
@@ -4961,8 +4929,8 @@ static void disas_cond_select(DisasContext *s, uint32_t insn)
     }
 }
 
-static void handle_clz(DisasContext *s, unsigned int sf,
-                       unsigned int rn, unsigned int rd)
+static void handle_clz(DisasContext *s, unsigned int sf, unsigned int rn,
+                       unsigned int rd)
 {
     TCGv_i64 tcg_rd, tcg_rn;
     tcg_rd = cpu_reg(s, rd);
@@ -4978,8 +4946,8 @@ static void handle_clz(DisasContext *s, unsigned int sf,
     }
 }
 
-static void handle_cls(DisasContext *s, unsigned int sf,
-                       unsigned int rn, unsigned int rd)
+static void handle_cls(DisasContext *s, unsigned int sf, unsigned int rn,
+                       unsigned int rd)
 {
     TCGv_i64 tcg_rd, tcg_rn;
     tcg_rd = cpu_reg(s, rd);
@@ -4995,8 +4963,8 @@ static void handle_cls(DisasContext *s, unsigned int sf,
     }
 }
 
-static void handle_rbit(DisasContext *s, unsigned int sf,
-                        unsigned int rn, unsigned int rd)
+static void handle_rbit(DisasContext *s, unsigned int sf, unsigned int rn,
+                        unsigned int rd)
 {
     TCGv_i64 tcg_rd, tcg_rn;
     tcg_rd = cpu_reg(s, rd);
@@ -5013,8 +4981,8 @@ static void handle_rbit(DisasContext *s, unsigned int sf,
 }
 
 /* REV with sf==1, opcode==3 ("REV64") */
-static void handle_rev64(DisasContext *s, unsigned int sf,
-                         unsigned int rn, unsigned int rd)
+static void handle_rev64(DisasContext *s, unsigned int sf, unsigned int rn,
+                         unsigned int rd)
 {
     if (!sf) {
         unallocated_encoding(s);
@@ -5026,8 +4994,8 @@ static void handle_rev64(DisasContext *s, unsigned int sf,
 /* REV with sf==0, opcode==2
  * REV32 (sf==1, opcode==2)
  */
-static void handle_rev32(DisasContext *s, unsigned int sf,
-                         unsigned int rn, unsigned int rd)
+static void handle_rev32(DisasContext *s, unsigned int sf, unsigned int rn,
+                         unsigned int rd)
 {
     TCGv_i64 tcg_rd = cpu_reg(s, rd);
     TCGv_i64 tcg_rn = cpu_reg(s, rn);
@@ -5041,8 +5009,8 @@ static void handle_rev32(DisasContext *s, unsigned int sf,
 }
 
 /* REV16 (opcode==1) */
-static void handle_rev16(DisasContext *s, unsigned int sf,
-                         unsigned int rn, unsigned int rd)
+static void handle_rev16(DisasContext *s, unsigned int sf, unsigned int rn,
+                         unsigned int rd)
 {
     TCGv_i64 tcg_rd = cpu_reg(s, rd);
     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
@@ -5285,9 +5253,9 @@ static void handle_div(DisasContext *s, bool is_signed, unsigned int sf,
 }
 
 /* LSLV, LSRV, ASRV, RORV */
-static void handle_shift_reg(DisasContext *s,
-                             enum a64_shift_type shift_type, unsigned int sf,
-                             unsigned int rm, unsigned int rn, unsigned int rd)
+static void handle_shift_reg(DisasContext *s, enum a64_shift_type shift_type,
+                             unsigned int sf, unsigned int rm, unsigned int rn,
+                             unsigned int rd)
 {
     TCGv_i64 tcg_shift = tcg_temp_new_i64();
     TCGv_i64 tcg_rd = cpu_reg(s, rd);
@@ -5298,16 +5266,15 @@ static void handle_shift_reg(DisasContext *s,
 }
 
 /* CRC32[BHWX], CRC32C[BHWX] */
-static void handle_crc32(DisasContext *s,
-                         unsigned int sf, unsigned int sz, bool crc32c,
-                         unsigned int rm, unsigned int rn, unsigned int rd)
+static void handle_crc32(DisasContext *s, unsigned int sf, unsigned int sz,
+                         bool crc32c, unsigned int rm, unsigned int rn,
+                         unsigned int rd)
 {
     TCGv_i64 tcg_acc, tcg_val;
     TCGv_i32 tcg_bytes;
 
-    if (!dc_isar_feature(aa64_crc32, s)
-        || (sf == 1 && sz != 3)
-        || (sf == 0 && sz == 3)) {
+    if (!dc_isar_feature(aa64_crc32, s) || (sf == 1 && sz != 3) ||
+        (sf == 0 && sz == 3)) {
         unallocated_encoding(s);
         return;
     }
@@ -5395,8 +5362,8 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
             goto do_unallocated;
         }
         if (s->ata) {
-            gen_helper_irg(cpu_reg_sp(s, rd), cpu_env,
-                           cpu_reg_sp(s, rn), cpu_reg(s, rm));
+            gen_helper_irg(cpu_reg_sp(s, rd), cpu_env, cpu_reg_sp(s, rn),
+                           cpu_reg(s, rm));
         } else {
             gen_address_with_allocation_tag0(cpu_reg_sp(s, rd),
                                              cpu_reg_sp(s, rn));
@@ -5429,8 +5396,8 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
         if (sf == 0 || !dc_isar_feature(aa64_pauth, s)) {
             goto do_unallocated;
         }
-        gen_helper_pacga(cpu_reg(s, rd), cpu_env,
-                         cpu_reg(s, rn), cpu_reg_sp(s, rm));
+        gen_helper_pacga(cpu_reg(s, rd), cpu_env, cpu_reg(s, rn),
+                         cpu_reg_sp(s, rm));
         break;
     case 16:
     case 17:
@@ -5516,9 +5483,9 @@ static void disas_data_proc_reg(DisasContext *s, uint32_t insn)
         break;
 
     case 0x6: /* Data-processing */
-        if (op0) {    /* (1 source) */
+        if (op0) { /* (1 source) */
             disas_data_proc_1src(s, insn);
-        } else {      /* (2 source) */
+        } else { /* (2 source) */
             disas_data_proc_2src(s, insn);
         }
         break;
@@ -5533,9 +5500,9 @@ static void disas_data_proc_reg(DisasContext *s, uint32_t insn)
     }
 }
 
-static void handle_fp_compare(DisasContext *s, int size,
-                              unsigned int rn, unsigned int rm,
-                              bool cmp_with_zero, bool signal_all_nans)
+static void handle_fp_compare(DisasContext *s, int size, unsigned int rn,
+                              unsigned int rm, bool cmp_with_zero,
+                              bool signal_all_nans)
 {
     TCGv_i64 tcg_flags = tcg_temp_new_i64();
     TCGv_ptr fpst = fpstatus_ptr(size == MO_16 ? FPST_FPCR_F16 : FPST_FPCR);
@@ -5755,8 +5722,8 @@ static void disas_fp_csel(DisasContext *s, uint32_t insn)
     read_vec_element(s, t_false, rm, 0, sz);
 
     a64_test_cc(&c, cond);
-    tcg_gen_movcond_i64(c.cond, t_true, c.value, tcg_constant_i64(0),
-                        t_true, t_false);
+    tcg_gen_movcond_i64(c.cond, t_true, c.value, tcg_constant_i64(0), t_true,
+                        t_false);
 
     /* Note that sregs & hregs write back zeros to the high bits,
        and we've already done the zero-extension.  */
@@ -5881,7 +5848,7 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
         gen_fpst(tcg_res, tcg_op, fpst);
     }
 
- done:
+done:
     write_fp_sreg(s, rd, tcg_res);
 }
 
@@ -5953,16 +5920,15 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
         gen_fpst(tcg_res, tcg_op, fpst);
     }
 
- done:
+done:
     write_fp_dreg(s, rd, tcg_res);
 }
 
-static void handle_fp_fcvt(DisasContext *s, int opcode,
-                           int rd, int rn, int dtype, int ntype)
+static void handle_fp_fcvt(DisasContext *s, int opcode, int rd, int rn,
+                           int dtype, int ntype)
 {
     switch (ntype) {
-    case 0x0:
-    {
+    case 0x0: {
         TCGv_i32 tcg_rn = read_fp_sreg(s, rn);
         if (dtype == 1) {
             /* Single to double */
@@ -5981,8 +5947,7 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
         }
         break;
     }
-    case 0x1:
-    {
+    case 0x1: {
         TCGv_i64 tcg_rn = read_fp_dreg(s, rn);
         TCGv_i32 tcg_rd = tcg_temp_new_i32();
         if (dtype == 0) {
@@ -5998,8 +5963,7 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
         write_fp_sreg(s, rd, tcg_rd);
         break;
     }
-    case 0x3:
-    {
+    case 0x3: {
         TCGv_i32 tcg_rn = read_fp_sreg(s, rn);
         TCGv_ptr tcg_fpst = fpstatus_ptr(FPST_FPCR);
         TCGv_i32 tcg_ahp = get_ahp_flag();
@@ -6041,8 +6005,9 @@ static void disas_fp_1src(DisasContext *s, uint32_t insn)
     }
 
     switch (opcode) {
-    case 0x4: case 0x5: case 0x7:
-    {
+    case 0x4:
+    case 0x5:
+    case 0x7: {
         /* FCVT between half, single and double precision */
         int dtype = extract32(opcode, 0, 2);
         if (type == 2 || dtype == type) {
@@ -6117,8 +6082,8 @@ static void disas_fp_1src(DisasContext *s, uint32_t insn)
 }
 
 /* Floating-point data-processing (2 source) - single precision */
-static void handle_fp_2src_single(DisasContext *s, int opcode,
-                                  int rd, int rn, int rm)
+static void handle_fp_2src_single(DisasContext *s, int opcode, int rd, int rn,
+                                  int rm)
 {
     TCGv_i32 tcg_op1;
     TCGv_i32 tcg_op2;
@@ -6165,8 +6130,8 @@ static void handle_fp_2src_single(DisasContext *s, int opcode,
 }
 
 /* Floating-point data-processing (2 source) - double precision */
-static void handle_fp_2src_double(DisasContext *s, int opcode,
-                                  int rd, int rn, int rm)
+static void handle_fp_2src_double(DisasContext *s, int opcode, int rd, int rn,
+                                  int rm)
 {
     TCGv_i64 tcg_op1;
     TCGv_i64 tcg_op2;
@@ -6213,8 +6178,8 @@ static void handle_fp_2src_double(DisasContext *s, int opcode,
 }
 
 /* Floating-point data-processing (2 source) - half precision */
-static void handle_fp_2src_half(DisasContext *s, int opcode,
-                                int rd, int rn, int rm)
+static void handle_fp_2src_half(DisasContext *s, int opcode, int rd, int rn,
+                                int rm)
 {
     TCGv_i32 tcg_op1;
     TCGv_i32 tcg_op2;
@@ -6311,8 +6276,8 @@ static void disas_fp_2src(DisasContext *s, uint32_t insn)
 }
 
 /* Floating-point data-processing (3 source) - single precision */
-static void handle_fp_3src_single(DisasContext *s, bool o0, bool o1,
-                                  int rd, int rn, int rm, int ra)
+static void handle_fp_3src_single(DisasContext *s, bool o0, bool o1, int rd,
+                                  int rn, int rm, int ra)
 {
     TCGv_i32 tcg_op1, tcg_op2, tcg_op3;
     TCGv_i32 tcg_res = tcg_temp_new_i32();
@@ -6343,8 +6308,8 @@ static void handle_fp_3src_single(DisasContext *s, bool o0, bool o1,
 }
 
 /* Floating-point data-processing (3 source) - double precision */
-static void handle_fp_3src_double(DisasContext *s, bool o0, bool o1,
-                                  int rd, int rn, int rm, int ra)
+static void handle_fp_3src_double(DisasContext *s, bool o0, bool o1, int rd,
+                                  int rn, int rm, int ra)
 {
     TCGv_i64 tcg_op1, tcg_op2, tcg_op3;
     TCGv_i64 tcg_res = tcg_temp_new_i64();
@@ -6375,8 +6340,8 @@ static void handle_fp_3src_double(DisasContext *s, bool o0, bool o1,
 }
 
 /* Floating-point data-processing (3 source) - half precision */
-static void handle_fp_3src_half(DisasContext *s, bool o0, bool o1,
-                                int rd, int rn, int rm, int ra)
+static void handle_fp_3src_half(DisasContext *s, bool o0, bool o1, int rd,
+                                int rn, int rm, int ra)
 {
     TCGv_i32 tcg_op1, tcg_op2, tcg_op3;
     TCGv_i32 tcg_res = tcg_temp_new_i32();
@@ -6538,11 +6503,11 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
         case 1: /* float64 */
             tcg_double = tcg_temp_new_i64();
             if (is_signed) {
-                gen_helper_vfp_sqtod(tcg_double, tcg_int,
-                                     tcg_shift, tcg_fpstatus);
+                gen_helper_vfp_sqtod(tcg_double, tcg_int, tcg_shift,
+                                     tcg_fpstatus);
             } else {
-                gen_helper_vfp_uqtod(tcg_double, tcg_int,
-                                     tcg_shift, tcg_fpstatus);
+                gen_helper_vfp_uqtod(tcg_double, tcg_int, tcg_shift,
+                                     tcg_fpstatus);
             }
             write_fp_dreg(s, rd, tcg_double);
             break;
@@ -6550,11 +6515,11 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
         case 0: /* float32 */
             tcg_single = tcg_temp_new_i32();
             if (is_signed) {
-                gen_helper_vfp_sqtos(tcg_single, tcg_int,
-                                     tcg_shift, tcg_fpstatus);
+                gen_helper_vfp_sqtos(tcg_single, tcg_int, tcg_shift,
+                                     tcg_fpstatus);
             } else {
-                gen_helper_vfp_uqtos(tcg_single, tcg_int,
-                                     tcg_shift, tcg_fpstatus);
+                gen_helper_vfp_uqtos(tcg_single, tcg_int, tcg_shift,
+                                     tcg_fpstatus);
             }
             write_fp_sreg(s, rd, tcg_single);
             break;
@@ -6562,11 +6527,11 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
         case 3: /* float16 */
             tcg_single = tcg_temp_new_i32();
             if (is_signed) {
-                gen_helper_vfp_sqtoh(tcg_single, tcg_int,
-                                     tcg_shift, tcg_fpstatus);
+                gen_helper_vfp_sqtoh(tcg_single, tcg_int, tcg_shift,
+                                     tcg_fpstatus);
             } else {
-                gen_helper_vfp_uqtoh(tcg_single, tcg_int,
-                                     tcg_shift, tcg_fpstatus);
+                gen_helper_vfp_uqtoh(tcg_single, tcg_int, tcg_shift,
+                                     tcg_fpstatus);
             }
             write_fp_sreg(s, rd, tcg_single);
             break;
@@ -6592,19 +6557,19 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
             tcg_double = read_fp_dreg(s, rn);
             if (is_signed) {
                 if (!sf) {
-                    gen_helper_vfp_tosld(tcg_int, tcg_double,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_tosld(tcg_int, tcg_double, tcg_shift,
+                                         tcg_fpstatus);
                 } else {
-                    gen_helper_vfp_tosqd(tcg_int, tcg_double,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_tosqd(tcg_int, tcg_double, tcg_shift,
+                                         tcg_fpstatus);
                 }
             } else {
                 if (!sf) {
-                    gen_helper_vfp_tould(tcg_int, tcg_double,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_tould(tcg_int, tcg_double, tcg_shift,
+                                         tcg_fpstatus);
                 } else {
-                    gen_helper_vfp_touqd(tcg_int, tcg_double,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_touqd(tcg_int, tcg_double, tcg_shift,
+                                         tcg_fpstatus);
                 }
             }
             if (!sf) {
@@ -6616,20 +6581,20 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
             tcg_single = read_fp_sreg(s, rn);
             if (sf) {
                 if (is_signed) {
-                    gen_helper_vfp_tosqs(tcg_int, tcg_single,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_tosqs(tcg_int, tcg_single, tcg_shift,
+                                         tcg_fpstatus);
                 } else {
-                    gen_helper_vfp_touqs(tcg_int, tcg_single,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_touqs(tcg_int, tcg_single, tcg_shift,
+                                         tcg_fpstatus);
                 }
             } else {
                 TCGv_i32 tcg_dest = tcg_temp_new_i32();
                 if (is_signed) {
-                    gen_helper_vfp_tosls(tcg_dest, tcg_single,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_tosls(tcg_dest, tcg_single, tcg_shift,
+                                         tcg_fpstatus);
                 } else {
-                    gen_helper_vfp_touls(tcg_dest, tcg_single,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_touls(tcg_dest, tcg_single, tcg_shift,
+                                         tcg_fpstatus);
                 }
                 tcg_gen_extu_i32_i64(tcg_int, tcg_dest);
             }
@@ -6639,20 +6604,20 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
             tcg_single = read_fp_sreg(s, rn);
             if (sf) {
                 if (is_signed) {
-                    gen_helper_vfp_tosqh(tcg_int, tcg_single,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_tosqh(tcg_int, tcg_single, tcg_shift,
+                                         tcg_fpstatus);
                 } else {
-                    gen_helper_vfp_touqh(tcg_int, tcg_single,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_touqh(tcg_int, tcg_single, tcg_shift,
+                                         tcg_fpstatus);
                 }
             } else {
                 TCGv_i32 tcg_dest = tcg_temp_new_i32();
                 if (is_signed) {
-                    gen_helper_vfp_toslh(tcg_dest, tcg_single,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_toslh(tcg_dest, tcg_single, tcg_shift,
+                                         tcg_fpstatus);
                 } else {
-                    gen_helper_vfp_toulh(tcg_dest, tcg_single,
-                                         tcg_shift, tcg_fpstatus);
+                    gen_helper_vfp_toulh(tcg_dest, tcg_single, tcg_shift,
+                                         tcg_fpstatus);
                 }
                 tcg_gen_extu_i32_i64(tcg_int, tcg_dest);
             }
@@ -7008,7 +6973,7 @@ static void disas_simd_ext(DisasContext *s, uint32_t insn)
             int reg;
             int elt;
         } EltPosns;
-        EltPosns eltposns[] = { {rn, 0}, {rn, 1}, {rm, 0}, {rm, 1} };
+        EltPosns eltposns[] = { { rn, 0 }, { rn, 1 }, { rm, 0 }, { rm, 1 } };
         EltPosns *elt = eltposns;
 
         if (pos >= 64) {
@@ -7060,11 +7025,9 @@ static void disas_simd_tb(DisasContext *s, uint32_t insn)
         return;
     }
 
-    tcg_gen_gvec_2_ptr(vec_full_reg_offset(s, rd),
-                       vec_full_reg_offset(s, rm), cpu_env,
-                       is_q ? 16 : 8, vec_full_reg_size(s),
-                       (len << 6) | (is_tbx << 5) | rn,
-                       gen_helper_simd_tblx);
+    tcg_gen_gvec_2_ptr(vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rm),
+                       cpu_env, is_q ? 16 : 8, vec_full_reg_size(s),
+                       (len << 6) | (is_tbx << 5) | rn, gen_helper_simd_tblx);
 }
 
 /* ZIP/UZP/TRN
@@ -7114,8 +7077,8 @@ static void disas_simd_zip_trn(DisasContext *s, uint32_t insn)
             if (i < midpoint) {
                 read_vec_element(s, tcg_ele, rn, 2 * i + part, size);
             } else {
-                read_vec_element(s, tcg_ele, rm,
-                                 2 * (i - midpoint) + part, size);
+                read_vec_element(s, tcg_ele, rm, 2 * (i - midpoint) + part,
+                                 size);
             }
             break;
         }
@@ -7334,7 +7297,6 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
             default:
                 g_assert_not_reached();
             }
-
         }
     } else {
         /* Floating point vector reduction ops which work across 32
@@ -7401,8 +7363,8 @@ static void handle_simd_dupe(DisasContext *s, int is_q, int rd, int rn,
 
     index = imm5 >> (size + 1);
     tcg_gen_gvec_dup_mem(size, vec_full_reg_offset(s, rd),
-                         vec_reg_offset(s, rn, index, size),
-                         is_q ? 16 : 8, vec_full_reg_size(s));
+                         vec_reg_offset(s, rn, index, size), is_q ? 16 : 8,
+                         vec_full_reg_size(s));
 }
 
 /* DUP (element, scalar)
@@ -7411,8 +7373,7 @@ static void handle_simd_dupe(DisasContext *s, int is_q, int rd, int rn,
  * | 0 1 0 1 1 1 1 0 0 0 0 |  imm5  | 0 0 0 0 0 1 |  Rn  |  Rd  |
  * +-----------------------+--------+-------------+------+------+
  */
-static void handle_simd_dupes(DisasContext *s, int rd, int rn,
-                              int imm5)
+static void handle_simd_dupes(DisasContext *s, int rd, int rn, int imm5)
 {
     int size = ctz32(imm5);
     int index;
@@ -7478,8 +7439,8 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
  * size: encoded in imm5 (see ARM ARM LowestSetBit())
  * index: encoded in imm5<4:size+1>
  */
-static void handle_simd_inse(DisasContext *s, int rd, int rn,
-                             int imm4, int imm5)
+static void handle_simd_inse(DisasContext *s, int rd, int rn, int imm4,
+                             int imm5)
 {
     int size = ctz32(imm5);
     int src_index, dst_index;
@@ -7494,7 +7455,7 @@ static void handle_simd_inse(DisasContext *s, int rd, int rn,
         return;
     }
 
-    dst_index = extract32(imm5, 1+size, 5);
+    dst_index = extract32(imm5, 1 + size, 5);
     src_index = extract32(imm4, size, 4);
 
     tmp = tcg_temp_new_i64();
@@ -7564,9 +7525,7 @@ static void handle_simd_umov_smov(DisasContext *s, int is_q, int is_signed,
             return;
         }
     } else {
-        if (size > 3
-            || (size < 3 && is_q)
-            || (size == 3 && !is_q)) {
+        if (size > 3 || (size < 3 && is_q) || (size == 3 && !is_q)) {
             unallocated_encoding(s);
             return;
         }
@@ -7576,7 +7535,7 @@ static void handle_simd_umov_smov(DisasContext *s, int is_q, int is_signed,
         return;
     }
 
-    element = extract32(imm5, 1+size, 4);
+    element = extract32(imm5, 1 + size, 4);
 
     tcg_rd = cpu_reg(s, rd);
     read_vec_element(s, tcg_rd, rn, element, size | (is_signed ? MO_SIGN : 0));
@@ -7900,12 +7859,10 @@ static void handle_shri_with_rndacc(TCGv_i64 tcg_res, TCGv_i64 tcg_src,
             if (!is_u) {
                 /* take care of sign extending tcg_res */
                 tcg_gen_sari_i64(tcg_src_hi, tcg_src, 63);
-                tcg_gen_add2_i64(tcg_src, tcg_src_hi,
-                                 tcg_src, tcg_src_hi,
+                tcg_gen_add2_i64(tcg_src, tcg_src_hi, tcg_src, tcg_src_hi,
                                  tcg_rnd, tcg_zero);
             } else {
-                tcg_gen_add2_i64(tcg_src, tcg_src_hi,
-                                 tcg_src, tcg_zero,
+                tcg_gen_add2_i64(tcg_src, tcg_src_hi, tcg_src, tcg_zero,
                                  tcg_rnd, tcg_zero);
             }
         } else {
@@ -7950,9 +7907,8 @@ static void handle_shri_with_rndacc(TCGv_i64 tcg_res, TCGv_i64 tcg_src,
 }
 
 /* SSHR[RA]/USHR[RA] - Scalar shift right (optional rounding/accumulate) */
-static void handle_scalar_simd_shri(DisasContext *s,
-                                    bool is_u, int immh, int immb,
-                                    int opcode, int rn, int rd)
+static void handle_scalar_simd_shri(DisasContext *s, bool is_u, int immh,
+                                    int immb, int opcode, int rn, int rd)
 {
     const int size = 3;
     int immhb = immh << 3 | immb;
@@ -8007,17 +7963,16 @@ static void handle_scalar_simd_shri(DisasContext *s,
             tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_rn, 0, esize - shift);
         }
     } else {
-        handle_shri_with_rndacc(tcg_rd, tcg_rn, tcg_round,
-                                accumulate, is_u, size, shift);
+        handle_shri_with_rndacc(tcg_rd, tcg_rn, tcg_round, accumulate, is_u,
+                                size, shift);
     }
 
     write_fp_dreg(s, rd, tcg_rd);
 }
 
 /* SHL/SLI - Scalar shift left */
-static void handle_scalar_simd_shli(DisasContext *s, bool insert,
-                                    int immh, int immb, int opcode,
-                                    int rn, int rd)
+static void handle_scalar_simd_shli(DisasContext *s, bool insert, int immh,
+                                    int immb, int opcode, int rn, int rd)
 {
     int size = 32 - clz32(immh) - 1;
     int immhb = immh << 3 | immb;
@@ -8049,9 +8004,8 @@ static void handle_scalar_simd_shli(DisasContext *s, bool insert,
 /* SQSHRN/SQSHRUN - Saturating (signed/unsigned) shift right with
  * (signed/unsigned) narrowing */
 static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
-                                   bool is_u_shift, bool is_u_narrow,
-                                   int immh, int immb, int opcode,
-                                   int rn, int rd)
+                                   bool is_u_shift, bool is_u_narrow, int immh,
+                                   int immb, int opcode, int rn, int rd)
 {
     int immhb = immh << 3 | immb;
     int size = 32 - clz32(immh) - 1;
@@ -8064,20 +8018,15 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
     TCGv_i32 tcg_rd_narrowed;
     TCGv_i64 tcg_final;
 
-    static NeonGenNarrowEnvFn * const signed_narrow_fns[4][2] = {
-        { gen_helper_neon_narrow_sat_s8,
-          gen_helper_neon_unarrow_sat8 },
-        { gen_helper_neon_narrow_sat_s16,
-          gen_helper_neon_unarrow_sat16 },
-        { gen_helper_neon_narrow_sat_s32,
-          gen_helper_neon_unarrow_sat32 },
+    static NeonGenNarrowEnvFn *const signed_narrow_fns[4][2] = {
+        { gen_helper_neon_narrow_sat_s8, gen_helper_neon_unarrow_sat8 },
+        { gen_helper_neon_narrow_sat_s16, gen_helper_neon_unarrow_sat16 },
+        { gen_helper_neon_narrow_sat_s32, gen_helper_neon_unarrow_sat32 },
         { NULL, NULL },
     };
-    static NeonGenNarrowEnvFn * const unsigned_narrow_fns[4] = {
-        gen_helper_neon_narrow_sat_u8,
-        gen_helper_neon_narrow_sat_u16,
-        gen_helper_neon_narrow_sat_u32,
-        NULL
+    static NeonGenNarrowEnvFn *const unsigned_narrow_fns[4] = {
+        gen_helper_neon_narrow_sat_u8, gen_helper_neon_narrow_sat_u16,
+        gen_helper_neon_narrow_sat_u32, NULL
     };
     NeonGenNarrowEnvFn *narrowfn;
 
@@ -8113,8 +8062,8 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
 
     for (i = 0; i < elements; i++) {
         read_vec_element(s, tcg_rn, rn, i, ldop);
-        handle_shri_with_rndacc(tcg_rd, tcg_rn, tcg_round,
-                                false, is_u_shift, size+1, shift);
+        handle_shri_with_rndacc(tcg_rd, tcg_rn, tcg_round, false, is_u_shift,
+                                size + 1, shift);
         narrowfn(tcg_rd_narrowed, cpu_env, tcg_rd);
         tcg_gen_extu_i32_i64(tcg_rd, tcg_rd_narrowed);
         if (i == 0) {
@@ -8134,8 +8083,8 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
 
 /* SQSHLU, UQSHL, SQSHL: saturating left shifts */
 static void handle_simd_qshl(DisasContext *s, bool scalar, bool is_q,
-                             bool src_unsigned, bool dst_unsigned,
-                             int immh, int immb, int rn, int rd)
+                             bool src_unsigned, bool dst_unsigned, int immh,
+                             int immb, int rn, int rd)
 {
     int immhb = immh << 3 | immb;
     int size = 32 - clz32(immh) - 1;
@@ -8176,7 +8125,7 @@ static void handle_simd_qshl(DisasContext *s, bool scalar, bool is_q,
 
     if (size == 3) {
         TCGv_i64 tcg_shift = tcg_constant_i64(shift);
-        static NeonGenTwo64OpEnvFn * const fns[2][2] = {
+        static NeonGenTwo64OpEnvFn *const fns[2][2] = {
             { gen_helper_neon_qshl_s64, gen_helper_neon_qshlu_s64 },
             { NULL, gen_helper_neon_qshl_u64 },
         };
@@ -8193,20 +8142,14 @@ static void handle_simd_qshl(DisasContext *s, bool scalar, bool is_q,
         clear_vec_high(s, is_q, rd);
     } else {
         TCGv_i32 tcg_shift = tcg_constant_i32(shift);
-        static NeonGenTwoOpEnvFn * const fns[2][2][3] = {
-            {
-                { gen_helper_neon_qshl_s8,
-                  gen_helper_neon_qshl_s16,
-                  gen_helper_neon_qshl_s32 },
-                { gen_helper_neon_qshlu_s8,
-                  gen_helper_neon_qshlu_s16,
-                  gen_helper_neon_qshlu_s32 }
-            }, {
-                { NULL, NULL, NULL },
-                { gen_helper_neon_qshl_u8,
-                  gen_helper_neon_qshl_u16,
-                  gen_helper_neon_qshl_u32 }
-            }
+        static NeonGenTwoOpEnvFn *const fns[2][2][3] = {
+            { { gen_helper_neon_qshl_s8, gen_helper_neon_qshl_s16,
+                gen_helper_neon_qshl_s32 },
+              { gen_helper_neon_qshlu_s8, gen_helper_neon_qshlu_s16,
+                gen_helper_neon_qshlu_s32 } },
+            { { NULL, NULL, NULL },
+              { gen_helper_neon_qshl_u8, gen_helper_neon_qshl_u16,
+                gen_helper_neon_qshl_u32 } }
         };
         NeonGenTwoOpEnvFn *genfn = fns[src_unsigned][dst_unsigned][size];
         MemOp memop = scalar ? size : MO_32;
@@ -8244,8 +8187,8 @@ static void handle_simd_qshl(DisasContext *s, bool scalar, bool is_q,
 
 /* Common vector code for handling integer to FP conversion */
 static void handle_simd_intfp_conv(DisasContext *s, int rd, int rn,
-                                   int elements, int is_signed,
-                                   int fracbits, int size)
+                                   int elements, int is_signed, int fracbits,
+                                   int size)
 {
     TCGv_ptr tcg_fpst = fpstatus_ptr(size == MO_16 ? FPST_FPCR_F16 : FPST_FPCR);
     TCGv_i32 tcg_shift = NULL;
@@ -8265,11 +8208,11 @@ static void handle_simd_intfp_conv(DisasContext *s, int rd, int rn,
             read_vec_element(s, tcg_int64, rn, pass, mop);
 
             if (is_signed) {
-                gen_helper_vfp_sqtod(tcg_double, tcg_int64,
-                                     tcg_shift, tcg_fpst);
+                gen_helper_vfp_sqtod(tcg_double, tcg_int64, tcg_shift,
+                                     tcg_fpst);
             } else {
-                gen_helper_vfp_uqtod(tcg_double, tcg_int64,
-                                     tcg_shift, tcg_fpst);
+                gen_helper_vfp_uqtod(tcg_double, tcg_int64, tcg_shift,
+                                     tcg_fpst);
             }
             if (elements == 1) {
                 write_fp_dreg(s, rd, tcg_double);
@@ -8288,11 +8231,11 @@ static void handle_simd_intfp_conv(DisasContext *s, int rd, int rn,
             case MO_32:
                 if (fracbits) {
                     if (is_signed) {
-                        gen_helper_vfp_sltos(tcg_float, tcg_int32,
-                                             tcg_shift, tcg_fpst);
+                        gen_helper_vfp_sltos(tcg_float, tcg_int32, tcg_shift,
+                                             tcg_fpst);
                     } else {
-                        gen_helper_vfp_ultos(tcg_float, tcg_int32,
-                                             tcg_shift, tcg_fpst);
+                        gen_helper_vfp_ultos(tcg_float, tcg_int32, tcg_shift,
+                                             tcg_fpst);
                     }
                 } else {
                     if (is_signed) {
@@ -8305,11 +8248,11 @@ static void handle_simd_intfp_conv(DisasContext *s, int rd, int rn,
             case MO_16:
                 if (fracbits) {
                     if (is_signed) {
-                        gen_helper_vfp_sltoh(tcg_float, tcg_int32,
-                                             tcg_shift, tcg_fpst);
+                        gen_helper_vfp_sltoh(tcg_float, tcg_int32, tcg_shift,
+                                             tcg_fpst);
                     } else {
-                        gen_helper_vfp_ultoh(tcg_float, tcg_int32,
-                                             tcg_shift, tcg_fpst);
+                        gen_helper_vfp_ultoh(tcg_float, tcg_int32, tcg_shift,
+                                             tcg_fpst);
                     }
                 } else {
                     if (is_signed) {
@@ -8336,9 +8279,8 @@ static void handle_simd_intfp_conv(DisasContext *s, int rd, int rn,
 
 /* UCVTF/SCVTF - Integer to FP conversion */
 static void handle_simd_shift_intfp_conv(DisasContext *s, bool is_scalar,
-                                         bool is_q, bool is_u,
-                                         int immh, int immb, int opcode,
-                                         int rn, int rd)
+                                         bool is_q, bool is_u, int immh,
+                                         int immb, int opcode, int rn, int rd)
 {
     int size, elements, fracbits;
     int immhb = immh << 3 | immb;
@@ -8380,8 +8322,8 @@ static void handle_simd_shift_intfp_conv(DisasContext *s, bool is_scalar,
 
 /* FCVTZS, FVCVTZU - FP to fixedpoint conversion */
 static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
-                                         bool is_q, bool is_u,
-                                         int immh, int immb, int rn, int rd)
+                                         bool is_q, bool is_u, int immh,
+                                         int immb, int rn, int rd)
 {
     int immhb = immh << 3 | immb;
     int pass, size, fracbits;
@@ -8516,8 +8458,8 @@ static void disas_simd_scalar_shift_imm(DisasContext *s, uint32_t insn)
         handle_scalar_simd_shli(s, is_u, immh, immb, opcode, rn, rd);
         break;
     case 0x1c: /* SCVTF, UCVTF */
-        handle_simd_shift_intfp_conv(s, true, false, is_u, immh, immb,
-                                     opcode, rn, rd);
+        handle_simd_shift_intfp_conv(s, true, false, is_u, immh, immb, opcode,
+                                     rn, rd);
         break;
     case 0x10: /* SQSHRUN, SQSHRUN2 */
     case 0x11: /* SQRSHRUN, SQRSHRUN2 */
@@ -8525,13 +8467,13 @@ static void disas_simd_scalar_shift_imm(DisasContext *s, uint32_t insn)
             unallocated_encoding(s);
             return;
         }
-        handle_vec_simd_sqshrn(s, true, false, false, true,
-                               immh, immb, opcode, rn, rd);
+        handle_vec_simd_sqshrn(s, true, false, false, true, immh, immb, opcode,
+                               rn, rd);
         break;
     case 0x12: /* SQSHRN, SQSHRN2, UQSHRN */
     case 0x13: /* SQRSHRN, SQRSHRN2, UQRSHRN, UQRSHRN2 */
-        handle_vec_simd_sqshrn(s, true, false, is_u, is_u,
-                               immh, immb, opcode, rn, rd);
+        handle_vec_simd_sqshrn(s, true, false, is_u, is_u, immh, immb, opcode,
+                               rn, rd);
         break;
     case 0xc: /* SQSHLU */
         if (!is_u) {
@@ -8609,8 +8551,8 @@ static void disas_simd_scalar_three_reg_diff(DisasContext *s, uint32_t insn)
             /* fall through */
         case 0x9: /* SQDMLAL, SQDMLAL2 */
             read_vec_element(s, tcg_op1, rd, 0, MO_64);
-            gen_helper_neon_addl_saturate_s64(tcg_res, cpu_env,
-                                              tcg_res, tcg_op1);
+            gen_helper_neon_addl_saturate_s64(tcg_res, cpu_env, tcg_res,
+                                              tcg_op1);
             break;
         default:
             g_assert_not_reached();
@@ -8635,8 +8577,8 @@ static void disas_simd_scalar_three_reg_diff(DisasContext *s, uint32_t insn)
         {
             TCGv_i64 tcg_op3 = tcg_temp_new_i64();
             read_vec_element(s, tcg_op3, rd, 0, MO_32);
-            gen_helper_neon_addl_saturate_s32(tcg_res, cpu_env,
-                                              tcg_res, tcg_op3);
+            gen_helper_neon_addl_saturate_s32(tcg_res, cpu_env, tcg_res,
+                                              tcg_op3);
             break;
         }
         default:
@@ -8759,8 +8701,8 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
                 /* fall through */
             case 0x19: /* FMLA */
                 read_vec_element(s, tcg_res, rd, pass, MO_64);
-                gen_helper_vfp_muladdd(tcg_res, tcg_op1, tcg_op2,
-                                       tcg_res, fpst);
+                gen_helper_vfp_muladdd(tcg_res, tcg_op1, tcg_op2, tcg_res,
+                                       fpst);
                 break;
             case 0x18: /* FMAXNM */
                 gen_helper_vfp_maxnumd(tcg_res, tcg_op1, tcg_op2, fpst);
@@ -8835,8 +8777,8 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
                 /* fall through */
             case 0x19: /* FMLA */
                 read_vec_element_i32(s, tcg_res, rd, pass, MO_32);
-                gen_helper_vfp_muladds(tcg_res, tcg_op1, tcg_op2,
-                                       tcg_res, fpst);
+                gen_helper_vfp_muladds(tcg_res, tcg_op1, tcg_op2, tcg_res,
+                                       fpst);
                 break;
             case 0x1a: /* FADD */
                 gen_helper_vfp_adds(tcg_res, tcg_op1, tcg_op2, fpst);
@@ -9009,7 +8951,7 @@ static void disas_simd_scalar_three_reg_same(DisasContext *s, uint32_t insn)
         switch (opcode) {
         case 0x1: /* SQADD, UQADD */
         {
-            static NeonGenTwoOpEnvFn * const fns[3][2] = {
+            static NeonGenTwoOpEnvFn *const fns[3][2] = {
                 { gen_helper_neon_qadd_s8, gen_helper_neon_qadd_u8 },
                 { gen_helper_neon_qadd_s16, gen_helper_neon_qadd_u16 },
                 { gen_helper_neon_qadd_s32, gen_helper_neon_qadd_u32 },
@@ -9019,7 +8961,7 @@ static void disas_simd_scalar_three_reg_same(DisasContext *s, uint32_t insn)
         }
         case 0x5: /* SQSUB, UQSUB */
         {
-            static NeonGenTwoOpEnvFn * const fns[3][2] = {
+            static NeonGenTwoOpEnvFn *const fns[3][2] = {
                 { gen_helper_neon_qsub_s8, gen_helper_neon_qsub_u8 },
                 { gen_helper_neon_qsub_s16, gen_helper_neon_qsub_u16 },
                 { gen_helper_neon_qsub_s32, gen_helper_neon_qsub_u32 },
@@ -9029,7 +8971,7 @@ static void disas_simd_scalar_three_reg_same(DisasContext *s, uint32_t insn)
         }
         case 0x9: /* SQSHL, UQSHL */
         {
-            static NeonGenTwoOpEnvFn * const fns[3][2] = {
+            static NeonGenTwoOpEnvFn *const fns[3][2] = {
                 { gen_helper_neon_qshl_s8, gen_helper_neon_qshl_u8 },
                 { gen_helper_neon_qshl_s16, gen_helper_neon_qshl_u16 },
                 { gen_helper_neon_qshl_s32, gen_helper_neon_qshl_u32 },
@@ -9039,7 +8981,7 @@ static void disas_simd_scalar_three_reg_same(DisasContext *s, uint32_t insn)
         }
         case 0xb: /* SQRSHL, UQRSHL */
         {
-            static NeonGenTwoOpEnvFn * const fns[3][2] = {
+            static NeonGenTwoOpEnvFn *const fns[3][2] = {
                 { gen_helper_neon_qrshl_s8, gen_helper_neon_qrshl_u8 },
                 { gen_helper_neon_qrshl_s16, gen_helper_neon_qrshl_u16 },
                 { gen_helper_neon_qrshl_s32, gen_helper_neon_qrshl_u32 },
@@ -9049,7 +8991,7 @@ static void disas_simd_scalar_three_reg_same(DisasContext *s, uint32_t insn)
         }
         case 0x16: /* SQDMULH, SQRDMULH */
         {
-            static NeonGenTwoOpEnvFn * const fns[2][2] = {
+            static NeonGenTwoOpEnvFn *const fns[2][2] = {
                 { gen_helper_neon_qdmulh_s16, gen_helper_neon_qrdmulh_s16 },
                 { gen_helper_neon_qdmulh_s32, gen_helper_neon_qrdmulh_s32 },
             };
@@ -9085,7 +9027,7 @@ static void disas_simd_scalar_three_reg_same_fp16(DisasContext *s,
     int rm = extract32(insn, 16, 5);
     bool u = extract32(insn, 29, 1);
     bool a = extract32(insn, 23, 1);
-    int fpopcode = opcode | (a << 3) |  (u << 4);
+    int fpopcode = opcode | (a << 3) | (u << 4);
     TCGv_ptr fpst;
     TCGv_i32 tcg_op1;
     TCGv_i32 tcg_op2;
@@ -9338,9 +9280,9 @@ static void handle_2misc_64(DisasContext *s, int opcode, bool u,
     }
 }
 
-static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-                                   bool is_scalar, bool is_u, bool is_q,
-                                   int size, int rn, int rd)
+static void handle_2misc_fcmp_zero(DisasContext *s, int opcode, bool is_scalar,
+                                   bool is_u, bool is_q, int size, int rn,
+                                   int rd)
 {
     bool is_double = (size == MO_64);
     TCGv_ptr fpst;
@@ -9467,9 +9409,9 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
     }
 }
 
-static void handle_2misc_reciprocal(DisasContext *s, int opcode,
-                                    bool is_scalar, bool is_u, bool is_q,
-                                    int size, int rn, int rd)
+static void handle_2misc_reciprocal(DisasContext *s, int opcode, bool is_scalar,
+                                    bool is_u, bool is_q, int size, int rn,
+                                    int rd)
 {
     bool is_double = (size == 3);
     TCGv_ptr fpst = fpstatus_ptr(FPST_FPCR);
@@ -9540,9 +9482,8 @@ static void handle_2misc_reciprocal(DisasContext *s, int opcode,
     }
 }
 
-static void handle_2misc_narrow(DisasContext *s, bool scalar,
-                                int opcode, bool u, bool is_q,
-                                int size, int rn, int rd)
+static void handle_2misc_narrow(DisasContext *s, bool scalar, int opcode,
+                                bool u, bool is_q, int size, int rn, int rd)
 {
     /* Handle 2-reg-misc ops which are narrowing (so each 2*size element
      * in the source becomes a size element in the destination).
@@ -9571,12 +9512,12 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar,
         switch (opcode) {
         case 0x12: /* XTN, SQXTUN */
         {
-            static NeonGenNarrowFn * const xtnfns[3] = {
+            static NeonGenNarrowFn *const xtnfns[3] = {
                 gen_helper_neon_narrow_u8,
                 gen_helper_neon_narrow_u16,
                 tcg_gen_extrl_i64_i32,
             };
-            static NeonGenNarrowEnvFn * const sqxtunfns[3] = {
+            static NeonGenNarrowEnvFn *const sqxtunfns[3] = {
                 gen_helper_neon_unarrow_sat8,
                 gen_helper_neon_unarrow_sat16,
                 gen_helper_neon_unarrow_sat32,
@@ -9590,7 +9531,7 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar,
         }
         case 0x14: /* SQXTN, UQXTN */
         {
-            static NeonGenNarrowEnvFn * const fns[3][2] = {
+            static NeonGenNarrowEnvFn *const fns[3][2] = {
                 { gen_helper_neon_narrow_sat_s8,
                   gen_helper_neon_narrow_sat_u8 },
                 { gen_helper_neon_narrow_sat_s16,
@@ -9618,12 +9559,11 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar,
             }
             break;
         case 0x36: /* BFCVTN, BFCVTN2 */
-            {
-                TCGv_ptr fpst = fpstatus_ptr(FPST_FPCR);
-                gen_helper_bfcvt_pair(tcg_res[pass], tcg_op, fpst);
-            }
-            break;
-        case 0x56:  /* FCVTXN, FCVTXN2 */
+        {
+            TCGv_ptr fpst = fpstatus_ptr(FPST_FPCR);
+            gen_helper_bfcvt_pair(tcg_res[pass], tcg_op, fpst);
+        } break;
+        case 0x56: /* FCVTXN, FCVTXN2 */
             /* 64 bit to 32 bit float conversion
              * with von Neumann rounding (round to odd)
              */
@@ -9885,7 +9825,7 @@ static void disas_simd_scalar_two_reg_misc(DisasContext *s, uint32_t insn)
         case 0x7: /* SQABS, SQNEG */
         {
             NeonGenOneOpEnvFn *genfn;
-            static NeonGenOneOpEnvFn * const fns[3][2] = {
+            static NeonGenOneOpEnvFn *const fns[3][2] = {
                 { gen_helper_neon_qabs_s8, gen_helper_neon_qneg_s8 },
                 { gen_helper_neon_qabs_s16, gen_helper_neon_qneg_s16 },
                 { gen_helper_neon_qabs_s32, gen_helper_neon_qneg_s32 },
@@ -10012,14 +9952,15 @@ static void handle_vec_simd_shli(DisasContext *s, bool is_q, bool insert,
 
 /* USHLL/SHLL - Vector shift left with widening */
 static void handle_vec_simd_wshli(DisasContext *s, bool is_q, bool is_u,
-                                 int immh, int immb, int opcode, int rn, int rd)
+                                  int immh, int immb, int opcode, int rn,
+                                  int rd)
 {
     int size = 32 - clz32(immh) - 1;
     int immhb = immh << 3 | immb;
     int shift = immhb - (8 << size);
     int dsize = 64;
     int esize = 8 << size;
-    int elements = dsize/esize;
+    int elements = dsize / esize;
     TCGv_i64 tcg_rn = tcg_temp_new_i64();
     TCGv_i64 tcg_rd = tcg_temp_new_i64();
     int i;
@@ -10048,14 +9989,14 @@ static void handle_vec_simd_wshli(DisasContext *s, bool is_q, bool is_u,
 }
 
 /* SHRN/RSHRN - Shift right with narrowing (and potential rounding) */
-static void handle_vec_simd_shrn(DisasContext *s, bool is_q,
-                                 int immh, int immb, int opcode, int rn, int rd)
+static void handle_vec_simd_shrn(DisasContext *s, bool is_q, int immh, int immb,
+                                 int opcode, int rn, int rd)
 {
     int immhb = immh << 3 | immb;
     int size = 32 - clz32(immh) - 1;
     int dsize = 64;
     int esize = 8 << size;
-    int elements = dsize/esize;
+    int elements = dsize / esize;
     int shift = (2 * esize) - immhb;
     bool round = extract32(opcode, 0, 1);
     TCGv_i64 tcg_rn, tcg_rd, tcg_final;
@@ -10083,9 +10024,9 @@ static void handle_vec_simd_shrn(DisasContext *s, bool is_q,
     }
 
     for (i = 0; i < elements; i++) {
-        read_vec_element(s, tcg_rn, rn, i, size+1);
-        handle_shri_with_rndacc(tcg_rd, tcg_rn, tcg_round,
-                                false, true, size+1, shift);
+        read_vec_element(s, tcg_rn, rn, i, size + 1);
+        handle_shri_with_rndacc(tcg_rd, tcg_rn, tcg_round, false, true,
+                                size + 1, shift);
 
         tcg_gen_deposit_i64(tcg_final, tcg_final, tcg_rd, esize * i, esize);
     }
@@ -10146,15 +10087,15 @@ static void disas_simd_shift_imm(DisasContext *s, uint32_t insn)
         break;
     case 0x12: /* SQSHRN / UQSHRN */
     case 0x13: /* SQRSHRN / UQRSHRN */
-        handle_vec_simd_sqshrn(s, false, is_q, is_u, is_u, immh, immb,
-                               opcode, rn, rd);
+        handle_vec_simd_sqshrn(s, false, is_q, is_u, is_u, immh, immb, opcode,
+                               rn, rd);
         break;
     case 0x14: /* SSHLL / USHLL */
         handle_vec_simd_wshli(s, is_q, is_u, immh, immb, opcode, rn, rd);
         break;
     case 0x1c: /* SCVTF / UCVTF */
-        handle_simd_shift_intfp_conv(s, false, is_q, is_u, immh, immb,
-                                     opcode, rn, rd);
+        handle_simd_shift_intfp_conv(s, false, is_q, is_u, immh, immb, opcode,
+                                     rn, rd);
         break;
     case 0xc: /* SQSHLU */
         if (!is_u) {
@@ -10181,7 +10122,7 @@ static void disas_simd_shift_imm(DisasContext *s, uint32_t insn)
 static void gen_neon_addl(int size, bool is_sub, TCGv_i64 tcg_res,
                           TCGv_i64 tcg_op1, TCGv_i64 tcg_op2)
 {
-    static NeonGenTwo64OpFn * const fns[3][2] = {
+    static NeonGenTwo64OpFn *const fns[3][2] = {
         { gen_helper_neon_addl_u16, gen_helper_neon_subl_u16 },
         { gen_helper_neon_addl_u32, gen_helper_neon_subl_u32 },
         { tcg_gen_add_i64, tcg_gen_sub_i64 },
@@ -10263,8 +10204,8 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 tcg_gen_sub_i64(tcg_tmp1, tcg_op1, tcg_op2);
                 tcg_gen_sub_i64(tcg_tmp2, tcg_op2, tcg_op1);
                 tcg_gen_movcond_i64(is_u ? TCG_COND_GEU : TCG_COND_GE,
-                                    tcg_passres,
-                                    tcg_op1, tcg_op2, tcg_tmp1, tcg_tmp2);
+                                    tcg_passres, tcg_op1, tcg_op2, tcg_tmp1,
+                                    tcg_tmp2);
                 break;
             }
             case 8: /* SMLAL, SMLAL2, UMLAL, UMLAL2 */
@@ -10318,7 +10259,7 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
             case 2: /* SSUBL, SSUBL2, USUBL, USUBL2 */
             {
                 TCGv_i64 tcg_op2_64 = tcg_temp_new_i64();
-                static NeonGenWidenFn * const widenfns[2][2] = {
+                static NeonGenWidenFn *const widenfns[2][2] = {
                     { gen_helper_neon_widen_s8, gen_helper_neon_widen_u8 },
                     { gen_helper_neon_widen_s16, gen_helper_neon_widen_u16 },
                 };
@@ -10326,8 +10267,8 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
 
                 widenfn(tcg_op2_64, tcg_op2);
                 widenfn(tcg_passres, tcg_op1);
-                gen_neon_addl(size, (opcode == 2), tcg_passres,
-                              tcg_passres, tcg_op2_64);
+                gen_neon_addl(size, (opcode == 2), tcg_passres, tcg_passres,
+                              tcg_op2_64);
                 break;
             }
             case 5: /* SABAL, SABAL2, UABAL, UABAL2 */
@@ -10381,9 +10322,8 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                     if (accop < 0) {
                         gen_helper_neon_negl_u32(tcg_passres, tcg_passres);
                     }
-                    gen_helper_neon_addl_saturate_s32(tcg_res[pass], cpu_env,
-                                                      tcg_res[pass],
-                                                      tcg_passres);
+                    gen_helper_neon_addl_saturate_s32(
+                        tcg_res[pass], cpu_env, tcg_res[pass], tcg_passres);
                 } else {
                     gen_neon_addl(size, (accop < 0), tcg_res[pass],
                                   tcg_res[pass], tcg_passres);
@@ -10407,7 +10347,7 @@ static void handle_3rd_wide(DisasContext *s, int is_q, int is_u, int size,
         TCGv_i64 tcg_op1 = tcg_temp_new_i64();
         TCGv_i32 tcg_op2 = tcg_temp_new_i32();
         TCGv_i64 tcg_op2_wide = tcg_temp_new_i64();
-        static NeonGenWidenFn * const widenfns[3][2] = {
+        static NeonGenWidenFn *const widenfns[3][2] = {
             { gen_helper_neon_widen_s8, gen_helper_neon_widen_u8 },
             { gen_helper_neon_widen_s16, gen_helper_neon_widen_u16 },
             { tcg_gen_ext_i32_i64, tcg_gen_extu_i32_i64 },
@@ -10418,8 +10358,8 @@ static void handle_3rd_wide(DisasContext *s, int is_q, int is_u, int size,
         read_vec_element_i32(s, tcg_op2, rm, part + pass, MO_32);
         widenfn(tcg_op2_wide, tcg_op2);
         tcg_res[pass] = tcg_temp_new_i64();
-        gen_neon_addl(size, (opcode == 3),
-                      tcg_res[pass], tcg_op1, tcg_op2_wide);
+        gen_neon_addl(size, (opcode == 3), tcg_res[pass], tcg_op1,
+                      tcg_op2_wide);
     }
 
     for (pass = 0; pass < 2; pass++) {
@@ -10444,7 +10384,7 @@ static void handle_3rd_narrowing(DisasContext *s, int is_q, int is_u, int size,
         TCGv_i64 tcg_op1 = tcg_temp_new_i64();
         TCGv_i64 tcg_op2 = tcg_temp_new_i64();
         TCGv_i64 tcg_wideres = tcg_temp_new_i64();
-        static NeonGenNarrowFn * const narrowfns[3][2] = {
+        static NeonGenNarrowFn *const narrowfns[3][2] = {
             { gen_helper_neon_narrow_high_u8,
               gen_helper_neon_narrow_round_high_u8 },
             { gen_helper_neon_narrow_high_u16,
@@ -10713,7 +10653,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
             switch (opcode) {
             case 0x17: /* ADDP */
             {
-                static NeonGenTwoOpFn * const fns[3] = {
+                static NeonGenTwoOpFn *const fns[3] = {
                     gen_helper_neon_padd_u8,
                     gen_helper_neon_padd_u16,
                     tcg_gen_add_i32,
@@ -10723,7 +10663,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
             }
             case 0x14: /* SMAXP, UMAXP */
             {
-                static NeonGenTwoOpFn * const fns[3][2] = {
+                static NeonGenTwoOpFn *const fns[3][2] = {
                     { gen_helper_neon_pmax_s8, gen_helper_neon_pmax_u8 },
                     { gen_helper_neon_pmax_s16, gen_helper_neon_pmax_u16 },
                     { tcg_gen_smax_i32, tcg_gen_umax_i32 },
@@ -10733,7 +10673,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
             }
             case 0x15: /* SMINP, UMINP */
             {
-                static NeonGenTwoOpFn * const fns[3][2] = {
+                static NeonGenTwoOpFn *const fns[3][2] = {
                     { gen_helper_neon_pmin_s8, gen_helper_neon_pmin_u8 },
                     { gen_helper_neon_pmin_s16, gen_helper_neon_pmin_u16 },
                     { tcg_gen_smin_i32, tcg_gen_umin_i32 },
@@ -10781,9 +10721,8 @@ static void disas_simd_3same_float(DisasContext *s, uint32_t insn)
      * together indicate the operation. size[0] indicates single
      * or double.
      */
-    int fpopcode = extract32(insn, 11, 5)
-        | (extract32(insn, 23, 1) << 5)
-        | (extract32(insn, 29, 1) << 6);
+    int fpopcode = extract32(insn, 11, 5) | (extract32(insn, 23, 1) << 5) |
+                   (extract32(insn, 29, 1) << 6);
     int is_q = extract32(insn, 30, 1);
     int size = extract32(insn, 22, 1);
     int rm = extract32(insn, 16, 5);
@@ -10809,8 +10748,8 @@ static void disas_simd_3same_float(DisasContext *s, uint32_t insn)
             unallocated_encoding(s);
             return;
         }
-        handle_simd_3same_pair(s, is_q, 0, fpopcode, size ? MO_64 : MO_32,
-                               rn, rm, rd);
+        handle_simd_3same_pair(s, is_q, 0, fpopcode, size ? MO_64 : MO_32, rn,
+                               rm, rd);
         return;
     case 0x1b: /* FMULX */
     case 0x1f: /* FRECPS */
@@ -10849,11 +10788,10 @@ static void disas_simd_3same_float(DisasContext *s, uint32_t insn)
             int is_s = extract32(insn, 23, 1);
             int is_2 = extract32(insn, 29, 1);
             int data = (is_2 << 1) | is_s;
-            tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-                               vec_full_reg_offset(s, rn),
-                               vec_full_reg_offset(s, rm), cpu_env,
-                               is_q ? 16 : 8, vec_full_reg_size(s),
-                               data, gen_helper_gvec_fmlal_a64);
+            tcg_gen_gvec_3_ptr(
+                vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                vec_full_reg_offset(s, rm), cpu_env, is_q ? 16 : 8,
+                vec_full_reg_size(s), data, gen_helper_gvec_fmlal_a64);
         }
         return;
 
@@ -10974,7 +10912,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
     case 0x13: /* MUL, PMUL */
         if (!u) { /* MUL */
             gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_mul, size);
-        } else {  /* PMUL */
+        } else { /* PMUL */
             gen_gvec_op3_ool(s, is_q, rd, rn, rm, 0, gen_helper_gvec_pmul_b);
         }
         return;
@@ -10986,13 +10924,13 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
         }
         return;
     case 0x16: /* SQDMULH, SQRDMULH */
-        {
-            static gen_helper_gvec_3_ptr * const fns[2][2] = {
-                { gen_helper_neon_sqdmulh_h, gen_helper_neon_sqrdmulh_h },
-                { gen_helper_neon_sqdmulh_s, gen_helper_neon_sqrdmulh_s },
-            };
-            gen_gvec_op3_qc(s, is_q, rd, rn, rm, fns[size - 1][u]);
-        }
+    {
+        static gen_helper_gvec_3_ptr *const fns[2][2] = {
+            { gen_helper_neon_sqdmulh_h, gen_helper_neon_sqrdmulh_h },
+            { gen_helper_neon_sqdmulh_s, gen_helper_neon_sqrdmulh_s },
+        };
+        gen_gvec_op3_qc(s, is_q, rd, rn, rm, fns[size - 1][u]);
+    }
         return;
     case 0x11:
         if (!u) { /* CMTST */
@@ -11009,8 +10947,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
         cond = u ? TCG_COND_GEU : TCG_COND_GE;
     do_gvec_cmp:
         tcg_gen_gvec_cmp(cond, size, vec_full_reg_offset(s, rd),
-                         vec_full_reg_offset(s, rn),
-                         vec_full_reg_offset(s, rm),
+                         vec_full_reg_offset(s, rn), vec_full_reg_offset(s, rm),
                          is_q ? 16 : 8, vec_full_reg_size(s));
         return;
     }
@@ -11043,7 +10980,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
             switch (opcode) {
             case 0x0: /* SHADD, UHADD */
             {
-                static NeonGenTwoOpFn * const fns[3][2] = {
+                static NeonGenTwoOpFn *const fns[3][2] = {
                     { gen_helper_neon_hadd_s8, gen_helper_neon_hadd_u8 },
                     { gen_helper_neon_hadd_s16, gen_helper_neon_hadd_u16 },
                     { gen_helper_neon_hadd_s32, gen_helper_neon_hadd_u32 },
@@ -11053,7 +10990,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
             }
             case 0x2: /* SRHADD, URHADD */
             {
-                static NeonGenTwoOpFn * const fns[3][2] = {
+                static NeonGenTwoOpFn *const fns[3][2] = {
                     { gen_helper_neon_rhadd_s8, gen_helper_neon_rhadd_u8 },
                     { gen_helper_neon_rhadd_s16, gen_helper_neon_rhadd_u16 },
                     { gen_helper_neon_rhadd_s32, gen_helper_neon_rhadd_u32 },
@@ -11063,7 +11000,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
             }
             case 0x4: /* SHSUB, UHSUB */
             {
-                static NeonGenTwoOpFn * const fns[3][2] = {
+                static NeonGenTwoOpFn *const fns[3][2] = {
                     { gen_helper_neon_hsub_s8, gen_helper_neon_hsub_u8 },
                     { gen_helper_neon_hsub_s16, gen_helper_neon_hsub_u16 },
                     { gen_helper_neon_hsub_s32, gen_helper_neon_hsub_u32 },
@@ -11073,7 +11010,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
             }
             case 0x9: /* SQSHL, UQSHL */
             {
-                static NeonGenTwoOpEnvFn * const fns[3][2] = {
+                static NeonGenTwoOpEnvFn *const fns[3][2] = {
                     { gen_helper_neon_qshl_s8, gen_helper_neon_qshl_u8 },
                     { gen_helper_neon_qshl_s16, gen_helper_neon_qshl_u16 },
                     { gen_helper_neon_qshl_s32, gen_helper_neon_qshl_u32 },
@@ -11083,7 +11020,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
             }
             case 0xa: /* SRSHL, URSHL */
             {
-                static NeonGenTwoOpFn * const fns[3][2] = {
+                static NeonGenTwoOpFn *const fns[3][2] = {
                     { gen_helper_neon_rshl_s8, gen_helper_neon_rshl_u8 },
                     { gen_helper_neon_rshl_s16, gen_helper_neon_rshl_u16 },
                     { gen_helper_neon_rshl_s32, gen_helper_neon_rshl_u32 },
@@ -11093,7 +11030,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
             }
             case 0xb: /* SQRSHL, UQRSHL */
             {
-                static NeonGenTwoOpEnvFn * const fns[3][2] = {
+                static NeonGenTwoOpEnvFn *const fns[3][2] = {
                     { gen_helper_neon_qrshl_s8, gen_helper_neon_qrshl_u8 },
                     { gen_helper_neon_qrshl_s16, gen_helper_neon_qrshl_u16 },
                     { gen_helper_neon_qrshl_s32, gen_helper_neon_qrshl_u32 },
@@ -11425,9 +11362,8 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
     case 0x1b: /* FCMLA, #270 */
     case 0x1c: /* FCADD, #90 */
     case 0x1e: /* FCADD, #270 */
-        if (size == 0
-            || (size == 1 && !dc_isar_feature(aa64_fp16, s))
-            || (size == 3 && !is_q)) {
+        if (size == 0 || (size == 1 && !dc_isar_feature(aa64_fp16, s)) ||
+            (size == 3 && !is_q)) {
             unallocated_encoding(s);
             return;
         }
@@ -11483,8 +11419,7 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
 
     case 0x04: /* SMMLA, UMMLA */
         gen_gvec_op4_ool(s, 1, rd, rn, rm, rd, 0,
-                         u ? gen_helper_gvec_ummla_b
-                         : gen_helper_gvec_smmla_b);
+                         u ? gen_helper_gvec_ummla_b : gen_helper_gvec_smmla_b);
         return;
     case 0x05: /* USMMLA */
         gen_gvec_op4_ool(s, 1, rd, rn, rm, rd, 0, gen_helper_gvec_usmmla_b);
@@ -11591,8 +11526,8 @@ static void handle_2misc_widening(DisasContext *s, int opcode, bool is_q,
             tcg_res[pass] = tcg_temp_new_i32();
 
             read_vec_element_i32(s, tcg_res[pass], rn, srcelt + pass, MO_16);
-            gen_helper_vfp_fcvt_f16_to_f32(tcg_res[pass], tcg_res[pass],
-                                           fpst, ahp);
+            gen_helper_vfp_fcvt_f16_to_f32(tcg_res[pass], tcg_res[pass], fpst,
+                                           ahp);
         }
         for (pass = 0; pass < 4; pass++) {
             write_vec_element_i32(s, tcg_res[pass], rd, pass, MO_32);
@@ -11600,8 +11535,8 @@ static void handle_2misc_widening(DisasContext *s, int opcode, bool is_q,
     }
 }
 
-static void handle_rev(DisasContext *s, int opcode, bool u,
-                       bool is_q, int size, int rn, int rd)
+static void handle_rev(DisasContext *s, int opcode, bool u, bool is_q, int size,
+                       int rn, int rd)
 {
     int op = (opcode << 1) | u;
     int opsz = op + size;
@@ -11705,9 +11640,9 @@ static void handle_2misc_pairwise(DisasContext *s, int opcode, bool u,
         for (pass = 0; pass < maxpass; pass++) {
             TCGv_i64 tcg_op = tcg_temp_new_i64();
             NeonGenOne64OpFn *genfn;
-            static NeonGenOne64OpFn * const fns[2][2] = {
-                { gen_helper_neon_addlp_s8,  gen_helper_neon_addlp_u8 },
-                { gen_helper_neon_addlp_s16,  gen_helper_neon_addlp_u16 },
+            static NeonGenOne64OpFn *const fns[2][2] = {
+                { gen_helper_neon_addlp_s8, gen_helper_neon_addlp_u8 },
+                { gen_helper_neon_addlp_s16, gen_helper_neon_addlp_u16 },
             };
 
             genfn = fns[size][u];
@@ -11720,11 +11655,11 @@ static void handle_2misc_pairwise(DisasContext *s, int opcode, bool u,
             if (accum) {
                 read_vec_element(s, tcg_op, rd, pass, MO_64);
                 if (size == 0) {
-                    gen_helper_neon_addl_u16(tcg_res[pass],
-                                             tcg_res[pass], tcg_op);
+                    gen_helper_neon_addl_u16(tcg_res[pass], tcg_res[pass],
+                                             tcg_op);
                 } else {
-                    gen_helper_neon_addl_u32(tcg_res[pass],
-                                             tcg_res[pass], tcg_op);
+                    gen_helper_neon_addl_u32(tcg_res[pass], tcg_res[pass],
+                                             tcg_op);
                 }
             }
         }
@@ -11745,7 +11680,7 @@ static void handle_shll(DisasContext *s, bool is_q, int size, int rn, int rd)
     TCGv_i64 tcg_res[2];
 
     for (pass = 0; pass < 2; pass++) {
-        static NeonGenWidenFn * const widenfns[3] = {
+        static NeonGenWidenFn *const widenfns[3] = {
             gen_helper_neon_widen_u8,
             gen_helper_neon_widen_u16,
             tcg_gen_extu_i32_i64,
@@ -11871,8 +11806,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
         }
         break;
     case 0xc ... 0xf:
-    case 0x16 ... 0x1f:
-    {
+    case 0x16 ... 0x1f: {
         /* Floating point: U, size[1] and opcode indicate operation;
          * size[0] indicates single or double precision.
          */
@@ -12104,8 +12038,8 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
 
             read_vec_element(s, tcg_op, rn, pass, MO_64);
 
-            handle_2misc_64(s, opcode, u, tcg_res, tcg_op,
-                            tcg_rmode, tcg_fpstatus);
+            handle_2misc_64(s, opcode, u, tcg_res, tcg_op, tcg_rmode,
+                            tcg_fpstatus);
 
             write_vec_element(s, tcg_res, rd, pass, MO_64);
         }
@@ -12149,16 +12083,16 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
                 case 0x1c: /* FCVTAS */
                 case 0x3a: /* FCVTPS */
                 case 0x3b: /* FCVTZS */
-                    gen_helper_vfp_tosls(tcg_res, tcg_op,
-                                         tcg_constant_i32(0), tcg_fpstatus);
+                    gen_helper_vfp_tosls(tcg_res, tcg_op, tcg_constant_i32(0),
+                                         tcg_fpstatus);
                     break;
                 case 0x5a: /* FCVTNU */
                 case 0x5b: /* FCVTMU */
                 case 0x5c: /* FCVTAU */
                 case 0x7a: /* FCVTPU */
                 case 0x7b: /* FCVTZU */
-                    gen_helper_vfp_touls(tcg_res, tcg_op,
-                                         tcg_constant_i32(0), tcg_fpstatus);
+                    gen_helper_vfp_touls(tcg_res, tcg_op, tcg_constant_i32(0),
+                                         tcg_fpstatus);
                     break;
                 case 0x18: /* FRINTN */
                 case 0x19: /* FRINTM */
@@ -12201,7 +12135,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
                 case 0x7: /* SQABS, SQNEG */
                 {
                     NeonGenOneOpEnvFn *genfn;
-                    static NeonGenOneOpEnvFn * const fns[2][2] = {
+                    static NeonGenOneOpEnvFn *const fns[2][2] = {
                         { gen_helper_neon_qabs_s8, gen_helper_neon_qneg_s8 },
                         { gen_helper_neon_qabs_s16, gen_helper_neon_qneg_s16 },
                     };
@@ -12301,8 +12235,7 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
         }
         handle_simd_intfp_conv(s, rd, rn, elements, !u, 0, MO_16);
         return;
-    }
-    break;
+    } break;
     case 0x2c: /* FCMGT (zero) */
     case 0x2d: /* FCMEQ (zero) */
     case 0x2e: /* FCMLT (zero) */
@@ -12735,8 +12668,8 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
     case 0x0e: /* SDOT */
     case 0x1e: /* UDOT */
         gen_gvec_op4_ool(s, is_q, rd, rn, rm, rd, index,
-                         u ? gen_helper_gvec_udot_idx_b
-                         : gen_helper_gvec_sdot_idx_b);
+                         u ? gen_helper_gvec_udot_idx_b :
+                             gen_helper_gvec_sdot_idx_b);
         return;
     case 0x0f:
         switch (extract32(insn, 22, 2)) {
@@ -12762,82 +12695,74 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
     case 0x13: /* FCMLA #90 */
     case 0x15: /* FCMLA #180 */
     case 0x17: /* FCMLA #270 */
-        {
-            int rot = extract32(insn, 13, 2);
-            int data = (index << 2) | rot;
-            tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, rd),
-                               vec_full_reg_offset(s, rn),
-                               vec_full_reg_offset(s, rm),
-                               vec_full_reg_offset(s, rd), fpst,
-                               is_q ? 16 : 8, vec_full_reg_size(s), data,
-                               size == MO_64
-                               ? gen_helper_gvec_fcmlas_idx
-                               : gen_helper_gvec_fcmlah_idx);
-        }
+    {
+        int rot = extract32(insn, 13, 2);
+        int data = (index << 2) | rot;
+        tcg_gen_gvec_4_ptr(
+            vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+            vec_full_reg_offset(s, rm), vec_full_reg_offset(s, rd), fpst,
+            is_q ? 16 : 8, vec_full_reg_size(s), data,
+            size == MO_64 ? gen_helper_gvec_fcmlas_idx :
+                            gen_helper_gvec_fcmlah_idx);
+    }
         return;
 
     case 0x00: /* FMLAL */
     case 0x04: /* FMLSL */
     case 0x18: /* FMLAL2 */
     case 0x1c: /* FMLSL2 */
-        {
-            int is_s = extract32(opcode, 2, 1);
-            int is_2 = u;
-            int data = (index << 2) | (is_2 << 1) | is_s;
-            tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-                               vec_full_reg_offset(s, rn),
-                               vec_full_reg_offset(s, rm), cpu_env,
-                               is_q ? 16 : 8, vec_full_reg_size(s),
-                               data, gen_helper_gvec_fmlal_idx_a64);
-        }
+    {
+        int is_s = extract32(opcode, 2, 1);
+        int is_2 = u;
+        int data = (index << 2) | (is_2 << 1) | is_s;
+        tcg_gen_gvec_3_ptr(
+            vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+            vec_full_reg_offset(s, rm), cpu_env, is_q ? 16 : 8,
+            vec_full_reg_size(s), data, gen_helper_gvec_fmlal_idx_a64);
+    }
         return;
 
     case 0x08: /* MUL */
         if (!is_long && !is_scalar) {
-            static gen_helper_gvec_3 * const fns[3] = {
+            static gen_helper_gvec_3 *const fns[3] = {
                 gen_helper_gvec_mul_idx_h,
                 gen_helper_gvec_mul_idx_s,
                 gen_helper_gvec_mul_idx_d,
             };
             tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
                                vec_full_reg_offset(s, rn),
-                               vec_full_reg_offset(s, rm),
-                               is_q ? 16 : 8, vec_full_reg_size(s),
-                               index, fns[size - 1]);
+                               vec_full_reg_offset(s, rm), is_q ? 16 : 8,
+                               vec_full_reg_size(s), index, fns[size - 1]);
             return;
         }
         break;
 
     case 0x10: /* MLA */
         if (!is_long && !is_scalar) {
-            static gen_helper_gvec_4 * const fns[3] = {
+            static gen_helper_gvec_4 *const fns[3] = {
                 gen_helper_gvec_mla_idx_h,
                 gen_helper_gvec_mla_idx_s,
                 gen_helper_gvec_mla_idx_d,
             };
-            tcg_gen_gvec_4_ool(vec_full_reg_offset(s, rd),
-                               vec_full_reg_offset(s, rn),
-                               vec_full_reg_offset(s, rm),
-                               vec_full_reg_offset(s, rd),
-                               is_q ? 16 : 8, vec_full_reg_size(s),
-                               index, fns[size - 1]);
+            tcg_gen_gvec_4_ool(
+                vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                vec_full_reg_offset(s, rm), vec_full_reg_offset(s, rd),
+                is_q ? 16 : 8, vec_full_reg_size(s), index, fns[size - 1]);
             return;
         }
         break;
 
     case 0x14: /* MLS */
         if (!is_long && !is_scalar) {
-            static gen_helper_gvec_4 * const fns[3] = {
+            static gen_helper_gvec_4 *const fns[3] = {
                 gen_helper_gvec_mls_idx_h,
                 gen_helper_gvec_mls_idx_s,
                 gen_helper_gvec_mls_idx_d,
             };
-            tcg_gen_gvec_4_ool(vec_full_reg_offset(s, rd),
-                               vec_full_reg_offset(s, rn),
-                               vec_full_reg_offset(s, rm),
-                               vec_full_reg_offset(s, rd),
-                               is_q ? 16 : 8, vec_full_reg_size(s),
-                               index, fns[size - 1]);
+            tcg_gen_gvec_4_ool(
+                vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                vec_full_reg_offset(s, rm), vec_full_reg_offset(s, rd),
+                is_q ? 16 : 8, vec_full_reg_size(s), index, fns[size - 1]);
             return;
         }
         break;
@@ -12915,7 +12840,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
             case 0x10: /* MLA */
             case 0x14: /* MLS */
             {
-                static NeonGenTwoOpFn * const fns[2][2] = {
+                static NeonGenTwoOpFn *const fns[2][2] = {
                     { gen_helper_neon_add_u16, gen_helper_neon_sub_u16 },
                     { tcg_gen_add_i32, tcg_gen_sub_i32 },
                 };
@@ -12960,8 +12885,8 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
                          * fused multiply-add */
                         tcg_gen_xori_i32(tcg_op, tcg_op, 0x80000000);
                     }
-                    gen_helper_vfp_muladds(tcg_res, tcg_op, tcg_idx,
-                                           tcg_res, fpst);
+                    gen_helper_vfp_muladds(tcg_res, tcg_op, tcg_idx, tcg_res,
+                                           fpst);
                     break;
                 default:
                     g_assert_not_reached();
@@ -12971,11 +12896,10 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
                 switch (size) {
                 case 1:
                     if (is_scalar) {
-                        gen_helper_advsimd_mulh(tcg_res, tcg_op,
-                                                tcg_idx, fpst);
+                        gen_helper_advsimd_mulh(tcg_res, tcg_op, tcg_idx, fpst);
                     } else {
-                        gen_helper_advsimd_mul2h(tcg_res, tcg_op,
-                                                 tcg_idx, fpst);
+                        gen_helper_advsimd_mul2h(tcg_res, tcg_op, tcg_idx,
+                                                 fpst);
                     }
                     break;
                 case 2:
@@ -12989,11 +12913,11 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
                 switch (size) {
                 case 1:
                     if (is_scalar) {
-                        gen_helper_advsimd_mulxh(tcg_res, tcg_op,
-                                                 tcg_idx, fpst);
+                        gen_helper_advsimd_mulxh(tcg_res, tcg_op, tcg_idx,
+                                                 fpst);
                     } else {
-                        gen_helper_advsimd_mulx2h(tcg_res, tcg_op,
-                                                  tcg_idx, fpst);
+                        gen_helper_advsimd_mulx2h(tcg_res, tcg_op, tcg_idx,
+                                                  fpst);
                     }
                     break;
                 case 2:
@@ -13005,42 +12929,42 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
                 break;
             case 0x0c: /* SQDMULH */
                 if (size == 1) {
-                    gen_helper_neon_qdmulh_s16(tcg_res, cpu_env,
-                                               tcg_op, tcg_idx);
+                    gen_helper_neon_qdmulh_s16(tcg_res, cpu_env, tcg_op,
+                                               tcg_idx);
                 } else {
-                    gen_helper_neon_qdmulh_s32(tcg_res, cpu_env,
-                                               tcg_op, tcg_idx);
+                    gen_helper_neon_qdmulh_s32(tcg_res, cpu_env, tcg_op,
+                                               tcg_idx);
                 }
                 break;
             case 0x0d: /* SQRDMULH */
                 if (size == 1) {
-                    gen_helper_neon_qrdmulh_s16(tcg_res, cpu_env,
-                                                tcg_op, tcg_idx);
+                    gen_helper_neon_qrdmulh_s16(tcg_res, cpu_env, tcg_op,
+                                                tcg_idx);
                 } else {
-                    gen_helper_neon_qrdmulh_s32(tcg_res, cpu_env,
-                                                tcg_op, tcg_idx);
+                    gen_helper_neon_qrdmulh_s32(tcg_res, cpu_env, tcg_op,
+                                                tcg_idx);
                 }
                 break;
             case 0x1d: /* SQRDMLAH */
                 read_vec_element_i32(s, tcg_res, rd, pass,
                                      is_scalar ? size : MO_32);
                 if (size == 1) {
-                    gen_helper_neon_qrdmlah_s16(tcg_res, cpu_env,
-                                                tcg_op, tcg_idx, tcg_res);
+                    gen_helper_neon_qrdmlah_s16(tcg_res, cpu_env, tcg_op,
+                                                tcg_idx, tcg_res);
                 } else {
-                    gen_helper_neon_qrdmlah_s32(tcg_res, cpu_env,
-                                                tcg_op, tcg_idx, tcg_res);
+                    gen_helper_neon_qrdmlah_s32(tcg_res, cpu_env, tcg_op,
+                                                tcg_idx, tcg_res);
                 }
                 break;
             case 0x1f: /* SQRDMLSH */
                 read_vec_element_i32(s, tcg_res, rd, pass,
                                      is_scalar ? size : MO_32);
                 if (size == 1) {
-                    gen_helper_neon_qrdmlsh_s16(tcg_res, cpu_env,
-                                                tcg_op, tcg_idx, tcg_res);
+                    gen_helper_neon_qrdmlsh_s16(tcg_res, cpu_env, tcg_op,
+                                                tcg_idx, tcg_res);
                 } else {
-                    gen_helper_neon_qrdmlsh_s32(tcg_res, cpu_env,
-                                                tcg_op, tcg_idx, tcg_res);
+                    gen_helper_neon_qrdmlsh_s32(tcg_res, cpu_env, tcg_op,
+                                                tcg_idx, tcg_res);
                 }
                 break;
             default:
@@ -13119,9 +13043,8 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
                     tcg_gen_neg_i64(tcg_passres, tcg_passres);
                     /* fall through */
                 case 0x3: /* SQDMLAL, SQDMLAL2 */
-                    gen_helper_neon_addl_saturate_s64(tcg_res[pass], cpu_env,
-                                                      tcg_res[pass],
-                                                      tcg_passres);
+                    gen_helper_neon_addl_saturate_s64(
+                        tcg_res[pass], cpu_env, tcg_res[pass], tcg_passres);
                     break;
                 default:
                     g_assert_not_reached();
@@ -13150,8 +13073,8 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
                 if (is_scalar) {
                     read_vec_element_i32(s, tcg_op, rn, pass, size);
                 } else {
-                    read_vec_element_i32(s, tcg_op, rn,
-                                         pass + (is_q * 2), MO_32);
+                    read_vec_element_i32(s, tcg_op, rn, pass + (is_q * 2),
+                                         MO_32);
                 }
 
                 tcg_res[pass] = tcg_temp_new_i64();
@@ -13193,9 +13116,8 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
                     gen_helper_neon_negl_u32(tcg_passres, tcg_passres);
                     /* fall through */
                 case 0x3: /* SQDMLAL, SQDMLAL2 */
-                    gen_helper_neon_addl_saturate_s32(tcg_res[pass], cpu_env,
-                                                      tcg_res[pass],
-                                                      tcg_passres);
+                    gen_helper_neon_addl_saturate_s32(
+                        tcg_res[pass], cpu_env, tcg_res[pass], tcg_passres);
                     break;
                 default:
                     g_assert_not_reached();
@@ -13415,7 +13337,7 @@ void gen_gvec_rax1(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
 static void disas_crypto_three_reg_sha512(DisasContext *s, uint32_t insn)
 {
     int opcode = extract32(insn, 10, 2);
-    int o =  extract32(insn, 14, 1);
+    int o = extract32(insn, 14, 1);
     int rm = extract32(insn, 16, 5);
     int rn = extract32(insn, 5, 5);
     int rd = extract32(insn, 0, 5);
@@ -13636,10 +13558,8 @@ static void disas_crypto_xar(DisasContext *s, uint32_t insn)
         return;
     }
 
-    gen_gvec_xar(MO_64, vec_full_reg_offset(s, rd),
-                 vec_full_reg_offset(s, rn),
-                 vec_full_reg_offset(s, rm), imm6, 16,
-                 vec_full_reg_size(s));
+    gen_gvec_xar(MO_64, vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
+                 vec_full_reg_offset(s, rm), imm6, 16, vec_full_reg_size(s));
 }
 
 /* Crypto three-reg imm2
@@ -13650,9 +13570,11 @@ static void disas_crypto_xar(DisasContext *s, uint32_t insn)
  */
 static void disas_crypto_three_reg_imm2(DisasContext *s, uint32_t insn)
 {
-    static gen_helper_gvec_3 * const fns[4] = {
-        gen_helper_crypto_sm3tt1a, gen_helper_crypto_sm3tt1b,
-        gen_helper_crypto_sm3tt2a, gen_helper_crypto_sm3tt2b,
+    static gen_helper_gvec_3 *const fns[4] = {
+        gen_helper_crypto_sm3tt1a,
+        gen_helper_crypto_sm3tt1b,
+        gen_helper_crypto_sm3tt2a,
+        gen_helper_crypto_sm3tt2b,
     };
     int opcode = extract32(insn, 10, 2);
     int imm2 = extract32(insn, 12, 2);
@@ -13773,8 +13695,8 @@ static bool is_guarded_page(CPUARMState *env, DisasContext *s)
      * that the TLB entry must be present and valid, and thus this
      * access will never raise an exception.
      */
-    flags = probe_access_full(env, addr, 0, MMU_INST_FETCH, mmu_idx,
-                              false, &host, &full, 0);
+    flags = probe_access_full(env, addr, 0, MMU_INST_FETCH, mmu_idx, false,
+                              &host, &full, 0);
     assert(!(flags & TLB_INVALID_MASK));
 
     return full->guarded;
@@ -13838,11 +13760,11 @@ static void disas_a64_legacy(DisasContext *s, uint32_t insn)
 {
     switch (extract32(insn, 25, 4)) {
     case 0x5:
-    case 0xd:      /* Data processing - register */
+    case 0xd: /* Data processing - register */
         disas_data_proc_reg(s, insn);
         break;
     case 0x7:
-    case 0xf:      /* Data processing - SIMD and floating point */
+    case 0xf: /* Data processing - SIMD and floating point */
         disas_data_proc_simd_fp(s, insn);
         break;
     default:
@@ -14038,9 +13960,8 @@ static void aarch64_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
              * everything else.  This allows us to handle this now
              * instead of waiting until the insn is otherwise decoded.
              */
-            if (s->btype != 0
-                && s->guarded_page
-                && !btype_destination_ok(insn, s->bt, s->btype)) {
+            if (s->btype != 0 && s->guarded_page &&
+                !btype_destination_ok(insn, s->bt, s->btype)) {
                 gen_exception_insn(s, 0, EXCP_UDEF, syn_btitrap(s->btype));
                 return;
             }
@@ -14055,9 +13976,7 @@ static void aarch64_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
         disas_sme_fa64(s, insn);
     }
 
-    if (!disas_a64(s, insn) &&
-        !disas_sme(s, insn) &&
-        !disas_sve(s, insn)) {
+    if (!disas_a64(s, insn) && !disas_sme(s, insn) && !disas_sve(s, insn)) {
         disas_a64_legacy(s, insn);
     }
 
@@ -14138,8 +14057,8 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
     }
 }
 
-static void aarch64_tr_disas_log(const DisasContextBase *dcbase,
-                                 CPUState *cpu, FILE *logfile)
+static void aarch64_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu,
+                                 FILE *logfile)
 {
     DisasContext *dc = container_of(dcbase, DisasContext, base);
 
@@ -14149,9 +14068,9 @@ static void aarch64_tr_disas_log(const DisasContextBase *dcbase,
 
 const TranslatorOps aarch64_translator_ops = {
     .init_disas_context = aarch64_tr_init_disas_context,
-    .tb_start           = aarch64_tr_tb_start,
-    .insn_start         = aarch64_tr_insn_start,
-    .translate_insn     = aarch64_tr_translate_insn,
-    .tb_stop            = aarch64_tr_tb_stop,
-    .disas_log          = aarch64_tr_disas_log,
+    .tb_start = aarch64_tr_tb_start,
+    .insn_start = aarch64_tr_insn_start,
+    .translate_insn = aarch64_tr_translate_insn,
+    .tb_stop = aarch64_tr_tb_stop,
+    .disas_log = aarch64_tr_disas_log,
 };

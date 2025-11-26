@@ -5,42 +5,42 @@
 
 static inline int env_offset_gpr(int num)
 {
-    return offsetof(CPUARMState,xregs[num]);//cpu->xregs == gpr
+    return offsetof(CPUARMState, xregs[num]); // cpu->xregs == gpr
 }
 
 static inline int env_offset_pc(void)
 {
-    return offsetof(CPUARMState,pc);
+    return offsetof(CPUARMState, pc);
 }
 
 static inline int env_offset_fpr(int num)
 {
-    return offsetof(CPUARMState,vfp.zregs[num]);
+    return offsetof(CPUARMState, vfp.zregs[num]);
 }
 
 static inline int env_offset_CF(void)
 {
-    return offsetof(CPUARMState,CF);
+    return offsetof(CPUARMState, CF);
 }
 
 static inline int env_offset_VF(void)
 {
-    return offsetof(CPUARMState,VF);
+    return offsetof(CPUARMState, VF);
 }
 
 static inline int env_offset_ZF(void)
 {
-    return offsetof(CPUARMState,ZF);
+    return offsetof(CPUARMState, ZF);
 }
 
 static inline int env_offset_NF(void)
 {
-    return offsetof(CPUARMState,NF);
+    return offsetof(CPUARMState, NF);
 }
 
 static inline int env_offset_PSTATE(void)
 {
-    return offsetof(CPUARMState,pstate);
+    return offsetof(CPUARMState, pstate);
 }
 
 static inline int env_offset_FPSCR(void)
@@ -65,7 +65,7 @@ static inline int env_offset_QC(void)
 
 static inline int env_offset_Exclusive(void)
 {
-    return offsetof(CPUARMState,exclusive_addr);
+    return offsetof(CPUARMState, exclusive_addr);
 }
 
 #define env_offset(item) offsetof(CPUARMState, item)

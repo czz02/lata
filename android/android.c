@@ -269,7 +269,6 @@ void *android_create_cpu(void)
 
 static void android_destory_cpu(void *env)
 {
-
 }
 
 void android_set_tls(void *env, uint64_t tls)
@@ -279,9 +278,11 @@ void android_set_tls(void *env, uint64_t tls)
     _env->cp15.tpidr_el[0] = tls;
 }
 
-void android_add_state_kv(void *berberis_state, void *env){
+void android_add_state_kv(void *berberis_state, void *env)
+{
     CPUArchState *_env = (CPUArchState *)env;
-    // printf("pid : %d, berberis_state : %p, qemu_state : %p\n", getpid(), berberis_state, _env);
+    // printf("pid : %d, berberis_state : %p, qemu_state : %p\n", getpid(),
+    // berberis_state, _env);
     pthread_mutex_lock(&b2q_mutex);
     g_hash_table_insert(berberis_to_qemu, berberis_state, env_cpu(_env));
     g_hash_table_insert(berberis_to_qemu, env_cpu(_env), berberis_state);
@@ -412,10 +413,8 @@ void *android_init(BerberisCallbacks *cbs)
 
 
     berberis_to_qemu = g_hash_table_new(g_direct_hash, g_direct_equal);
-    berberis_guest_host =
-        g_hash_table_new(g_direct_hash, g_direct_equal);
-    berberis_guest_callee =
-        g_hash_table_new(g_direct_hash, g_direct_equal);
+    berberis_guest_host = g_hash_table_new(g_direct_hash, g_direct_equal);
+    berberis_guest_callee = g_hash_table_new(g_direct_hash, g_direct_equal);
 
     return main_cpu->env_ptr;
 }

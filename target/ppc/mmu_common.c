@@ -47,13 +47,15 @@ void ppc_store_sdr1(CPUPPCState *env, target_ulong value)
         target_ulong htabsize = value & SDR_64_HTABSIZE;
 
         if (value & ~sdr_mask) {
-            qemu_log_mask(LOG_GUEST_ERROR, "Invalid bits 0x"TARGET_FMT_lx
-                     " set in SDR1", value & ~sdr_mask);
+            qemu_log_mask(LOG_GUEST_ERROR,
+                          "Invalid bits 0x" TARGET_FMT_lx " set in SDR1",
+                          value & ~sdr_mask);
             value &= sdr_mask;
         }
         if (htabsize > 28) {
-            qemu_log_mask(LOG_GUEST_ERROR, "Invalid HTABSIZE 0x" TARGET_FMT_lx
-                     " stored in SDR1", htabsize);
+            qemu_log_mask(LOG_GUEST_ERROR,
+                          "Invalid HTABSIZE 0x" TARGET_FMT_lx " stored in SDR1",
+                          htabsize);
             return;
         }
     }
@@ -108,8 +110,8 @@ static int check_prot(int prot, MMUAccessType access_type)
     return prot & prot_for_access_type(access_type) ? 0 : -2;
 }
 
-int ppc6xx_tlb_getnum(CPUPPCState *env, target_ulong eaddr,
-                                    int way, int is_code)
+int ppc6xx_tlb_getnum(CPUPPCState *env, target_ulong eaddr, int way,
+                      int is_code)
 {
     int nr;
 
@@ -168,8 +170,8 @@ static int ppc6xx_tlb_pte_check(mmu_ctx_t *ctx, target_ulong pte0,
     return ret;
 }
 
-static int pte_update_flags(mmu_ctx_t *ctx, target_ulong *pte1p,
-                            int ret, MMUAccessType access_type)
+static int pte_update_flags(mmu_ctx_t *ctx, target_ulong *pte1p, int ret,
+                            MMUAccessType access_type)
 {
     int store = 0;
 
@@ -209,22 +211,24 @@ static int ppc6xx_tlb_check(CPUPPCState *env, mmu_ctx_t *ctx,
         tlb = &env->tlb.tlb6[nr];
         /* This test "emulates" the PTE index match for hardware TLBs */
         if ((eaddr & TARGET_PAGE_MASK) != tlb->EPN) {
-            qemu_log_mask(CPU_LOG_MMU, "TLB %d/%d %s [" TARGET_FMT_lx
-                          " " TARGET_FMT_lx "] <> " TARGET_FMT_lx "\n",
+            qemu_log_mask(CPU_LOG_MMU,
+                          "TLB %d/%d %s [" TARGET_FMT_lx " " TARGET_FMT_lx
+                          "] <> " TARGET_FMT_lx "\n",
                           nr, env->nb_tlb,
-                          pte_is_valid(tlb->pte0) ? "valid" : "inval",
-                          tlb->EPN, tlb->EPN + TARGET_PAGE_SIZE, eaddr);
+                          pte_is_valid(tlb->pte0) ? "valid" : "inval", tlb->EPN,
+                          tlb->EPN + TARGET_PAGE_SIZE, eaddr);
             continue;
         }
-        qemu_log_mask(CPU_LOG_MMU, "TLB %d/%d %s " TARGET_FMT_lx " <> "
-                      TARGET_FMT_lx " " TARGET_FMT_lx " %c %c\n",
+        qemu_log_mask(CPU_LOG_MMU,
+                      "TLB %d/%d %s " TARGET_FMT_lx " <> " TARGET_FMT_lx
+                      " " TARGET_FMT_lx " %c %c\n",
                       nr, env->nb_tlb,
-                      pte_is_valid(tlb->pte0) ? "valid" : "inval",
-                      tlb->EPN, eaddr, tlb->pte1,
+                      pte_is_valid(tlb->pte0) ? "valid" : "inval", tlb->EPN,
+                      eaddr, tlb->pte1,
                       access_type == MMU_DATA_STORE ? 'S' : 'L',
                       access_type == MMU_INST_FETCH ? 'I' : 'D');
-        switch (ppc6xx_tlb_pte_check(ctx, tlb->pte0, tlb->pte1,
-                                     0, access_type)) {
+        switch (
+            ppc6xx_tlb_pte_check(ctx, tlb->pte0, tlb->pte1, 0, access_type)) {
         case -3:
             /* TLB inconsistency */
             return -1;
@@ -252,8 +256,8 @@ static int ppc6xx_tlb_check(CPUPPCState *env, mmu_ctx_t *ctx,
     }
     if (best != -1) {
     done:
-        qemu_log_mask(CPU_LOG_MMU, "found TLB at addr " HWADDR_FMT_plx
-                      " prot=%01x ret=%d\n",
+        qemu_log_mask(CPU_LOG_MMU,
+                      "found TLB at addr " HWADDR_FMT_plx " prot=%01x ret=%d\n",
                       ctx->raddr & TARGET_PAGE_MASK, ctx->prot, ret);
         /* Update page flags */
         pte_update_flags(ctx, &env->tlb.tlb6[best].pte1, ret, access_type);
@@ -298,8 +302,8 @@ static int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
     int ret = -1;
     bool ifetch = access_type == MMU_INST_FETCH;
 
-     qemu_log_mask(CPU_LOG_MMU, "%s: %cBAT v " TARGET_FMT_lx "\n", __func__,
-             ifetch ? 'I' : 'D', virtual);
+    qemu_log_mask(CPU_LOG_MMU, "%s: %cBAT v " TARGET_FMT_lx "\n", __func__,
+                  ifetch ? 'I' : 'D', virtual);
     if (ifetch) {
         BATlt = env->IBAT[1];
         BATut = env->IBAT[0];
@@ -313,25 +317,28 @@ static int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
         BEPIu = *BATu & 0xF0000000;
         BEPIl = *BATu & 0x0FFE0000;
         bat_size_prot(env, &bl, &valid, &prot, BATu, BATl);
-         qemu_log_mask(CPU_LOG_MMU, "%s: %cBAT%d v " TARGET_FMT_lx " BATu "
-                       TARGET_FMT_lx " BATl " TARGET_FMT_lx "\n", __func__,
-                       ifetch ? 'I' : 'D', i, virtual, *BATu, *BATl);
+        qemu_log_mask(CPU_LOG_MMU,
+                      "%s: %cBAT%d v " TARGET_FMT_lx " BATu " TARGET_FMT_lx
+                      " BATl " TARGET_FMT_lx "\n",
+                      __func__, ifetch ? 'I' : 'D', i, virtual, *BATu, *BATl);
         if ((virtual & 0xF0000000) == BEPIu &&
             ((virtual & 0x0FFE0000) & ~bl) == BEPIl) {
             /* BAT matches */
             if (valid != 0) {
                 /* Get physical address */
-                ctx->raddr = (*BATl & 0xF0000000) |
+                ctx->raddr =
+                    (*BATl & 0xF0000000) |
                     ((virtual & 0x0FFE0000 & bl) | (*BATl & 0x0FFE0000)) |
                     (virtual & 0x0001F000);
                 /* Compute access rights */
                 ctx->prot = prot;
                 ret = check_prot(ctx->prot, access_type);
                 if (ret == 0) {
-                    qemu_log_mask(CPU_LOG_MMU, "BAT %d match: r " HWADDR_FMT_plx
-                                  " prot=%c%c\n", i, ctx->raddr,
-                                  ctx->prot & PAGE_READ ? 'R' : '-',
-                                  ctx->prot & PAGE_WRITE ? 'W' : '-');
+                    qemu_log_mask(
+                        CPU_LOG_MMU,
+                        "BAT %d match: r " HWADDR_FMT_plx " prot=%c%c\n", i,
+                        ctx->raddr, ctx->prot & PAGE_READ ? 'R' : '-',
+                        ctx->prot & PAGE_WRITE ? 'W' : '-');
                 }
                 break;
             }
@@ -339,20 +346,21 @@ static int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
     }
     if (ret < 0) {
         if (qemu_log_enabled()) {
-            qemu_log_mask(CPU_LOG_MMU, "no BAT match for "
-                          TARGET_FMT_lx ":\n", virtual);
+            qemu_log_mask(CPU_LOG_MMU, "no BAT match for " TARGET_FMT_lx ":\n",
+                          virtual);
             for (i = 0; i < 4; i++) {
                 BATu = &BATut[i];
                 BATl = &BATlt[i];
                 BEPIu = *BATu & 0xF0000000;
                 BEPIl = *BATu & 0x0FFE0000;
                 bl = (*BATu & 0x00001FFC) << 15;
-                 qemu_log_mask(CPU_LOG_MMU, "%s: %cBAT%d v "
-                               TARGET_FMT_lx " BATu " TARGET_FMT_lx
-                               " BATl " TARGET_FMT_lx "\n\t" TARGET_FMT_lx " "
-                               TARGET_FMT_lx " " TARGET_FMT_lx "\n",
-                               __func__, ifetch ? 'I' : 'D', i, virtual,
-                               *BATu, *BATl, BEPIu, BEPIl, bl);
+                qemu_log_mask(CPU_LOG_MMU,
+                              "%s: %cBAT%d v " TARGET_FMT_lx
+                              " BATu " TARGET_FMT_lx " BATl " TARGET_FMT_lx
+                              "\n\t" TARGET_FMT_lx " " TARGET_FMT_lx
+                              " " TARGET_FMT_lx "\n",
+                              __func__, ifetch ? 'I' : 'D', i, virtual, *BATu,
+                              *BATl, BEPIu, BEPIl, bl);
             }
         }
     }
@@ -377,8 +385,8 @@ static int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
     ctx->eaddr = eaddr;
 
     sr = env->sr[eaddr >> 28];
-    ctx->key = (((sr & 0x20000000) && pr) ||
-                ((sr & 0x40000000) && !pr)) ? 1 : 0;
+    ctx->key =
+        (((sr & 0x20000000) && pr) || ((sr & 0x40000000) && !pr)) ? 1 : 0;
     ds = sr & 0x80000000 ? 1 : 0;
     ctx->nx = sr & 0x10000000 ? 1 : 0;
     vsid = sr & 0x00FFFFFF;
@@ -396,17 +404,18 @@ static int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
     ctx->ptem = (vsid << 7) | (pgidx >> 10);
 
     qemu_log_mask(CPU_LOG_MMU,
-            "pte segment: key=%d ds %d nx %d vsid " TARGET_FMT_lx "\n",
-            ctx->key, ds, ctx->nx, vsid);
+                  "pte segment: key=%d ds %d nx %d vsid " TARGET_FMT_lx "\n",
+                  ctx->key, ds, ctx->nx, vsid);
     ret = -1;
     if (!ds) {
         /* Check if instruction fetch is allowed, if needed */
         if (type != ACCESS_CODE || ctx->nx == 0) {
             /* Page address translation */
-            qemu_log_mask(CPU_LOG_MMU, "htab_base " HWADDR_FMT_plx
-                    " htab_mask " HWADDR_FMT_plx
-                    " hash " HWADDR_FMT_plx "\n",
-                    ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu), hash);
+            qemu_log_mask(
+                CPU_LOG_MMU,
+                "htab_base " HWADDR_FMT_plx " htab_mask " HWADDR_FMT_plx
+                " hash " HWADDR_FMT_plx "\n",
+                ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu), hash);
             ctx->hash[0] = hash;
             ctx->hash[1] = ~hash;
 
@@ -420,12 +429,12 @@ static int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
                 hwaddr curaddr;
                 uint32_t a0, a1, a2, a3;
 
-                qemu_log("Page table: " HWADDR_FMT_plx " len " HWADDR_FMT_plx
-                         "\n", ppc_hash32_hpt_base(cpu),
-                         ppc_hash32_hpt_mask(cpu) + 0x80);
+                qemu_log(
+                    "Page table: " HWADDR_FMT_plx " len " HWADDR_FMT_plx "\n",
+                    ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu) + 0x80);
                 for (curaddr = ppc_hash32_hpt_base(cpu);
-                     curaddr < (ppc_hash32_hpt_base(cpu)
-                                + ppc_hash32_hpt_mask(cpu) + 0x80);
+                     curaddr < (ppc_hash32_hpt_base(cpu) +
+                                ppc_hash32_hpt_mask(cpu) + 0x80);
                      curaddr += 16) {
                     a0 = ldl_phys(cs->as, curaddr);
                     a1 = ldl_phys(cs->as, curaddr + 4);
@@ -473,7 +482,7 @@ static int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
             return -4;
         default:
             qemu_log_mask(CPU_LOG_MMU, "ERROR: instruction should not need "
-                          "address translation\n");
+                                       "address translation\n");
             return -4;
         }
         if ((access_type == MMU_DATA_STORE || ctx->key != 1) &&
@@ -490,8 +499,8 @@ static int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
 
 /* Generic TLB check function for embedded PowerPC implementations */
 static bool ppcemb_tlb_check(CPUPPCState *env, ppcemb_tlb_t *tlb,
-                             hwaddr *raddrp,
-                             target_ulong address, uint32_t pid, int i)
+                             hwaddr *raddrp, target_ulong address, uint32_t pid,
+                             int i)
 {
     target_ulong mask;
 
@@ -500,10 +509,11 @@ static bool ppcemb_tlb_check(CPUPPCState *env, ppcemb_tlb_t *tlb,
         return false;
     }
     mask = ~(tlb->size - 1);
-    qemu_log_mask(CPU_LOG_MMU, "%s: TLB %d address " TARGET_FMT_lx
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s: TLB %d address " TARGET_FMT_lx
                   " PID %u <=> " TARGET_FMT_lx " " TARGET_FMT_lx " %u %x\n",
-                  __func__, i, address, pid, tlb->EPN,
-                  mask, (uint32_t)tlb->PID, tlb->prot);
+                  __func__, i, address, pid, tlb->EPN, mask, (uint32_t)tlb->PID,
+                  tlb->prot);
     /* Check PID */
     if (tlb->PID != 0 && tlb->PID != pid) {
         return false;
@@ -545,15 +555,15 @@ static int mmu40x_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
     pr = FIELD_EX64(env->msr, MSR, PR);
     for (i = 0; i < env->nb_tlb; i++) {
         tlb = &env->tlb.tlbe[i];
-        if (!ppcemb_tlb_check(env, tlb, &raddr, address,
-                              env->spr[SPR_40x_PID], i)) {
+        if (!ppcemb_tlb_check(env, tlb, &raddr, address, env->spr[SPR_40x_PID],
+                              i)) {
             continue;
         }
         zsel = (tlb->attr >> 4) & 0xF;
         zpr = (env->spr[SPR_40x_ZPR] >> (30 - (2 * zsel))) & 0x3;
         qemu_log_mask(CPU_LOG_MMU,
-                      "%s: TLB %d zsel %d zpr %d ty %d attr %08x\n",
-                      __func__, i, zsel, zpr, access_type, tlb->attr);
+                      "%s: TLB %d zsel %d zpr %d ty %d attr %08x\n", __func__,
+                      i, zsel, zpr, access_type, tlb->attr);
         /* Check execute enable bit */
         switch (zpr) {
         case 0x2:
@@ -587,16 +597,17 @@ static int mmu40x_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
         }
         if (ret >= 0) {
             ctx->raddr = raddr;
-            qemu_log_mask(CPU_LOG_MMU, "%s: access granted " TARGET_FMT_lx
-                          " => " HWADDR_FMT_plx
-                          " %d %d\n", __func__, address, ctx->raddr, ctx->prot,
-                          ret);
+            qemu_log_mask(CPU_LOG_MMU,
+                          "%s: access granted " TARGET_FMT_lx
+                          " => " HWADDR_FMT_plx " %d %d\n",
+                          __func__, address, ctx->raddr, ctx->prot, ret);
             return 0;
         }
     }
-     qemu_log_mask(CPU_LOG_MMU, "%s: access refused " TARGET_FMT_lx
-                   " => " HWADDR_FMT_plx
-                   " %d %d\n", __func__, address, raddr, ctx->prot, ret);
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s: access refused " TARGET_FMT_lx " => " HWADDR_FMT_plx
+                  " %d %d\n",
+                  __func__, address, raddr, ctx->prot, ret);
 
     return ret;
 }
@@ -643,8 +654,8 @@ static int mmubooke_check_tlb(CPUPPCState *env, ppcemb_tlb_t *tlb,
 
     /* Check the address space */
     if ((access_type == MMU_INST_FETCH ?
-        FIELD_EX64(env->msr, MSR, IR) :
-        FIELD_EX64(env->msr, MSR, DR)) != (tlb->attr & 1)) {
+             FIELD_EX64(env->msr, MSR, IR) :
+             FIELD_EX64(env->msr, MSR, DR)) != (tlb->attr & 1)) {
         qemu_log_mask(CPU_LOG_MMU, "%s: AS doesn't match\n", __func__);
         return -1;
     }
@@ -680,13 +691,15 @@ static int mmubooke_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
 
     if (ret >= 0) {
         ctx->raddr = raddr;
-        qemu_log_mask(CPU_LOG_MMU, "%s: access granted " TARGET_FMT_lx
-                      " => " HWADDR_FMT_plx " %d %d\n", __func__,
-                      address, ctx->raddr, ctx->prot, ret);
+        qemu_log_mask(CPU_LOG_MMU,
+                      "%s: access granted " TARGET_FMT_lx " => " HWADDR_FMT_plx
+                      " %d %d\n",
+                      __func__, address, ctx->raddr, ctx->prot, ret);
     } else {
-         qemu_log_mask(CPU_LOG_MMU, "%s: access refused " TARGET_FMT_lx
-                       " => " HWADDR_FMT_plx " %d %d\n", __func__,
-                       address, raddr, ctx->prot, ret);
+        qemu_log_mask(CPU_LOG_MMU,
+                      "%s: access refused " TARGET_FMT_lx " => " HWADDR_FMT_plx
+                      " %d %d\n",
+                      __func__, address, raddr, ctx->prot, ret);
     }
 
     return ret;
@@ -719,11 +732,12 @@ int ppcmas_tlb_check(CPUPPCState *env, ppcmas_tlb_t *tlb, hwaddr *raddrp,
     }
 
     mask = ~(booke206_tlb_to_page_size(env, tlb) - 1);
-     qemu_log_mask(CPU_LOG_MMU, "%s: TLB ADDR=0x" TARGET_FMT_lx
-                   " PID=0x%x MAS1=0x%x MAS2=0x%" PRIx64 " mask=0x%"
-                   HWADDR_PRIx " MAS7_3=0x%" PRIx64 " MAS8=0x%" PRIx32 "\n",
-                   __func__, address, pid, tlb->mas1, tlb->mas2, mask,
-                   tlb->mas7_3, tlb->mas8);
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s: TLB ADDR=0x" TARGET_FMT_lx
+                  " PID=0x%x MAS1=0x%x MAS2=0x%" PRIx64 " mask=0x%" HWADDR_PRIx
+                  " MAS7_3=0x%" PRIx64 " MAS8=0x%" PRIx32 "\n",
+                  __func__, address, pid, tlb->mas1, tlb->mas2, mask,
+                  tlb->mas7_3, tlb->mas8);
 
     /* Check PID */
     tlb_pid = (tlb->mas1 & MAS1_TID_MASK) >> MAS1_TID_SHIFT;
@@ -768,9 +782,8 @@ static uint32_t mmubooke206_esr(int mmu_idx, MMUAccessType access_type)
  * only if EPID load is requested, otherwise the caller must detect
  * the correct EPID.  Return true if valid EPID is returned.
  */
-static bool mmubooke206_get_as(CPUPPCState *env,
-                               int mmu_idx, uint32_t *epid_out,
-                               bool *as_out, bool *pr_out)
+static bool mmubooke206_get_as(CPUPPCState *env, int mmu_idx,
+                               uint32_t *epid_out, bool *as_out, bool *pr_out)
 {
     if (is_epid_mmu(mmu_idx)) {
         uint32_t epidr;
@@ -792,8 +805,7 @@ static bool mmubooke206_get_as(CPUPPCState *env,
 
 /* Check if the tlb found by hashing really matches */
 static int mmubooke206_check_tlb(CPUPPCState *env, ppcmas_tlb_t *tlb,
-                                 hwaddr *raddr, int *prot,
-                                 target_ulong address,
+                                 hwaddr *raddr, int *prot, target_ulong address,
                                  MMUAccessType access_type, int mmu_idx)
 {
     int prot2 = 0;
@@ -824,8 +836,10 @@ static int mmubooke206_check_tlb(CPUPPCState *env, ppcmas_tlb_t *tlb,
         }
     }
 
-    qemu_log_mask(CPU_LOG_MMU, "%s: No TLB entry found for effective address "
-                  "0x" TARGET_FMT_lx "\n", __func__, address);
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s: No TLB entry found for effective address "
+                  "0x" TARGET_FMT_lx "\n",
+                  __func__, address);
     return -1;
 
 found_tlb:
@@ -906,23 +920,25 @@ found_tlb:
 
     if (ret >= 0) {
         ctx->raddr = raddr;
-         qemu_log_mask(CPU_LOG_MMU, "%s: access granted " TARGET_FMT_lx
-                       " => " HWADDR_FMT_plx " %d %d\n", __func__, address,
-                       ctx->raddr, ctx->prot, ret);
+        qemu_log_mask(CPU_LOG_MMU,
+                      "%s: access granted " TARGET_FMT_lx " => " HWADDR_FMT_plx
+                      " %d %d\n",
+                      __func__, address, ctx->raddr, ctx->prot, ret);
     } else {
-         qemu_log_mask(CPU_LOG_MMU, "%s: access refused " TARGET_FMT_lx
-                       " => " HWADDR_FMT_plx " %d %d\n", __func__, address,
-                       raddr, ctx->prot, ret);
+        qemu_log_mask(CPU_LOG_MMU,
+                      "%s: access refused " TARGET_FMT_lx " => " HWADDR_FMT_plx
+                      " %d %d\n",
+                      __func__, address, raddr, ctx->prot, ret);
     }
 
     return ret;
 }
 
 static const char *book3e_tsize_to_str[32] = {
-    "1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K", "512K",
-    "1M", "2M", "4M", "8M", "16M", "32M", "64M", "128M", "256M", "512M",
-    "1G", "2G", "4G", "8G", "16G", "32G", "64G", "128G", "256G", "512G",
-    "1T", "2T"
+    "1K",   "2K",   "4K",   "8K",   "16K",  "32K",  "64K", "128K",
+    "256K", "512K", "1M",   "2M",   "4M",   "8M",   "16M", "32M",
+    "64M",  "128M", "256M", "512M", "1G",   "2G",   "4G",  "8G",
+    "16G",  "32G",  "64G",  "128G", "256G", "512G", "1T",  "2T"
 };
 
 static void mmubooke_dump_mmu(CPUPPCState *env)
@@ -967,7 +983,6 @@ static void mmubooke_dump_mmu(CPUPPCState *env)
                     (uint64_t)ea, (uint64_t)pa, size_buf, (uint32_t)entry->PID,
                     entry->prot, entry->attr);
     }
-
 }
 
 static void mmubooke206_dump_one_tlb(CPUPPCState *env, int tlbn, int offset,
@@ -994,27 +1009,25 @@ static void mmubooke206_dump_one_tlb(CPUPPCState *env, int tlbn, int offset,
         ea = entry->mas2 & ~(size - 1);
         pa = entry->mas7_3 & ~(size - 1);
 
-        qemu_printf("0x%016" PRIx64 " 0x%016" PRIx64 " %4s %-5u %1u  S%c%c%c"
-                    " U%c%c%c %c%c%c%c%c U%c%c%c%c\n",
-                    (uint64_t)ea, (uint64_t)pa,
-                    book3e_tsize_to_str[tsize],
-                    (entry->mas1 & MAS1_TID_MASK) >> MAS1_TID_SHIFT,
-                    (entry->mas1 & MAS1_TS) >> MAS1_TS_SHIFT,
-                    entry->mas7_3 & MAS3_SR ? 'R' : '-',
-                    entry->mas7_3 & MAS3_SW ? 'W' : '-',
-                    entry->mas7_3 & MAS3_SX ? 'X' : '-',
-                    entry->mas7_3 & MAS3_UR ? 'R' : '-',
-                    entry->mas7_3 & MAS3_UW ? 'W' : '-',
-                    entry->mas7_3 & MAS3_UX ? 'X' : '-',
-                    entry->mas2 & MAS2_W ? 'W' : '-',
-                    entry->mas2 & MAS2_I ? 'I' : '-',
-                    entry->mas2 & MAS2_M ? 'M' : '-',
-                    entry->mas2 & MAS2_G ? 'G' : '-',
-                    entry->mas2 & MAS2_E ? 'E' : '-',
-                    entry->mas7_3 & MAS3_U0 ? '0' : '-',
-                    entry->mas7_3 & MAS3_U1 ? '1' : '-',
-                    entry->mas7_3 & MAS3_U2 ? '2' : '-',
-                    entry->mas7_3 & MAS3_U3 ? '3' : '-');
+        qemu_printf(
+            "0x%016" PRIx64 " 0x%016" PRIx64 " %4s %-5u %1u  S%c%c%c"
+            " U%c%c%c %c%c%c%c%c U%c%c%c%c\n",
+            (uint64_t)ea, (uint64_t)pa, book3e_tsize_to_str[tsize],
+            (entry->mas1 & MAS1_TID_MASK) >> MAS1_TID_SHIFT,
+            (entry->mas1 & MAS1_TS) >> MAS1_TS_SHIFT,
+            entry->mas7_3 & MAS3_SR ? 'R' : '-',
+            entry->mas7_3 & MAS3_SW ? 'W' : '-',
+            entry->mas7_3 & MAS3_SX ? 'X' : '-',
+            entry->mas7_3 & MAS3_UR ? 'R' : '-',
+            entry->mas7_3 & MAS3_UW ? 'W' : '-',
+            entry->mas7_3 & MAS3_UX ? 'X' : '-',
+            entry->mas2 & MAS2_W ? 'W' : '-', entry->mas2 & MAS2_I ? 'I' : '-',
+            entry->mas2 & MAS2_M ? 'M' : '-', entry->mas2 & MAS2_G ? 'G' : '-',
+            entry->mas2 & MAS2_E ? 'E' : '-',
+            entry->mas7_3 & MAS3_U0 ? '0' : '-',
+            entry->mas7_3 & MAS3_U1 ? '1' : '-',
+            entry->mas7_3 & MAS3_U2 ? '2' : '-',
+            entry->mas7_3 & MAS3_U3 ? '3' : '-');
     }
 }
 
@@ -1065,11 +1078,11 @@ static void mmu6xx_dump_BATs(CPUPPCState *env, int type)
         BEPIu = *BATu & 0xF0000000;
         BEPIl = *BATu & 0x0FFE0000;
         bl = (*BATu & 0x00001FFC) << 15;
-        qemu_printf("%s BAT%d BATu " TARGET_FMT_lx
-                    " BATl " TARGET_FMT_lx "\n\t" TARGET_FMT_lx " "
-                    TARGET_FMT_lx " " TARGET_FMT_lx "\n",
-                    type == ACCESS_CODE ? "code" : "data", i,
-                    *BATu, *BATl, BEPIu, BEPIl, bl);
+        qemu_printf("%s BAT%d BATu " TARGET_FMT_lx " BATl " TARGET_FMT_lx
+                    "\n\t" TARGET_FMT_lx " " TARGET_FMT_lx " " TARGET_FMT_lx
+                    "\n",
+                    type == ACCESS_CODE ? "code" : "data", i, *BATu, *BATl,
+                    BEPIu, BEPIl, bl);
     }
 }
 
@@ -1080,16 +1093,16 @@ static void mmu6xx_dump_mmu(CPUPPCState *env)
     target_ulong sr;
     int type, way, entry, i;
 
-    qemu_printf("HTAB base = 0x%"HWADDR_PRIx"\n", ppc_hash32_hpt_base(cpu));
-    qemu_printf("HTAB mask = 0x%"HWADDR_PRIx"\n", ppc_hash32_hpt_mask(cpu));
+    qemu_printf("HTAB base = 0x%" HWADDR_PRIx "\n", ppc_hash32_hpt_base(cpu));
+    qemu_printf("HTAB mask = 0x%" HWADDR_PRIx "\n", ppc_hash32_hpt_mask(cpu));
 
     qemu_printf("\nSegment registers:\n");
     for (i = 0; i < 32; i++) {
         sr = env->sr[i];
         if (sr & 0x80000000) {
             qemu_printf("%02d T=%d Ks=%d Kp=%d BUID=0x%03x "
-                        "CNTLR_SPEC=0x%05x\n", i,
-                        sr & 0x80000000 ? 1 : 0, sr & 0x40000000 ? 1 : 0,
+                        "CNTLR_SPEC=0x%05x\n",
+                        i, sr & 0x80000000 ? 1 : 0, sr & 0x40000000 ? 1 : 0,
                         sr & 0x20000000 ? 1 : 0, (uint32_t)((sr >> 20) & 0x1FF),
                         (uint32_t)(sr & 0xFFFFF));
         } else {
@@ -1116,10 +1129,9 @@ static void mmu6xx_dump_mmu(CPUPPCState *env)
             for (entry = env->nb_tlb * type + env->tlb_per_way * way;
                  entry < (env->nb_tlb * type + env->tlb_per_way * (way + 1));
                  entry++) {
-
                 tlb = &env->tlb.tlb6[entry];
-                qemu_printf("%s TLB %02d/%02d way:%d %s ["
-                            TARGET_FMT_lx " " TARGET_FMT_lx "]\n",
+                qemu_printf("%s TLB %02d/%02d way:%d %s [" TARGET_FMT_lx
+                            " " TARGET_FMT_lx "]\n",
                             type ? "code" : "data", entry % env->nb_tlb,
                             env->nb_tlb, way,
                             pte_is_valid(tlb->pte0) ? "valid" : "inval",
@@ -1185,9 +1197,8 @@ static int check_physical(CPUPPCState *env, mmu_ctx_t *ctx, target_ulong eaddr,
 }
 
 int get_physical_address_wtlb(CPUPPCState *env, mmu_ctx_t *ctx,
-                                     target_ulong eaddr,
-                                     MMUAccessType access_type, int type,
-                                     int mmu_idx)
+                              target_ulong eaddr, MMUAccessType access_type,
+                              int type, int mmu_idx)
 {
     int ret = -1;
     bool real_mode = (type == ACCESS_CODE && !FIELD_EX64(env->msr, MSR, IR)) ||
@@ -1300,9 +1311,9 @@ static void booke206_update_mas_tlb_miss(CPUPPCState *env, target_ulong address,
 /* Perform address translation */
 /* TODO: Split this by mmu_model. */
 static bool ppc_jumbo_xlate(PowerPCCPU *cpu, vaddr eaddr,
-                            MMUAccessType access_type,
-                            hwaddr *raddrp, int *psizep, int *protp,
-                            int mmu_idx, bool guest_visible)
+                            MMUAccessType access_type, hwaddr *raddrp,
+                            int *psizep, int *protp, int mmu_idx,
+                            bool guest_visible)
 {
     CPUState *cs = CPU(cpu);
     CPUPPCState *env = &cpu->env;
@@ -1320,8 +1331,8 @@ static bool ppc_jumbo_xlate(PowerPCCPU *cpu, vaddr eaddr,
         type = ACCESS_INT;
     }
 
-    ret = get_physical_address_wtlb(env, &ctx, eaddr, access_type,
-                                    type, mmu_idx);
+    ret =
+        get_physical_address_wtlb(env, &ctx, eaddr, access_type, type, mmu_idx);
     if (ret == 0) {
         *raddrp = ctx.raddr;
         *protp = ctx.prot;
@@ -1355,13 +1366,14 @@ static bool ppc_jumbo_xlate(PowerPCCPU *cpu, vaddr eaddr,
                     cs->exception_index = POWERPC_EXCP_ITLB;
                     env->error_code = 0;
                     env->spr[SPR_BOOKE_DEAR] = eaddr;
-                    env->spr[SPR_BOOKE_ESR] = mmubooke206_esr(mmu_idx, MMU_DATA_LOAD);
+                    env->spr[SPR_BOOKE_ESR] =
+                        mmubooke206_esr(mmu_idx, MMU_DATA_LOAD);
                     break;
                 case POWERPC_MMU_MPC8xx:
                     cpu_abort(cs, "MPC8xx MMU model is not implemented\n");
                 case POWERPC_MMU_REAL:
                     cpu_abort(cs, "PowerPC in real mode should never raise "
-                              "any MMU exceptions\n");
+                                  "any MMU exceptions\n");
                 default:
                     cpu_abort(cs, "Unknown or invalid MMU model\n");
                 }
@@ -1417,9 +1429,9 @@ static bool ppc_jumbo_xlate(PowerPCCPU *cpu, vaddr eaddr,
                 tlb_miss:
                     env->error_code |= ctx.key << 19;
                     env->spr[SPR_HASH1] = ppc_hash32_hpt_base(cpu) +
-                        get_pteg_offset32(cpu, ctx.hash[0]);
+                                          get_pteg_offset32(cpu, ctx.hash[0]);
                     env->spr[SPR_HASH2] = ppc_hash32_hpt_base(cpu) +
-                        get_pteg_offset32(cpu, ctx.hash[1]);
+                                          get_pteg_offset32(cpu, ctx.hash[1]);
                     break;
                 case POWERPC_MMU_SOFT_4xx:
                     cs->exception_index = POWERPC_EXCP_DTLB;
@@ -1435,17 +1447,19 @@ static bool ppc_jumbo_xlate(PowerPCCPU *cpu, vaddr eaddr,
                     /* XXX: TODO */
                     cpu_abort(cs, "MPC8xx MMU model is not implemented\n");
                 case POWERPC_MMU_BOOKE206:
-                    booke206_update_mas_tlb_miss(env, eaddr, access_type, mmu_idx);
+                    booke206_update_mas_tlb_miss(env, eaddr, access_type,
+                                                 mmu_idx);
                     /* fall through */
                 case POWERPC_MMU_BOOKE:
                     cs->exception_index = POWERPC_EXCP_DTLB;
                     env->error_code = 0;
                     env->spr[SPR_BOOKE_DEAR] = eaddr;
-                    env->spr[SPR_BOOKE_ESR] = mmubooke206_esr(mmu_idx, access_type);
+                    env->spr[SPR_BOOKE_ESR] =
+                        mmubooke206_esr(mmu_idx, access_type);
                     break;
                 case POWERPC_MMU_REAL:
                     cpu_abort(cs, "PowerPC in real mode should never raise "
-                              "any MMU exceptions\n");
+                                  "any MMU exceptions\n");
                 default:
                     cpu_abort(cs, "Unknown or invalid MMU model\n");
                 }
@@ -1462,7 +1476,8 @@ static bool ppc_jumbo_xlate(PowerPCCPU *cpu, vaddr eaddr,
                 } else if ((env->mmu_model == POWERPC_MMU_BOOKE) ||
                            (env->mmu_model == POWERPC_MMU_BOOKE206)) {
                     env->spr[SPR_BOOKE_DEAR] = eaddr;
-                    env->spr[SPR_BOOKE_ESR] = mmubooke206_esr(mmu_idx, access_type);
+                    env->spr[SPR_BOOKE_ESR] =
+                        mmubooke206_esr(mmu_idx, access_type);
                 } else {
                     env->spr[SPR_DAR] = eaddr;
                     if (access_type == MMU_DATA_STORE) {
@@ -1521,32 +1536,32 @@ static bool ppc_jumbo_xlate(PowerPCCPU *cpu, vaddr eaddr,
 /*****************************************************************************/
 
 bool ppc_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
-                      hwaddr *raddrp, int *psizep, int *protp,
-                      int mmu_idx, bool guest_visible)
+               hwaddr *raddrp, int *psizep, int *protp, int mmu_idx,
+               bool guest_visible)
 {
     switch (cpu->env.mmu_model) {
 #if defined(TARGET_PPC64)
     case POWERPC_MMU_3_00:
         if (ppc64_v3_radix(cpu)) {
-            return ppc_radix64_xlate(cpu, eaddr, access_type, raddrp,
-                                     psizep, protp, mmu_idx, guest_visible);
+            return ppc_radix64_xlate(cpu, eaddr, access_type, raddrp, psizep,
+                                     protp, mmu_idx, guest_visible);
         }
         /* fall through */
     case POWERPC_MMU_64B:
     case POWERPC_MMU_2_03:
     case POWERPC_MMU_2_06:
     case POWERPC_MMU_2_07:
-        return ppc_hash64_xlate(cpu, eaddr, access_type,
-                                raddrp, psizep, protp, mmu_idx, guest_visible);
+        return ppc_hash64_xlate(cpu, eaddr, access_type, raddrp, psizep, protp,
+                                mmu_idx, guest_visible);
 #endif
 
     case POWERPC_MMU_32B:
-        return ppc_hash32_xlate(cpu, eaddr, access_type, raddrp,
-                               psizep, protp, mmu_idx, guest_visible);
+        return ppc_hash32_xlate(cpu, eaddr, access_type, raddrp, psizep, protp,
+                                mmu_idx, guest_visible);
 
     default:
-        return ppc_jumbo_xlate(cpu, eaddr, access_type, raddrp,
-                               psizep, protp, mmu_idx, guest_visible);
+        return ppc_jumbo_xlate(cpu, eaddr, access_type, raddrp, psizep, protp,
+                               mmu_idx, guest_visible);
     }
 }
 

@@ -13,19 +13,19 @@
  * Debuginfo describing a certain address.
  */
 struct debuginfo_query {
-    uint64_t address;    /* Input: address. */
-    int flags;           /* Input: debuginfo subset. */
-    const char *symbol;  /* Symbol that the address is part of. */
-    uint64_t offset;     /* Offset from the symbol. */
-    const char *file;    /* Source file associated with the address. */
-    int line;            /* Line number in the source file. */
+    uint64_t address; /* Input: address. */
+    int flags; /* Input: debuginfo subset. */
+    const char *symbol; /* Symbol that the address is part of. */
+    uint64_t offset; /* Offset from the symbol. */
+    const char *file; /* Source file associated with the address. */
+    int line; /* Line number in the source file. */
 };
 
 /*
  * Debuginfo subsets.
  */
 #define DEBUGINFO_SYMBOL BIT(1)
-#define DEBUGINFO_LINE   BIT(2)
+#define DEBUGINFO_LINE BIT(2)
 
 #if defined(CONFIG_TCG) && defined(CONFIG_LIBDW)
 /*

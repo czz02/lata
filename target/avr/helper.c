@@ -105,8 +105,8 @@ hwaddr avr_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
 }
 
 bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                      MMUAccessType access_type, int mmu_idx,
-                      bool probe, uintptr_t retaddr)
+                      MMUAccessType access_type, int mmu_idx, bool probe,
+                      uintptr_t retaddr)
 {
     int prot, page_size = TARGET_PAGE_SIZE;
     uint32_t paddr;
@@ -343,8 +343,8 @@ void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
 
     /* Following logic assumes this: */
     assert(OFFSET_CPU_REGISTERS == OFFSET_DATA);
-    assert(OFFSET_IO_REGISTERS == OFFSET_CPU_REGISTERS +
-                                  NUMBER_OF_CPU_REGISTERS);
+    assert(OFFSET_IO_REGISTERS ==
+           OFFSET_CPU_REGISTERS + NUMBER_OF_CPU_REGISTERS);
 
     if (addr < NUMBER_OF_CPU_REGISTERS) {
         /* CPU registers */

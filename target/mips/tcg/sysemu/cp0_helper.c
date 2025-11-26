@@ -151,17 +151,12 @@ static CPUMIPSState *mips_cpu_map_tc(CPUMIPSState *env, int *tc)
  */
 
 /* Called for updates to CP0_TCStatus.  */
-static void sync_c0_tcstatus(CPUMIPSState *cpu, int tc,
-                             target_ulong v)
+static void sync_c0_tcstatus(CPUMIPSState *cpu, int tc, target_ulong v)
 {
     uint32_t status;
     uint32_t tcu, tmx, tasid, tksu;
-    uint32_t mask = ((1U << CP0St_CU3)
-                       | (1 << CP0St_CU2)
-                       | (1 << CP0St_CU1)
-                       | (1 << CP0St_CU0)
-                       | (1 << CP0St_MX)
-                       | (3 << CP0St_KSU));
+    uint32_t mask = ((1U << CP0St_CU3) | (1 << CP0St_CU2) | (1 << CP0St_CU1) |
+                     (1 << CP0St_CU0) | (1 << CP0St_MX) | (3 << CP0St_KSU));
 
     tcu = (v >> CP0TCSt_TCU0) & 0xf;
     tmx = (v >> CP0TCSt_TMX) & 0x1;
@@ -373,7 +368,7 @@ target_ulong helper_mfc0_count(CPUMIPSState *env)
 target_ulong helper_mfc0_saar(CPUMIPSState *env)
 {
     if ((env->CP0_SAARI & 0x3f) < 2) {
-        return (int32_t) env->CP0_SAAR[env->CP0_SAARI & 0x3f];
+        return (int32_t)env->CP0_SAAR[env->CP0_SAARI & 0x3f];
     }
     return 0;
 }
@@ -417,7 +412,7 @@ target_ulong helper_mfc0_lladdr(CPUMIPSState *env)
 
 target_ulong helper_mfc0_maar(CPUMIPSState *env)
 {
-    return (int32_t) env->CP0_MAAR[env->CP0_MAARI];
+    return (int32_t)env->CP0_MAAR[env->CP0_MAARI];
 }
 
 target_ulong helper_mfhc0_maar(CPUMIPSState *env)
@@ -432,7 +427,7 @@ target_ulong helper_mfc0_watchlo(CPUMIPSState *env, uint32_t sel)
 
 target_ulong helper_mfc0_watchhi(CPUMIPSState *env, uint32_t sel)
 {
-    return (int32_t) env->CP0_WatchHi[sel];
+    return (int32_t)env->CP0_WatchHi[sel];
 }
 
 target_ulong helper_mfhc0_watchhi(CPUMIPSState *env, uint32_t sel)
@@ -464,7 +459,7 @@ target_ulong helper_mftc0_debug(CPUMIPSState *env)
 
     /* XXX: Might be wrong, check with EJTAG spec. */
     return (other->CP0_Debug & ~((1 << CP0DB_SSt) | (1 << CP0DB_Halt))) |
-            (tcstatus & ((1 << CP0DB_SSt) | (1 << CP0DB_Halt)));
+           (tcstatus & ((1 << CP0DB_SSt) | (1 << CP0DB_Halt)));
 }
 
 #if defined(TARGET_MIPS64)
@@ -540,8 +535,7 @@ void helper_mtc0_mvpcontrol(CPUMIPSState *env, target_ulong arg1)
     uint32_t newval;
 
     if (env->CP0_VPEConf0 & (1 << CP0VPEC0_MVP)) {
-        mask |= (1 << CP0MVPCo_CPA) | (1 << CP0MVPCo_VPC) |
-                (1 << CP0MVPCo_EVP);
+        mask |= (1 << CP0MVPCo_CPA) | (1 << CP0MVPCo_VPC) | (1 << CP0MVPCo_EVP);
     }
     if (env->mvp->CP0_MVPControl & (1 << CP0MVPCo_VPC)) {
         mask |= (1 << CP0MVPCo_STLB);
@@ -558,8 +552,8 @@ void helper_mtc0_vpecontrol(CPUMIPSState *env, target_ulong arg1)
     uint32_t mask;
     uint32_t newval;
 
-    mask = (1 << CP0VPECo_YSI) | (1 << CP0VPECo_GSI) |
-           (1 << CP0VPECo_TE) | (0xff << CP0VPECo_TargTC);
+    mask = (1 << CP0VPECo_YSI) | (1 << CP0VPECo_GSI) | (1 << CP0VPECo_TE) |
+           (0xff << CP0VPECo_TargTC);
     newval = (env->CP0_VPEControl & ~mask) | (arg1 & mask);
 
     /*
@@ -579,8 +573,8 @@ void helper_mttc0_vpecontrol(CPUMIPSState *env, target_ulong arg1)
     uint32_t mask;
     uint32_t newval;
 
-    mask = (1 << CP0VPECo_YSI) | (1 << CP0VPECo_GSI) |
-           (1 << CP0VPECo_TE) | (0xff << CP0VPECo_TargTC);
+    mask = (1 << CP0VPECo_YSI) | (1 << CP0VPECo_GSI) | (1 << CP0VPECo_TE) |
+           (0xff << CP0VPECo_TargTC);
     newval = (other->CP0_VPEControl & ~mask) | (arg1 & mask);
 
     /* TODO: Enable/disable TCs.  */
@@ -671,8 +665,8 @@ void helper_mtc0_entrylo0(CPUMIPSState *env, target_ulong arg1)
 {
     /* 1k pages not implemented */
     target_ulong rxi = arg1 & (env->CP0_PageGrain & (3u << CP0PG_XIE));
-    env->CP0_EntryLo0 = (arg1 & MTC0_ENTRYLO_MASK(env))
-                        | (rxi << (CP0EnLo_XI - 30));
+    env->CP0_EntryLo0 =
+        (arg1 & MTC0_ENTRYLO_MASK(env)) | (rxi << (CP0EnLo_XI - 30));
 }
 
 #if defined(TARGET_MIPS64)
@@ -859,8 +853,8 @@ void helper_mtc0_entrylo1(CPUMIPSState *env, target_ulong arg1)
 {
     /* 1k pages not implemented */
     target_ulong rxi = arg1 & (env->CP0_PageGrain & (3u << CP0PG_XIE));
-    env->CP0_EntryLo1 = (arg1 & MTC0_ENTRYLO_MASK(env))
-                        | (rxi << (CP0EnLo_XI - 30));
+    env->CP0_EntryLo1 =
+        (arg1 & MTC0_ENTRYLO_MASK(env)) | (rxi << (CP0EnLo_XI - 30));
 }
 
 #if defined(TARGET_MIPS64)
@@ -880,7 +874,7 @@ void helper_mtc0_memorymapid(CPUMIPSState *env, target_ulong arg1)
 {
     int32_t old;
     old = env->CP0_MemoryMapID;
-    env->CP0_MemoryMapID = (int32_t) arg1;
+    env->CP0_MemoryMapID = (int32_t)arg1;
     /* If the MemoryMapID changes, flush qemu's TLB.  */
     if (old != env->CP0_MemoryMapID) {
         cpu_mips_tlb_flush(env);
@@ -980,10 +974,9 @@ void helper_mtc0_pwfield(CPUMIPSState *env, target_ulong arg1)
     env->CP0_PWField = arg1 & mask;
 
     if ((new_ptei >= 32) ||
-            ((env->insn_flags & ISA_MIPS_R6) &&
-                    (new_ptei == 0 || new_ptei == 1))) {
-        env->CP0_PWField = (env->CP0_PWField & ~0x3FULL) |
-                (old_ptei << CP0PF_PTEI);
+        ((env->insn_flags & ISA_MIPS_R6) && (new_ptei == 0 || new_ptei == 1))) {
+        env->CP0_PWField =
+            (env->CP0_PWField & ~0x3FULL) | (old_ptei << CP0PF_PTEI);
     }
 #else
     uint32_t mask = 0x3FFFFFFF;
@@ -1007,10 +1000,9 @@ void helper_mtc0_pwfield(CPUMIPSState *env, target_ulong arg1)
     env->CP0_PWField = arg1 & mask;
 
     if ((new_ptew >= 32) ||
-            ((env->insn_flags & ISA_MIPS_R6) &&
-                    (new_ptew == 0 || new_ptew == 1))) {
-        env->CP0_PWField = (env->CP0_PWField & ~0x3F) |
-                (old_ptew << CP0PF_PTEW);
+        ((env->insn_flags & ISA_MIPS_R6) && (new_ptew == 0 || new_ptew == 1))) {
+        env->CP0_PWField =
+            (env->CP0_PWField & ~0x3F) | (old_ptew << CP0PF_PTEW);
     }
 #endif
 }
@@ -1127,7 +1119,7 @@ void helper_mthc0_saar(CPUMIPSState *env, target_ulong arg1)
     uint32_t target = env->CP0_SAARI & 0x3f;
     if (target < 2) {
         env->CP0_SAAR[target] =
-            (((uint64_t) arg1 << 32) & 0x00000fff00000000ULL) |
+            (((uint64_t)arg1 << 32) & 0x00000fff00000000ULL) |
             (env->CP0_SAAR[target] & 0x00000000ffffffffULL);
         switch (target) {
         case 0:
@@ -1197,10 +1189,9 @@ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
     val = env->CP0_Status;
 
     if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
-        qemu_log("Status %08x (%08x) => %08x (%08x) Cause %08x",
-                old, old & env->CP0_Cause & CP0Ca_IP_mask,
-                val, val & env->CP0_Cause & CP0Ca_IP_mask,
-                env->CP0_Cause);
+        qemu_log("Status %08x (%08x) => %08x (%08x) Cause %08x", old,
+                 old & env->CP0_Cause & CP0Ca_IP_mask, val,
+                 val & env->CP0_Cause & CP0Ca_IP_mask, env->CP0_Cause);
         switch (cpu_mmu_index(env, false)) {
         case 3:
             qemu_log(", ERL\n");
@@ -1297,13 +1288,19 @@ target_ulong helper_mftc0_configx(CPUMIPSState *env, target_ulong idx)
     CPUMIPSState *other = mips_cpu_map_tc(env, &other_tc);
 
     switch (idx) {
-    case 0: return other->CP0_Config0;
-    case 1: return other->CP0_Config1;
-    case 2: return other->CP0_Config2;
-    case 3: return other->CP0_Config3;
+    case 0:
+        return other->CP0_Config0;
+    case 1:
+        return other->CP0_Config1;
+    case 2:
+        return other->CP0_Config2;
+    case 3:
+        return other->CP0_Config3;
     /* 4 and 5 are reserved.  */
-    case 6: return other->CP0_Config6;
-    case 7: return other->CP0_Config7;
+    case 6:
+        return other->CP0_Config6;
+    case 7:
+        return other->CP0_Config7;
     default:
         break;
     }
@@ -1339,8 +1336,9 @@ void helper_mtc0_config5(CPUMIPSState *env, target_ulong arg1)
 {
     env->CP0_Config5 = (env->CP0_Config5 & (~env->CP0_Config5_rw_bitmask)) |
                        (arg1 & env->CP0_Config5_rw_bitmask);
-    env->CP0_EntryHi_ASID_mask = (env->CP0_Config5 & (1 << CP0C5_MI)) ?
-            0x0 : (env->CP0_Config4 & (1 << CP0C4_AE)) ? 0x3ff : 0xff;
+    env->CP0_EntryHi_ASID_mask = (env->CP0_Config5 & (1 << CP0C5_MI)) ? 0x0 :
+                                 (env->CP0_Config4 & (1 << CP0C4_AE)) ? 0x3ff :
+                                                                        0xff;
     compute_hflags(env);
 }
 
@@ -1352,7 +1350,7 @@ void helper_mtc0_lladdr(CPUMIPSState *env, target_ulong arg1)
 }
 
 #define MTC0_MAAR_MASK(env) \
-        ((0x1ULL << 63) | ((env->PAMask >> 4) & ~0xFFFull) | 0x3)
+    ((0x1ULL << 63) | ((env->PAMask >> 4) & ~0xFFFull) | 0x3)
 
 void helper_mtc0_maar(CPUMIPSState *env, target_ulong arg1)
 {
@@ -1362,7 +1360,7 @@ void helper_mtc0_maar(CPUMIPSState *env, target_ulong arg1)
 void helper_mthc0_maar(CPUMIPSState *env, target_ulong arg1)
 {
     env->CP0_MAAR[env->CP0_MAARI] =
-        (((uint64_t) arg1 << 32) & MTC0_MAAR_MASK(env)) |
+        (((uint64_t)arg1 << 32) & MTC0_MAAR_MASK(env)) |
         (env->CP0_MAAR[env->CP0_MAARI] & 0x00000000ffffffffULL);
 }
 
@@ -1406,7 +1404,7 @@ void helper_mtc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
 
 void helper_mthc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
 {
-    env->CP0_WatchHi[sel] = ((uint64_t) (arg1) << 32) |
+    env->CP0_WatchHi[sel] = ((uint64_t)(arg1) << 32) |
                             (env->CP0_WatchHi[sel] & 0x00000000ffffffffULL);
 }
 
@@ -1443,9 +1441,9 @@ void helper_mttc0_debug(CPUMIPSState *env, target_ulong arg1)
     } else {
         other->tcs[other_tc].CP0_Debug_tcstatus = val;
     }
-    other->CP0_Debug = (other->CP0_Debug &
-                     ((1 << CP0DB_SSt) | (1 << CP0DB_Halt))) |
-                     (arg1 & ~((1 << CP0DB_SSt) | (1 << CP0DB_Halt)));
+    other->CP0_Debug =
+        (other->CP0_Debug & ((1 << CP0DB_SSt) | (1 << CP0DB_Halt))) |
+        (arg1 & ~((1 << CP0DB_SSt) | (1 << CP0DB_Halt)));
 }
 
 void helper_mtc0_performance0(CPUMIPSState *env, target_ulong arg1)
@@ -1636,7 +1634,7 @@ target_ulong helper_dvpe(CPUMIPSState *env)
     CPUState *other_cs = first_cpu;
     target_ulong prev = env->mvp->CP0_MVPControl;
 
-    CPU_FOREACH(other_cs) {
+    CPU_FOREACH (other_cs) {
         MIPSCPU *other_cpu = MIPS_CPU(other_cs);
         /* Turn off all VPEs except the one executing the dvpe.  */
         if (&other_cpu->env != env) {
@@ -1652,7 +1650,7 @@ target_ulong helper_evpe(CPUMIPSState *env)
     CPUState *other_cs = first_cpu;
     target_ulong prev = env->mvp->CP0_MVPControl;
 
-    CPU_FOREACH(other_cs) {
+    CPU_FOREACH (other_cs) {
         MIPSCPU *other_cpu = MIPS_CPU(other_cs);
 
         if (&other_cpu->env != env
@@ -1673,7 +1671,7 @@ target_ulong helper_dvp(CPUMIPSState *env)
     target_ulong prev = env->CP0_VPControl;
 
     if (!((env->CP0_VPControl >> CP0VPCtl_DIS) & 1)) {
-        CPU_FOREACH(other_cs) {
+        CPU_FOREACH (other_cs) {
             MIPSCPU *other_cpu = MIPS_CPU(other_cs);
             /* Turn off all VPs except the one executing the dvp. */
             if (&other_cpu->env != env) {
@@ -1691,7 +1689,7 @@ target_ulong helper_evp(CPUMIPSState *env)
     target_ulong prev = env->CP0_VPControl;
 
     if ((env->CP0_VPControl >> CP0VPCtl_DIS) & 1) {
-        CPU_FOREACH(other_cs) {
+        CPU_FOREACH (other_cs) {
             MIPSCPU *other_cpu = MIPS_CPU(other_cs);
             if ((&other_cpu->env != env) && !mips_vp_is_wfi(other_cpu)) {
                 /*

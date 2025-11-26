@@ -41,13 +41,14 @@ enum {
  *  This table represents the mapping from the encoding to the actual values.
  */
 
-#define DEF_REGMAP(NAME, ELEMENTS, ...) \
-    static const unsigned int DECODE_REGISTER_##NAME[ELEMENTS] = \
-    { __VA_ARGS__ };
-        /* Name   Num Table */
-DEF_REGMAP(R_16,  16, 0, 1, 2, 3, 4, 5, 6, 7, 16, 17, 18, 19, 20, 21, 22, 23)
-DEF_REGMAP(R__8,  8,  0, 2, 4, 6, 16, 18, 20, 22)
-DEF_REGMAP(R_8,   8,  0, 1, 2, 3, 4, 5, 6, 7)
+#define DEF_REGMAP(NAME, ELEMENTS, ...)                            \
+    static const unsigned int DECODE_REGISTER_##NAME[ELEMENTS] = { \
+        __VA_ARGS__                                                \
+    };
+/* Name   Num Table */
+DEF_REGMAP(R_16, 16, 0, 1, 2, 3, 4, 5, 6, 7, 16, 17, 18, 19, 20, 21, 22, 23)
+DEF_REGMAP(R__8, 8, 0, 2, 4, 6, 16, 18, 20, 22)
+DEF_REGMAP(R_8, 8, 0, 1, 2, 3, 4, 5, 6, 7)
 
 #define DECODE_MAPPED_REG(OPNUM, NAME) \
     insn->regno[OPNUM] = DECODE_REGISTER_##NAME[insn->regno[OPNUM]];
@@ -75,15 +76,15 @@ typedef struct DectreeTable {
 
 #define DECODE_NEW_TABLE(TAG, SIZE, WHATNOT) \
     static const DectreeTable dectree_table_##TAG;
-#define TABLE_LINK(TABLE)                     /* NOTHING */
-#define TERMINAL(TAG, ENC)                    /* NOTHING */
-#define SUBINSNS(TAG, CLASSA, CLASSB, ENC)    /* NOTHING */
-#define EXTSPACE(TAG, ENC)                    /* NOTHING */
-#define INVALID()                             /* NOTHING */
-#define DECODE_END_TABLE(...)                 /* NOTHING */
-#define DECODE_MATCH_INFO(...)                /* NOTHING */
-#define DECODE_LEGACY_MATCH_INFO(...)         /* NOTHING */
-#define DECODE_OPINFO(...)                    /* NOTHING */
+#define TABLE_LINK(TABLE) /* NOTHING */
+#define TERMINAL(TAG, ENC) /* NOTHING */
+#define SUBINSNS(TAG, CLASSA, CLASSB, ENC) /* NOTHING */
+#define EXTSPACE(TAG, ENC) /* NOTHING */
+#define INVALID() /* NOTHING */
+#define DECODE_END_TABLE(...) /* NOTHING */
+#define DECODE_MATCH_INFO(...) /* NOTHING */
+#define DECODE_LEGACY_MATCH_INFO(...) /* NOTHING */
+#define DECODE_OPINFO(...) /* NOTHING */
 
 #include "dectree_generated.h.inc"
 
@@ -100,34 +101,33 @@ typedef struct DectreeTable {
 #undef DECODE_SEPARATOR_BITS
 
 #define DECODE_SEPARATOR_BITS(START, WIDTH) NULL, START, WIDTH
-#define DECODE_NEW_TABLE_HELPER(TAG, SIZE, FN, START, WIDTH) \
-    static const DectreeTable dectree_table_##TAG = { \
-        .size = SIZE, \
-        .lookup_function = FN, \
-        .startbit = START, \
-        .width = WIDTH, \
-        .table = {
+#define DECODE_NEW_TABLE_HELPER(TAG, SIZE, FN, START, WIDTH)                 \
+    static const DectreeTable dectree_table_##TAG = { .size = SIZE,          \
+                                                      .lookup_function = FN, \
+                                                      .startbit = START,     \
+                                                      .width = WIDTH,        \
+                                                      .table = {
 #define DECODE_NEW_TABLE(TAG, SIZE, WHATNOT) \
     DECODE_NEW_TABLE_HELPER(TAG, SIZE, WHATNOT)
 
 #define TABLE_LINK(TABLE) \
     { .type = DECTREE_TABLE_LINK, .table_link = &dectree_table_##TABLE },
-#define TERMINAL(TAG, ENC) \
-    { .type = DECTREE_TERMINAL, .opcode = TAG  },
-#define SUBINSNS(TAG, CLASSA, CLASSB, ENC) \
-    { \
-        .type = DECTREE_SUBINSNS, \
-        .table_link = &dectree_table_DECODE_SUBINSN_##CLASSA, \
-        .table_link_b = &dectree_table_DECODE_SUBINSN_##CLASSB \
-    },
+#define TERMINAL(TAG, ENC) { .type = DECTREE_TERMINAL, .opcode = TAG },
+#define SUBINSNS(TAG, CLASSA, CLASSB, ENC)                  \
+    { .type = DECTREE_SUBINSNS,                             \
+      .table_link = &dectree_table_DECODE_SUBINSN_##CLASSA, \
+      .table_link_b = &dectree_table_DECODE_SUBINSN_##CLASSB },
 #define EXTSPACE(TAG, ENC) { .type = DECTREE_EXTSPACE },
 #define INVALID() { .type = DECTREE_ENTRY_INVALID, .opcode = XX_LAST_OPCODE },
 
-#define DECODE_END_TABLE(...) } };
+#define DECODE_END_TABLE(...) \
+    }                         \
+    }                         \
+    ;
 
-#define DECODE_MATCH_INFO(...)                /* NOTHING */
-#define DECODE_LEGACY_MATCH_INFO(...)         /* NOTHING */
-#define DECODE_OPINFO(...)                    /* NOTHING */
+#define DECODE_MATCH_INFO(...) /* NOTHING */
+#define DECODE_LEGACY_MATCH_INFO(...) /* NOTHING */
+#define DECODE_OPINFO(...) /* NOTHING */
 
 #include "dectree_generated.h.inc"
 
@@ -144,12 +144,15 @@ typedef struct DectreeTable {
 #undef DECODE_NEW_TABLE_HELPER
 #undef DECODE_SEPARATOR_BITS
 
-static const DectreeTable dectree_table_DECODE_EXT_EXT_noext = {
-    .size = 1, .lookup_function = NULL, .startbit = 0, .width = 0,
-    .table = {
-        { .type = DECTREE_ENTRY_INVALID, .opcode = XX_LAST_OPCODE },
-    }
-};
+static const DectreeTable
+    dectree_table_DECODE_EXT_EXT_noext = { .size = 1,
+                                           .lookup_function = NULL,
+                                           .startbit = 0,
+                                           .width = 0,
+                                           .table = {
+                                               { .type = DECTREE_ENTRY_INVALID,
+                                                 .opcode = XX_LAST_OPCODE },
+                                           } };
 
 static const DectreeTable *ext_trees[XX_LAST_EXT_IDX];
 
@@ -169,23 +172,22 @@ typedef struct {
     uint32_t match;
 } DecodeITableEntry;
 
-#define DECODE_NEW_TABLE(TAG, SIZE, WHATNOT)  /* NOTHING */
-#define TABLE_LINK(TABLE)                     /* NOTHING */
-#define TERMINAL(TAG, ENC)                    /* NOTHING */
-#define SUBINSNS(TAG, CLASSA, CLASSB, ENC)    /* NOTHING */
-#define EXTSPACE(TAG, ENC)                    /* NOTHING */
-#define INVALID()                             /* NOTHING */
-#define DECODE_END_TABLE(...)                 /* NOTHING */
-#define DECODE_OPINFO(...)                    /* NOTHING */
+#define DECODE_NEW_TABLE(TAG, SIZE, WHATNOT) /* NOTHING */
+#define TABLE_LINK(TABLE) /* NOTHING */
+#define TERMINAL(TAG, ENC) /* NOTHING */
+#define SUBINSNS(TAG, CLASSA, CLASSB, ENC) /* NOTHING */
+#define EXTSPACE(TAG, ENC) /* NOTHING */
+#define INVALID() /* NOTHING */
+#define DECODE_END_TABLE(...) /* NOTHING */
+#define DECODE_OPINFO(...) /* NOTHING */
 
 #define DECODE_MATCH_INFO_NORMAL(TAG, MASK, MATCH) \
-    [TAG] = { \
-        .mask = MASK, \
-        .match = MATCH, \
+    [TAG] = {                                      \
+        .mask = MASK,                              \
+        .match = MATCH,                            \
     },
 
-#define DECODE_MATCH_INFO_NULL(TAG, MASK, MATCH) \
-    [TAG] = { .match = ~0 },
+#define DECODE_MATCH_INFO_NULL(TAG, MASK, MATCH) [TAG] = { .match = ~0 },
 
 #define DECODE_MATCH_INFO(...) DECODE_MATCH_INFO_NORMAL(__VA_ARGS__)
 #define DECODE_LEGACY_MATCH_INFO(...) /* NOTHING */
@@ -244,8 +246,7 @@ void decode_send_insn_to(Packet *packet, int start, int newloc)
 }
 
 /* Fill newvalue registers with the correct regno */
-static void
-decode_fill_newvalue_regno(Packet *packet)
+static void decode_fill_newvalue_regno(Packet *packet)
 {
     int i, use_regidx, offset, def_idx, dst_idx;
     uint16_t def_opcode, use_opcode;
@@ -259,10 +260,10 @@ decode_fill_newvalue_regno(Packet *packet)
             /* It's a store, so we're adjusting the Nt field */
             if (GET_ATTRIB(use_opcode, A_STORE)) {
                 use_regidx = strchr(opcode_reginfo[use_opcode], 't') -
-                    opcode_reginfo[use_opcode];
-            } else {    /* It's a Jump, so we're adjusting the Ns field */
+                             opcode_reginfo[use_opcode];
+            } else { /* It's a Jump, so we're adjusting the Ns field */
                 use_regidx = strchr(opcode_reginfo[use_opcode], 's') -
-                    opcode_reginfo[use_opcode];
+                             opcode_reginfo[use_opcode];
             }
 
             /*
@@ -343,9 +344,9 @@ static void decode_split_cmpjump(Packet *pkt)
         /* It's a cmp-jump */
         if (GET_ATTRIB(pkt->insn[i].opcode, A_NEWCMPJUMP)) {
             last = pkt->num_insns;
-            pkt->insn[last] = pkt->insn[i];    /* copy the instruction */
-            pkt->insn[last].part1 = true;      /* last insn does the CMP */
-            pkt->insn[i].part1 = false;        /* existing insn does the JUMP */
+            pkt->insn[last] = pkt->insn[i]; /* copy the instruction */
+            pkt->insn[last].part1 = true; /* last insn does the CMP */
+            pkt->insn[i].part1 = false; /* existing insn does the JUMP */
             pkt->num_insns++;
         }
     }
@@ -360,10 +361,8 @@ static void decode_split_cmpjump(Packet *pkt)
 
 static bool decode_opcode_can_jump(int opcode)
 {
-    if ((GET_ATTRIB(opcode, A_JUMP)) ||
-        (GET_ATTRIB(opcode, A_CALL)) ||
-        (opcode == J2_trap0) ||
-        (opcode == J2_pause)) {
+    if ((GET_ATTRIB(opcode, A_JUMP)) || (GET_ATTRIB(opcode, A_CALL)) ||
+        (opcode == J2_trap0) || (opcode == J2_pause)) {
         /* Exception to A_JUMP attribute */
         if (opcode == J4_hintjumpr) {
             return false;
@@ -395,7 +394,7 @@ static void decode_set_insn_attr_fields(Packet *pkt)
     for (i = 0; i < numinsns; i++) {
         opcode = pkt->insn[i].opcode;
         if (pkt->insn[i].part1) {
-            continue;    /* Skip compare of cmp-jumps */
+            continue; /* Skip compare of cmp-jumps */
         }
 
         if (GET_ATTRIB(opcode, A_DCZEROA)) {
@@ -442,7 +441,7 @@ static void decode_shuffle_for_execution(Packet *packet)
 {
     bool changed = false;
     int i;
-    bool flag;    /* flag means we've seen a non-memory instruction */
+    bool flag; /* flag means we've seen a non-memory instruction */
     int n_mems;
     int last_insn = packet->num_insns - 1;
 
@@ -544,8 +543,7 @@ static void decode_shuffle_for_execution(Packet *packet)
     }
 }
 
-static void
-apply_extender(Packet *pkt, int i, uint32_t extender)
+static void apply_extender(Packet *pkt, int i, uint32_t extender)
 {
     int immed_num;
     uint32_t base_immed;
@@ -574,8 +572,8 @@ static void decode_remove_extenders(Packet *packet)
         if (GET_ATTRIB(packet->insn[i].opcode, A_IT_EXTENDER)) {
             /* Remove this one by moving the remaining instructions down */
             for (j = i;
-                (j < packet->num_insns - 1) && (j < INSTRUCTIONS_MAX - 1);
-                j++) {
+                 (j < packet->num_insns - 1) && (j < INSTRUCTIONS_MAX - 1);
+                 j++) {
                 packet->insn[j] = packet->insn[j + 1];
             }
             packet->num_insns--;
@@ -593,43 +591,40 @@ static SlotMask get_valid_slots(const Packet *pkt, unsigned int slot)
     }
 }
 
-#define DECODE_NEW_TABLE(TAG, SIZE, WHATNOT)     /* NOTHING */
-#define TABLE_LINK(TABLE)                        /* NOTHING */
-#define TERMINAL(TAG, ENC)                       /* NOTHING */
-#define SUBINSNS(TAG, CLASSA, CLASSB, ENC)       /* NOTHING */
-#define EXTSPACE(TAG, ENC)                       /* NOTHING */
-#define INVALID()                                /* NOTHING */
-#define DECODE_END_TABLE(...)                    /* NOTHING */
-#define DECODE_MATCH_INFO(...)                   /* NOTHING */
-#define DECODE_LEGACY_MATCH_INFO(...)            /* NOTHING */
+#define DECODE_NEW_TABLE(TAG, SIZE, WHATNOT) /* NOTHING */
+#define TABLE_LINK(TABLE) /* NOTHING */
+#define TERMINAL(TAG, ENC) /* NOTHING */
+#define SUBINSNS(TAG, CLASSA, CLASSB, ENC) /* NOTHING */
+#define EXTSPACE(TAG, ENC) /* NOTHING */
+#define INVALID() /* NOTHING */
+#define DECODE_END_TABLE(...) /* NOTHING */
+#define DECODE_MATCH_INFO(...) /* NOTHING */
+#define DECODE_LEGACY_MATCH_INFO(...) /* NOTHING */
 
 #define DECODE_REG(REGNO, WIDTH, STARTBIT) \
     insn->regno[REGNO] = ((encoding >> STARTBIT) & ((1 << WIDTH) - 1));
 
-#define DECODE_IMPL_REG(REGNO, VAL) \
-    insn->regno[REGNO] = VAL;
+#define DECODE_IMPL_REG(REGNO, VAL) insn->regno[REGNO] = VAL;
 
-#define DECODE_IMM(IMMNO, WIDTH, STARTBIT, VALSTART) \
-    insn->immed[IMMNO] |= (((encoding >> STARTBIT) & ((1 << WIDTH) - 1))) << \
-                          (VALSTART);
+#define DECODE_IMM(IMMNO, WIDTH, STARTBIT, VALSTART)                      \
+    insn->immed[IMMNO] |= (((encoding >> STARTBIT) & ((1 << WIDTH) - 1))) \
+                          << (VALSTART);
 
 #define DECODE_IMM_SXT(IMMNO, WIDTH) \
-    insn->immed[IMMNO] = ((((int32_t)insn->immed[IMMNO]) << (32 - WIDTH)) >> \
-                          (32 - WIDTH));
+    insn->immed[IMMNO] =             \
+        ((((int32_t)insn->immed[IMMNO]) << (32 - WIDTH)) >> (32 - WIDTH));
 
-#define DECODE_IMM_NEG(IMMNO, WIDTH) \
-    insn->immed[IMMNO] = -insn->immed[IMMNO];
+#define DECODE_IMM_NEG(IMMNO, WIDTH) insn->immed[IMMNO] = -insn->immed[IMMNO];
 
 #define DECODE_IMM_SHIFT(IMMNO, SHAMT)                                 \
-    if ((!insn->extension_valid) || \
-        (insn->which_extended != IMMNO)) { \
-        insn->immed[IMMNO] <<= SHAMT; \
+    if ((!insn->extension_valid) || (insn->which_extended != IMMNO)) { \
+        insn->immed[IMMNO] <<= SHAMT;                                  \
     }
 
 #define DECODE_OPINFO(TAG, BEH) \
-    case TAG: \
-        { BEH  } \
-        break; \
+    case TAG: {                 \
+        BEH                     \
+    } break;
 
 /*
  * Fill in the operands of the instruction
@@ -644,8 +639,7 @@ static SlotMask get_valid_slots(const Packet *pkt, unsigned int slot)
  * with the macros defined above, we'll fill in a switch statement
  * where each case is an opcode tag.
  */
-static void
-decode_op(Insn *insn, Opcode tag, uint32_t encoding)
+static void decode_op(Insn *insn, Opcode tag, uint32_t encoding)
 {
     insn->immed[0] = 0;
     insn->immed[1] = 0;
@@ -681,9 +675,9 @@ decode_op(Insn *insn, Opcode tag, uint32_t encoding)
 #undef DECODE_NEW_TABLE
 #undef DECODE_SEPARATOR_BITS
 
-static unsigned int
-decode_subinsn_tablewalk(Insn *insn, const DectreeTable *table,
-                         uint32_t encoding)
+static unsigned int decode_subinsn_tablewalk(Insn *insn,
+                                             const DectreeTable *table,
+                                             uint32_t encoding)
 {
     unsigned int i;
     Opcode opc;
@@ -718,8 +712,7 @@ static unsigned int get_insn_b(uint32_t encoding)
 }
 
 static unsigned int
-decode_insns_tablewalk(Insn *insn, const DectreeTable *table,
-                       uint32_t encoding)
+decode_insns_tablewalk(Insn *insn, const DectreeTable *table, uint32_t encoding)
 {
     unsigned int i;
     unsigned int a, b;
@@ -761,8 +754,7 @@ decode_insns_tablewalk(Insn *insn, const DectreeTable *table,
     }
 }
 
-static unsigned int
-decode_insns(Insn *insn, uint32_t encoding)
+static unsigned int decode_insns(Insn *insn, uint32_t encoding)
 {
     const DectreeTable *table;
     if (parse_bits(encoding) != 0) {
@@ -816,8 +808,7 @@ static bool has_valid_slot_assignment(Packet *pkt)
     return true;
 }
 
-static bool
-decode_set_slot_number(Packet *pkt)
+static bool decode_set_slot_number(Packet *pkt)
 {
     int slot;
     int i;
@@ -953,8 +944,7 @@ int decode_packet(int max_words, const uint32_t *words, Packet *pkt,
     pkt->encod_pkt_size_in_bytes = words_read * 4;
     pkt->pkt_has_hvx = false;
     for (i = 0; i < num_insns; i++) {
-        pkt->pkt_has_hvx |=
-            GET_ATTRIB(pkt->insn[i].opcode, A_CVI);
+        pkt->pkt_has_hvx |= GET_ATTRIB(pkt->insn[i].opcode, A_CVI);
     }
 
     /*
@@ -1003,8 +993,7 @@ int decode_packet(int max_words, const uint32_t *words, Packet *pkt,
 }
 
 /* Used for "-d in_asm" logging */
-int disassemble_hexagon(uint32_t *words, int nwords, bfd_vma pc,
-                        GString *buf)
+int disassemble_hexagon(uint32_t *words, int nwords, bfd_vma pc, GString *buf)
 {
     Packet pkt;
 

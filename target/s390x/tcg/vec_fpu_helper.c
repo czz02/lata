@@ -19,11 +19,11 @@
 #include "exec/helper-proto.h"
 #include "fpu/softfloat.h"
 
-#define VIC_INVALID         0x1
-#define VIC_DIVBYZERO       0x2
-#define VIC_OVERFLOW        0x3
-#define VIC_UNDERFLOW       0x4
-#define VIC_INEXACT         0x5
+#define VIC_INVALID 0x1
+#define VIC_DIVBYZERO 0x2
+#define VIC_OVERFLOW 0x3
+#define VIC_UNDERFLOW 0x4
+#define VIC_INEXACT 0x5
 
 /* returns the VEX. If the VEX is 0, there is no trap */
 static uint8_t check_ieee_exc(CPUS390XState *env, uint8_t enr, bool XxC,
@@ -159,8 +159,8 @@ static void vop64_2(S390Vector *v1, const S390Vector *v2, CPUS390XState *env,
 
 typedef float128 (*vop128_2_fn)(float128 a, float_status *s);
 static void vop128_2(S390Vector *v1, const S390Vector *v2, CPUS390XState *env,
-                    bool s, bool XxC, uint8_t erm, vop128_2_fn fn,
-                    uintptr_t retaddr)
+                     bool s, bool XxC, uint8_t erm, vop128_2_fn fn,
+                     uintptr_t retaddr)
 {
     const float128 a = s390_vec_read_float128(v2);
     uint8_t vxc, vec_exc = 0;
@@ -223,27 +223,25 @@ static float64 vclgd64(float64 a, float_status *s)
     return float64_is_any_nan(a) ? 0 : tmp;
 }
 
-#define DEF_GVEC_VOP2_FN(NAME, FN, BITS)                                       \
-void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, CPUS390XState *env,   \
-                               uint32_t desc)                                  \
-{                                                                              \
-    const uint8_t erm = extract32(simd_data(desc), 4, 4);                      \
-    const bool se = extract32(simd_data(desc), 3, 1);                          \
-    const bool XxC = extract32(simd_data(desc), 2, 1);                         \
-                                                                               \
-    vop##BITS##_2(v1, v2, env, se, XxC, erm, FN, GETPC());                     \
-}
+#define DEF_GVEC_VOP2_FN(NAME, FN, BITS)                              \
+    void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2,          \
+                                   CPUS390XState *env, uint32_t desc) \
+    {                                                                 \
+        const uint8_t erm = extract32(simd_data(desc), 4, 4);         \
+        const bool se = extract32(simd_data(desc), 3, 1);             \
+        const bool XxC = extract32(simd_data(desc), 2, 1);            \
+                                                                      \
+        vop##BITS##_2(v1, v2, env, se, XxC, erm, FN, GETPC());        \
+    }
 
-#define DEF_GVEC_VOP2_32(NAME)                                                 \
-DEF_GVEC_VOP2_FN(NAME, NAME##32, 32)
+#define DEF_GVEC_VOP2_32(NAME) DEF_GVEC_VOP2_FN(NAME, NAME##32, 32)
 
-#define DEF_GVEC_VOP2_64(NAME)                                                 \
-DEF_GVEC_VOP2_FN(NAME, NAME##64, 64)
+#define DEF_GVEC_VOP2_64(NAME) DEF_GVEC_VOP2_FN(NAME, NAME##64, 64)
 
-#define DEF_GVEC_VOP2(NAME, OP)                                                \
-DEF_GVEC_VOP2_FN(NAME, float32_##OP, 32)                                       \
-DEF_GVEC_VOP2_FN(NAME, float64_##OP, 64)                                       \
-DEF_GVEC_VOP2_FN(NAME, float128_##OP, 128)
+#define DEF_GVEC_VOP2(NAME, OP)              \
+    DEF_GVEC_VOP2_FN(NAME, float32_##OP, 32) \
+    DEF_GVEC_VOP2_FN(NAME, float64_##OP, 64) \
+    DEF_GVEC_VOP2_FN(NAME, float128_##OP, 128)
 
 DEF_GVEC_VOP2_32(vcdg)
 DEF_GVEC_VOP2_32(vcdlg)
@@ -318,27 +316,27 @@ static void vop128_3(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
     *v1 = tmp;
 }
 
-#define DEF_GVEC_VOP3_B(NAME, OP, BITS)                                        \
-void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, const void *v3,       \
-                              CPUS390XState *env, uint32_t desc)               \
-{                                                                              \
-    const bool se = extract32(simd_data(desc), 3, 1);                          \
-                                                                               \
-    vop##BITS##_3(v1, v2, v3, env, se, float##BITS##_##OP, GETPC());           \
-}
+#define DEF_GVEC_VOP3_B(NAME, OP, BITS)                                      \
+    void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, const void *v3, \
+                                   CPUS390XState *env, uint32_t desc)        \
+    {                                                                        \
+        const bool se = extract32(simd_data(desc), 3, 1);                    \
+                                                                             \
+        vop##BITS##_3(v1, v2, v3, env, se, float##BITS##_##OP, GETPC());     \
+    }
 
-#define DEF_GVEC_VOP3(NAME, OP)                                                \
-DEF_GVEC_VOP3_B(NAME, OP, 32)                                                  \
-DEF_GVEC_VOP3_B(NAME, OP, 64)                                                  \
-DEF_GVEC_VOP3_B(NAME, OP, 128)
+#define DEF_GVEC_VOP3(NAME, OP)   \
+    DEF_GVEC_VOP3_B(NAME, OP, 32) \
+    DEF_GVEC_VOP3_B(NAME, OP, 64) \
+    DEF_GVEC_VOP3_B(NAME, OP, 128)
 
 DEF_GVEC_VOP3(vfa, add)
 DEF_GVEC_VOP3(vfs, sub)
 DEF_GVEC_VOP3(vfd, div)
 DEF_GVEC_VOP3(vfm, mul)
 
-static int wfc32(const S390Vector *v1, const S390Vector *v2,
-                 CPUS390XState *env, bool signal, uintptr_t retaddr)
+static int wfc32(const S390Vector *v1, const S390Vector *v2, CPUS390XState *env,
+                 bool signal, uintptr_t retaddr)
 {
     /* only the zero-indexed elements are compared */
     const float32 a = s390_vec_read_float32(v1, 0);
@@ -357,8 +355,8 @@ static int wfc32(const S390Vector *v1, const S390Vector *v2,
     return float_comp_to_cc(env, cmp);
 }
 
-static int wfc64(const S390Vector *v1, const S390Vector *v2,
-                 CPUS390XState *env, bool signal, uintptr_t retaddr)
+static int wfc64(const S390Vector *v1, const S390Vector *v2, CPUS390XState *env,
+                 bool signal, uintptr_t retaddr)
 {
     /* only the zero-indexed elements are compared */
     const float64 a = s390_vec_read_float64(v1, 0);
@@ -397,17 +395,17 @@ static int wfc128(const S390Vector *v1, const S390Vector *v2,
     return float_comp_to_cc(env, cmp);
 }
 
-#define DEF_GVEC_WFC_B(NAME, SIGNAL, BITS)                                     \
-void HELPER(gvec_##NAME##BITS)(const void *v1, const void *v2,                 \
-                               CPUS390XState *env, uint32_t desc)              \
-{                                                                              \
-    env->cc_op = wfc##BITS(v1, v2, env, SIGNAL, GETPC());                      \
-}
+#define DEF_GVEC_WFC_B(NAME, SIGNAL, BITS)                            \
+    void HELPER(gvec_##NAME##BITS)(const void *v1, const void *v2,    \
+                                   CPUS390XState *env, uint32_t desc) \
+    {                                                                 \
+        env->cc_op = wfc##BITS(v1, v2, env, SIGNAL, GETPC());         \
+    }
 
-#define DEF_GVEC_WFC(NAME, SIGNAL)                                             \
-     DEF_GVEC_WFC_B(NAME, SIGNAL, 32)                                          \
-     DEF_GVEC_WFC_B(NAME, SIGNAL, 64)                                          \
-     DEF_GVEC_WFC_B(NAME, SIGNAL, 128)
+#define DEF_GVEC_WFC(NAME, SIGNAL)   \
+    DEF_GVEC_WFC_B(NAME, SIGNAL, 32) \
+    DEF_GVEC_WFC_B(NAME, SIGNAL, 64) \
+    DEF_GVEC_WFC_B(NAME, SIGNAL, 128)
 
 DEF_GVEC_WFC(wfc, false)
 DEF_GVEC_WFC(wfk, true)
@@ -478,7 +476,7 @@ static int vfc64(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
 
 typedef bool (*vfc128_fn)(float128 a, float128 b, float_status *status);
 static int vfc128(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
-                 CPUS390XState *env, bool s, vfc128_fn fn, uintptr_t retaddr)
+                  CPUS390XState *env, bool s, vfc128_fn fn, uintptr_t retaddr)
 {
     const float128 a = s390_vec_read_float128(v2);
     const float128 b = s390_vec_read_float128(v3);
@@ -498,31 +496,34 @@ static int vfc128(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
     return match ? 0 : 3;
 }
 
-#define DEF_GVEC_VFC_B(NAME, OP, BITS)                                         \
-void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, const void *v3,       \
-                               CPUS390XState *env, uint32_t desc)              \
-{                                                                              \
-    const bool se = extract32(simd_data(desc), 3, 1);                          \
-    const bool sq = extract32(simd_data(desc), 2, 1);                          \
-    vfc##BITS##_fn fn = sq ? float##BITS##_##OP : float##BITS##_##OP##_quiet;  \
-                                                                               \
-    vfc##BITS(v1, v2, v3, env, se, fn, GETPC());                               \
-}                                                                              \
-                                                                               \
-void HELPER(gvec_##NAME##BITS##_cc)(void *v1, const void *v2, const void *v3,  \
-                                    CPUS390XState *env, uint32_t desc)         \
-{                                                                              \
-    const bool se = extract32(simd_data(desc), 3, 1);                          \
-    const bool sq = extract32(simd_data(desc), 2, 1);                          \
-    vfc##BITS##_fn fn = sq ? float##BITS##_##OP : float##BITS##_##OP##_quiet;  \
-                                                                               \
-    env->cc_op = vfc##BITS(v1, v2, v3, env, se, fn, GETPC());                  \
-}
+#define DEF_GVEC_VFC_B(NAME, OP, BITS)                                       \
+    void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, const void *v3, \
+                                   CPUS390XState *env, uint32_t desc)        \
+    {                                                                        \
+        const bool se = extract32(simd_data(desc), 3, 1);                    \
+        const bool sq = extract32(simd_data(desc), 2, 1);                    \
+        vfc##BITS##_fn fn =                                                  \
+            sq ? float##BITS##_##OP : float##BITS##_##OP##_quiet;            \
+                                                                             \
+        vfc##BITS(v1, v2, v3, env, se, fn, GETPC());                         \
+    }                                                                        \
+                                                                             \
+    void HELPER(gvec_##NAME##BITS##_cc)(void *v1, const void *v2,            \
+                                        const void *v3, CPUS390XState *env,  \
+                                        uint32_t desc)                       \
+    {                                                                        \
+        const bool se = extract32(simd_data(desc), 3, 1);                    \
+        const bool sq = extract32(simd_data(desc), 2, 1);                    \
+        vfc##BITS##_fn fn =                                                  \
+            sq ? float##BITS##_##OP : float##BITS##_##OP##_quiet;            \
+                                                                             \
+        env->cc_op = vfc##BITS(v1, v2, v3, env, se, fn, GETPC());            \
+    }
 
-#define DEF_GVEC_VFC(NAME, OP)                                                 \
-DEF_GVEC_VFC_B(NAME, OP, 32)                                                   \
-DEF_GVEC_VFC_B(NAME, OP, 64)                                                   \
-DEF_GVEC_VFC_B(NAME, OP, 128)                                                  \
+#define DEF_GVEC_VFC(NAME, OP)   \
+    DEF_GVEC_VFC_B(NAME, OP, 32) \
+    DEF_GVEC_VFC_B(NAME, OP, 64) \
+    DEF_GVEC_VFC_B(NAME, OP, 128)
 
 DEF_GVEC_VFC(vfce, eq)
 DEF_GVEC_VFC(vfch, lt)
@@ -556,8 +557,8 @@ void HELPER(gvec_vfll64)(void *v1, const void *v2, CPUS390XState *env,
                          uint32_t desc)
 {
     /* load from even element */
-    const float128 ret = float64_to_float128(s390_vec_read_float64(v2, 0),
-                                             &env->fpu_status);
+    const float128 ret =
+        float64_to_float128(s390_vec_read_float64(v2, 0), &env->fpu_status);
     uint8_t vxc, vec_exc = 0;
 
     vxc = check_ieee_exc(env, 0, false, &vec_exc);
@@ -676,19 +677,19 @@ static void vfma128(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
     s390_vec_write_float128(v1, ret);
 }
 
-#define DEF_GVEC_VFMA_B(NAME, FLAGS, BITS)                                     \
-void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, const void *v3,       \
-                               const void *v4, CPUS390XState *env,             \
-                               uint32_t desc)                                  \
-{                                                                              \
-    const bool se = extract32(simd_data(desc), 3, 1);                          \
-                                                                               \
-    vfma##BITS(v1, v2, v3, v4, env, se, FLAGS, GETPC());                       \
-}
+#define DEF_GVEC_VFMA_B(NAME, FLAGS, BITS)                                   \
+    void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, const void *v3, \
+                                   const void *v4, CPUS390XState *env,       \
+                                   uint32_t desc)                            \
+    {                                                                        \
+        const bool se = extract32(simd_data(desc), 3, 1);                    \
+                                                                             \
+        vfma##BITS(v1, v2, v3, v4, env, se, FLAGS, GETPC());                 \
+    }
 
-#define DEF_GVEC_VFMA(NAME, FLAGS)                                             \
-    DEF_GVEC_VFMA_B(NAME, FLAGS, 32)                                           \
-    DEF_GVEC_VFMA_B(NAME, FLAGS, 64)                                           \
+#define DEF_GVEC_VFMA(NAME, FLAGS)   \
+    DEF_GVEC_VFMA_B(NAME, FLAGS, 32) \
+    DEF_GVEC_VFMA_B(NAME, FLAGS, 64) \
     DEF_GVEC_VFMA_B(NAME, FLAGS, 128)
 
 DEF_GVEC_VFMA(vfma, 0)
@@ -1077,25 +1078,25 @@ static void vfminmax128(S390Vector *v1, const S390Vector *v2,
     s390_vec_write_float128(v1, result);
 }
 
-#define DEF_GVEC_VFMINMAX_B(NAME, IS_MIN, BITS)                                \
-void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, const void *v3,       \
-                               CPUS390XState *env, uint32_t desc)              \
-{                                                                              \
-    const bool se = extract32(simd_data(desc), 3, 1);                          \
-    uint8_t type = extract32(simd_data(desc), 4, 4);                           \
-    bool is_abs = false;                                                       \
-                                                                               \
-    if (type >= 8) {                                                           \
-        is_abs = true;                                                         \
-        type -= 8;                                                             \
-    }                                                                          \
-                                                                               \
-    vfminmax##BITS(v1, v2, v3, env, type, IS_MIN, is_abs, se, GETPC());        \
-}
+#define DEF_GVEC_VFMINMAX_B(NAME, IS_MIN, BITS)                              \
+    void HELPER(gvec_##NAME##BITS)(void *v1, const void *v2, const void *v3, \
+                                   CPUS390XState *env, uint32_t desc)        \
+    {                                                                        \
+        const bool se = extract32(simd_data(desc), 3, 1);                    \
+        uint8_t type = extract32(simd_data(desc), 4, 4);                     \
+        bool is_abs = false;                                                 \
+                                                                             \
+        if (type >= 8) {                                                     \
+            is_abs = true;                                                   \
+            type -= 8;                                                       \
+        }                                                                    \
+                                                                             \
+        vfminmax##BITS(v1, v2, v3, env, type, IS_MIN, is_abs, se, GETPC());  \
+    }
 
-#define DEF_GVEC_VFMINMAX(NAME, IS_MIN)                                        \
-    DEF_GVEC_VFMINMAX_B(NAME, IS_MIN, 32)                                      \
-    DEF_GVEC_VFMINMAX_B(NAME, IS_MIN, 64)                                      \
+#define DEF_GVEC_VFMINMAX(NAME, IS_MIN)   \
+    DEF_GVEC_VFMINMAX_B(NAME, IS_MIN, 32) \
+    DEF_GVEC_VFMINMAX_B(NAME, IS_MIN, 64) \
     DEF_GVEC_VFMINMAX_B(NAME, IS_MIN, 128)
 
 DEF_GVEC_VFMINMAX(vfmax, false)

@@ -70,8 +70,7 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs,
     cpu->env.psw_n = (tb->flags & PSW_N) != 0;
 }
 
-static void hppa_restore_state_to_opc(CPUState *cs,
-                                      const TranslationBlock *tb,
+static void hppa_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                       const uint64_t *data)
 {
     HPPACPU *cpu = HPPA_CPU(cs);
@@ -100,10 +99,10 @@ static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
 }
 
 #ifndef CONFIG_USER_ONLY
-static G_NORETURN
-void hppa_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                  MMUAccessType access_type, int mmu_idx,
-                                  uintptr_t retaddr)
+static G_NORETURN void hppa_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+                                                    MMUAccessType access_type,
+                                                    int mmu_idx,
+                                                    uintptr_t retaddr)
 {
     HPPACPU *cpu = HPPA_CPU(cs);
     CPUHPPAState *env = &cpu->env;
@@ -137,8 +136,8 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
 #ifndef CONFIG_USER_ONLY
     {
         HPPACPU *cpu = HPPA_CPU(cs);
-        cpu->alarm_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                        hppa_cpu_alarm_timer, cpu);
+        cpu->alarm_timer =
+            timer_new_ns(QEMU_CLOCK_VIRTUAL, hppa_cpu_alarm_timer, cpu);
     }
 #endif
 }

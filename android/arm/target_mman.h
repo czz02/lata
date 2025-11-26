@@ -4,9 +4,9 @@
  * TASK_SIZE                 CONFIG_PAGE_OFFSET
  * CONFIG_PAGE_OFFSET        0xC0000000 (default in Kconfig)
  */
-#define TASK_UNMAPPED_BASE   0x40000000
+#define TASK_UNMAPPED_BASE 0x40000000
 
 /* arch/arm/include/asm/elf.h */
-#define ELF_ET_DYN_BASE      0x00400000
+#define ELF_ET_DYN_BASE 0x00400000
 
 #include "../generic/target_mman.h"

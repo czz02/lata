@@ -26,8 +26,7 @@
 #include "trace.h"
 #include "exec/exec-all.h"
 
-static bool pmp_write_cfg(CPURISCVState *env, uint32_t addr_index,
-                          uint8_t val);
+static bool pmp_write_cfg(CPURISCVState *env, uint32_t addr_index, uint8_t val);
 static uint8_t pmp_read_cfg(CPURISCVState *env, uint32_t addr_index);
 
 /*
@@ -44,7 +43,6 @@ static inline uint8_t pmp_get_a_field(uint8_t cfg)
  */
 static inline int pmp_is_locked(CPURISCVState *env, uint32_t pmp_index)
 {
-
     if (env->pmp_state.pmp[pmp_index].cfg_reg & PMP_LOCK) {
         return 1;
     }
@@ -62,7 +60,7 @@ static inline int pmp_is_locked(CPURISCVState *env, uint32_t pmp_index)
  */
 uint32_t pmp_get_num_rules(CPURISCVState *env)
 {
-     return env->pmp_state.num_rules;
+    return env->pmp_state.num_rules;
 }
 
 /*
@@ -131,8 +129,7 @@ static bool pmp_write_cfg(CPURISCVState *env, uint32_t pmp_index, uint8_t val)
     return false;
 }
 
-static void pmp_decode_napot(target_ulong a, target_ulong *sa,
-                             target_ulong *ea)
+static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
 {
     /*
      * aaaa...aaa0   8-byte NAPOT range
@@ -200,16 +197,14 @@ void pmp_update_rule_nums(CPURISCVState *env)
 
     env->pmp_state.num_rules = 0;
     for (i = 0; i < MAX_RISCV_PMPS; i++) {
-        const uint8_t a_field =
-            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+        const uint8_t a_field = pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
         if (PMP_AMATCH_OFF != a_field) {
             env->pmp_state.num_rules++;
         }
     }
 }
 
-static int pmp_is_in_range(CPURISCVState *env, int pmp_index,
-                           target_ulong addr)
+static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
 {
     int result = 0;
 
@@ -331,8 +326,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
         }
 
         /* fully inside */
-        const uint8_t a_field =
-            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+        const uint8_t a_field = pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
 
         /*
          * Convert the PMP permissions to match the truth table in the
@@ -445,8 +439,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
 /*
  * Handle a write to a pmpcfg CSR
  */
-void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
-                      target_ulong val)
+void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index, target_ulong val)
 {
     int i;
     uint8_t cfg_val;
@@ -456,7 +449,7 @@ void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
     trace_pmpcfg_csr_write(env->mhartid, reg_index, val);
 
     for (i = 0; i < pmpcfg_nums; i++) {
-        cfg_val = (val >> 8 * i)  & 0xff;
+        cfg_val = (val >> 8 * i) & 0xff;
         modified |= pmp_write_cfg(env, (reg_index * 4) + i, cfg_val);
     }
 
@@ -523,8 +516,7 @@ void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
                 tlb_flush(env_cpu(env));
             }
         } else {
-            qemu_log_mask(LOG_GUEST_ERROR,
-                          "ignoring pmpaddr write - locked\n");
+            qemu_log_mask(LOG_GUEST_ERROR, "ignoring pmpaddr write - locked\n");
         }
     } else {
         qemu_log_mask(LOG_GUEST_ERROR,

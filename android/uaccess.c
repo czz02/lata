@@ -94,7 +94,7 @@ ssize_t target_strlen(abi_ulong guest_addr1)
     size_t max_len, len;
 
     guest_addr = guest_addr1;
-    for(;;) {
+    for (;;) {
         max_len = TARGET_PAGE_SIZE - (guest_addr & ~TARGET_PAGE_MASK);
         ptr = lock_user(VERIFY_READ, guest_addr, max_len, 1);
         if (!ptr)

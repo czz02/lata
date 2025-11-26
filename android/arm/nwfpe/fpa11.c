@@ -23,76 +23,74 @@
 
 #include "fpopcode.h"
 
-//#include "fpmodule.h"
-//#include "fpmodule.inl"
+// #include "fpmodule.h"
+// #include "fpmodule.inl"
 
-//#include <asm/system.h>
+// #include <asm/system.h>
 
 
-FPA11* qemufpa = NULL;
-CPUARMState* user_registers;
+FPA11 *qemufpa = NULL;
+CPUARMState *user_registers;
 
 /* Reset the FPA11 chip.  Called to initialize and reset the emulator. */
 void resetFPA11(void)
 {
-  int i;
-  FPA11 *fpa11 = GET_FPA11();
+    int i;
+    FPA11 *fpa11 = GET_FPA11();
 
-  /* initialize the register type array */
-  for (i=0;i<=7;i++)
-  {
-    fpa11->fType[i] = typeNone;
-  }
+    /* initialize the register type array */
+    for (i = 0; i <= 7; i++) {
+        fpa11->fType[i] = typeNone;
+    }
 
-  /* FPSR: set system id to FP_EMULATOR, set AC, clear all other bits */
-  fpa11->fpsr = FP_EMULATOR | BIT_AC;
+    /* FPSR: set system id to FP_EMULATOR, set AC, clear all other bits */
+    fpa11->fpsr = FP_EMULATOR | BIT_AC;
 
-  /* FPCR: set SB, AB and DA bits, clear all others */
+    /* FPCR: set SB, AB and DA bits, clear all others */
 #ifdef MAINTAIN_FPCR
-  fpa11->fpcr = MASK_RESET;
+    fpa11->fpcr = MASK_RESET;
 #endif
 }
 
 void SetRoundingMode(const unsigned int opcode)
 {
     int rounding_mode;
-   FPA11 *fpa11 = GET_FPA11();
+    FPA11 *fpa11 = GET_FPA11();
 
 #ifdef MAINTAIN_FPCR
-   fpa11->fpcr &= ~MASK_ROUNDING_MODE;
+    fpa11->fpcr &= ~MASK_ROUNDING_MODE;
 #endif
-   switch (opcode & MASK_ROUNDING_MODE)
-   {
-      default:
-      case ROUND_TO_NEAREST:
-         rounding_mode = float_round_nearest_even;
+    switch (opcode & MASK_ROUNDING_MODE) {
+    default:
+    case ROUND_TO_NEAREST:
+        rounding_mode = float_round_nearest_even;
 #ifdef MAINTAIN_FPCR
-         fpa11->fpcr |= ROUND_TO_NEAREST;
+        fpa11->fpcr |= ROUND_TO_NEAREST;
 #endif
-      break;
+        break;
 
-      case ROUND_TO_PLUS_INFINITY:
-         rounding_mode = float_round_up;
+    case ROUND_TO_PLUS_INFINITY:
+        rounding_mode = float_round_up;
 #ifdef MAINTAIN_FPCR
-         fpa11->fpcr |= ROUND_TO_PLUS_INFINITY;
+        fpa11->fpcr |= ROUND_TO_PLUS_INFINITY;
 #endif
-      break;
+        break;
 
-      case ROUND_TO_MINUS_INFINITY:
-         rounding_mode = float_round_down;
+    case ROUND_TO_MINUS_INFINITY:
+        rounding_mode = float_round_down;
 #ifdef MAINTAIN_FPCR
-         fpa11->fpcr |= ROUND_TO_MINUS_INFINITY;
+        fpa11->fpcr |= ROUND_TO_MINUS_INFINITY;
 #endif
-      break;
+        break;
 
-      case ROUND_TO_ZERO:
-         rounding_mode = float_round_to_zero;
+    case ROUND_TO_ZERO:
+        rounding_mode = float_round_to_zero;
 #ifdef MAINTAIN_FPCR
-         fpa11->fpcr |= ROUND_TO_ZERO;
+        fpa11->fpcr |= ROUND_TO_ZERO;
 #endif
-      break;
-  }
-   set_float_rounding_mode(rounding_mode, &fpa11->fp_status);
+        break;
+    }
+    set_float_rounding_mode(rounding_mode, &fpa11->fp_status);
 }
 
 void SetRoundingPrecision(const unsigned int opcode)
@@ -133,78 +131,70 @@ void SetRoundingPrecision(const unsigned int opcode)
 
 /* Emulate the instruction in the opcode. */
 /* ??? This is not thread safe.  */
-unsigned int EmulateAll(unsigned int opcode, FPA11* qfpa, CPUARMState* qregs)
+unsigned int EmulateAll(unsigned int opcode, FPA11 *qfpa, CPUARMState *qregs)
 {
-  unsigned int nRc = 0;
-//  unsigned long flags;
-  FPA11 *fpa11;
-  unsigned int cp;
-//  save_flags(flags); sti();
+    unsigned int nRc = 0;
+    //  unsigned long flags;
+    FPA11 *fpa11;
+    unsigned int cp;
+    //  save_flags(flags); sti();
 
-  /* Check that this is really an FPA11 instruction: the coprocessor
-   * field in bits [11:8] must be 1 or 2.
-   */
-  cp = (opcode >> 8) & 0xf;
-  if (cp != 1 && cp != 2) {
-    return 0;
-  }
+    /* Check that this is really an FPA11 instruction: the coprocessor
+     * field in bits [11:8] must be 1 or 2.
+     */
+    cp = (opcode >> 8) & 0xf;
+    if (cp != 1 && cp != 2) {
+        return 0;
+    }
 
-  qemufpa=qfpa;
-  user_registers=qregs;
+    qemufpa = qfpa;
+    user_registers = qregs;
 
 #if 0
   fprintf(stderr,"emulating FP insn 0x%08x, PC=0x%08x\n",
           opcode, qregs[ARM_REG_PC]);
 #endif
-  fpa11 = GET_FPA11();
+    fpa11 = GET_FPA11();
 
-  if (fpa11->initflag == 0)		/* good place for __builtin_expect */
-  {
-    resetFPA11();
-    SetRoundingMode(ROUND_TO_NEAREST);
-    SetRoundingPrecision(ROUND_EXTENDED);
-    fpa11->initflag = 1;
-  }
+    if (fpa11->initflag == 0) /* good place for __builtin_expect */
+    {
+        resetFPA11();
+        SetRoundingMode(ROUND_TO_NEAREST);
+        SetRoundingPrecision(ROUND_EXTENDED);
+        fpa11->initflag = 1;
+    }
 
-  set_float_exception_flags(0, &fpa11->fp_status);
+    set_float_exception_flags(0, &fpa11->fp_status);
 
-  if (TEST_OPCODE(opcode,MASK_CPRT))
-  {
-    //fprintf(stderr,"emulating CPRT\n");
-    /* Emulate conversion opcodes. */
-    /* Emulate register transfer opcodes. */
-    /* Emulate comparison opcodes. */
-    nRc = EmulateCPRT(opcode);
-  }
-  else if (TEST_OPCODE(opcode,MASK_CPDO))
-  {
-    //fprintf(stderr,"emulating CPDO\n");
-    /* Emulate monadic arithmetic opcodes. */
-    /* Emulate dyadic arithmetic opcodes. */
-    nRc = EmulateCPDO(opcode);
-  }
-  else if (TEST_OPCODE(opcode,MASK_CPDT))
-  {
-    //fprintf(stderr,"emulating CPDT\n");
-    /* Emulate load/store opcodes. */
-    /* Emulate load/store multiple opcodes. */
-    nRc = EmulateCPDT(opcode);
-  }
-  else
-  {
-    /* Invalid instruction detected.  Return FALSE. */
-    nRc = 0;
-  }
+    if (TEST_OPCODE(opcode, MASK_CPRT)) {
+        // fprintf(stderr,"emulating CPRT\n");
+        /* Emulate conversion opcodes. */
+        /* Emulate register transfer opcodes. */
+        /* Emulate comparison opcodes. */
+        nRc = EmulateCPRT(opcode);
+    } else if (TEST_OPCODE(opcode, MASK_CPDO)) {
+        // fprintf(stderr,"emulating CPDO\n");
+        /* Emulate monadic arithmetic opcodes. */
+        /* Emulate dyadic arithmetic opcodes. */
+        nRc = EmulateCPDO(opcode);
+    } else if (TEST_OPCODE(opcode, MASK_CPDT)) {
+        // fprintf(stderr,"emulating CPDT\n");
+        /* Emulate load/store opcodes. */
+        /* Emulate load/store multiple opcodes. */
+        nRc = EmulateCPDT(opcode);
+    } else {
+        /* Invalid instruction detected.  Return FALSE. */
+        nRc = 0;
+    }
 
-//  restore_flags(flags);
-  if(nRc == 1 && get_float_exception_flags(&fpa11->fp_status))
-  {
-    //printf("fef 0x%x\n",float_exception_flags);
-    nRc = -get_float_exception_flags(&fpa11->fp_status);
-  }
+    //  restore_flags(flags);
+    if (nRc == 1 && get_float_exception_flags(&fpa11->fp_status)) {
+        // printf("fef 0x%x\n",float_exception_flags);
+        nRc = -get_float_exception_flags(&fpa11->fp_status);
+    }
 
-  //printf("returning %d\n",nRc);
-  return(nRc);
+    // printf("returning %d\n",nRc);
+    return (nRc);
 }
 
 #if 0

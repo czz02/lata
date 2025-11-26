@@ -49,7 +49,7 @@ struct riscv64_note {
 
 #define RISCV64_NOTE_HEADER_SIZE offsetof(struct riscv64_note, prstatus)
 #define RISCV64_PRSTATUS_NOTE_SIZE \
-            (RISCV64_NOTE_HEADER_SIZE + sizeof(struct riscv64_elf_prstatus))
+    (RISCV64_NOTE_HEADER_SIZE + sizeof(struct riscv64_elf_prstatus))
 
 static void riscv64_note_init(struct riscv64_note *note, DumpState *s,
                               const char *name, Elf64_Word namesz,
@@ -64,8 +64,8 @@ static void riscv64_note_init(struct riscv64_note *note, DumpState *s,
     memcpy(note->name, name, namesz);
 }
 
-int riscv_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                               int cpuid, DumpState *s)
+int riscv_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                               DumpState *s)
 {
     struct riscv64_note note;
     RISCVCPU *cpu = RISCV_CPU(cs);
@@ -73,8 +73,8 @@ int riscv_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
     int ret, i = 0;
     const char name[] = "CORE";
 
-    riscv64_note_init(&note, s, name, sizeof(name),
-                      NT_PRSTATUS, sizeof(note.prstatus));
+    riscv64_note_init(&note, s, name, sizeof(name), NT_PRSTATUS,
+                      sizeof(note.prstatus));
 
     note.prstatus.pr_pid = cpu_to_dump32(s, cpuid);
 
@@ -118,7 +118,7 @@ struct riscv32_note {
 
 #define RISCV32_NOTE_HEADER_SIZE offsetof(struct riscv32_note, prstatus)
 #define RISCV32_PRSTATUS_NOTE_SIZE \
-            (RISCV32_NOTE_HEADER_SIZE + sizeof(struct riscv32_elf_prstatus))
+    (RISCV32_NOTE_HEADER_SIZE + sizeof(struct riscv32_elf_prstatus))
 
 static void riscv32_note_init(struct riscv32_note *note, DumpState *s,
                               const char *name, Elf32_Word namesz,
@@ -133,8 +133,8 @@ static void riscv32_note_init(struct riscv32_note *note, DumpState *s,
     memcpy(note->name, name, namesz);
 }
 
-int riscv_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-                               int cpuid, DumpState *s)
+int riscv_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                               DumpState *s)
 {
     struct riscv32_note note;
     RISCVCPU *cpu = RISCV_CPU(cs);
@@ -142,8 +142,8 @@ int riscv_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
     int ret, i;
     const char name[] = "CORE";
 
-    riscv32_note_init(&note, s, name, sizeof(name),
-                      NT_PRSTATUS, sizeof(note.prstatus));
+    riscv32_note_init(&note, s, name, sizeof(name), NT_PRSTATUS,
+                      sizeof(note.prstatus));
 
     note.prstatus.pr_pid = cpu_to_dump32(s, cpuid);
 
@@ -181,8 +181,8 @@ int cpu_get_dump_info(ArchDumpInfo *info,
     info->d_class = ELFCLASS32;
 #endif
 
-    info->d_endian = (env->mstatus & MSTATUS_UBE) != 0 ?
-                     ELFDATA2MSB : ELFDATA2LSB;
+    info->d_endian =
+        (env->mstatus & MSTATUS_UBE) != 0 ? ELFDATA2MSB : ELFDATA2LSB;
 
     return 0;
 }

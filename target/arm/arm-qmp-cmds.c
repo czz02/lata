@@ -90,13 +90,11 @@ QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
  * then the order that considers those dependencies must be used.
  */
 static const char *cpu_model_advertised_features[] = {
-    "aarch64", "pmu", "sve",
-    "sve128", "sve256", "sve384", "sve512",
-    "sve640", "sve768", "sve896", "sve1024", "sve1152", "sve1280",
-    "sve1408", "sve1536", "sve1664", "sve1792", "sve1920", "sve2048",
-    "kvm-no-adjvtime", "kvm-steal-time",
-    "pauth", "pauth-impdef",
-    NULL
+    "aarch64",        "pmu",     "sve",          "sve128",  "sve256",
+    "sve384",         "sve512",  "sve640",       "sve768",  "sve896",
+    "sve1024",        "sve1152", "sve1280",      "sve1408", "sve1536",
+    "sve1664",        "sve1792", "sve1920",      "sve2048", "kvm-no-adjvtime",
+    "kvm-steal-time", "pauth",   "pauth-impdef", NULL
 };
 
 CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
@@ -145,8 +143,10 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
             }
         }
         if (!supported) {
-            error_setg(errp, "We cannot guarantee the CPU type '%s' works "
-                             "with KVM on this host", model->name);
+            error_setg(errp,
+                       "We cannot guarantee the CPU type '%s' works "
+                       "with KVM on this host",
+                       model->name);
             return NULL;
         }
     }
@@ -237,8 +237,8 @@ static void arm_cpu_add_definition(gpointer data, gpointer user_data)
 
     typename = object_class_get_name(oc);
     info = g_malloc0(sizeof(*info));
-    info->name = g_strndup(typename,
-                           strlen(typename) - strlen("-" TYPE_ARM_CPU));
+    info->name =
+        g_strndup(typename, strlen(typename) - strlen("-" TYPE_ARM_CPU));
     info->q_typename = g_strdup(typename);
 
     QAPI_LIST_PREPEND(*cpu_list, info);

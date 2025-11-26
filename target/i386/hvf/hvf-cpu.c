@@ -22,12 +22,9 @@ static void hvf_cpu_max_instance_init(X86CPU *cpu)
 
     host_cpu_max_instance_init(cpu);
 
-    env->cpuid_min_level =
-        hvf_get_supported_cpuid(0x0, 0, R_EAX);
-    env->cpuid_min_xlevel =
-        hvf_get_supported_cpuid(0x80000000, 0, R_EAX);
-    env->cpuid_min_xlevel2 =
-        hvf_get_supported_cpuid(0xC0000000, 0, R_EAX);
+    env->cpuid_min_level = hvf_get_supported_cpuid(0x0, 0, R_EAX);
+    env->cpuid_min_xlevel = hvf_get_supported_cpuid(0x80000000, 0, R_EAX);
+    env->cpuid_min_xlevel2 = hvf_get_supported_cpuid(0xC0000000, 0, R_EAX);
 }
 
 static void hvf_cpu_xsave_init(void)

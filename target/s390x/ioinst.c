@@ -400,8 +400,8 @@ typedef struct ChscResp {
 
 #define CHSC_SCPD 0x0002
 #define CHSC_SCSC 0x0010
-#define CHSC_SDA  0x0031
-#define CHSC_SEI  0x000e
+#define CHSC_SDA 0x0031
+#define CHSC_SEI 0x000e
 
 #define CHSC_SCPD_0_M 0x20000000
 #define CHSC_SCPD_0_C 0x10000000
@@ -424,7 +424,7 @@ static void ioinst_handle_chsc_scpd(ChscReq *req, ChscResp *res)
     int m;
 
     rfmt = (param0 & CHSC_SCPD_0_RFMT) >> 8;
-    if ((rfmt == 0) ||  (rfmt == 1)) {
+    if ((rfmt == 0) || (rfmt == 1)) {
         rfmt = !!(param0 & CHSC_SCPD_0_C);
     }
     if ((len != 0x0010) || (param0 & CHSC_SCPD_0_RES) ||
@@ -451,14 +451,14 @@ static void ioinst_handle_chsc_scpd(ChscReq *req, ChscResp *res)
         goto out_err;
     }
     /* css_collect_chp_desc() is endian-aware */
-    desc_size = css_collect_chp_desc(m, cssid, f_chpid, l_chpid, rfmt,
-                                     &res->data);
+    desc_size =
+        css_collect_chp_desc(m, cssid, f_chpid, l_chpid, rfmt, &res->data);
     res->code = cpu_to_be16(0x0001);
     res->len = cpu_to_be16(8 + desc_size);
     res->param = cpu_to_be32(rfmt);
     return;
 
-  out_err:
+out_err:
     res->code = cpu_to_be16(resp_code);
     res->len = cpu_to_be16(CHSC_MIN_RESP_LEN);
     res->param = cpu_to_be32(rfmt);
@@ -515,7 +515,7 @@ static void ioinst_handle_chsc_scsc(ChscReq *req, ChscResp *res)
     memcpy(res->data + sizeof(general_chars), chsc_chars, sizeof(chsc_chars));
     return;
 
-  out_err:
+out_err:
     res->code = cpu_to_be16(resp_code);
     res->len = cpu_to_be16(CHSC_MIN_RESP_LEN);
     res->param = 0;
@@ -599,8 +599,8 @@ static int chsc_sei_nt2_have_event(void)
     return 0;
 }
 
-#define CHSC_SEI_NT0    (1ULL << 63)
-#define CHSC_SEI_NT2    (1ULL << 61)
+#define CHSC_SEI_NT0 (1ULL << 63)
+#define CHSC_SEI_NT2 (1ULL << 61)
 static void ioinst_handle_chsc_sei(ChscReq *req, ChscResp *res)
 {
     uint64_t selection_mask = ldq_p(&req->param1);
@@ -706,11 +706,11 @@ void ioinst_handle_chsc(S390CPU *cpu, uint32_t ipb, uintptr_t ra)
 
     if (s390_is_pv()) {
         s390_cpu_pv_mem_write(cpu, addr + len, res, be16_to_cpu(res->len));
-        setcc(cpu, 0);    /* Command execution complete */
+        setcc(cpu, 0); /* Command execution complete */
     } else {
         if (!s390_cpu_virt_mem_write(cpu, addr + len, reg, res,
                                      be16_to_cpu(res->len))) {
-            setcc(cpu, 0);    /* Command execution complete */
+            setcc(cpu, 0); /* Command execution complete */
         } else {
             s390_cpu_virt_mem_handle_exc(cpu, ra);
         }

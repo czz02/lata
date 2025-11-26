@@ -27,7 +27,7 @@
 #define DEBUG_PCALL
 
 #ifdef DEBUG_PCALL
-static const char * const excp_names[0x80] = {
+static const char *const excp_names[0x80] = {
     [TT_TFAULT] = "Instruction Access Fault",
     [TT_TMISS] = "Instruction Access MMU Miss",
     [TT_CODE_ACCESS] = "Instruction Access Error",
@@ -65,8 +65,8 @@ static const char * const excp_names[0x80] = {
 void cpu_check_irqs(CPUSPARCState *env)
 {
     CPUState *cs;
-    uint32_t pil = env->pil_in |
-                  (env->softint & ~(SOFTINT_TIMER | SOFTINT_STIMER));
+    uint32_t pil =
+        env->pil_in | (env->softint & ~(SOFTINT_TIMER | SOFTINT_STIMER));
 
     /* We should be holding the BQL before we mess with IRQs */
     g_assert(qemu_mutex_iothread_locked());
@@ -98,7 +98,6 @@ void cpu_check_irqs(CPUSPARCState *env)
     }
 
     if (cpu_interrupts_enabled(env)) {
-
         unsigned int i;
 
         for (i = 15; i > env->psrpil; i--) {
@@ -106,11 +105,11 @@ void cpu_check_irqs(CPUSPARCState *env)
                 int old_interrupt = env->interrupt_index;
                 int new_interrupt = TT_EXTINT | i;
 
-                if (unlikely(env->tl > 0 && cpu_tsptr(env)->tt > new_interrupt
-                  && ((cpu_tsptr(env)->tt & 0x1f0) == TT_EXTINT))) {
-                    trace_sparc64_cpu_check_irqs_noset_irq(env->tl,
-                                                      cpu_tsptr(env)->tt,
-                                                      new_interrupt);
+                if (unlikely(env->tl > 0 &&
+                             cpu_tsptr(env)->tt > new_interrupt &&
+                             ((cpu_tsptr(env)->tt & 0x1f0) == TT_EXTINT))) {
+                    trace_sparc64_cpu_check_irqs_noset_irq(
+                        env->tl, cpu_tsptr(env)->tt, new_interrupt);
                 } else if (old_interrupt != new_interrupt) {
                     env->interrupt_index = new_interrupt;
                     trace_sparc64_cpu_check_irqs_set_irq(i, old_interrupt,
@@ -182,8 +181,10 @@ void sparc_cpu_do_interrupt(CPUState *cs)
 #endif
 #if !defined(CONFIG_USER_ONLY)
     if (env->tl >= env->maxtl) {
-        cpu_abort(cs, "Trap 0x%04x while trap level (%d) >= MAXTL (%d),"
-                  " Error state", cs->exception_index, env->tl, env->maxtl);
+        cpu_abort(cs,
+                  "Trap 0x%04x while trap level (%d) >= MAXTL (%d),"
+                  " Error state",
+                  cs->exception_index, env->tl, env->maxtl);
         return;
     }
 #endif
@@ -254,14 +255,14 @@ void sparc_cpu_do_interrupt(CPUState *cs)
     if (cpu_hypervisor_mode(env)) {
         env->pc = (env->htba & ~0x3fffULL) | (intno << 5);
     } else {
-        env->pc = env->tbr  & ~0x7fffULL;
+        env->pc = env->tbr & ~0x7fffULL;
         env->pc |= ((env->tl > 1) ? 1 << 14 : 0) | (intno << 5);
     }
     env->npc = env->pc + 4;
     cs->exception_index = -1;
 }
 
-trap_state *cpu_tsptr(CPUSPARCState* env)
+trap_state *cpu_tsptr(CPUSPARCState *env)
 {
     return &env->ts[env->tl & MAXTL_MASK];
 }

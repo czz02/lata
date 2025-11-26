@@ -40,8 +40,7 @@ static vaddr alpha_cpu_get_pc(CPUState *cs)
     return cpu->env.pc;
 }
 
-static void alpha_restore_state_to_opc(CPUState *cs,
-                                       const TranslationBlock *tb,
+static void alpha_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                        const uint64_t *data)
 {
     AlphaCPU *cpu = ALPHA_CPU(cs);
@@ -58,10 +57,8 @@ static bool alpha_cpu_has_work(CPUState *cs)
        assume that if a CPU really wants to stay asleep, it will mask
        interrupts at the chipset level, which will prevent these bits
        from being set in the first place.  */
-    return cs->interrupt_request & (CPU_INTERRUPT_HARD
-                                    | CPU_INTERRUPT_TIMER
-                                    | CPU_INTERRUPT_SMP
-                                    | CPU_INTERRUPT_MCHK);
+    return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_TIMER |
+                                    CPU_INTERRUPT_SMP | CPU_INTERRUPT_MCHK);
 }
 
 static void alpha_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
@@ -111,12 +108,12 @@ typedef struct AlphaCPUAlias {
 } AlphaCPUAlias;
 
 static const AlphaCPUAlias alpha_cpu_aliases[] = {
-    { "21064",   ALPHA_CPU_TYPE_NAME("ev4") },
-    { "21164",   ALPHA_CPU_TYPE_NAME("ev5") },
-    { "21164a",  ALPHA_CPU_TYPE_NAME("ev56") },
+    { "21064", ALPHA_CPU_TYPE_NAME("ev4") },
+    { "21164", ALPHA_CPU_TYPE_NAME("ev5") },
+    { "21164a", ALPHA_CPU_TYPE_NAME("ev56") },
     { "21164pc", ALPHA_CPU_TYPE_NAME("pca56") },
-    { "21264",   ALPHA_CPU_TYPE_NAME("ev6") },
-    { "21264a",  ALPHA_CPU_TYPE_NAME("ev67") },
+    { "21264", ALPHA_CPU_TYPE_NAME("ev6") },
+    { "21264a", ALPHA_CPU_TYPE_NAME("ev67") },
 };
 
 static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
@@ -214,9 +211,10 @@ static void alpha_cpu_initfn(Object *obj)
     env->lock_addr = -1;
 #if defined(CONFIG_USER_ONLY)
     env->flags = ENV_FLAG_PS_USER | ENV_FLAG_FEN;
-    cpu_alpha_store_fpcr(env, (uint64_t)(FPCR_INVD | FPCR_DZED | FPCR_OVFD
-                                         | FPCR_UNFD | FPCR_INED | FPCR_DNOD
-                                         | FPCR_DYN_NORMAL) << 32);
+    cpu_alpha_store_fpcr(env, (uint64_t)(FPCR_INVD | FPCR_DZED | FPCR_OVFD |
+                                         FPCR_UNFD | FPCR_INED | FPCR_DNOD |
+                                         FPCR_DYN_NORMAL)
+                                  << 32);
 #else
     env->flags = ENV_FLAG_PAL_MODE | ENV_FLAG_FEN;
 #endif
@@ -275,11 +273,10 @@ static void alpha_cpu_class_init(ObjectClass *oc, void *data)
 }
 
 #define DEFINE_ALPHA_CPU_TYPE(base_type, cpu_model, initfn) \
-     {                                                      \
-         .parent = base_type,                               \
-         .instance_init = initfn,                           \
-         .name = ALPHA_CPU_TYPE_NAME(cpu_model),            \
-     }
+    {                                                       \
+        .parent = base_type, .instance_init = initfn,       \
+        .name = ALPHA_CPU_TYPE_NAME(cpu_model),             \
+    }
 
 static const TypeInfo alpha_cpu_type_infos[] = {
     {

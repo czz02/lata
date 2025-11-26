@@ -17,14 +17,14 @@ typedef uint32_t compat_pfn_t;
 typedef uint32_t compat_ulong_t;
 typedef uint32_t compat_ptr_t;
 
-#define __DEFINE_COMPAT_HANDLE(name, type)      \
-    typedef struct {                            \
-        compat_ptr_t c;                         \
-        type *_[0] __attribute__((packed));   \
-    } __compat_handle_ ## name;                 \
+#define __DEFINE_COMPAT_HANDLE(name, type)  \
+    typedef struct {                        \
+        compat_ptr_t c;                     \
+        type *_[0] __attribute__((packed)); \
+    } __compat_handle_##name;
 
 #define DEFINE_COMPAT_HANDLE(name) __DEFINE_COMPAT_HANDLE(name, name)
-#define COMPAT_HANDLE(name) __compat_handle_ ## name
+#define COMPAT_HANDLE(name) __compat_handle_##name
 
 DEFINE_COMPAT_HANDLE(compat_pfn_t);
 DEFINE_COMPAT_HANDLE(compat_ulong_t);

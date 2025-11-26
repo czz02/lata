@@ -31,7 +31,7 @@ static inline uint32_t arm_ldl_code(CPUARMState *env, DisasContextBase *s,
 }
 
 /* Ditto, for a halfword (Thumb) instruction */
-static inline uint16_t arm_lduw_code(CPUARMState *env, DisasContextBase* s,
+static inline uint16_t arm_lduw_code(CPUARMState *env, DisasContextBase *s,
                                      target_ulong addr, bool sctlr_b)
 {
 #ifndef CONFIG_USER_ONLY

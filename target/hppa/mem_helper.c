@@ -32,8 +32,8 @@ static hppa_tlb_entry *hppa_find_tlb(CPUHPPAState *env, vaddr addr)
     for (i = 0; i < ARRAY_SIZE(env->tlb); ++i) {
         hppa_tlb_entry *ent = &env->tlb[i];
         if (ent->va_b <= addr && addr <= ent->va_e) {
-            trace_hppa_tlb_find_entry(env, ent + i, ent->entry_valid,
-                                      ent->va_b, ent->va_e, ent->pa);
+            trace_hppa_tlb_find_entry(env, ent + i, ent->entry_valid, ent->va_b,
+                                      ent->va_e, ent->pa);
             return ent;
         }
     }
@@ -172,7 +172,7 @@ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
         prot &= PAGE_EXEC;
     }
 
- egress:
+egress:
     *pphys = phys;
     *pprot = prot;
     trace_hppa_tlb_get_physical_address(env, ret, prot, addr, phys);
@@ -192,8 +192,8 @@ hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
         return addr;
     }
 
-    excp = hppa_get_physical_address(&cpu->env, addr, MMU_KERNEL_IDX, 0,
-                                     &phys, &prot);
+    excp = hppa_get_physical_address(&cpu->env, addr, MMU_KERNEL_IDX, 0, &phys,
+                                     &prot);
 
     /* Since we're translating for debugging, the only error that is a
        hard error is no translation at all.  Otherwise, while a real cpu
@@ -201,9 +201,8 @@ hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
     return excp == EXCP_DTLB_MISS ? -1 : phys;
 }
 
-bool hppa_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-                       MMUAccessType type, int mmu_idx,
-                       bool probe, uintptr_t retaddr)
+bool hppa_cpu_tlb_fill(CPUState *cs, vaddr addr, int size, MMUAccessType type,
+                       int mmu_idx, bool probe, uintptr_t retaddr)
 {
     HPPACPU *cpu = HPPA_CPU(cs);
     CPUHPPAState *env = &cpu->env;
@@ -222,8 +221,7 @@ bool hppa_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
         break;
     }
 
-    excp = hppa_get_physical_address(env, addr, mmu_idx,
-                                     a_prot, &phys, &prot);
+    excp = hppa_get_physical_address(env, addr, mmu_idx, a_prot, &phys, &prot);
     if (unlikely(excp >= 0)) {
         if (probe) {
             return false;
@@ -242,8 +240,8 @@ bool hppa_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
     trace_hppa_tlb_fill_success(env, addr & TARGET_PAGE_MASK,
                                 phys & TARGET_PAGE_MASK, size, type, mmu_idx);
     /* Success!  Store the translation into the QEMU TLB.  */
-    tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
-                 prot, mmu_idx, TARGET_PAGE_SIZE);
+    tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK, prot,
+                 mmu_idx, TARGET_PAGE_SIZE);
     return true;
 }
 
@@ -306,7 +304,7 @@ void HELPER(itlbp)(CPUHPPAState *env, target_ulong addr, target_ureg reg)
 static void ptlb_work(CPUState *cpu, run_on_cpu_data data)
 {
     CPUHPPAState *env = cpu->env_ptr;
-    target_ulong addr = (target_ulong) data.target_ptr;
+    target_ulong addr = (target_ulong)data.target_ptr;
     hppa_tlb_entry *ent = hppa_find_tlb(env, addr);
 
     if (ent && ent->entry_valid) {
@@ -321,7 +319,7 @@ void HELPER(ptlb)(CPUHPPAState *env, target_ulong addr)
     trace_hppa_tlb_ptlb(env);
     run_on_cpu_data data = RUN_ON_CPU_TARGET_PTR(addr);
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         if (cpu != src) {
             async_run_on_cpu(cpu, ptlb_work, data);
         }
@@ -355,8 +353,8 @@ target_ureg HELPER(lpa)(CPUHPPAState *env, target_ulong addr)
     hwaddr phys;
     int prot, excp;
 
-    excp = hppa_get_physical_address(env, addr, MMU_KERNEL_IDX, 0,
-                                     &phys, &prot);
+    excp =
+        hppa_get_physical_address(env, addr, MMU_KERNEL_IDX, 0, &phys, &prot);
     if (excp >= 0) {
         if (env->psw & PSW_Q) {
             /* ??? Needs tweaking for hppa64.  */

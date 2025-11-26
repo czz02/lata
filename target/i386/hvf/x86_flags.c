@@ -31,49 +31,50 @@
 
 /* this is basically bocsh code */
 
-#define LF_SIGN_BIT     31
+#define LF_SIGN_BIT 31
 
-#define LF_BIT_SD      (0)          /* lazy Sign Flag Delta            */
-#define LF_BIT_AF      (3)          /* lazy Adjust flag                */
-#define LF_BIT_PDB     (8)          /* lazy Parity Delta Byte (8 bits) */
-#define LF_BIT_CF      (31)         /* lazy Carry Flag                 */
-#define LF_BIT_PO      (30)         /* lazy Partial Overflow = CF ^ OF */
+#define LF_BIT_SD (0) /* lazy Sign Flag Delta            */
+#define LF_BIT_AF (3) /* lazy Adjust flag                */
+#define LF_BIT_PDB (8) /* lazy Parity Delta Byte (8 bits) */
+#define LF_BIT_CF (31) /* lazy Carry Flag                 */
+#define LF_BIT_PO (30) /* lazy Partial Overflow = CF ^ OF */
 
-#define LF_MASK_SD     (0x01 << LF_BIT_SD)
-#define LF_MASK_AF     (0x01 << LF_BIT_AF)
-#define LF_MASK_PDB    (0xFF << LF_BIT_PDB)
-#define LF_MASK_CF     (0x01 << LF_BIT_CF)
-#define LF_MASK_PO     (0x01 << LF_BIT_PO)
+#define LF_MASK_SD (0x01 << LF_BIT_SD)
+#define LF_MASK_AF (0x01 << LF_BIT_AF)
+#define LF_MASK_PDB (0xFF << LF_BIT_PDB)
+#define LF_MASK_CF (0x01 << LF_BIT_CF)
+#define LF_MASK_PO (0x01 << LF_BIT_PO)
 
 #define ADD_COUT_VEC(op1, op2, result) \
-   (((op1) & (op2)) | (((op1) | (op2)) & (~(result))))
+    (((op1) & (op2)) | (((op1) | (op2)) & (~(result))))
 
 #define SUB_COUT_VEC(op1, op2, result) \
-   (((~(op1)) & (op2)) | (((~(op1)) ^ (op2)) & (result)))
+    (((~(op1)) & (op2)) | (((~(op1)) ^ (op2)) & (result)))
 
 #define GET_ADD_OVERFLOW(op1, op2, result, mask) \
-   ((((op1) ^ (result)) & ((op2) ^ (result))) & (mask))
+    ((((op1) ^ (result)) & ((op2) ^ (result))) & (mask))
 
 /* ******************* */
 /* OSZAPC */
 /* ******************* */
 
 /* size, carries, result */
-#define SET_FLAGS_OSZAPC_SIZE(size, lf_carries, lf_result) { \
-    target_ulong temp = ((lf_carries) & (LF_MASK_AF)) | \
-    (((lf_carries) >> (size - 2)) << LF_BIT_PO); \
-    env->hvf_lflags.result = (target_ulong)(int##size##_t)(lf_result); \
-    if ((size) == 32) { \
-        temp = ((lf_carries) & ~(LF_MASK_PDB | LF_MASK_SD)); \
-    } else if ((size) == 16) { \
-        temp = ((lf_carries) & (LF_MASK_AF)) | ((lf_carries) << 16); \
-    } else if ((size) == 8)  { \
-        temp = ((lf_carries) & (LF_MASK_AF)) | ((lf_carries) << 24); \
-    } else { \
-        VM_PANIC("unimplemented");  \
-    } \
-    env->hvf_lflags.auxbits = (target_ulong)(uint32_t)temp; \
-}
+#define SET_FLAGS_OSZAPC_SIZE(size, lf_carries, lf_result)                 \
+    {                                                                      \
+        target_ulong temp = ((lf_carries) & (LF_MASK_AF)) |                \
+                            (((lf_carries) >> (size - 2)) << LF_BIT_PO);   \
+        env->hvf_lflags.result = (target_ulong)(int##size##_t)(lf_result); \
+        if ((size) == 32) {                                                \
+            temp = ((lf_carries) & ~(LF_MASK_PDB | LF_MASK_SD));           \
+        } else if ((size) == 16) {                                         \
+            temp = ((lf_carries) & (LF_MASK_AF)) | ((lf_carries) << 16);   \
+        } else if ((size) == 8) {                                          \
+            temp = ((lf_carries) & (LF_MASK_AF)) | ((lf_carries) << 24);   \
+        } else {                                                           \
+            VM_PANIC("unimplemented");                                     \
+        }                                                                  \
+        env->hvf_lflags.auxbits = (target_ulong)(uint32_t)temp;            \
+    }
 
 /* carries, result */
 #define SET_FLAGS_OSZAPC_8(carries, result) \
@@ -87,23 +88,24 @@
 /* OSZAP */
 /* ******************* */
 /* size, carries, result */
-#define SET_FLAGS_OSZAP_SIZE(size, lf_carries, lf_result) { \
-    target_ulong temp = ((lf_carries) & (LF_MASK_AF)) | \
-    (((lf_carries) >> (size - 2)) << LF_BIT_PO); \
-    if ((size) == 32) { \
-        temp = ((lf_carries) & ~(LF_MASK_PDB | LF_MASK_SD)); \
-    } else if ((size) == 16) { \
-        temp = ((lf_carries) & (LF_MASK_AF)) | ((lf_carries) << 16); \
-    } else if ((size) == 8) { \
-        temp = ((lf_carries) & (LF_MASK_AF)) | ((lf_carries) << 24); \
-    } else { \
-        VM_PANIC("unimplemented");      \
-    } \
-    env->hvf_lflags.result = (target_ulong)(int##size##_t)(lf_result); \
-    target_ulong delta_c = (env->hvf_lflags.auxbits ^ temp) & LF_MASK_CF; \
-    delta_c ^= (delta_c >> 1); \
-    env->hvf_lflags.auxbits = (target_ulong)(uint32_t)(temp ^ delta_c); \
-}
+#define SET_FLAGS_OSZAP_SIZE(size, lf_carries, lf_result)                     \
+    {                                                                         \
+        target_ulong temp = ((lf_carries) & (LF_MASK_AF)) |                   \
+                            (((lf_carries) >> (size - 2)) << LF_BIT_PO);      \
+        if ((size) == 32) {                                                   \
+            temp = ((lf_carries) & ~(LF_MASK_PDB | LF_MASK_SD));              \
+        } else if ((size) == 16) {                                            \
+            temp = ((lf_carries) & (LF_MASK_AF)) | ((lf_carries) << 16);      \
+        } else if ((size) == 8) {                                             \
+            temp = ((lf_carries) & (LF_MASK_AF)) | ((lf_carries) << 24);      \
+        } else {                                                              \
+            VM_PANIC("unimplemented");                                        \
+        }                                                                     \
+        env->hvf_lflags.result = (target_ulong)(int##size##_t)(lf_result);    \
+        target_ulong delta_c = (env->hvf_lflags.auxbits ^ temp) & LF_MASK_CF; \
+        delta_c ^= (delta_c >> 1);                                            \
+        env->hvf_lflags.auxbits = (target_ulong)(uint32_t)(temp ^ delta_c);   \
+    }
 
 /* carries, result */
 #define SET_FLAGS_OSZAP_8(carries, result) \
@@ -133,7 +135,7 @@ void SET_FLAGS_OSZAPC_SUB16(CPUX86State *env, uint16_t v1, uint16_t v2,
 }
 
 void SET_FLAGS_OSZAPC_SUB8(CPUX86State *env, uint8_t v1, uint8_t v2,
-                            uint8_t diff)
+                           uint8_t diff)
 {
     SET_FLAGS_OSZAPC_8(SUB_COUT_VEC(v1, v2, diff), diff);
 }
@@ -151,43 +153,43 @@ void SET_FLAGS_OSZAPC_ADD16(CPUX86State *env, uint16_t v1, uint16_t v2,
 }
 
 void SET_FLAGS_OSZAPC_ADD8(CPUX86State *env, uint8_t v1, uint8_t v2,
-                            uint8_t diff)
+                           uint8_t diff)
 {
     SET_FLAGS_OSZAPC_8(ADD_COUT_VEC(v1, v2, diff), diff);
 }
 
 void SET_FLAGS_OSZAP_SUB32(CPUX86State *env, uint32_t v1, uint32_t v2,
-                            uint32_t diff)
+                           uint32_t diff)
 {
     SET_FLAGS_OSZAP_32(SUB_COUT_VEC(v1, v2, diff), diff);
 }
 
 void SET_FLAGS_OSZAP_SUB16(CPUX86State *env, uint16_t v1, uint16_t v2,
-                            uint16_t diff)
+                           uint16_t diff)
 {
     SET_FLAGS_OSZAP_16(SUB_COUT_VEC(v1, v2, diff), diff);
 }
 
 void SET_FLAGS_OSZAP_SUB8(CPUX86State *env, uint8_t v1, uint8_t v2,
-                            uint8_t diff)
+                          uint8_t diff)
 {
     SET_FLAGS_OSZAP_8(SUB_COUT_VEC(v1, v2, diff), diff);
 }
 
 void SET_FLAGS_OSZAP_ADD32(CPUX86State *env, uint32_t v1, uint32_t v2,
-                            uint32_t diff)
+                           uint32_t diff)
 {
     SET_FLAGS_OSZAP_32(ADD_COUT_VEC(v1, v2, diff), diff);
 }
 
 void SET_FLAGS_OSZAP_ADD16(CPUX86State *env, uint16_t v1, uint16_t v2,
-                            uint16_t diff)
+                           uint16_t diff)
 {
     SET_FLAGS_OSZAP_16(ADD_COUT_VEC(v1, v2, diff), diff);
 }
 
 void SET_FLAGS_OSZAP_ADD8(CPUX86State *env, uint8_t v1, uint8_t v2,
-                            uint8_t diff)
+                          uint8_t diff)
 {
     SET_FLAGS_OSZAP_8(ADD_COUT_VEC(v1, v2, diff), diff);
 }
@@ -268,7 +270,7 @@ void set_ZF(CPUX86State *env, bool val)
 {
     if (val) {
         env->hvf_lflags.auxbits ^=
-         (((env->hvf_lflags.result >> LF_SIGN_BIT) & 1) << LF_BIT_SD);
+            (((env->hvf_lflags.result >> LF_SIGN_BIT) & 1) << LF_BIT_SD);
         /* merge the parity bits into the Parity Delta Byte */
         uint32_t temp_pdb = (255 & env->hvf_lflags.result);
         env->hvf_lflags.auxbits ^= (temp_pdb << LF_BIT_PDB);
@@ -282,7 +284,8 @@ void set_ZF(CPUX86State *env, bool val)
 bool get_SF(CPUX86State *env)
 {
     return ((env->hvf_lflags.result >> LF_SIGN_BIT) ^
-            (env->hvf_lflags.auxbits >> LF_BIT_SD)) & 1;
+            (env->hvf_lflags.auxbits >> LF_BIT_SD)) &
+           1;
 }
 
 void set_SF(CPUX86State *env, bool val)

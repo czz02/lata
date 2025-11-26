@@ -89,10 +89,10 @@ static void r4k_helper_tlbinv(CPUMIPSState *env)
     r4k_tlb_t *tlb;
     int idx;
 
-    MMID = mi ? MMID : (uint32_t) ASID;
+    MMID = mi ? MMID : (uint32_t)ASID;
     for (idx = 0; idx < env->tlb->nb_tlb; idx++) {
         tlb = &env->tlb->mmu.r4k.tlb[idx];
-        tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
+        tlb_mmid = mi ? tlb->MMID : (uint32_t)tlb->ASID;
         if (!tlb->G && tlb_mmid == MMID) {
             tlb->EHINV = 1;
         }
@@ -121,7 +121,7 @@ static void r4k_helper_tlbwi(CPUMIPSState *env)
     r4k_tlb_t *tlb;
     int idx;
 
-    MMID = mi ? MMID : (uint32_t) ASID;
+    MMID = mi ? MMID : (uint32_t)ASID;
 
     idx = (env->CP0_Index & ~0x80000000) % env->tlb->nb_tlb;
     tlb = &env->tlb->mmu.r4k.tlb[idx];
@@ -133,24 +133,22 @@ static void r4k_helper_tlbwi(CPUMIPSState *env)
     G = env->CP0_EntryLo0 & env->CP0_EntryLo1 & 1;
     V0 = (env->CP0_EntryLo0 & 2) != 0;
     D0 = (env->CP0_EntryLo0 & 4) != 0;
-    XI0 = (env->CP0_EntryLo0 >> CP0EnLo_XI) &1;
-    RI0 = (env->CP0_EntryLo0 >> CP0EnLo_RI) &1;
+    XI0 = (env->CP0_EntryLo0 >> CP0EnLo_XI) & 1;
+    RI0 = (env->CP0_EntryLo0 >> CP0EnLo_RI) & 1;
     V1 = (env->CP0_EntryLo1 & 2) != 0;
     D1 = (env->CP0_EntryLo1 & 4) != 0;
-    XI1 = (env->CP0_EntryLo1 >> CP0EnLo_XI) &1;
-    RI1 = (env->CP0_EntryLo1 >> CP0EnLo_RI) &1;
+    XI1 = (env->CP0_EntryLo1 >> CP0EnLo_XI) & 1;
+    RI1 = (env->CP0_EntryLo1 >> CP0EnLo_RI) & 1;
 
-    tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
+    tlb_mmid = mi ? tlb->MMID : (uint32_t)tlb->ASID;
     /*
      * Discard cached TLB entries, unless tlbwi is just upgrading access
      * permissions on the current entry.
      */
     if (tlb->VPN != VPN || tlb_mmid != MMID || tlb->G != G ||
-        (!tlb->EHINV && EHINV) ||
-        (tlb->V0 && !V0) || (tlb->D0 && !D0) ||
-        (!tlb->XI0 && XI0) || (!tlb->RI0 && RI0) ||
-        (tlb->V1 && !V1) || (tlb->D1 && !D1) ||
-        (!tlb->XI1 && XI1) || (!tlb->RI1 && RI1)) {
+        (!tlb->EHINV && EHINV) || (tlb->V0 && !V0) || (tlb->D0 && !D0) ||
+        (!tlb->XI0 && XI0) || (!tlb->RI0 && RI0) || (tlb->V1 && !V1) ||
+        (tlb->D1 && !D1) || (!tlb->XI1 && XI1) || (!tlb->RI1 && RI1)) {
         r4k_mips_tlb_flush_extra(env, env->tlb->nb_tlb);
     }
 
@@ -178,7 +176,7 @@ static void r4k_helper_tlbp(CPUMIPSState *env)
     uint32_t tlb_mmid;
     int i;
 
-    MMID = mi ? MMID : (uint32_t) ASID;
+    MMID = mi ? MMID : (uint32_t)ASID;
     for (i = 0; i < env->tlb->nb_tlb; i++) {
         tlb = &env->tlb->mmu.r4k.tlb[i];
         /* 1k pages are not supported. */
@@ -188,7 +186,7 @@ static void r4k_helper_tlbp(CPUMIPSState *env)
 #if defined(TARGET_MIPS64)
         tag &= env->SEGMask;
 #endif
-        tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
+        tlb_mmid = mi ? tlb->MMID : (uint32_t)tlb->ASID;
         /* Check ASID/MMID, virtual page number & size */
         if ((tlb->G == 1 || tlb_mmid == MMID) && VPN == tag && !tlb->EHINV) {
             /* TLB match */
@@ -207,7 +205,7 @@ static void r4k_helper_tlbp(CPUMIPSState *env)
 #if defined(TARGET_MIPS64)
             tag &= env->SEGMask;
 #endif
-            tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
+            tlb_mmid = mi ? tlb->MMID : (uint32_t)tlb->ASID;
             /* Check ASID/MMID, virtual page number & size */
             if ((tlb->G == 1 || tlb_mmid == MMID) && VPN == tag) {
                 r4k_mips_tlb_flush_extra(env, i);
@@ -238,11 +236,11 @@ static void r4k_helper_tlbr(CPUMIPSState *env)
     r4k_tlb_t *tlb;
     int idx;
 
-    MMID = mi ? MMID : (uint32_t) ASID;
+    MMID = mi ? MMID : (uint32_t)ASID;
     idx = (env->CP0_Index & ~0x80000000) % env->tlb->nb_tlb;
     tlb = &env->tlb->mmu.r4k.tlb[idx];
 
-    tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
+    tlb_mmid = mi ? tlb->MMID : (uint32_t)tlb->ASID;
     /* If this will change the current ASID/MMID, flush qemu's TLB.  */
     if (MMID != tlb_mmid) {
         cpu_mips_tlb_flush(env);
@@ -260,13 +258,15 @@ static void r4k_helper_tlbr(CPUMIPSState *env)
         env->CP0_MemoryMapID = tlb->MMID;
         env->CP0_PageMask = tlb->PageMask;
         env->CP0_EntryLo0 = tlb->G | (tlb->V0 << 1) | (tlb->D0 << 2) |
-                        ((uint64_t)tlb->RI0 << CP0EnLo_RI) |
-                        ((uint64_t)tlb->XI0 << CP0EnLo_XI) | (tlb->C0 << 3) |
-                        get_entrylo_pfn_from_tlb(tlb->PFN[0] >> 12);
+                            ((uint64_t)tlb->RI0 << CP0EnLo_RI) |
+                            ((uint64_t)tlb->XI0 << CP0EnLo_XI) |
+                            (tlb->C0 << 3) |
+                            get_entrylo_pfn_from_tlb(tlb->PFN[0] >> 12);
         env->CP0_EntryLo1 = tlb->G | (tlb->V1 << 1) | (tlb->D1 << 2) |
-                        ((uint64_t)tlb->RI1 << CP0EnLo_RI) |
-                        ((uint64_t)tlb->XI1 << CP0EnLo_XI) | (tlb->C1 << 3) |
-                        get_entrylo_pfn_from_tlb(tlb->PFN[1] >> 12);
+                            ((uint64_t)tlb->RI1 << CP0EnLo_RI) |
+                            ((uint64_t)tlb->XI1 << CP0EnLo_XI) |
+                            (tlb->C1 << 3) |
+                            get_entrylo_pfn_from_tlb(tlb->PFN[1] >> 12);
     }
 }
 
@@ -300,16 +300,11 @@ void helper_tlbinvf(CPUMIPSState *env)
     env->tlb->helper_tlbinvf(env);
 }
 
-static void global_invalidate_tlb(CPUMIPSState *env,
-                           uint32_t invMsgVPN2,
-                           uint8_t invMsgR,
-                           uint32_t invMsgMMid,
-                           bool invAll,
-                           bool invVAMMid,
-                           bool invMMid,
-                           bool invVA)
+static void global_invalidate_tlb(CPUMIPSState *env, uint32_t invMsgVPN2,
+                                  uint8_t invMsgR, uint32_t invMsgMMid,
+                                  bool invAll, bool invVAMMid, bool invMMid,
+                                  bool invVA)
 {
-
     int idx;
     r4k_tlb_t *tlb;
     bool VAMatch;
@@ -320,15 +315,13 @@ static void global_invalidate_tlb(CPUMIPSState *env,
         VAMatch =
             (((tlb->VPN & ~tlb->PageMask) == (invMsgVPN2 & ~tlb->PageMask))
 #ifdef TARGET_MIPS64
-            &&
-            (extract64(env->CP0_EntryHi, 62, 2) == invMsgR)
+             && (extract64(env->CP0_EntryHi, 62, 2) == invMsgR)
 #endif
             );
         MMidMatch = tlb->MMID == invMsgMMid;
         if ((invAll && (idx > env->CP0_Wired)) ||
             (VAMatch && invVAMMid && (tlb->G || MMidMatch)) ||
-            (VAMatch && invVA) ||
-            (MMidMatch && !(tlb->G) && invMMid)) {
+            (VAMatch && invVA) || (MMidMatch && !(tlb->G) && invMMid)) {
             tlb->EHINV = 1;
         }
     }
@@ -350,7 +343,7 @@ void helper_ginvt(CPUMIPSState *env, target_ulong arg, uint32_t type)
     invMsgR = extract64(arg, 62, 2);
 #endif
 
-    CPU_FOREACH(other_cs) {
+    CPU_FOREACH (other_cs) {
         MIPSCPU *other_cpu = MIPS_CPU(other_cs);
         global_invalidate_tlb(&other_cpu->env, invMsgVPN2, invMsgR, invMsgMMid,
                               invAll, invVAMMid, invMMid, invVA);
@@ -367,8 +360,8 @@ static int no_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
 }
 
 /* fixed mapping MMU emulation */
-static int fixed_mmu_map_address(CPUMIPSState *env, hwaddr *physical,
-                                 int *prot, target_ulong address,
+static int fixed_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
+                                 target_ulong address,
                                  MMUAccessType access_type)
 {
     if (address <= (int32_t)0x7FFFFFFFUL) {
@@ -397,7 +390,7 @@ static int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
     uint32_t tlb_mmid;
     int i;
 
-    MMID = mi ? MMID : (uint32_t) ASID;
+    MMID = mi ? MMID : (uint32_t)ASID;
 
     for (i = 0; i < env->tlb->tlb_in_use; i++) {
         r4k_tlb_t *tlb = &env->tlb->mmu.r4k.tlb[i];
@@ -410,7 +403,7 @@ static int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
 #endif
 
         /* Check ASID/MMID, virtual page number & size */
-        tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
+        tlb_mmid = mi ? tlb->MMID : (uint32_t)tlb->ASID;
         if ((tlb->G == 1 || tlb_mmid == MMID) && VPN == tag && !tlb->EHINV) {
             /* TLB match */
             int n = !!(address & mask & ~(mask >> 1));
@@ -557,8 +550,8 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
     if (!(env->hflags & MIPS_HFLAG_DM)) {
         env->CP0_BadVAddr = address;
     }
-    env->CP0_Context = (env->CP0_Context & ~0x007fffff) |
-                       ((address >> 9) & 0x007ffff0);
+    env->CP0_Context =
+        (env->CP0_Context & ~0x007fffff) | ((address >> 9) & 0x007ffff0);
     env->CP0_EntryHi = (env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask) |
                        (env->CP0_EntryHi & (1 << CP0EnHi_EHINV)) |
                        (address & (TARGET_PAGE_MASK << 1));
@@ -566,8 +559,8 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
     env->CP0_EntryHi &= env->SEGMask;
     env->CP0_XContext =
         (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) | /* PTEBase */
-        (extract64(address, 62, 2) << (env->SEGBITS - 9)) |     /* R       */
-        (extract64(address, 13, env->SEGBITS - 13) << 4);       /* BadVPN2 */
+        (extract64(address, 62, 2) << (env->SEGBITS - 9)) | /* R       */
+        (extract64(address, 13, env->SEGBITS - 13) << 4); /* BadVPN2 */
 #endif
     cs->exception_index = exception;
     env->error_code = error_code;
@@ -593,7 +586,7 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
  */
 
 static bool get_pte(CPUMIPSState *env, uint64_t vaddr, int entry_size,
-        uint64_t *pte)
+                    uint64_t *pte)
 {
     if ((vaddr & ((entry_size >> 3) - 1)) != 0) {
         return false;
@@ -607,7 +600,7 @@ static bool get_pte(CPUMIPSState *env, uint64_t vaddr, int entry_size,
 }
 
 static uint64_t get_tlb_entry_layout(CPUMIPSState *env, uint64_t entry,
-        int entry_size, int ptei)
+                                     int entry_size, int ptei)
 {
     uint64_t result = entry;
     uint64_t rixi;
@@ -622,9 +615,10 @@ static uint64_t get_tlb_entry_layout(CPUMIPSState *env, uint64_t entry,
 }
 
 static int walk_directory(CPUMIPSState *env, uint64_t *vaddr,
-        int directory_index, bool *huge_page, bool *hgpg_directory_hit,
-        uint64_t *pw_entrylo0, uint64_t *pw_entrylo1,
-        unsigned directory_shift, unsigned leaf_shift)
+                          int directory_index, bool *huge_page,
+                          bool *hgpg_directory_hit, uint64_t *pw_entrylo0,
+                          uint64_t *pw_entrylo1, unsigned directory_shift,
+                          unsigned leaf_shift)
 {
     int dph = (env->CP0_PWCtl >> CP0PC_DPH) & 0x1;
     int psn = (env->CP0_PWCtl >> CP0PC_PSN) & 0x3F;
@@ -639,8 +633,7 @@ static int walk_directory(CPUMIPSState *env, uint64_t *vaddr,
     uint64_t w = 0;
 
     if (get_physical_address(env, &paddr, &prot, *vaddr, MMU_DATA_LOAD,
-                             cpu_mmu_index(env, false)) !=
-                             TLBRET_MATCH) {
+                             cpu_mmu_index(env, false)) != TLBRET_MATCH) {
         /* wrong base address */
         return 0;
     }
@@ -668,7 +661,7 @@ static int walk_directory(CPUMIPSState *env, uint64_t *vaddr,
             }
             if (get_physical_address(env, &paddr, &prot, vaddr2, MMU_DATA_LOAD,
                                      cpu_mmu_index(env, false)) !=
-                                     TLBRET_MATCH) {
+                TLBRET_MATCH) {
                 return 0;
             }
             if (!get_pte(env, vaddr2, leafentry_size, &entry)) {
@@ -776,9 +769,8 @@ static bool page_table_walk_refill(CPUMIPSState *env, vaddr address,
     if (gdw > 0) {
         vaddr |= goffset;
         switch (walk_directory(env, &vaddr, pf_gdw, &huge_page, &hgpg_gdhit,
-                               &pw_entrylo0, &pw_entrylo1,
-                               directory_shift, leaf_shift))
-        {
+                               &pw_entrylo0, &pw_entrylo1, directory_shift,
+                               leaf_shift)) {
         case 0:
             return false;
         case 1:
@@ -793,9 +785,8 @@ static bool page_table_walk_refill(CPUMIPSState *env, vaddr address,
     if (udw > 0) {
         vaddr |= uoffset;
         switch (walk_directory(env, &vaddr, pf_udw, &huge_page, &hgpg_udhit,
-                               &pw_entrylo0, &pw_entrylo1,
-                               directory_shift, leaf_shift))
-        {
+                               &pw_entrylo0, &pw_entrylo1, directory_shift,
+                               leaf_shift)) {
         case 0:
             return false;
         case 1:
@@ -810,9 +801,8 @@ static bool page_table_walk_refill(CPUMIPSState *env, vaddr address,
     if (mdw > 0) {
         vaddr |= moffset;
         switch (walk_directory(env, &vaddr, pf_mdw, &huge_page, &hgpg_mdhit,
-                               &pw_entrylo0, &pw_entrylo1,
-                               directory_shift, leaf_shift))
-        {
+                               &pw_entrylo0, &pw_entrylo1, directory_shift,
+                               leaf_shift)) {
         case 0:
             return false;
         case 1:
@@ -826,8 +816,7 @@ static bool page_table_walk_refill(CPUMIPSState *env, vaddr address,
     /* Leaf Level Page Table - First half of PTE pair */
     vaddr |= ptoffset0;
     if (get_physical_address(env, &paddr, &prot, vaddr, MMU_DATA_LOAD,
-                             cpu_mmu_index(env, false)) !=
-                             TLBRET_MATCH) {
+                             cpu_mmu_index(env, false)) != TLBRET_MATCH) {
         return false;
     }
     if (!get_pte(env, vaddr, leafentry_size, &dir_entry)) {
@@ -839,8 +828,7 @@ static bool page_table_walk_refill(CPUMIPSState *env, vaddr address,
     /* Leaf Level Page Table - Second half of PTE pair */
     vaddr |= ptoffset1;
     if (get_physical_address(env, &paddr, &prot, vaddr, MMU_DATA_LOAD,
-                             cpu_mmu_index(env, false)) !=
-                             TLBRET_MATCH) {
+                             cpu_mmu_index(env, false)) != TLBRET_MATCH) {
         return false;
     }
     if (!get_pte(env, vaddr, leafentry_size, &dir_entry)) {
@@ -855,8 +843,7 @@ refill:
 
     if (huge_page) {
         switch (hgpg_bdhit << 3 | hgpg_gdhit << 2 | hgpg_udhit << 1 |
-                hgpg_mdhit)
-        {
+                hgpg_mdhit) {
         case 4:
             m = (1 << pf_gdw) - 1;
             if (pf_gdw & 1) {
@@ -908,8 +895,8 @@ refill:
 #endif
 
 bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                       MMUAccessType access_type, int mmu_idx,
-                       bool probe, uintptr_t retaddr)
+                       MMUAccessType access_type, int mmu_idx, bool probe,
+                       uintptr_t retaddr)
 {
     MIPSCPU *cpu = MIPS_CPU(cs);
     CPUMIPSState *env = &cpu->env;
@@ -919,24 +906,24 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
 
     /* data access */
     /* XXX: put correct access by using cpu_restore_state() correctly */
-    ret = get_physical_address(env, &physical, &prot, address,
-                               access_type, mmu_idx);
+    ret = get_physical_address(env, &physical, &prot, address, access_type,
+                               mmu_idx);
     switch (ret) {
     case TLBRET_MATCH:
         qemu_log_mask(CPU_LOG_MMU,
                       "%s address=%" VADDR_PRIx " physical " HWADDR_FMT_plx
-                      " prot %d\n", __func__, address, physical, prot);
+                      " prot %d\n",
+                      __func__, address, physical, prot);
         break;
     default:
-        qemu_log_mask(CPU_LOG_MMU,
-                      "%s address=%" VADDR_PRIx " ret %d\n", __func__, address,
-                      ret);
+        qemu_log_mask(CPU_LOG_MMU, "%s address=%" VADDR_PRIx " ret %d\n",
+                      __func__, address, ret);
         break;
     }
     if (ret == TLBRET_MATCH) {
         tlb_set_page(cs, address & TARGET_PAGE_MASK,
-                     physical & TARGET_PAGE_MASK, prot,
-                     mmu_idx, TARGET_PAGE_SIZE);
+                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
+                     TARGET_PAGE_SIZE);
         return true;
     }
 #if !defined(TARGET_MIPS64)
@@ -955,8 +942,8 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
                                        access_type, mmu_idx);
             if (ret == TLBRET_MATCH) {
                 tlb_set_page(cs, address & TARGET_PAGE_MASK,
-                             physical & TARGET_PAGE_MASK, prot,
-                             mmu_idx, TARGET_PAGE_SIZE);
+                             physical & TARGET_PAGE_MASK, prot, mmu_idx,
+                             TARGET_PAGE_SIZE);
                 return true;
             }
         }
@@ -995,8 +982,7 @@ static void set_hflags_for_handler(CPUMIPSState *env)
     env->hflags &= ~(MIPS_HFLAG_M16);
     /* ...except that microMIPS lets you choose.  */
     if (env->insn_flags & ASE_MICROMIPS) {
-        env->hflags |= (!!(env->CP0_Config3 &
-                           (1 << CP0C3_ISA_ON_EXC))
+        env->hflags |= (!!(env->CP0_Config3 & (1 << CP0C3_ISA_ON_EXC))
                         << MIPS_HFLAG_M16_SHIFT);
     }
 }
@@ -1040,8 +1026,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
     target_ulong offset;
     int cause = -1;
 
-    if (qemu_loglevel_mask(CPU_LOG_INT)
-        && cs->exception_index != EXCP_EXT_INTERRUPT) {
+    if (qemu_loglevel_mask(CPU_LOG_INT) &&
+        cs->exception_index != EXCP_EXT_INTERRUPT) {
         qemu_log("%s enter: PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx
                  " %s exception\n",
                  __func__, env->active_tc.PC, env->CP0_EPC,
@@ -1077,8 +1063,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
     case EXCP_DBp:
         env->CP0_Debug |= 1 << CP0DB_DBp;
         /* Setup DExcCode - SDBBP instruction */
-        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) |
-                         (9 << CP0DB_DEC);
+        env->CP0_Debug =
+            (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) | (9 << CP0DB_DEC);
         goto set_DEPC;
     case EXCP_DDBS:
         env->CP0_Debug |= 1 << CP0DB_DDBS;
@@ -1088,7 +1074,7 @@ void mips_cpu_do_interrupt(CPUState *cs)
     set_DEPC:
         env->CP0_DEPC = exception_resume_pc(env);
         env->hflags &= ~MIPS_HFLAG_BMASK;
- enter_debug_mode:
+    enter_debug_mode:
         if (env->insn_flags & ISA_MIPS3) {
             env->hflags |= MIPS_HFLAG_64;
             if (!(env->insn_flags & ISA_MIPS_R6) ||
@@ -1114,7 +1100,7 @@ void mips_cpu_do_interrupt(CPUState *cs)
         goto set_error_EPC;
     case EXCP_NMI:
         env->CP0_Status |= (1 << CP0St_NMI);
- set_error_EPC:
+    set_error_EPC:
         env->CP0_ErrorEPC = exception_resume_pc(env);
         env->hflags &= ~MIPS_HFLAG_BMASK;
         env->CP0_Status |= (1 << CP0St_ERL) | (1 << CP0St_BEV);
@@ -1292,7 +1278,7 @@ void mips_cpu_do_interrupt(CPUState *cs)
     case EXCP_CACHE:
         cause = 30;
         offset = 0x100;
- set_EPC:
+    set_EPC:
         if (!(env->CP0_Status & (1 << CP0St_EXL))) {
             env->CP0_EPC = exception_resume_pc(env);
             if (update_badinstr) {
@@ -1327,14 +1313,14 @@ void mips_cpu_do_interrupt(CPUState *cs)
 
         env->active_tc.PC += offset;
         set_hflags_for_handler(env);
-        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) |
-                         (cause << CP0Ca_EC);
+        env->CP0_Cause =
+            (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) | (cause << CP0Ca_EC);
         break;
     default:
         abort();
     }
-    if (qemu_loglevel_mask(CPU_LOG_INT)
-        && cs->exception_index != EXCP_EXT_INTERRUPT) {
+    if (qemu_loglevel_mask(CPU_LOG_INT) &&
+        cs->exception_index != EXCP_EXT_INTERRUPT) {
         qemu_log("%s: PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx " cause %d\n"
                  "    S %08x C %08x A " TARGET_FMT_lx " D " TARGET_FMT_lx "\n",
                  __func__, env->active_tc.PC, env->CP0_EPC, cause,
@@ -1374,14 +1360,14 @@ void r4k_invalidate_tlb(CPUMIPSState *env, int idx, int use_extra)
     uint32_t tlb_mmid;
     target_ulong mask;
 
-    MMID = mi ? MMID : (uint32_t) ASID;
+    MMID = mi ? MMID : (uint32_t)ASID;
 
     tlb = &env->tlb->mmu.r4k.tlb[idx];
     /*
      * The qemu TLB is flushed when the ASID/MMID changes, so no need to
      * flush these entries again.
      */
-    tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
+    tlb_mmid = mi ? tlb->MMID : (uint32_t)tlb->ASID;
     if (tlb->G == 0 && tlb_mmid != MMID) {
         return;
     }

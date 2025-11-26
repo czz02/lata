@@ -55,7 +55,7 @@ struct hvf_sw_breakpoint *hvf_find_sw_breakpoint(CPUState *cpu, target_ulong pc)
 {
     struct hvf_sw_breakpoint *bp;
 
-    QTAILQ_FOREACH(bp, &hvf_state->hvf_sw_breakpoints, entry) {
+    QTAILQ_FOREACH (bp, &hvf_state->hvf_sw_breakpoints, entry) {
         if (bp->pc == pc) {
             return bp;
         }

@@ -40,68 +40,130 @@
 static const char *powerpc_excp_name(int excp)
 {
     switch (excp) {
-    case POWERPC_EXCP_CRITICAL: return "CRITICAL";
-    case POWERPC_EXCP_MCHECK:   return "MCHECK";
-    case POWERPC_EXCP_DSI:      return "DSI";
-    case POWERPC_EXCP_ISI:      return "ISI";
-    case POWERPC_EXCP_EXTERNAL: return "EXTERNAL";
-    case POWERPC_EXCP_ALIGN:    return "ALIGN";
-    case POWERPC_EXCP_PROGRAM:  return "PROGRAM";
-    case POWERPC_EXCP_FPU:      return "FPU";
-    case POWERPC_EXCP_SYSCALL:  return "SYSCALL";
-    case POWERPC_EXCP_APU:      return "APU";
-    case POWERPC_EXCP_DECR:     return "DECR";
-    case POWERPC_EXCP_FIT:      return "FIT";
-    case POWERPC_EXCP_WDT:      return "WDT";
-    case POWERPC_EXCP_DTLB:     return "DTLB";
-    case POWERPC_EXCP_ITLB:     return "ITLB";
-    case POWERPC_EXCP_DEBUG:    return "DEBUG";
-    case POWERPC_EXCP_SPEU:     return "SPEU";
-    case POWERPC_EXCP_EFPDI:    return "EFPDI";
-    case POWERPC_EXCP_EFPRI:    return "EFPRI";
-    case POWERPC_EXCP_EPERFM:   return "EPERFM";
-    case POWERPC_EXCP_DOORI:    return "DOORI";
-    case POWERPC_EXCP_DOORCI:   return "DOORCI";
-    case POWERPC_EXCP_GDOORI:   return "GDOORI";
-    case POWERPC_EXCP_GDOORCI:  return "GDOORCI";
-    case POWERPC_EXCP_HYPPRIV:  return "HYPPRIV";
-    case POWERPC_EXCP_RESET:    return "RESET";
-    case POWERPC_EXCP_DSEG:     return "DSEG";
-    case POWERPC_EXCP_ISEG:     return "ISEG";
-    case POWERPC_EXCP_HDECR:    return "HDECR";
-    case POWERPC_EXCP_TRACE:    return "TRACE";
-    case POWERPC_EXCP_HDSI:     return "HDSI";
-    case POWERPC_EXCP_HISI:     return "HISI";
-    case POWERPC_EXCP_HDSEG:    return "HDSEG";
-    case POWERPC_EXCP_HISEG:    return "HISEG";
-    case POWERPC_EXCP_VPU:      return "VPU";
-    case POWERPC_EXCP_PIT:      return "PIT";
-    case POWERPC_EXCP_EMUL:     return "EMUL";
-    case POWERPC_EXCP_IFTLB:    return "IFTLB";
-    case POWERPC_EXCP_DLTLB:    return "DLTLB";
-    case POWERPC_EXCP_DSTLB:    return "DSTLB";
-    case POWERPC_EXCP_FPA:      return "FPA";
-    case POWERPC_EXCP_DABR:     return "DABR";
-    case POWERPC_EXCP_IABR:     return "IABR";
-    case POWERPC_EXCP_SMI:      return "SMI";
-    case POWERPC_EXCP_PERFM:    return "PERFM";
-    case POWERPC_EXCP_THERM:    return "THERM";
-    case POWERPC_EXCP_VPUA:     return "VPUA";
-    case POWERPC_EXCP_SOFTP:    return "SOFTP";
-    case POWERPC_EXCP_MAINT:    return "MAINT";
-    case POWERPC_EXCP_MEXTBR:   return "MEXTBR";
-    case POWERPC_EXCP_NMEXTBR:  return "NMEXTBR";
-    case POWERPC_EXCP_ITLBE:    return "ITLBE";
-    case POWERPC_EXCP_DTLBE:    return "DTLBE";
-    case POWERPC_EXCP_VSXU:     return "VSXU";
-    case POWERPC_EXCP_FU:       return "FU";
-    case POWERPC_EXCP_HV_EMU:   return "HV_EMU";
-    case POWERPC_EXCP_HV_MAINT: return "HV_MAINT";
-    case POWERPC_EXCP_HV_FU:    return "HV_FU";
-    case POWERPC_EXCP_SDOOR:    return "SDOOR";
-    case POWERPC_EXCP_SDOOR_HV: return "SDOOR_HV";
-    case POWERPC_EXCP_HVIRT:    return "HVIRT";
-    case POWERPC_EXCP_SYSCALL_VECTORED: return "SYSCALL_VECTORED";
+    case POWERPC_EXCP_CRITICAL:
+        return "CRITICAL";
+    case POWERPC_EXCP_MCHECK:
+        return "MCHECK";
+    case POWERPC_EXCP_DSI:
+        return "DSI";
+    case POWERPC_EXCP_ISI:
+        return "ISI";
+    case POWERPC_EXCP_EXTERNAL:
+        return "EXTERNAL";
+    case POWERPC_EXCP_ALIGN:
+        return "ALIGN";
+    case POWERPC_EXCP_PROGRAM:
+        return "PROGRAM";
+    case POWERPC_EXCP_FPU:
+        return "FPU";
+    case POWERPC_EXCP_SYSCALL:
+        return "SYSCALL";
+    case POWERPC_EXCP_APU:
+        return "APU";
+    case POWERPC_EXCP_DECR:
+        return "DECR";
+    case POWERPC_EXCP_FIT:
+        return "FIT";
+    case POWERPC_EXCP_WDT:
+        return "WDT";
+    case POWERPC_EXCP_DTLB:
+        return "DTLB";
+    case POWERPC_EXCP_ITLB:
+        return "ITLB";
+    case POWERPC_EXCP_DEBUG:
+        return "DEBUG";
+    case POWERPC_EXCP_SPEU:
+        return "SPEU";
+    case POWERPC_EXCP_EFPDI:
+        return "EFPDI";
+    case POWERPC_EXCP_EFPRI:
+        return "EFPRI";
+    case POWERPC_EXCP_EPERFM:
+        return "EPERFM";
+    case POWERPC_EXCP_DOORI:
+        return "DOORI";
+    case POWERPC_EXCP_DOORCI:
+        return "DOORCI";
+    case POWERPC_EXCP_GDOORI:
+        return "GDOORI";
+    case POWERPC_EXCP_GDOORCI:
+        return "GDOORCI";
+    case POWERPC_EXCP_HYPPRIV:
+        return "HYPPRIV";
+    case POWERPC_EXCP_RESET:
+        return "RESET";
+    case POWERPC_EXCP_DSEG:
+        return "DSEG";
+    case POWERPC_EXCP_ISEG:
+        return "ISEG";
+    case POWERPC_EXCP_HDECR:
+        return "HDECR";
+    case POWERPC_EXCP_TRACE:
+        return "TRACE";
+    case POWERPC_EXCP_HDSI:
+        return "HDSI";
+    case POWERPC_EXCP_HISI:
+        return "HISI";
+    case POWERPC_EXCP_HDSEG:
+        return "HDSEG";
+    case POWERPC_EXCP_HISEG:
+        return "HISEG";
+    case POWERPC_EXCP_VPU:
+        return "VPU";
+    case POWERPC_EXCP_PIT:
+        return "PIT";
+    case POWERPC_EXCP_EMUL:
+        return "EMUL";
+    case POWERPC_EXCP_IFTLB:
+        return "IFTLB";
+    case POWERPC_EXCP_DLTLB:
+        return "DLTLB";
+    case POWERPC_EXCP_DSTLB:
+        return "DSTLB";
+    case POWERPC_EXCP_FPA:
+        return "FPA";
+    case POWERPC_EXCP_DABR:
+        return "DABR";
+    case POWERPC_EXCP_IABR:
+        return "IABR";
+    case POWERPC_EXCP_SMI:
+        return "SMI";
+    case POWERPC_EXCP_PERFM:
+        return "PERFM";
+    case POWERPC_EXCP_THERM:
+        return "THERM";
+    case POWERPC_EXCP_VPUA:
+        return "VPUA";
+    case POWERPC_EXCP_SOFTP:
+        return "SOFTP";
+    case POWERPC_EXCP_MAINT:
+        return "MAINT";
+    case POWERPC_EXCP_MEXTBR:
+        return "MEXTBR";
+    case POWERPC_EXCP_NMEXTBR:
+        return "NMEXTBR";
+    case POWERPC_EXCP_ITLBE:
+        return "ITLBE";
+    case POWERPC_EXCP_DTLBE:
+        return "DTLBE";
+    case POWERPC_EXCP_VSXU:
+        return "VSXU";
+    case POWERPC_EXCP_FU:
+        return "FU";
+    case POWERPC_EXCP_HV_EMU:
+        return "HV_EMU";
+    case POWERPC_EXCP_HV_MAINT:
+        return "HV_MAINT";
+    case POWERPC_EXCP_HV_FU:
+        return "HV_FU";
+    case POWERPC_EXCP_SDOOR:
+        return "SDOOR";
+    case POWERPC_EXCP_SDOOR_HV:
+        return "SDOOR_HV";
+    case POWERPC_EXCP_HVIRT:
+        return "HVIRT";
+    case POWERPC_EXCP_SYSCALL_VECTORED:
+        return "SYSCALL_VECTORED";
     default:
         g_assert_not_reached();
     }
@@ -109,10 +171,10 @@ static const char *powerpc_excp_name(int excp)
 
 static void dump_syscall(CPUPPCState *env)
 {
-    qemu_log_mask(CPU_LOG_INT, "syscall r0=%016" PRIx64
-                  " r3=%016" PRIx64 " r4=%016" PRIx64 " r5=%016" PRIx64
-                  " r6=%016" PRIx64 " r7=%016" PRIx64 " r8=%016" PRIx64
-                  " nip=" TARGET_FMT_lx "\n",
+    qemu_log_mask(CPU_LOG_INT,
+                  "syscall r0=%016" PRIx64 " r3=%016" PRIx64 " r4=%016" PRIx64
+                  " r5=%016" PRIx64 " r6=%016" PRIx64 " r7=%016" PRIx64
+                  " r8=%016" PRIx64 " nip=" TARGET_FMT_lx "\n",
                   ppc_dump_gpr(env, 0), ppc_dump_gpr(env, 3),
                   ppc_dump_gpr(env, 4), ppc_dump_gpr(env, 5),
                   ppc_dump_gpr(env, 6), ppc_dump_gpr(env, 7),
@@ -121,17 +183,16 @@ static void dump_syscall(CPUPPCState *env)
 
 static void dump_hcall(CPUPPCState *env)
 {
-    qemu_log_mask(CPU_LOG_INT, "hypercall r3=%016" PRIx64
-                  " r4=%016" PRIx64 " r5=%016" PRIx64 " r6=%016" PRIx64
-                  " r7=%016" PRIx64 " r8=%016" PRIx64 " r9=%016" PRIx64
-                  " r10=%016" PRIx64 " r11=%016" PRIx64 " r12=%016" PRIx64
-                  " nip=" TARGET_FMT_lx "\n",
+    qemu_log_mask(CPU_LOG_INT,
+                  "hypercall r3=%016" PRIx64 " r4=%016" PRIx64 " r5=%016" PRIx64
+                  " r6=%016" PRIx64 " r7=%016" PRIx64 " r8=%016" PRIx64
+                  " r9=%016" PRIx64 " r10=%016" PRIx64 " r11=%016" PRIx64
+                  " r12=%016" PRIx64 " nip=" TARGET_FMT_lx "\n",
                   ppc_dump_gpr(env, 3), ppc_dump_gpr(env, 4),
                   ppc_dump_gpr(env, 5), ppc_dump_gpr(env, 6),
                   ppc_dump_gpr(env, 7), ppc_dump_gpr(env, 8),
                   ppc_dump_gpr(env, 9), ppc_dump_gpr(env, 10),
-                  ppc_dump_gpr(env, 11), ppc_dump_gpr(env, 12),
-                  env->nip);
+                  ppc_dump_gpr(env, 11), ppc_dump_gpr(env, 12), env->nip);
 }
 
 #ifdef CONFIG_TCG
@@ -179,10 +240,9 @@ static void ppc_excp_debug_sw_tlb(CPUPPCState *env, int excp)
         miss = &env->spr[SPR_DMISS];
         cmp = &env->spr[SPR_DCMP];
     }
-    qemu_log("6xx %sTLB miss: %cM " TARGET_FMT_lx " %cC "
-             TARGET_FMT_lx " H1 " TARGET_FMT_lx " H2 "
-             TARGET_FMT_lx " %08x\n", es, en, *miss, en, *cmp,
-             env->spr[SPR_HASH1], env->spr[SPR_HASH2],
+    qemu_log("6xx %sTLB miss: %cM " TARGET_FMT_lx " %cC " TARGET_FMT_lx
+             " H1 " TARGET_FMT_lx " H2 " TARGET_FMT_lx " %08x\n",
+             es, en, *miss, en, *cmp, env->spr[SPR_HASH1], env->spr[SPR_HASH2],
              env->error_code);
 }
 
@@ -222,8 +282,8 @@ static int powerpc_reset_wakeup(CPUPPCState *env, int excp, target_ulong *msr)
         *msr |= SRR1_WAKEHVI;
         break;
     default:
-        cpu_abort(env_cpu(env),
-                  "Unsupported exception %d in Power Save mode\n", excp);
+        cpu_abort(env_cpu(env), "Unsupported exception %d in Power Save mode\n",
+                  excp);
     }
     return POWERPC_EXCP_RESET;
 }
@@ -293,8 +353,7 @@ static void ppc_excp_apply_ail(PowerPCCPU *cpu, int excp, target_ulong msr,
     bool hv_escalation = !(msr & MSR_HVB) && (*new_msr & MSR_HVB);
     int ail = 0;
 
-    if (excp == POWERPC_EXCP_MCHECK ||
-        excp == POWERPC_EXCP_RESET ||
+    if (excp == POWERPC_EXCP_MCHECK || excp == POWERPC_EXCP_RESET ||
         excp == POWERPC_EXCP_HV_MAINT) {
         /* SRESET, MCE, HMI never apply AIL */
         return;
@@ -329,7 +388,7 @@ static void ppc_excp_apply_ail(PowerPCCPU *cpu, int excp, target_ulong msr,
             return;
         }
 
-    /* P10 and up */
+        /* P10 and up */
     } else {
         if (!mmu_all_on && !hv_escalation) {
             /*
@@ -434,7 +493,7 @@ static void powerpc_mcheck_checkstop(CPUPPCState *env)
 
     /* Machine check exception is not enabled. Enter checkstop state. */
     fprintf(stderr, "Machine check while not allowed. "
-            "Entering checkstop state\n");
+                    "Entering checkstop state\n");
     if (qemu_log_separate()) {
         qemu_log("Machine check while not allowed. "
                  "Entering checkstop state\n");
@@ -473,18 +532,17 @@ static void powerpc_excp_40x(PowerPCCPU *cpu, int excp)
 
     vector = env->excp_vectors[excp];
     if (vector == (target_ulong)-1ULL) {
-        cpu_abort(cs, "Raised an exception without defined vector %d\n",
-                  excp);
+        cpu_abort(cs, "Raised an exception without defined vector %d\n", excp);
     }
 
     vector |= env->excp_prefix;
 
     switch (excp) {
-    case POWERPC_EXCP_CRITICAL:    /* Critical input                         */
+    case POWERPC_EXCP_CRITICAL: /* Critical input                         */
         srr0 = SPR_40x_SRR2;
         srr1 = SPR_40x_SRR3;
         break;
-    case POWERPC_EXCP_MCHECK:    /* Machine check exception                  */
+    case POWERPC_EXCP_MCHECK: /* Machine check exception                  */
         powerpc_mcheck_checkstop(env);
         /* machine check exceptions don't have ME set */
         new_msr &= ~((target_ulong)1 << MSR_ME);
@@ -492,17 +550,17 @@ static void powerpc_excp_40x(PowerPCCPU *cpu, int excp)
         srr0 = SPR_40x_SRR2;
         srr1 = SPR_40x_SRR3;
         break;
-    case POWERPC_EXCP_DSI:       /* Data storage exception                   */
+    case POWERPC_EXCP_DSI: /* Data storage exception                   */
         trace_ppc_excp_dsi(env->spr[SPR_40x_ESR], env->spr[SPR_40x_DEAR]);
         break;
-    case POWERPC_EXCP_ISI:       /* Instruction storage exception            */
+    case POWERPC_EXCP_ISI: /* Instruction storage exception            */
         trace_ppc_excp_isi(msr, env->nip);
         break;
-    case POWERPC_EXCP_EXTERNAL:  /* External input                           */
+    case POWERPC_EXCP_EXTERNAL: /* External input                           */
         break;
-    case POWERPC_EXCP_ALIGN:     /* Alignment exception                      */
+    case POWERPC_EXCP_ALIGN: /* Alignment exception                      */
         break;
-    case POWERPC_EXCP_PROGRAM:   /* Program exception                        */
+    case POWERPC_EXCP_PROGRAM: /* Program exception                        */
         switch (env->error_code & ~0xF) {
         case POWERPC_EXCP_FP:
             if (!FIELD_EX64_FE(env->msr) || !FIELD_EX64(env->msr, MSR, FP)) {
@@ -528,7 +586,7 @@ static void powerpc_excp_40x(PowerPCCPU *cpu, int excp)
             break;
         }
         break;
-    case POWERPC_EXCP_SYSCALL:   /* System call exception                    */
+    case POWERPC_EXCP_SYSCALL: /* System call exception                    */
         dump_syscall(env);
 
         /*
@@ -537,19 +595,19 @@ static void powerpc_excp_40x(PowerPCCPU *cpu, int excp)
          */
         env->nip += 4;
         break;
-    case POWERPC_EXCP_FIT:       /* Fixed-interval timer interrupt           */
+    case POWERPC_EXCP_FIT: /* Fixed-interval timer interrupt           */
         trace_ppc_excp_print("FIT");
         break;
-    case POWERPC_EXCP_WDT:       /* Watchdog timer interrupt                 */
+    case POWERPC_EXCP_WDT: /* Watchdog timer interrupt                 */
         trace_ppc_excp_print("WDT");
         break;
-    case POWERPC_EXCP_DTLB:      /* Data TLB error                           */
-    case POWERPC_EXCP_ITLB:      /* Instruction TLB error                    */
+    case POWERPC_EXCP_DTLB: /* Data TLB error                           */
+    case POWERPC_EXCP_ITLB: /* Instruction TLB error                    */
         break;
-    case POWERPC_EXCP_PIT:       /* Programmable interval timer interrupt    */
+    case POWERPC_EXCP_PIT: /* Programmable interval timer interrupt    */
         trace_ppc_excp_print("PIT");
         break;
-    case POWERPC_EXCP_DEBUG:     /* Debug interrupt                          */
+    case POWERPC_EXCP_DEBUG: /* Debug interrupt                          */
         cpu_abort(cs, "%s exception not implemented\n",
                   powerpc_excp_name(excp));
         break;
@@ -592,31 +650,30 @@ static void powerpc_excp_6xx(PowerPCCPU *cpu, int excp)
 
     vector = env->excp_vectors[excp];
     if (vector == (target_ulong)-1ULL) {
-        cpu_abort(cs, "Raised an exception without defined vector %d\n",
-                  excp);
+        cpu_abort(cs, "Raised an exception without defined vector %d\n", excp);
     }
 
     vector |= env->excp_prefix;
 
     switch (excp) {
-    case POWERPC_EXCP_CRITICAL:    /* Critical input                         */
+    case POWERPC_EXCP_CRITICAL: /* Critical input                         */
         break;
-    case POWERPC_EXCP_MCHECK:    /* Machine check exception                  */
+    case POWERPC_EXCP_MCHECK: /* Machine check exception                  */
         powerpc_mcheck_checkstop(env);
         /* machine check exceptions don't have ME set */
         new_msr &= ~((target_ulong)1 << MSR_ME);
 
         break;
-    case POWERPC_EXCP_DSI:       /* Data storage exception                   */
+    case POWERPC_EXCP_DSI: /* Data storage exception                   */
         trace_ppc_excp_dsi(env->spr[SPR_DSISR], env->spr[SPR_DAR]);
         break;
-    case POWERPC_EXCP_ISI:       /* Instruction storage exception            */
+    case POWERPC_EXCP_ISI: /* Instruction storage exception            */
         trace_ppc_excp_isi(msr, env->nip);
         msr |= env->error_code;
         break;
-    case POWERPC_EXCP_EXTERNAL:  /* External input                           */
+    case POWERPC_EXCP_EXTERNAL: /* External input                           */
         break;
-    case POWERPC_EXCP_ALIGN:     /* Alignment exception                      */
+    case POWERPC_EXCP_ALIGN: /* Alignment exception                      */
         /* Get rS/rD and rA from faulting opcode */
         /*
          * Note: the opcode fields will not be set properly for a
@@ -625,7 +682,7 @@ static void powerpc_excp_6xx(PowerPCCPU *cpu, int excp)
          */
         env->spr[SPR_DSISR] |= (env->error_code & 0x03FF0000) >> 16;
         break;
-    case POWERPC_EXCP_PROGRAM:   /* Program exception                        */
+    case POWERPC_EXCP_PROGRAM: /* Program exception                        */
         switch (env->error_code & ~0xF) {
         case POWERPC_EXCP_FP:
             if (!FIELD_EX64_FE(env->msr) || !FIELD_EX64(env->msr, MSR, FP)) {
@@ -658,7 +715,7 @@ static void powerpc_excp_6xx(PowerPCCPU *cpu, int excp)
             break;
         }
         break;
-    case POWERPC_EXCP_SYSCALL:   /* System call exception                    */
+    case POWERPC_EXCP_SYSCALL: /* System call exception                    */
         dump_syscall(env);
 
         /*
@@ -667,23 +724,25 @@ static void powerpc_excp_6xx(PowerPCCPU *cpu, int excp)
          */
         env->nip += 4;
         break;
-    case POWERPC_EXCP_FPU:       /* Floating-point unavailable exception     */
-    case POWERPC_EXCP_DECR:      /* Decrementer exception                    */
+    case POWERPC_EXCP_FPU: /* Floating-point unavailable exception     */
+    case POWERPC_EXCP_DECR: /* Decrementer exception                    */
         break;
-    case POWERPC_EXCP_DTLB:      /* Data TLB error                           */
-    case POWERPC_EXCP_ITLB:      /* Instruction TLB error                    */
+    case POWERPC_EXCP_DTLB: /* Data TLB error                           */
+    case POWERPC_EXCP_ITLB: /* Instruction TLB error                    */
         break;
-    case POWERPC_EXCP_RESET:     /* System reset exception                   */
+    case POWERPC_EXCP_RESET: /* System reset exception                   */
         if (FIELD_EX64(env->msr, MSR, POW)) {
-            cpu_abort(cs, "Trying to deliver power-saving system reset "
-                      "exception %d with no HV support\n", excp);
+            cpu_abort(cs,
+                      "Trying to deliver power-saving system reset "
+                      "exception %d with no HV support\n",
+                      excp);
         }
         break;
-    case POWERPC_EXCP_TRACE:     /* Trace exception                          */
+    case POWERPC_EXCP_TRACE: /* Trace exception                          */
         break;
-    case POWERPC_EXCP_IFTLB:     /* Instruction fetch TLB error              */
-    case POWERPC_EXCP_DLTLB:     /* Data load TLB miss                       */
-    case POWERPC_EXCP_DSTLB:     /* Data store TLB miss                      */
+    case POWERPC_EXCP_IFTLB: /* Instruction fetch TLB error              */
+    case POWERPC_EXCP_DLTLB: /* Data load TLB miss                       */
+    case POWERPC_EXCP_DSTLB: /* Data store TLB miss                      */
         /* Swap temporary saved registers with GPRs */
         if (!(new_msr & ((target_ulong)1 << MSR_TGPR))) {
             new_msr |= (target_ulong)1 << MSR_TGPR;
@@ -697,12 +756,12 @@ static void powerpc_excp_6xx(PowerPCCPU *cpu, int excp)
         /* Set way using a LRU mechanism */
         msr |= ((env->last_way + 1) & (env->nb_ways - 1)) << 17;
         break;
-    case POWERPC_EXCP_FPA:       /* Floating-point assist exception          */
-    case POWERPC_EXCP_DABR:      /* Data address breakpoint                  */
-    case POWERPC_EXCP_IABR:      /* Instruction address breakpoint           */
-    case POWERPC_EXCP_SMI:       /* System management interrupt              */
-    case POWERPC_EXCP_MEXTBR:    /* Maskable external breakpoint             */
-    case POWERPC_EXCP_NMEXTBR:   /* Non maskable external breakpoint         */
+    case POWERPC_EXCP_FPA: /* Floating-point assist exception          */
+    case POWERPC_EXCP_DABR: /* Data address breakpoint                  */
+    case POWERPC_EXCP_IABR: /* Instruction address breakpoint           */
+    case POWERPC_EXCP_SMI: /* System management interrupt              */
+    case POWERPC_EXCP_MEXTBR: /* Maskable external breakpoint             */
+    case POWERPC_EXCP_NMEXTBR: /* Non maskable external breakpoint         */
         cpu_abort(cs, "%s exception not implemented\n",
                   powerpc_excp_name(excp));
         break;
@@ -753,29 +812,28 @@ static void powerpc_excp_7xx(PowerPCCPU *cpu, int excp)
 
     vector = env->excp_vectors[excp];
     if (vector == (target_ulong)-1ULL) {
-        cpu_abort(cs, "Raised an exception without defined vector %d\n",
-                  excp);
+        cpu_abort(cs, "Raised an exception without defined vector %d\n", excp);
     }
 
     vector |= env->excp_prefix;
 
     switch (excp) {
-    case POWERPC_EXCP_MCHECK:    /* Machine check exception                  */
+    case POWERPC_EXCP_MCHECK: /* Machine check exception                  */
         powerpc_mcheck_checkstop(env);
         /* machine check exceptions don't have ME set */
         new_msr &= ~((target_ulong)1 << MSR_ME);
 
         break;
-    case POWERPC_EXCP_DSI:       /* Data storage exception                   */
+    case POWERPC_EXCP_DSI: /* Data storage exception                   */
         trace_ppc_excp_dsi(env->spr[SPR_DSISR], env->spr[SPR_DAR]);
         break;
-    case POWERPC_EXCP_ISI:       /* Instruction storage exception            */
+    case POWERPC_EXCP_ISI: /* Instruction storage exception            */
         trace_ppc_excp_isi(msr, env->nip);
         msr |= env->error_code;
         break;
-    case POWERPC_EXCP_EXTERNAL:  /* External input                           */
+    case POWERPC_EXCP_EXTERNAL: /* External input                           */
         break;
-    case POWERPC_EXCP_ALIGN:     /* Alignment exception                      */
+    case POWERPC_EXCP_ALIGN: /* Alignment exception                      */
         /* Get rS/rD and rA from faulting opcode */
         /*
          * Note: the opcode fields will not be set properly for a
@@ -784,7 +842,7 @@ static void powerpc_excp_7xx(PowerPCCPU *cpu, int excp)
          */
         env->spr[SPR_DSISR] |= (env->error_code & 0x03FF0000) >> 16;
         break;
-    case POWERPC_EXCP_PROGRAM:   /* Program exception                        */
+    case POWERPC_EXCP_PROGRAM: /* Program exception                        */
         switch (env->error_code & ~0xF) {
         case POWERPC_EXCP_FP:
             if (!FIELD_EX64_FE(env->msr) || !FIELD_EX64(env->msr, MSR, FP)) {
@@ -817,7 +875,7 @@ static void powerpc_excp_7xx(PowerPCCPU *cpu, int excp)
             break;
         }
         break;
-    case POWERPC_EXCP_SYSCALL:   /* System call exception                    */
+    case POWERPC_EXCP_SYSCALL: /* System call exception                    */
     {
         int lev = env->error_code;
 
@@ -848,20 +906,22 @@ static void powerpc_excp_7xx(PowerPCCPU *cpu, int excp)
 
         break;
     }
-    case POWERPC_EXCP_FPU:       /* Floating-point unavailable exception     */
-    case POWERPC_EXCP_DECR:      /* Decrementer exception                    */
+    case POWERPC_EXCP_FPU: /* Floating-point unavailable exception     */
+    case POWERPC_EXCP_DECR: /* Decrementer exception                    */
         break;
-    case POWERPC_EXCP_RESET:     /* System reset exception                   */
+    case POWERPC_EXCP_RESET: /* System reset exception                   */
         if (FIELD_EX64(env->msr, MSR, POW)) {
-            cpu_abort(cs, "Trying to deliver power-saving system reset "
-                      "exception %d with no HV support\n", excp);
+            cpu_abort(cs,
+                      "Trying to deliver power-saving system reset "
+                      "exception %d with no HV support\n",
+                      excp);
         }
         break;
-    case POWERPC_EXCP_TRACE:     /* Trace exception                          */
+    case POWERPC_EXCP_TRACE: /* Trace exception                          */
         break;
-    case POWERPC_EXCP_IFTLB:     /* Instruction fetch TLB error              */
-    case POWERPC_EXCP_DLTLB:     /* Data load TLB miss                       */
-    case POWERPC_EXCP_DSTLB:     /* Data store TLB miss                      */
+    case POWERPC_EXCP_IFTLB: /* Instruction fetch TLB error              */
+    case POWERPC_EXCP_DLTLB: /* Data load TLB miss                       */
+    case POWERPC_EXCP_DSTLB: /* Data store TLB miss                      */
         ppc_excp_debug_sw_tlb(env, excp);
 
         msr |= env->crf[0] << 28;
@@ -870,10 +930,10 @@ static void powerpc_excp_7xx(PowerPCCPU *cpu, int excp)
         msr |= ((env->last_way + 1) & (env->nb_ways - 1)) << 17;
 
         break;
-    case POWERPC_EXCP_IABR:      /* Instruction address breakpoint           */
-    case POWERPC_EXCP_SMI:       /* System management interrupt              */
-    case POWERPC_EXCP_THERM:     /* Thermal interrupt                        */
-    case POWERPC_EXCP_PERFM:     /* Embedded performance monitor interrupt   */
+    case POWERPC_EXCP_IABR: /* Instruction address breakpoint           */
+    case POWERPC_EXCP_SMI: /* System management interrupt              */
+    case POWERPC_EXCP_THERM: /* Thermal interrupt                        */
+    case POWERPC_EXCP_PERFM: /* Embedded performance monitor interrupt   */
         cpu_abort(cs, "%s exception not implemented\n",
                   powerpc_excp_name(excp));
         break;
@@ -924,29 +984,28 @@ static void powerpc_excp_74xx(PowerPCCPU *cpu, int excp)
 
     vector = env->excp_vectors[excp];
     if (vector == (target_ulong)-1ULL) {
-        cpu_abort(cs, "Raised an exception without defined vector %d\n",
-                  excp);
+        cpu_abort(cs, "Raised an exception without defined vector %d\n", excp);
     }
 
     vector |= env->excp_prefix;
 
     switch (excp) {
-    case POWERPC_EXCP_MCHECK:    /* Machine check exception                  */
+    case POWERPC_EXCP_MCHECK: /* Machine check exception                  */
         powerpc_mcheck_checkstop(env);
         /* machine check exceptions don't have ME set */
         new_msr &= ~((target_ulong)1 << MSR_ME);
 
         break;
-    case POWERPC_EXCP_DSI:       /* Data storage exception                   */
+    case POWERPC_EXCP_DSI: /* Data storage exception                   */
         trace_ppc_excp_dsi(env->spr[SPR_DSISR], env->spr[SPR_DAR]);
         break;
-    case POWERPC_EXCP_ISI:       /* Instruction storage exception            */
+    case POWERPC_EXCP_ISI: /* Instruction storage exception            */
         trace_ppc_excp_isi(msr, env->nip);
         msr |= env->error_code;
         break;
-    case POWERPC_EXCP_EXTERNAL:  /* External input                           */
+    case POWERPC_EXCP_EXTERNAL: /* External input                           */
         break;
-    case POWERPC_EXCP_ALIGN:     /* Alignment exception                      */
+    case POWERPC_EXCP_ALIGN: /* Alignment exception                      */
         /* Get rS/rD and rA from faulting opcode */
         /*
          * Note: the opcode fields will not be set properly for a
@@ -955,7 +1014,7 @@ static void powerpc_excp_74xx(PowerPCCPU *cpu, int excp)
          */
         env->spr[SPR_DSISR] |= (env->error_code & 0x03FF0000) >> 16;
         break;
-    case POWERPC_EXCP_PROGRAM:   /* Program exception                        */
+    case POWERPC_EXCP_PROGRAM: /* Program exception                        */
         switch (env->error_code & ~0xF) {
         case POWERPC_EXCP_FP:
             if (!FIELD_EX64_FE(env->msr) || !FIELD_EX64(env->msr, MSR, FP)) {
@@ -988,7 +1047,7 @@ static void powerpc_excp_74xx(PowerPCCPU *cpu, int excp)
             break;
         }
         break;
-    case POWERPC_EXCP_SYSCALL:   /* System call exception                    */
+    case POWERPC_EXCP_SYSCALL: /* System call exception                    */
     {
         int lev = env->error_code;
 
@@ -1019,24 +1078,26 @@ static void powerpc_excp_74xx(PowerPCCPU *cpu, int excp)
 
         break;
     }
-    case POWERPC_EXCP_FPU:       /* Floating-point unavailable exception     */
-    case POWERPC_EXCP_DECR:      /* Decrementer exception                    */
+    case POWERPC_EXCP_FPU: /* Floating-point unavailable exception     */
+    case POWERPC_EXCP_DECR: /* Decrementer exception                    */
         break;
-    case POWERPC_EXCP_RESET:     /* System reset exception                   */
+    case POWERPC_EXCP_RESET: /* System reset exception                   */
         if (FIELD_EX64(env->msr, MSR, POW)) {
-            cpu_abort(cs, "Trying to deliver power-saving system reset "
-                      "exception %d with no HV support\n", excp);
+            cpu_abort(cs,
+                      "Trying to deliver power-saving system reset "
+                      "exception %d with no HV support\n",
+                      excp);
         }
         break;
-    case POWERPC_EXCP_TRACE:     /* Trace exception                          */
+    case POWERPC_EXCP_TRACE: /* Trace exception                          */
         break;
-    case POWERPC_EXCP_VPU:       /* Vector unavailable exception             */
+    case POWERPC_EXCP_VPU: /* Vector unavailable exception             */
         break;
-    case POWERPC_EXCP_IABR:      /* Instruction address breakpoint           */
-    case POWERPC_EXCP_SMI:       /* System management interrupt              */
-    case POWERPC_EXCP_THERM:     /* Thermal interrupt                        */
-    case POWERPC_EXCP_PERFM:     /* Embedded performance monitor interrupt   */
-    case POWERPC_EXCP_VPUA:      /* Vector assist exception                  */
+    case POWERPC_EXCP_IABR: /* Instruction address breakpoint           */
+    case POWERPC_EXCP_SMI: /* System management interrupt              */
+    case POWERPC_EXCP_THERM: /* Thermal interrupt                        */
+    case POWERPC_EXCP_PERFM: /* Embedded performance monitor interrupt   */
+    case POWERPC_EXCP_VPUA: /* Vector assist exception                  */
         cpu_abort(cs, "%s exception not implemented\n",
                   powerpc_excp_name(excp));
         break;
@@ -1101,18 +1162,17 @@ static void powerpc_excp_booke(PowerPCCPU *cpu, int excp)
 
     vector = env->excp_vectors[excp];
     if (vector == (target_ulong)-1ULL) {
-        cpu_abort(cs, "Raised an exception without defined vector %d\n",
-                  excp);
+        cpu_abort(cs, "Raised an exception without defined vector %d\n", excp);
     }
 
     vector |= env->excp_prefix;
 
     switch (excp) {
-    case POWERPC_EXCP_CRITICAL:    /* Critical input                         */
+    case POWERPC_EXCP_CRITICAL: /* Critical input                         */
         srr0 = SPR_BOOKE_CSRR0;
         srr1 = SPR_BOOKE_CSRR1;
         break;
-    case POWERPC_EXCP_MCHECK:    /* Machine check exception                  */
+    case POWERPC_EXCP_MCHECK: /* Machine check exception                  */
         powerpc_mcheck_checkstop(env);
         /* machine check exceptions don't have ME set */
         new_msr &= ~((target_ulong)1 << MSR_ME);
@@ -1125,21 +1185,21 @@ static void powerpc_excp_booke(PowerPCCPU *cpu, int excp)
         env->spr[SPR_BOOKE_CSRR1] = msr;
 
         break;
-    case POWERPC_EXCP_DSI:       /* Data storage exception                   */
+    case POWERPC_EXCP_DSI: /* Data storage exception                   */
         trace_ppc_excp_dsi(env->spr[SPR_BOOKE_ESR], env->spr[SPR_BOOKE_DEAR]);
         break;
-    case POWERPC_EXCP_ISI:       /* Instruction storage exception            */
+    case POWERPC_EXCP_ISI: /* Instruction storage exception            */
         trace_ppc_excp_isi(msr, env->nip);
         break;
-    case POWERPC_EXCP_EXTERNAL:  /* External input                           */
+    case POWERPC_EXCP_EXTERNAL: /* External input                           */
         if (env->mpic_proxy) {
             /* IACK the IRQ on delivery */
             env->spr[SPR_BOOKE_EPR] = ldl_phys(cs->as, env->mpic_iack);
         }
         break;
-    case POWERPC_EXCP_ALIGN:     /* Alignment exception                      */
+    case POWERPC_EXCP_ALIGN: /* Alignment exception                      */
         break;
-    case POWERPC_EXCP_PROGRAM:   /* Program exception                        */
+    case POWERPC_EXCP_PROGRAM: /* Program exception                        */
         switch (env->error_code & ~0xF) {
         case POWERPC_EXCP_FP:
             if (!FIELD_EX64_FE(env->msr) || !FIELD_EX64(env->msr, MSR, FP)) {
@@ -1176,7 +1236,7 @@ static void powerpc_excp_booke(PowerPCCPU *cpu, int excp)
             break;
         }
         break;
-    case POWERPC_EXCP_SYSCALL:   /* System call exception                    */
+    case POWERPC_EXCP_SYSCALL: /* System call exception                    */
         dump_syscall(env);
 
         /*
@@ -1185,23 +1245,23 @@ static void powerpc_excp_booke(PowerPCCPU *cpu, int excp)
          */
         env->nip += 4;
         break;
-    case POWERPC_EXCP_FPU:       /* Floating-point unavailable exception     */
-    case POWERPC_EXCP_APU:       /* Auxiliary processor unavailable          */
-    case POWERPC_EXCP_DECR:      /* Decrementer exception                    */
+    case POWERPC_EXCP_FPU: /* Floating-point unavailable exception     */
+    case POWERPC_EXCP_APU: /* Auxiliary processor unavailable          */
+    case POWERPC_EXCP_DECR: /* Decrementer exception                    */
         break;
-    case POWERPC_EXCP_FIT:       /* Fixed-interval timer interrupt           */
+    case POWERPC_EXCP_FIT: /* Fixed-interval timer interrupt           */
         /* FIT on 4xx */
         trace_ppc_excp_print("FIT");
         break;
-    case POWERPC_EXCP_WDT:       /* Watchdog timer interrupt                 */
+    case POWERPC_EXCP_WDT: /* Watchdog timer interrupt                 */
         trace_ppc_excp_print("WDT");
         srr0 = SPR_BOOKE_CSRR0;
         srr1 = SPR_BOOKE_CSRR1;
         break;
-    case POWERPC_EXCP_DTLB:      /* Data TLB error                           */
-    case POWERPC_EXCP_ITLB:      /* Instruction TLB error                    */
+    case POWERPC_EXCP_DTLB: /* Data TLB error                           */
+    case POWERPC_EXCP_ITLB: /* Instruction TLB error                    */
         break;
-    case POWERPC_EXCP_DEBUG:     /* Debug interrupt                          */
+    case POWERPC_EXCP_DEBUG: /* Debug interrupt                          */
         if (env->flags & POWERPC_FLAG_DE) {
             /* FIXME: choose one or the other based on CPU type */
             srr0 = SPR_BOOKE_DSRR0;
@@ -1215,23 +1275,25 @@ static void powerpc_excp_booke(PowerPCCPU *cpu, int excp)
             cpu_abort(cs, "Debug exception triggered on unsupported model\n");
         }
         break;
-    case POWERPC_EXCP_SPEU:   /* SPE/embedded floating-point unavailable/VPU  */
+    case POWERPC_EXCP_SPEU: /* SPE/embedded floating-point unavailable/VPU  */
         env->spr[SPR_BOOKE_ESR] = ESR_SPV;
         break;
-    case POWERPC_EXCP_DOORI:     /* Embedded doorbell interrupt              */
+    case POWERPC_EXCP_DOORI: /* Embedded doorbell interrupt              */
         break;
-    case POWERPC_EXCP_DOORCI:    /* Embedded doorbell critical interrupt     */
+    case POWERPC_EXCP_DOORCI: /* Embedded doorbell critical interrupt     */
         srr0 = SPR_BOOKE_CSRR0;
         srr1 = SPR_BOOKE_CSRR1;
         break;
-    case POWERPC_EXCP_RESET:     /* System reset exception                   */
+    case POWERPC_EXCP_RESET: /* System reset exception                   */
         if (FIELD_EX64(env->msr, MSR, POW)) {
-            cpu_abort(cs, "Trying to deliver power-saving system reset "
-                      "exception %d with no HV support\n", excp);
+            cpu_abort(cs,
+                      "Trying to deliver power-saving system reset "
+                      "exception %d with no HV support\n",
+                      excp);
         }
         break;
-    case POWERPC_EXCP_EFPDI:     /* Embedded floating-point data interrupt   */
-    case POWERPC_EXCP_EFPRI:     /* Embedded floating-point round interrupt  */
+    case POWERPC_EXCP_EFPDI: /* Embedded floating-point data interrupt   */
+    case POWERPC_EXCP_EFPRI: /* Embedded floating-point round interrupt  */
         cpu_abort(cs, "%s exception not implemented\n",
                   powerpc_excp_name(excp));
         break;
@@ -1398,14 +1460,13 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
      * kernel wants the interrupt.
      */
     if (excp == POWERPC_EXCP_HV_EMU && !(env->msr_mask & MSR_HVB) &&
-            !books_vhyp_handles_hv_excp(cpu)) {
+        !books_vhyp_handles_hv_excp(cpu)) {
         excp = POWERPC_EXCP_PROGRAM;
     }
 
     vector = env->excp_vectors[excp];
     if (vector == (target_ulong)-1ULL) {
-        cpu_abort(cs, "Raised an exception without defined vector %d\n",
-                  excp);
+        cpu_abort(cs, "Raised an exception without defined vector %d\n", excp);
     }
 
     vector |= env->excp_prefix;
@@ -1415,7 +1476,7 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
     }
 
     switch (excp) {
-    case POWERPC_EXCP_MCHECK:    /* Machine check exception                  */
+    case POWERPC_EXCP_MCHECK: /* Machine check exception                  */
         powerpc_mcheck_checkstop(env);
         if (env->msr_mask & MSR_HVB) {
             /*
@@ -1431,14 +1492,14 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
         msr |= env->error_code;
         break;
 
-    case POWERPC_EXCP_DSI:       /* Data storage exception                   */
+    case POWERPC_EXCP_DSI: /* Data storage exception                   */
         trace_ppc_excp_dsi(env->spr[SPR_DSISR], env->spr[SPR_DAR]);
         break;
-    case POWERPC_EXCP_ISI:       /* Instruction storage exception            */
+    case POWERPC_EXCP_ISI: /* Instruction storage exception            */
         trace_ppc_excp_isi(msr, env->nip);
         msr |= env->error_code;
         break;
-    case POWERPC_EXCP_EXTERNAL:  /* External input                           */
+    case POWERPC_EXCP_EXTERNAL: /* External input                           */
     {
         bool lpes0;
 
@@ -1461,7 +1522,7 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
 
         break;
     }
-    case POWERPC_EXCP_ALIGN:     /* Alignment exception                      */
+    case POWERPC_EXCP_ALIGN: /* Alignment exception                      */
         /* Optional DSISR update was removed from ISA v3.0 */
         if (!(env->insns_flags2 & PPC2_ISA300)) {
             /* Get rS/rD and rA from faulting opcode */
@@ -1473,7 +1534,7 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
             env->spr[SPR_DSISR] |= (env->error_code & 0x03FF0000) >> 16;
         }
         break;
-    case POWERPC_EXCP_PROGRAM:   /* Program exception                        */
+    case POWERPC_EXCP_PROGRAM: /* Program exception                        */
         switch (env->error_code & ~0xF) {
         case POWERPC_EXCP_FP:
             if (!FIELD_EX64_FE(env->msr) || !FIELD_EX64(env->msr, MSR, FP)) {
@@ -1506,7 +1567,7 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
             break;
         }
         break;
-    case POWERPC_EXCP_SYSCALL:   /* System call exception                    */
+    case POWERPC_EXCP_SYSCALL: /* System call exception                    */
         lev = env->error_code;
 
         if (lev == 1 && cpu->vhyp) {
@@ -1548,10 +1609,10 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
         env->lr = env->nip;
         env->ctr = msr;
         break;
-    case POWERPC_EXCP_FPU:       /* Floating-point unavailable exception     */
-    case POWERPC_EXCP_DECR:      /* Decrementer exception                    */
+    case POWERPC_EXCP_FPU: /* Floating-point unavailable exception     */
+    case POWERPC_EXCP_DECR: /* Decrementer exception                    */
         break;
-    case POWERPC_EXCP_RESET:     /* System reset exception                   */
+    case POWERPC_EXCP_RESET: /* System reset exception                   */
         /* A power-saving exception sets ME, otherwise it is unchanged */
         if (FIELD_EX64(env->msr, MSR, POW)) {
             /* indicate that we resumed from power save mode */
@@ -1566,24 +1627,26 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
             new_msr |= (target_ulong)MSR_HVB;
         } else {
             if (FIELD_EX64(env->msr, MSR, POW)) {
-                cpu_abort(cs, "Trying to deliver power-saving system reset "
-                          "exception %d with no HV support\n", excp);
+                cpu_abort(cs,
+                          "Trying to deliver power-saving system reset "
+                          "exception %d with no HV support\n",
+                          excp);
             }
         }
         break;
-    case POWERPC_EXCP_DSEG:      /* Data segment exception                   */
-    case POWERPC_EXCP_ISEG:      /* Instruction segment exception            */
-    case POWERPC_EXCP_TRACE:     /* Trace exception                          */
-    case POWERPC_EXCP_SDOOR:     /* Doorbell interrupt                       */
-    case POWERPC_EXCP_PERFM:     /* Performance monitor interrupt            */
+    case POWERPC_EXCP_DSEG: /* Data segment exception                   */
+    case POWERPC_EXCP_ISEG: /* Instruction segment exception            */
+    case POWERPC_EXCP_TRACE: /* Trace exception                          */
+    case POWERPC_EXCP_SDOOR: /* Doorbell interrupt                       */
+    case POWERPC_EXCP_PERFM: /* Performance monitor interrupt            */
         break;
-    case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage exception */
+    case POWERPC_EXCP_HISI: /* Hypervisor instruction storage exception */
         msr |= env->error_code;
         /* fall through */
-    case POWERPC_EXCP_HDECR:     /* Hypervisor decrementer exception         */
-    case POWERPC_EXCP_HDSI:      /* Hypervisor data storage exception        */
-    case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt            */
-    case POWERPC_EXCP_HVIRT:     /* Hypervisor virtualization                */
+    case POWERPC_EXCP_HDECR: /* Hypervisor decrementer exception         */
+    case POWERPC_EXCP_HDSI: /* Hypervisor data storage exception        */
+    case POWERPC_EXCP_SDOOR_HV: /* Hypervisor Doorbell interrupt            */
+    case POWERPC_EXCP_HVIRT: /* Hypervisor virtualization                */
         srr0 = SPR_HSRR0;
         srr1 = SPR_HSRR1;
         new_msr |= (target_ulong)MSR_HVB;
@@ -1605,20 +1668,20 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
         break;
     }
 #endif
-    case POWERPC_EXCP_VPU:       /* Vector unavailable exception             */
-    case POWERPC_EXCP_VSXU:       /* VSX unavailable exception               */
-    case POWERPC_EXCP_FU:         /* Facility unavailable exception          */
+    case POWERPC_EXCP_VPU: /* Vector unavailable exception             */
+    case POWERPC_EXCP_VSXU: /* VSX unavailable exception               */
+    case POWERPC_EXCP_FU: /* Facility unavailable exception          */
         env->spr[SPR_FSCR] |= ((target_ulong)env->error_code << 56);
         break;
-    case POWERPC_EXCP_HV_FU:     /* Hypervisor Facility Unavailable Exception */
+    case POWERPC_EXCP_HV_FU: /* Hypervisor Facility Unavailable Exception */
         env->spr[SPR_HFSCR] |= ((target_ulong)env->error_code << FSCR_IC_POS);
         srr0 = SPR_HSRR0;
         srr1 = SPR_HSRR1;
         new_msr |= (target_ulong)MSR_HVB;
         new_msr |= env->msr & ((target_ulong)1 << MSR_RI);
         break;
-    case POWERPC_EXCP_PERFM_EBB:        /* Performance Monitor EBB Exception  */
-    case POWERPC_EXCP_EXTERNAL_EBB:     /* External EBB Exception             */
+    case POWERPC_EXCP_PERFM_EBB: /* Performance Monitor EBB Exception  */
+    case POWERPC_EXCP_EXTERNAL_EBB: /* External EBB Exception             */
         env->spr[SPR_BESCR] &= ~BESCR_GE;
 
         /*
@@ -1632,10 +1695,10 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
          * This exception is handled in userspace. No need to proceed.
          */
         return;
-    case POWERPC_EXCP_THERM:     /* Thermal interrupt                        */
-    case POWERPC_EXCP_VPUA:      /* Vector assist exception                  */
-    case POWERPC_EXCP_MAINT:     /* Maintenance exception                    */
-    case POWERPC_EXCP_HV_MAINT:  /* Hypervisor Maintenance exception         */
+    case POWERPC_EXCP_THERM: /* Thermal interrupt                        */
+    case POWERPC_EXCP_VPUA: /* Vector assist exception                  */
+    case POWERPC_EXCP_MAINT: /* Maintenance exception                    */
+    case POWERPC_EXCP_HV_MAINT: /* Hypervisor Maintenance exception         */
         cpu_abort(cs, "%s exception not implemented\n",
                   powerpc_excp_name(excp));
         break;
@@ -1673,8 +1736,10 @@ static void powerpc_excp_books(PowerPCCPU *cpu, int excp)
     } else {
         /* Sanity check */
         if (!(env->msr_mask & MSR_HVB) && srr0 == SPR_HSRR0) {
-            cpu_abort(cs, "Trying to deliver HV exception (HSRR) %d with "
-                      "no HV support\n", excp);
+            cpu_abort(cs,
+                      "Trying to deliver HV exception (HSRR) %d with "
+                      "no HV support\n",
+                      excp);
         }
 
         /* This can update new_msr and vector if AIL applies */
@@ -1699,9 +1764,10 @@ static void powerpc_excp(PowerPCCPU *cpu, int excp)
         cpu_abort(cs, "Invalid PowerPC exception %d. Aborting\n", excp);
     }
 
-    qemu_log_mask(CPU_LOG_INT, "Raise exception at " TARGET_FMT_lx
-                  " => %s (%d) error=%02x\n", env->nip, powerpc_excp_name(excp),
-                  excp, env->error_code);
+    qemu_log_mask(CPU_LOG_INT,
+                  "Raise exception at " TARGET_FMT_lx
+                  " => %s (%d) error=%02x\n",
+                  env->nip, powerpc_excp_name(excp), excp, env->error_code);
     env->excp_stats[excp]++;
 
     switch (env->excp_model) {
@@ -1740,7 +1806,7 @@ void ppc_cpu_do_interrupt(CPUState *cs)
 }
 
 #if defined(TARGET_PPC64)
-#define P7_UNUSED_INTERRUPTS \
+#define P7_UNUSED_INTERRUPTS                                                \
     (PPC_INTERRUPT_RESET | PPC_INTERRUPT_HVIRT | PPC_INTERRUPT_CEXT |       \
      PPC_INTERRUPT_WDT | PPC_INTERRUPT_CDOORBELL | PPC_INTERRUPT_FIT |      \
      PPC_INTERRUPT_PIT | PPC_INTERRUPT_DOORBELL | PPC_INTERRUPT_HDOORBELL | \
@@ -1805,7 +1871,7 @@ static int p7_next_unmasked_interrupt(CPUPPCState *env)
         bool heic = !!(env->spr[SPR_LPCR] & LPCR_HEIC);
         /* HEIC blocks delivery to the hypervisor */
         if ((msr_ee && !(heic && FIELD_EX64_HV(env->msr) &&
-            !FIELD_EX64(env->msr, MSR, PR))) ||
+                         !FIELD_EX64(env->msr, MSR, PR))) ||
             (env->has_hv_mode && !FIELD_EX64_HV(env->msr) && !lpes0)) {
             return PPC_INTERRUPT_EXT;
         }
@@ -1823,10 +1889,10 @@ static int p7_next_unmasked_interrupt(CPUPPCState *env)
     return 0;
 }
 
-#define P8_UNUSED_INTERRUPTS \
+#define P8_UNUSED_INTERRUPTS                                            \
     (PPC_INTERRUPT_RESET | PPC_INTERRUPT_DEBUG | PPC_INTERRUPT_HVIRT |  \
-    PPC_INTERRUPT_CEXT | PPC_INTERRUPT_WDT | PPC_INTERRUPT_CDOORBELL |  \
-    PPC_INTERRUPT_FIT | PPC_INTERRUPT_PIT | PPC_INTERRUPT_THERM)
+     PPC_INTERRUPT_CEXT | PPC_INTERRUPT_WDT | PPC_INTERRUPT_CDOORBELL | \
+     PPC_INTERRUPT_FIT | PPC_INTERRUPT_PIT | PPC_INTERRUPT_THERM)
 
 static int p8_interrupt_powersave(CPUPPCState *env)
 {
@@ -1895,7 +1961,7 @@ static int p8_next_unmasked_interrupt(CPUPPCState *env)
         bool heic = !!(env->spr[SPR_LPCR] & LPCR_HEIC);
         /* HEIC blocks delivery to the hypervisor */
         if ((msr_ee && !(heic && FIELD_EX64_HV(env->msr) &&
-            !FIELD_EX64(env->msr, MSR, PR))) ||
+                         !FIELD_EX64(env->msr, MSR, PR))) ||
             (env->has_hv_mode && !FIELD_EX64_HV(env->msr) && !lpes0)) {
             return PPC_INTERRUPT_EXT;
         }
@@ -1930,9 +1996,9 @@ static int p8_next_unmasked_interrupt(CPUPPCState *env)
     return 0;
 }
 
-#define P9_UNUSED_INTERRUPTS \
-    (PPC_INTERRUPT_RESET | PPC_INTERRUPT_DEBUG | PPC_INTERRUPT_CEXT |   \
-     PPC_INTERRUPT_WDT | PPC_INTERRUPT_CDOORBELL | PPC_INTERRUPT_FIT |  \
+#define P9_UNUSED_INTERRUPTS                                           \
+    (PPC_INTERRUPT_RESET | PPC_INTERRUPT_DEBUG | PPC_INTERRUPT_CEXT |  \
+     PPC_INTERRUPT_WDT | PPC_INTERRUPT_CDOORBELL | PPC_INTERRUPT_FIT | \
      PPC_INTERRUPT_PIT | PPC_INTERRUPT_THERM)
 
 static int p9_interrupt_powersave(CPUPPCState *env)
@@ -2036,7 +2102,7 @@ static int p9_next_unmasked_interrupt(CPUPPCState *env)
         bool heic = !!(env->spr[SPR_LPCR] & LPCR_HEIC);
         /* HEIC blocks delivery to the hypervisor */
         if ((msr_ee && !(heic && FIELD_EX64_HV(env->msr) &&
-            !FIELD_EX64(env->msr, MSR, PR))) ||
+                         !FIELD_EX64(env->msr, MSR, PR))) ||
             (env->has_hv_mode && !FIELD_EX64_HV(env->msr) && !lpes0)) {
             return PPC_INTERRUPT_EXT;
         }
@@ -2124,7 +2190,7 @@ static int ppc_next_unmasked_interrupt_generic(CPUPPCState *env)
         bool heic = !!(env->spr[SPR_LPCR] & LPCR_HEIC);
         /* HEIC blocks delivery to the hypervisor */
         if ((async_deliver && !(heic && FIELD_EX64_HV(env->msr) &&
-            !FIELD_EX64(env->msr, MSR, PR))) ||
+                                !FIELD_EX64(env->msr, MSR, PR))) ||
             (env->has_hv_mode && !FIELD_EX64_HV(env->msr) && !lpes0)) {
             return PPC_INTERRUPT_EXT;
         }
@@ -2502,7 +2568,7 @@ static void ppc_deliver_interrupt_generic(CPUPPCState *env, int interrupt)
         env->pending_interrupts &= ~PPC_INTERRUPT_PERFM;
         powerpc_excp(cpu, POWERPC_EXCP_PERFM);
         break;
-    case PPC_INTERRUPT_THERM:  /* Thermal interrupt */
+    case PPC_INTERRUPT_THERM: /* Thermal interrupt */
         env->pending_interrupts &= ~PPC_INTERRUPT_THERM;
         powerpc_excp(cpu, POWERPC_EXCP_THERM);
         break;
@@ -2629,8 +2695,7 @@ void raise_exception(CPUPPCState *env, uint32_t exception)
     raise_exception_err_ra(env, exception, 0, 0);
 }
 
-void raise_exception_ra(CPUPPCState *env, uint32_t exception,
-                        uintptr_t raddr)
+void raise_exception_ra(CPUPPCState *env, uint32_t exception, uintptr_t raddr)
 {
     raise_exception_err_ra(env, exception, 0, raddr);
 }
@@ -2682,8 +2747,8 @@ void helper_pminsn(CPUPPCState *env, uint32_t insn)
     cs->halted = 1;
 
     /* Condition for waking up at 0x100 */
-    env->resume_as_sreset = (insn != PPC_PM_STOP) ||
-        (env->spr[SPR_PSSCR] & PSSCR_EC);
+    env->resume_as_sreset =
+        (insn != PPC_PM_STOP) || (env->spr[SPR_PSSCR] & PSSCR_EC);
 
     /* HDECR is not to wake from PM state, it may have already fired */
     if (env->resume_as_sreset) {
@@ -2868,8 +2933,8 @@ void helper_tw(CPUPPCState *env, target_ulong arg1, target_ulong arg2,
                   ((int32_t)arg1 == (int32_t)arg2 && (flags & 0x04)) ||
                   ((uint32_t)arg1 < (uint32_t)arg2 && (flags & 0x02)) ||
                   ((uint32_t)arg1 > (uint32_t)arg2 && (flags & 0x01))))) {
-        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_TRAP, GETPC());
+        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM, POWERPC_EXCP_TRAP,
+                               GETPC());
     }
 }
 
@@ -2882,8 +2947,8 @@ void helper_td(CPUPPCState *env, target_ulong arg1, target_ulong arg2,
                   ((int64_t)arg1 == (int64_t)arg2 && (flags & 0x04)) ||
                   ((uint64_t)arg1 < (uint64_t)arg2 && (flags & 0x02)) ||
                   ((uint64_t)arg1 > (uint64_t)arg2 && (flags & 0x01))))) {
-        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_TRAP, GETPC());
+        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM, POWERPC_EXCP_TRAP,
+                               GETPC());
     }
 }
 #endif
@@ -2918,8 +2983,8 @@ static uint32_t helper_SIMON_LIKE_32_64(uint32_t x, uint64_t key, uint32_t lane)
     }
 
     for (int i = 0; i < 32; i++) {
-        fxleft[i] = (rol16(xleft[i], 1) &
-            rol16(xleft[i], 8)) ^ rol16(xleft[i], 2);
+        fxleft[i] =
+            (rol16(xleft[i], 1) & rol16(xleft[i], 8)) ^ rol16(xleft[i], 2);
         xleft[i + 1] = xright[i] ^ fxleft[i] ^ eff_k[i];
         xright[i + 1] = xleft[i];
     }
@@ -2959,8 +3024,8 @@ static void do_hash(CPUPPCState *env, target_ulong ea, target_ulong ra,
     } else {
         loaded_hash = cpu_ldq_data_ra(env, ea, GETPC());
         if (loaded_hash != calculated_hash) {
-            raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                POWERPC_EXCP_TRAP, GETPC());
+            raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM, POWERPC_EXCP_TRAP,
+                                   GETPC());
         }
     }
 }
@@ -2969,31 +3034,31 @@ static void do_hash(CPUPPCState *env, target_ulong ea, target_ulong ra,
 
 #ifdef TARGET_PPC64
 #define HELPER_HASH(op, key, store, dexcr_aspect)                             \
-void helper_##op(CPUPPCState *env, target_ulong ea, target_ulong ra,          \
-                 target_ulong rb)                                             \
-{                                                                             \
-    if (env->msr & R_MSR_PR_MASK) {                                           \
-        if (!(env->spr[SPR_DEXCR] & R_DEXCR_PRO_##dexcr_aspect##_MASK ||      \
-            env->spr[SPR_HDEXCR] & R_HDEXCR_ENF_##dexcr_aspect##_MASK))       \
-            return;                                                           \
-    } else if (!(env->msr & R_MSR_HV_MASK)) {                                 \
-        if (!(env->spr[SPR_DEXCR] & R_DEXCR_PNH_##dexcr_aspect##_MASK ||      \
-            env->spr[SPR_HDEXCR] & R_HDEXCR_ENF_##dexcr_aspect##_MASK))       \
-            return;                                                           \
-    } else if (!(env->msr & R_MSR_S_MASK)) {                                  \
-        if (!(env->spr[SPR_HDEXCR] & R_HDEXCR_HNU_##dexcr_aspect##_MASK))     \
-            return;                                                           \
-    }                                                                         \
+    void helper_##op(CPUPPCState *env, target_ulong ea, target_ulong ra,      \
+                     target_ulong rb)                                         \
+    {                                                                         \
+        if (env->msr & R_MSR_PR_MASK) {                                       \
+            if (!(env->spr[SPR_DEXCR] & R_DEXCR_PRO_##dexcr_aspect##_MASK ||  \
+                  env->spr[SPR_HDEXCR] & R_HDEXCR_ENF_##dexcr_aspect##_MASK)) \
+                return;                                                       \
+        } else if (!(env->msr & R_MSR_HV_MASK)) {                             \
+            if (!(env->spr[SPR_DEXCR] & R_DEXCR_PNH_##dexcr_aspect##_MASK ||  \
+                  env->spr[SPR_HDEXCR] & R_HDEXCR_ENF_##dexcr_aspect##_MASK)) \
+                return;                                                       \
+        } else if (!(env->msr & R_MSR_S_MASK)) {                              \
+            if (!(env->spr[SPR_HDEXCR] & R_HDEXCR_HNU_##dexcr_aspect##_MASK)) \
+                return;                                                       \
+        }                                                                     \
                                                                               \
-    do_hash(env, ea, ra, rb, key, store);                                     \
-}
+        do_hash(env, ea, ra, rb, key, store);                                 \
+    }
 #else
-#define HELPER_HASH(op, key, store, dexcr_aspect)                             \
-void helper_##op(CPUPPCState *env, target_ulong ea, target_ulong ra,          \
-                 target_ulong rb)                                             \
-{                                                                             \
-    do_hash(env, ea, ra, rb, key, store);                                     \
-}
+#define HELPER_HASH(op, key, store, dexcr_aspect)                        \
+    void helper_##op(CPUPPCState *env, target_ulong ea, target_ulong ra, \
+                     target_ulong rb)                                    \
+    {                                                                    \
+        do_hash(env, ea, ra, rb, key, store);                            \
+    }
 #endif /* TARGET_PPC64 */
 
 HELPER_HASH(HASHST, env->spr[SPR_HASHKEYR], true, NPHIE)
@@ -3052,7 +3117,7 @@ void helper_msgsnd(target_ulong rb)
     }
 
     qemu_mutex_lock_iothread();
-    CPU_FOREACH(cs) {
+    CPU_FOREACH (cs) {
         PowerPCCPU *cpu = POWERPC_CPU(cs);
         CPUPPCState *cenv = &cpu->env;
 
@@ -3089,7 +3154,7 @@ static void book3s_msgsnd_common(int pir, int irq)
     CPUState *cs;
 
     qemu_mutex_lock_iothread();
-    CPU_FOREACH(cs) {
+    CPU_FOREACH (cs) {
         PowerPCCPU *cpu = POWERPC_CPU(cs);
         CPUPPCState *cenv = &cpu->env;
 
@@ -3153,7 +3218,8 @@ void helper_book3s_msgsndp(CPUPPCState *env, target_ulong rb)
 
     /* Does iothread need to be locked for walking CPU list? */
     qemu_mutex_lock_iothread();
-    THREAD_SIBLING_FOREACH(cs, ccs) {
+    THREAD_SIBLING_FOREACH(cs, ccs)
+    {
         PowerPCCPU *ccpu = POWERPC_CPU(ccs);
         uint32_t thread_id = ppc_cpu_tir(ccpu);
 
@@ -3169,8 +3235,8 @@ void helper_book3s_msgsndp(CPUPPCState *env, target_ulong rb)
 #endif /* TARGET_PPC64 */
 
 void ppc_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-                                 MMUAccessType access_type,
-                                 int mmu_idx, uintptr_t retaddr)
+                                 MMUAccessType access_type, int mmu_idx,
+                                 uintptr_t retaddr)
 {
     CPUPPCState *env = cs->env_ptr;
     uint32_t insn;
@@ -3197,9 +3263,8 @@ void ppc_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
     cpu_loop_exit(cs);
 }
 
-void ppc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                   vaddr vaddr, unsigned size,
-                                   MMUAccessType access_type,
+void ppc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr vaddr,
+                                   unsigned size, MMUAccessType access_type,
                                    int mmu_idx, MemTxAttrs attrs,
                                    MemTxResult response, uintptr_t retaddr)
 {

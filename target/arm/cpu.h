@@ -28,48 +28,48 @@
 #include "qapi/qapi-types-common.h"
 
 /* ARM processors have a weak memory model */
-#define TCG_GUEST_DEFAULT_MO      (0)
+#define TCG_GUEST_DEFAULT_MO (0)
 
 #ifdef TARGET_AARCH64
 #define KVM_HAVE_MCE_INJECTION 1
 #endif
 
-#define EXCP_UDEF            1   /* undefined instruction */
-#define EXCP_SWI             2   /* software interrupt */
-#define EXCP_PREFETCH_ABORT  3
-#define EXCP_DATA_ABORT      4
-#define EXCP_IRQ             5
-#define EXCP_FIQ             6
-#define EXCP_BKPT            7
-#define EXCP_EXCEPTION_EXIT  8   /* Return from v7M exception.  */
-#define EXCP_KERNEL_TRAP     9   /* Jumped to kernel code page.  */
-#define EXCP_HVC            11   /* HyperVisor Call */
-#define EXCP_HYP_TRAP       12
-#define EXCP_SMC            13   /* Secure Monitor Call */
-#define EXCP_VIRQ           14
-#define EXCP_VFIQ           15
-#define EXCP_SEMIHOST       16   /* semihosting call */
-#define EXCP_NOCP           17   /* v7M NOCP UsageFault */
-#define EXCP_INVSTATE       18   /* v7M INVSTATE UsageFault */
-#define EXCP_STKOF          19   /* v8M STKOF UsageFault */
-#define EXCP_LAZYFP         20   /* v7M fault during lazy FP stacking */
-#define EXCP_LSERR          21   /* v8M LSERR SecureFault */
-#define EXCP_UNALIGNED      22   /* v7M UNALIGNED UsageFault */
-#define EXCP_DIVBYZERO      23   /* v7M DIVBYZERO UsageFault */
-#define EXCP_VSERR          24
-#define EXCP_GPC            25   /* v9 Granule Protection Check Fault */
+#define EXCP_UDEF 1 /* undefined instruction */
+#define EXCP_SWI 2 /* software interrupt */
+#define EXCP_PREFETCH_ABORT 3
+#define EXCP_DATA_ABORT 4
+#define EXCP_IRQ 5
+#define EXCP_FIQ 6
+#define EXCP_BKPT 7
+#define EXCP_EXCEPTION_EXIT 8 /* Return from v7M exception.  */
+#define EXCP_KERNEL_TRAP 9 /* Jumped to kernel code page.  */
+#define EXCP_HVC 11 /* HyperVisor Call */
+#define EXCP_HYP_TRAP 12
+#define EXCP_SMC 13 /* Secure Monitor Call */
+#define EXCP_VIRQ 14
+#define EXCP_VFIQ 15
+#define EXCP_SEMIHOST 16 /* semihosting call */
+#define EXCP_NOCP 17 /* v7M NOCP UsageFault */
+#define EXCP_INVSTATE 18 /* v7M INVSTATE UsageFault */
+#define EXCP_STKOF 19 /* v8M STKOF UsageFault */
+#define EXCP_LAZYFP 20 /* v7M fault during lazy FP stacking */
+#define EXCP_LSERR 21 /* v8M LSERR SecureFault */
+#define EXCP_UNALIGNED 22 /* v7M UNALIGNED UsageFault */
+#define EXCP_DIVBYZERO 23 /* v7M DIVBYZERO UsageFault */
+#define EXCP_VSERR 24
+#define EXCP_GPC 25 /* v9 Granule Protection Check Fault */
 /* NB: add new EXCP_ defines to the array in arm_log_exception() too */
 
-#define ARMV7M_EXCP_RESET   1
-#define ARMV7M_EXCP_NMI     2
-#define ARMV7M_EXCP_HARD    3
-#define ARMV7M_EXCP_MEM     4
-#define ARMV7M_EXCP_BUS     5
-#define ARMV7M_EXCP_USAGE   6
-#define ARMV7M_EXCP_SECURE  7
-#define ARMV7M_EXCP_SVC     11
-#define ARMV7M_EXCP_DEBUG   12
-#define ARMV7M_EXCP_PENDSV  14
+#define ARMV7M_EXCP_RESET 1
+#define ARMV7M_EXCP_NMI 2
+#define ARMV7M_EXCP_HARD 3
+#define ARMV7M_EXCP_MEM 4
+#define ARMV7M_EXCP_BUS 5
+#define ARMV7M_EXCP_USAGE 6
+#define ARMV7M_EXCP_SECURE 7
+#define ARMV7M_EXCP_SVC 11
+#define ARMV7M_EXCP_DEBUG 12
+#define ARMV7M_EXCP_PENDSV 14
 #define ARMV7M_EXCP_SYSTICK 15
 
 /* For M profile, some registers are banked secure vs non-secure;
@@ -88,9 +88,9 @@ enum {
 };
 
 /* ARM-specific interrupt pending bits.  */
-#define CPU_INTERRUPT_FIQ   CPU_INTERRUPT_TGT_EXT_1
-#define CPU_INTERRUPT_VIRQ  CPU_INTERRUPT_TGT_EXT_2
-#define CPU_INTERRUPT_VFIQ  CPU_INTERRUPT_TGT_EXT_3
+#define CPU_INTERRUPT_FIQ CPU_INTERRUPT_TGT_EXT_1
+#define CPU_INTERRUPT_VIRQ CPU_INTERRUPT_TGT_EXT_2
+#define CPU_INTERRUPT_VFIQ CPU_INTERRUPT_TGT_EXT_3
 #define CPU_INTERRUPT_VSERR CPU_INTERRUPT_TGT_INT_0
 
 /* The usual mapping for an AArch64 system register to its AArch32
@@ -160,12 +160,12 @@ typedef struct ARMGenericTimer {
     uint64_t ctl; /* Timer Control register */
 } ARMGenericTimer;
 
-#define GTIMER_PHYS     0
-#define GTIMER_VIRT     1
-#define GTIMER_HYP      2
-#define GTIMER_SEC      3
-#define GTIMER_HYPVIRT  4
-#define NUM_GTIMERS     5
+#define GTIMER_PHYS 0
+#define GTIMER_VIRT 1
+#define GTIMER_HYP 2
+#define GTIMER_SEC 3
+#define GTIMER_HYPVIRT 4
+#define NUM_GTIMERS 5
 
 #define VTCR_NSW (1u << 29)
 #define VTCR_NSA (1u << 30)
@@ -256,7 +256,7 @@ typedef struct CPUArchState {
      */
     uint32_t pstate;
     bool aarch64; /* True if CPU is in aarch64 state; inverse of PSTATE.nRW */
-    bool thumb;   /* True if CPU is in thumb mode; cpsr[5] */
+    bool thumb; /* True if CPU is in thumb mode; cpsr[5] */
 
     /* Cached TBFLAGS state.  See below for which bits are included.  */
     CPUARMTBFlags hflags;
@@ -284,13 +284,13 @@ typedef struct CPUArchState {
     uint32_t QF; /* 0 or 1 */
     uint32_t GE; /* cpsr[19:16] */
     uint32_t condexec_bits; /* IT bits.  cpsr[15:10,26:25].  */
-    uint32_t btype;  /* BTI branch type.  spsr[11:10].  */
+    uint32_t btype; /* BTI branch type.  spsr[11:10].  */
     uint64_t daif; /* exception masks, in the bits they are in PSTATE */
     uint64_t svcr; /* PSTATE.{SM,ZA} in the bits they are in SVCR */
 
     uint64_t elr_el[4]; /* AArch64 exception link regs  */
     uint64_t sp_el[4]; /* AArch64 banked stack pointers */
-    
+
 #ifdef CONFIG_LATA
     long jr_cnt;
     long jr_hit;
@@ -353,8 +353,8 @@ typedef struct CPUArchState {
         float_status standard_fp_status;
         float_status standard_fp_status_f16;
 
-        uint64_t zcr_el[4];   /* ZCR_EL[1-3] */
-        uint64_t smcr_el[4];  /* SMCR_EL[1-3] */
+        uint64_t zcr_el[4]; /* ZCR_EL[1-3] */
+        uint64_t smcr_el[4]; /* SMCR_EL[1-3] */
     } vfp;
 
     /* System control coprocessor (cp15) */
@@ -380,7 +380,7 @@ typedef struct CPUArchState {
         };
         uint64_t vsctlr; /* Virtualization System control register. */
         uint64_t cpacr_el1; /* Architectural feature access control register */
-        uint64_t cptr_el[4];  /* ARMv8 feature trap registers */
+        uint64_t cptr_el[4]; /* ARMv8 feature trap registers */
         uint32_t c1_xscaleauxcr; /* XScale auxiliary control register.  */
         uint64_t sder; /* Secure debug enable register. */
         uint32_t nsacr; /* Non-secure access control register. */
@@ -564,7 +564,7 @@ typedef struct CPUArchState {
         uint64_t dbgbcr[16]; /* breakpoint control registers */
         uint64_t dbgwvr[16]; /* watchpoint value registers */
         uint64_t dbgwcr[16]; /* watchpoint control registers */
-        uint64_t dbgclaim;   /* DBGCLAIM bits */
+        uint64_t dbgclaim; /* DBGCLAIM bits */
         uint64_t mdscr_el1;
         uint64_t oslsr_el1; /* OS Lock Status */
         uint64_t osdlr_el1; /* OS DoubleLock status */
@@ -752,7 +752,8 @@ typedef struct CPUArchState {
     ARMMMUFaultInfo *tlb_fi;
 
     /* Fields up to this point are cleared by a CPU reset */
-    struct {} end_reset_fields;
+    struct {
+    } end_reset_fields;
 
     /* Fields after this point are preserved across CPU reset. */
 
@@ -1147,17 +1148,17 @@ int arm_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
  */
 const char *arm_gdb_get_dynamic_xml(CPUState *cpu, const char *xmlname);
 
-int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                             int cpuid, DumpState *s);
-int arm_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-                             int cpuid, DumpState *s);
+int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                             DumpState *s);
+int arm_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                             DumpState *s);
 
 #ifdef TARGET_AARCH64
 int aarch64_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
 int aarch64_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
 void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
-void aarch64_sve_change_el(CPUARMState *env, int old_el,
-                           int new_el, bool el0_a64);
+void aarch64_sve_change_el(CPUARMState *env, int old_el, int new_el,
+                           bool el0_a64);
 void aarch64_set_svcr(CPUARMState *env, uint64_t new, uint64_t mask);
 
 /*
@@ -1185,10 +1186,12 @@ static inline uint64_t *sve_bswap64(uint64_t *dst, uint64_t *src, int nr)
 }
 
 #else
-static inline void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq) { }
-static inline void aarch64_sve_change_el(CPUARMState *env, int o,
-                                         int n, bool a)
-{ }
+static inline void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq)
+{
+}
+static inline void aarch64_sve_change_el(CPUARMState *env, int o, int n, bool a)
+{
+}
 #endif
 
 void aarch64_sync_32_to_64(CPUARMState *env);
@@ -1255,122 +1258,122 @@ void pmu_init(ARMCPU *cpu);
  * bits should probably check or otherwise arrange that the CPU
  * is the architectural version it expects.
  */
-#define SCTLR_M       (1U << 0)
-#define SCTLR_A       (1U << 1)
-#define SCTLR_C       (1U << 2)
-#define SCTLR_W       (1U << 3) /* up to v6; RAO in v7 */
+#define SCTLR_M (1U << 0)
+#define SCTLR_A (1U << 1)
+#define SCTLR_C (1U << 2)
+#define SCTLR_W (1U << 3) /* up to v6; RAO in v7 */
 #define SCTLR_nTLSMD_32 (1U << 3) /* v8.2-LSMAOC, AArch32 only */
-#define SCTLR_SA      (1U << 3) /* AArch64 only */
-#define SCTLR_P       (1U << 4) /* up to v5; RAO in v6 and v7 */
+#define SCTLR_SA (1U << 3) /* AArch64 only */
+#define SCTLR_P (1U << 4) /* up to v5; RAO in v6 and v7 */
 #define SCTLR_LSMAOE_32 (1U << 4) /* v8.2-LSMAOC, AArch32 only */
-#define SCTLR_SA0     (1U << 4) /* v8 onward, AArch64 only */
-#define SCTLR_D       (1U << 5) /* up to v5; RAO in v6 */
+#define SCTLR_SA0 (1U << 4) /* v8 onward, AArch64 only */
+#define SCTLR_D (1U << 5) /* up to v5; RAO in v6 */
 #define SCTLR_CP15BEN (1U << 5) /* v7 onward */
-#define SCTLR_L       (1U << 6) /* up to v5; RAO in v6 and v7; RAZ in v8 */
-#define SCTLR_nAA     (1U << 6) /* when FEAT_LSE2 is implemented */
-#define SCTLR_B       (1U << 7) /* up to v6; RAZ in v7 */
-#define SCTLR_ITD     (1U << 7) /* v8 onward */
-#define SCTLR_S       (1U << 8) /* up to v6; RAZ in v7 */
-#define SCTLR_SED     (1U << 8) /* v8 onward */
-#define SCTLR_R       (1U << 9) /* up to v6; RAZ in v7 */
-#define SCTLR_UMA     (1U << 9) /* v8 onward, AArch64 only */
-#define SCTLR_F       (1U << 10) /* up to v6 */
-#define SCTLR_SW      (1U << 10) /* v7 */
-#define SCTLR_EnRCTX  (1U << 10) /* in v8.0-PredInv */
-#define SCTLR_Z       (1U << 11) /* in v7, RES1 in v8 */
-#define SCTLR_EOS     (1U << 11) /* v8.5-ExS */
-#define SCTLR_I       (1U << 12)
-#define SCTLR_V       (1U << 13) /* AArch32 only */
-#define SCTLR_EnDB    (1U << 13) /* v8.3, AArch64 only */
-#define SCTLR_RR      (1U << 14) /* up to v7 */
-#define SCTLR_DZE     (1U << 14) /* v8 onward, AArch64 only */
-#define SCTLR_L4      (1U << 15) /* up to v6; RAZ in v7 */
-#define SCTLR_UCT     (1U << 15) /* v8 onward, AArch64 only */
-#define SCTLR_DT      (1U << 16) /* up to ??, RAO in v6 and v7 */
-#define SCTLR_nTWI    (1U << 16) /* v8 onward */
-#define SCTLR_HA      (1U << 17) /* up to v7, RES0 in v8 */
-#define SCTLR_BR      (1U << 17) /* PMSA only */
-#define SCTLR_IT      (1U << 18) /* up to ??, RAO in v6 and v7 */
-#define SCTLR_nTWE    (1U << 18) /* v8 onward */
-#define SCTLR_WXN     (1U << 19)
-#define SCTLR_ST      (1U << 20) /* up to ??, RAZ in v6 */
-#define SCTLR_UWXN    (1U << 20) /* v7 onward, AArch32 only */
-#define SCTLR_TSCXT   (1U << 20) /* FEAT_CSV2_1p2, AArch64 only */
-#define SCTLR_FI      (1U << 21) /* up to v7, v8 RES0 */
-#define SCTLR_IESB    (1U << 21) /* v8.2-IESB, AArch64 only */
-#define SCTLR_U       (1U << 22) /* up to v6, RAO in v7 */
-#define SCTLR_EIS     (1U << 22) /* v8.5-ExS */
-#define SCTLR_XP      (1U << 23) /* up to v6; v7 onward RAO */
-#define SCTLR_SPAN    (1U << 23) /* v8.1-PAN */
-#define SCTLR_VE      (1U << 24) /* up to v7 */
-#define SCTLR_E0E     (1U << 24) /* v8 onward, AArch64 only */
-#define SCTLR_EE      (1U << 25)
-#define SCTLR_L2      (1U << 26) /* up to v6, RAZ in v7 */
-#define SCTLR_UCI     (1U << 26) /* v8 onward, AArch64 only */
-#define SCTLR_NMFI    (1U << 27) /* up to v7, RAZ in v7VE and v8 */
-#define SCTLR_EnDA    (1U << 27) /* v8.3, AArch64 only */
-#define SCTLR_TRE     (1U << 28) /* AArch32 only */
+#define SCTLR_L (1U << 6) /* up to v5; RAO in v6 and v7; RAZ in v8 */
+#define SCTLR_nAA (1U << 6) /* when FEAT_LSE2 is implemented */
+#define SCTLR_B (1U << 7) /* up to v6; RAZ in v7 */
+#define SCTLR_ITD (1U << 7) /* v8 onward */
+#define SCTLR_S (1U << 8) /* up to v6; RAZ in v7 */
+#define SCTLR_SED (1U << 8) /* v8 onward */
+#define SCTLR_R (1U << 9) /* up to v6; RAZ in v7 */
+#define SCTLR_UMA (1U << 9) /* v8 onward, AArch64 only */
+#define SCTLR_F (1U << 10) /* up to v6 */
+#define SCTLR_SW (1U << 10) /* v7 */
+#define SCTLR_EnRCTX (1U << 10) /* in v8.0-PredInv */
+#define SCTLR_Z (1U << 11) /* in v7, RES1 in v8 */
+#define SCTLR_EOS (1U << 11) /* v8.5-ExS */
+#define SCTLR_I (1U << 12)
+#define SCTLR_V (1U << 13) /* AArch32 only */
+#define SCTLR_EnDB (1U << 13) /* v8.3, AArch64 only */
+#define SCTLR_RR (1U << 14) /* up to v7 */
+#define SCTLR_DZE (1U << 14) /* v8 onward, AArch64 only */
+#define SCTLR_L4 (1U << 15) /* up to v6; RAZ in v7 */
+#define SCTLR_UCT (1U << 15) /* v8 onward, AArch64 only */
+#define SCTLR_DT (1U << 16) /* up to ??, RAO in v6 and v7 */
+#define SCTLR_nTWI (1U << 16) /* v8 onward */
+#define SCTLR_HA (1U << 17) /* up to v7, RES0 in v8 */
+#define SCTLR_BR (1U << 17) /* PMSA only */
+#define SCTLR_IT (1U << 18) /* up to ??, RAO in v6 and v7 */
+#define SCTLR_nTWE (1U << 18) /* v8 onward */
+#define SCTLR_WXN (1U << 19)
+#define SCTLR_ST (1U << 20) /* up to ??, RAZ in v6 */
+#define SCTLR_UWXN (1U << 20) /* v7 onward, AArch32 only */
+#define SCTLR_TSCXT (1U << 20) /* FEAT_CSV2_1p2, AArch64 only */
+#define SCTLR_FI (1U << 21) /* up to v7, v8 RES0 */
+#define SCTLR_IESB (1U << 21) /* v8.2-IESB, AArch64 only */
+#define SCTLR_U (1U << 22) /* up to v6, RAO in v7 */
+#define SCTLR_EIS (1U << 22) /* v8.5-ExS */
+#define SCTLR_XP (1U << 23) /* up to v6; v7 onward RAO */
+#define SCTLR_SPAN (1U << 23) /* v8.1-PAN */
+#define SCTLR_VE (1U << 24) /* up to v7 */
+#define SCTLR_E0E (1U << 24) /* v8 onward, AArch64 only */
+#define SCTLR_EE (1U << 25)
+#define SCTLR_L2 (1U << 26) /* up to v6, RAZ in v7 */
+#define SCTLR_UCI (1U << 26) /* v8 onward, AArch64 only */
+#define SCTLR_NMFI (1U << 27) /* up to v7, RAZ in v7VE and v8 */
+#define SCTLR_EnDA (1U << 27) /* v8.3, AArch64 only */
+#define SCTLR_TRE (1U << 28) /* AArch32 only */
 #define SCTLR_nTLSMD_64 (1U << 28) /* v8.2-LSMAOC, AArch64 only */
-#define SCTLR_AFE     (1U << 29) /* AArch32 only */
+#define SCTLR_AFE (1U << 29) /* AArch32 only */
 #define SCTLR_LSMAOE_64 (1U << 29) /* v8.2-LSMAOC, AArch64 only */
-#define SCTLR_TE      (1U << 30) /* AArch32 only */
-#define SCTLR_EnIB    (1U << 30) /* v8.3, AArch64 only */
-#define SCTLR_EnIA    (1U << 31) /* v8.3, AArch64 only */
+#define SCTLR_TE (1U << 30) /* AArch32 only */
+#define SCTLR_EnIB (1U << 30) /* v8.3, AArch64 only */
+#define SCTLR_EnIA (1U << 31) /* v8.3, AArch64 only */
 #define SCTLR_DSSBS_32 (1U << 31) /* v8.5, AArch32 only */
-#define SCTLR_BT0     (1ULL << 35) /* v8.5-BTI */
-#define SCTLR_BT1     (1ULL << 36) /* v8.5-BTI */
-#define SCTLR_ITFSB   (1ULL << 37) /* v8.5-MemTag */
-#define SCTLR_TCF0    (3ULL << 38) /* v8.5-MemTag */
-#define SCTLR_TCF     (3ULL << 40) /* v8.5-MemTag */
-#define SCTLR_ATA0    (1ULL << 42) /* v8.5-MemTag */
-#define SCTLR_ATA     (1ULL << 43) /* v8.5-MemTag */
+#define SCTLR_BT0 (1ULL << 35) /* v8.5-BTI */
+#define SCTLR_BT1 (1ULL << 36) /* v8.5-BTI */
+#define SCTLR_ITFSB (1ULL << 37) /* v8.5-MemTag */
+#define SCTLR_TCF0 (3ULL << 38) /* v8.5-MemTag */
+#define SCTLR_TCF (3ULL << 40) /* v8.5-MemTag */
+#define SCTLR_ATA0 (1ULL << 42) /* v8.5-MemTag */
+#define SCTLR_ATA (1ULL << 43) /* v8.5-MemTag */
 #define SCTLR_DSSBS_64 (1ULL << 44) /* v8.5, AArch64 only */
-#define SCTLR_TWEDEn  (1ULL << 45)  /* FEAT_TWED */
-#define SCTLR_TWEDEL  MAKE_64_MASK(46, 4)  /* FEAT_TWED */
-#define SCTLR_TMT0    (1ULL << 50) /* FEAT_TME */
-#define SCTLR_TMT     (1ULL << 51) /* FEAT_TME */
-#define SCTLR_TME0    (1ULL << 52) /* FEAT_TME */
-#define SCTLR_TME     (1ULL << 53) /* FEAT_TME */
-#define SCTLR_EnASR   (1ULL << 54) /* FEAT_LS64_V */
-#define SCTLR_EnAS0   (1ULL << 55) /* FEAT_LS64_ACCDATA */
-#define SCTLR_EnALS   (1ULL << 56) /* FEAT_LS64 */
-#define SCTLR_EPAN    (1ULL << 57) /* FEAT_PAN3 */
-#define SCTLR_EnTP2   (1ULL << 60) /* FEAT_SME */
-#define SCTLR_NMI     (1ULL << 61) /* FEAT_NMI */
+#define SCTLR_TWEDEn (1ULL << 45) /* FEAT_TWED */
+#define SCTLR_TWEDEL MAKE_64_MASK(46, 4) /* FEAT_TWED */
+#define SCTLR_TMT0 (1ULL << 50) /* FEAT_TME */
+#define SCTLR_TMT (1ULL << 51) /* FEAT_TME */
+#define SCTLR_TME0 (1ULL << 52) /* FEAT_TME */
+#define SCTLR_TME (1ULL << 53) /* FEAT_TME */
+#define SCTLR_EnASR (1ULL << 54) /* FEAT_LS64_V */
+#define SCTLR_EnAS0 (1ULL << 55) /* FEAT_LS64_ACCDATA */
+#define SCTLR_EnALS (1ULL << 56) /* FEAT_LS64 */
+#define SCTLR_EPAN (1ULL << 57) /* FEAT_PAN3 */
+#define SCTLR_EnTP2 (1ULL << 60) /* FEAT_SME */
+#define SCTLR_NMI (1ULL << 61) /* FEAT_NMI */
 #define SCTLR_SPINTMASK (1ULL << 62) /* FEAT_NMI */
-#define SCTLR_TIDCP   (1ULL << 63) /* FEAT_TIDCP1 */
+#define SCTLR_TIDCP (1ULL << 63) /* FEAT_TIDCP1 */
 
 /* Bit definitions for CPACR (AArch32 only) */
 FIELD(CPACR, CP10, 20, 2)
 FIELD(CPACR, CP11, 22, 2)
-FIELD(CPACR, TRCDIS, 28, 1)    /* matches CPACR_EL1.TTA */
-FIELD(CPACR, D32DIS, 30, 1)    /* up to v7; RAZ in v8 */
+FIELD(CPACR, TRCDIS, 28, 1) /* matches CPACR_EL1.TTA */
+FIELD(CPACR, D32DIS, 30, 1) /* up to v7; RAZ in v8 */
 FIELD(CPACR, ASEDIS, 31, 1)
 
 /* Bit definitions for CPACR_EL1 (AArch64 only) */
 FIELD(CPACR_EL1, ZEN, 16, 2)
 FIELD(CPACR_EL1, FPEN, 20, 2)
 FIELD(CPACR_EL1, SMEN, 24, 2)
-FIELD(CPACR_EL1, TTA, 28, 1)   /* matches CPACR.TRCDIS */
+FIELD(CPACR_EL1, TTA, 28, 1) /* matches CPACR.TRCDIS */
 
 /* Bit definitions for HCPTR (AArch32 only) */
 FIELD(HCPTR, TCP10, 10, 1)
 FIELD(HCPTR, TCP11, 11, 1)
 FIELD(HCPTR, TASE, 15, 1)
 FIELD(HCPTR, TTA, 20, 1)
-FIELD(HCPTR, TAM, 30, 1)       /* matches CPTR_EL2.TAM */
-FIELD(HCPTR, TCPAC, 31, 1)     /* matches CPTR_EL2.TCPAC */
+FIELD(HCPTR, TAM, 30, 1) /* matches CPTR_EL2.TAM */
+FIELD(HCPTR, TCPAC, 31, 1) /* matches CPTR_EL2.TCPAC */
 
 /* Bit definitions for CPTR_EL2 (AArch64 only) */
-FIELD(CPTR_EL2, TZ, 8, 1)      /* !E2H */
-FIELD(CPTR_EL2, TFP, 10, 1)    /* !E2H, matches HCPTR.TCP10 */
-FIELD(CPTR_EL2, TSM, 12, 1)    /* !E2H */
-FIELD(CPTR_EL2, ZEN, 16, 2)    /* E2H */
-FIELD(CPTR_EL2, FPEN, 20, 2)   /* E2H */
-FIELD(CPTR_EL2, SMEN, 24, 2)   /* E2H */
+FIELD(CPTR_EL2, TZ, 8, 1) /* !E2H */
+FIELD(CPTR_EL2, TFP, 10, 1) /* !E2H, matches HCPTR.TCP10 */
+FIELD(CPTR_EL2, TSM, 12, 1) /* !E2H */
+FIELD(CPTR_EL2, ZEN, 16, 2) /* E2H */
+FIELD(CPTR_EL2, FPEN, 20, 2) /* E2H */
+FIELD(CPTR_EL2, SMEN, 24, 2) /* E2H */
 FIELD(CPTR_EL2, TTA, 28, 1)
-FIELD(CPTR_EL2, TAM, 30, 1)    /* matches HCPTR.TAM */
-FIELD(CPTR_EL2, TCPAC, 31, 1)  /* matches HCPTR.TCPAC */
+FIELD(CPTR_EL2, TAM, 30, 1) /* matches HCPTR.TAM */
+FIELD(CPTR_EL2, TCPAC, 31, 1) /* matches HCPTR.TCPAC */
 
 /* Bit definitions for CPTR_EL3 (AArch64 only) */
 FIELD(CPTR_EL3, EZ, 8, 1)
@@ -1380,32 +1383,32 @@ FIELD(CPTR_EL3, TTA, 20, 1)
 FIELD(CPTR_EL3, TAM, 30, 1)
 FIELD(CPTR_EL3, TCPAC, 31, 1)
 
-#define MDCR_MTPME    (1U << 28)
-#define MDCR_TDCC     (1U << 27)
-#define MDCR_HLP      (1U << 26)  /* MDCR_EL2 */
-#define MDCR_SCCD     (1U << 23)  /* MDCR_EL3 */
-#define MDCR_HCCD     (1U << 23)  /* MDCR_EL2 */
-#define MDCR_EPMAD    (1U << 21)
-#define MDCR_EDAD     (1U << 20)
-#define MDCR_TTRF     (1U << 19)
-#define MDCR_STE      (1U << 18)  /* MDCR_EL3 */
-#define MDCR_SPME     (1U << 17)  /* MDCR_EL3 */
-#define MDCR_HPMD     (1U << 17)  /* MDCR_EL2 */
-#define MDCR_SDD      (1U << 16)
-#define MDCR_SPD      (3U << 14)
-#define MDCR_TDRA     (1U << 11)
-#define MDCR_TDOSA    (1U << 10)
-#define MDCR_TDA      (1U << 9)
-#define MDCR_TDE      (1U << 8)
-#define MDCR_HPME     (1U << 7)
-#define MDCR_TPM      (1U << 6)
-#define MDCR_TPMCR    (1U << 5)
-#define MDCR_HPMN     (0x1fU)
+#define MDCR_MTPME (1U << 28)
+#define MDCR_TDCC (1U << 27)
+#define MDCR_HLP (1U << 26) /* MDCR_EL2 */
+#define MDCR_SCCD (1U << 23) /* MDCR_EL3 */
+#define MDCR_HCCD (1U << 23) /* MDCR_EL2 */
+#define MDCR_EPMAD (1U << 21)
+#define MDCR_EDAD (1U << 20)
+#define MDCR_TTRF (1U << 19)
+#define MDCR_STE (1U << 18) /* MDCR_EL3 */
+#define MDCR_SPME (1U << 17) /* MDCR_EL3 */
+#define MDCR_HPMD (1U << 17) /* MDCR_EL2 */
+#define MDCR_SDD (1U << 16)
+#define MDCR_SPD (3U << 14)
+#define MDCR_TDRA (1U << 11)
+#define MDCR_TDOSA (1U << 10)
+#define MDCR_TDA (1U << 9)
+#define MDCR_TDE (1U << 8)
+#define MDCR_HPME (1U << 7)
+#define MDCR_TPM (1U << 6)
+#define MDCR_TPMCR (1U << 5)
+#define MDCR_HPMN (0x1fU)
 
 /* Not all of the MDCR_EL3 bits are present in the 32-bit SDCR */
-#define SDCR_VALID_MASK (MDCR_MTPME | MDCR_TDCC | MDCR_SCCD | \
-                         MDCR_EPMAD | MDCR_EDAD | MDCR_TTRF | \
-                         MDCR_STE | MDCR_SPME | MDCR_SPD)
+#define SDCR_VALID_MASK                                                        \
+    (MDCR_MTPME | MDCR_TDCC | MDCR_SCCD | MDCR_EPMAD | MDCR_EDAD | MDCR_TTRF | \
+     MDCR_STE | MDCR_SPME | MDCR_SPD)
 
 #define CPSR_M (0x1fU)
 #define CPSR_T (1U << 5)
@@ -1430,8 +1433,8 @@ FIELD(CPTR_EL3, TCPAC, 31, 1)
 #define CPSR_AIF (CPSR_A | CPSR_I | CPSR_F)
 
 #define CPSR_IT (CPSR_IT_0_1 | CPSR_IT_2_7)
-#define CACHED_CPSR_BITS (CPSR_T | CPSR_AIF | CPSR_GE | CPSR_IT | CPSR_Q \
-    | CPSR_NZCV)
+#define CACHED_CPSR_BITS \
+    (CPSR_T | CPSR_AIF | CPSR_GE | CPSR_IT | CPSR_Q | CPSR_NZCV)
 /* Bits writable in user mode.  */
 #define CPSR_USER (CPSR_NZCV | CPSR_Q | CPSR_GE | CPSR_E)
 /* Execution state bits.  MRS read as zero, MSR writes ignored.  */
@@ -1453,21 +1456,21 @@ FIELD(CPTR_EL3, TCPAC, 31, 1)
 #define XPSR_NZCV CPSR_NZCV
 #define XPSR_IT CPSR_IT
 
-#define TTBCR_N      (7U << 0) /* TTBCR.EAE==0 */
-#define TTBCR_T0SZ   (7U << 0) /* TTBCR.EAE==1 */
-#define TTBCR_PD0    (1U << 4)
-#define TTBCR_PD1    (1U << 5)
-#define TTBCR_EPD0   (1U << 7)
-#define TTBCR_IRGN0  (3U << 8)
-#define TTBCR_ORGN0  (3U << 10)
-#define TTBCR_SH0    (3U << 12)
-#define TTBCR_T1SZ   (3U << 16)
-#define TTBCR_A1     (1U << 22)
-#define TTBCR_EPD1   (1U << 23)
-#define TTBCR_IRGN1  (3U << 24)
-#define TTBCR_ORGN1  (3U << 26)
-#define TTBCR_SH1    (1U << 28)
-#define TTBCR_EAE    (1U << 31)
+#define TTBCR_N (7U << 0) /* TTBCR.EAE==0 */
+#define TTBCR_T0SZ (7U << 0) /* TTBCR.EAE==1 */
+#define TTBCR_PD0 (1U << 4)
+#define TTBCR_PD1 (1U << 5)
+#define TTBCR_EPD0 (1U << 7)
+#define TTBCR_IRGN0 (3U << 8)
+#define TTBCR_ORGN0 (3U << 10)
+#define TTBCR_SH0 (3U << 12)
+#define TTBCR_T1SZ (3U << 16)
+#define TTBCR_A1 (1U << 22)
+#define TTBCR_EPD1 (1U << 23)
+#define TTBCR_IRGN1 (3U << 24)
+#define TTBCR_ORGN1 (3U << 26)
+#define TTBCR_SH1 (1U << 28)
+#define TTBCR_EAE (1U << 31)
 
 FIELD(VTCR, T0SZ, 0, 6)
 FIELD(VTCR, SL0, 6, 2)
@@ -1557,9 +1560,8 @@ static inline uint32_t pstate_read(CPUARMState *env)
     int ZF;
 
     ZF = (env->ZF == 0);
-    return (env->NF & 0x80000000) | (ZF << 30)
-        | (env->CF << 29) | ((env->VF & 0x80000000) >> 3)
-        | env->pstate | env->daif;
+    return (env->NF & 0x80000000) | (ZF << 30) | (env->CF << 29) |
+           ((env->VF & 0x80000000) >> 3) | env->pstate | env->daif;
 }
 // static inline uint32_t pstate_read(CPUARMState *env)
 // {
@@ -1591,11 +1593,11 @@ static inline void pstate_write(CPUARMState *env, uint32_t val)
 uint32_t cpsr_read(CPUARMState *env);
 
 typedef enum CPSRWriteType {
-    CPSRWriteByInstr = 0,         /* from guest MSR or CPS */
+    CPSRWriteByInstr = 0, /* from guest MSR or CPS */
     CPSRWriteExceptionReturn = 1, /* from guest exception return insn */
     CPSRWriteRaw = 2,
-        /* trust values, no reg bank switch, no hflags rebuild */
-    CPSRWriteByGDBStub = 3,       /* from the GDB stub */
+    /* trust values, no reg bank switch, no hflags rebuild */
+    CPSRWriteByGDBStub = 3, /* from the GDB stub */
 } CPSRWriteType;
 
 /*
@@ -1612,12 +1614,11 @@ static inline uint32_t xpsr_read(CPUARMState *env)
 {
     int ZF;
     ZF = (env->ZF == 0);
-    return (env->NF & 0x80000000) | (ZF << 30)
-        | (env->CF << 29) | ((env->VF & 0x80000000) >> 3) | (env->QF << 27)
-        | (env->thumb << 24) | ((env->condexec_bits & 3) << 25)
-        | ((env->condexec_bits & 0xfc) << 8)
-        | (env->GE << 16)
-        | env->v7m.exception;
+    return (env->NF & 0x80000000) | (ZF << 30) | (env->CF << 29) |
+           ((env->VF & 0x80000000) >> 3) | (env->QF << 27) |
+           (env->thumb << 24) | ((env->condexec_bits & 3) << 25) |
+           ((env->condexec_bits & 0xfc) << 8) | (env->GE << 16) |
+           env->v7m.exception;
 }
 
 /* Set the xPSR.  Note that some bits of mask must be all-set or all-clear.  */
@@ -1654,119 +1655,119 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
 #endif
 }
 
-#define HCR_VM        (1ULL << 0)
-#define HCR_SWIO      (1ULL << 1)
-#define HCR_PTW       (1ULL << 2)
-#define HCR_FMO       (1ULL << 3)
-#define HCR_IMO       (1ULL << 4)
-#define HCR_AMO       (1ULL << 5)
-#define HCR_VF        (1ULL << 6)
-#define HCR_VI        (1ULL << 7)
-#define HCR_VSE       (1ULL << 8)
-#define HCR_FB        (1ULL << 9)
-#define HCR_BSU_MASK  (3ULL << 10)
-#define HCR_DC        (1ULL << 12)
-#define HCR_TWI       (1ULL << 13)
-#define HCR_TWE       (1ULL << 14)
-#define HCR_TID0      (1ULL << 15)
-#define HCR_TID1      (1ULL << 16)
-#define HCR_TID2      (1ULL << 17)
-#define HCR_TID3      (1ULL << 18)
-#define HCR_TSC       (1ULL << 19)
-#define HCR_TIDCP     (1ULL << 20)
-#define HCR_TACR      (1ULL << 21)
-#define HCR_TSW       (1ULL << 22)
-#define HCR_TPCP      (1ULL << 23)
-#define HCR_TPU       (1ULL << 24)
-#define HCR_TTLB      (1ULL << 25)
-#define HCR_TVM       (1ULL << 26)
-#define HCR_TGE       (1ULL << 27)
-#define HCR_TDZ       (1ULL << 28)
-#define HCR_HCD       (1ULL << 29)
-#define HCR_TRVM      (1ULL << 30)
-#define HCR_RW        (1ULL << 31)
-#define HCR_CD        (1ULL << 32)
-#define HCR_ID        (1ULL << 33)
-#define HCR_E2H       (1ULL << 34)
-#define HCR_TLOR      (1ULL << 35)
-#define HCR_TERR      (1ULL << 36)
-#define HCR_TEA       (1ULL << 37)
-#define HCR_MIOCNCE   (1ULL << 38)
-#define HCR_TME       (1ULL << 39)
-#define HCR_APK       (1ULL << 40)
-#define HCR_API       (1ULL << 41)
-#define HCR_NV        (1ULL << 42)
-#define HCR_NV1       (1ULL << 43)
-#define HCR_AT        (1ULL << 44)
-#define HCR_NV2       (1ULL << 45)
-#define HCR_FWB       (1ULL << 46)
-#define HCR_FIEN      (1ULL << 47)
-#define HCR_GPF       (1ULL << 48)
-#define HCR_TID4      (1ULL << 49)
-#define HCR_TICAB     (1ULL << 50)
-#define HCR_AMVOFFEN  (1ULL << 51)
-#define HCR_TOCU      (1ULL << 52)
-#define HCR_ENSCXT    (1ULL << 53)
-#define HCR_TTLBIS    (1ULL << 54)
-#define HCR_TTLBOS    (1ULL << 55)
-#define HCR_ATA       (1ULL << 56)
-#define HCR_DCT       (1ULL << 57)
-#define HCR_TID5      (1ULL << 58)
-#define HCR_TWEDEN    (1ULL << 59)
-#define HCR_TWEDEL    MAKE_64BIT_MASK(60, 4)
+#define HCR_VM (1ULL << 0)
+#define HCR_SWIO (1ULL << 1)
+#define HCR_PTW (1ULL << 2)
+#define HCR_FMO (1ULL << 3)
+#define HCR_IMO (1ULL << 4)
+#define HCR_AMO (1ULL << 5)
+#define HCR_VF (1ULL << 6)
+#define HCR_VI (1ULL << 7)
+#define HCR_VSE (1ULL << 8)
+#define HCR_FB (1ULL << 9)
+#define HCR_BSU_MASK (3ULL << 10)
+#define HCR_DC (1ULL << 12)
+#define HCR_TWI (1ULL << 13)
+#define HCR_TWE (1ULL << 14)
+#define HCR_TID0 (1ULL << 15)
+#define HCR_TID1 (1ULL << 16)
+#define HCR_TID2 (1ULL << 17)
+#define HCR_TID3 (1ULL << 18)
+#define HCR_TSC (1ULL << 19)
+#define HCR_TIDCP (1ULL << 20)
+#define HCR_TACR (1ULL << 21)
+#define HCR_TSW (1ULL << 22)
+#define HCR_TPCP (1ULL << 23)
+#define HCR_TPU (1ULL << 24)
+#define HCR_TTLB (1ULL << 25)
+#define HCR_TVM (1ULL << 26)
+#define HCR_TGE (1ULL << 27)
+#define HCR_TDZ (1ULL << 28)
+#define HCR_HCD (1ULL << 29)
+#define HCR_TRVM (1ULL << 30)
+#define HCR_RW (1ULL << 31)
+#define HCR_CD (1ULL << 32)
+#define HCR_ID (1ULL << 33)
+#define HCR_E2H (1ULL << 34)
+#define HCR_TLOR (1ULL << 35)
+#define HCR_TERR (1ULL << 36)
+#define HCR_TEA (1ULL << 37)
+#define HCR_MIOCNCE (1ULL << 38)
+#define HCR_TME (1ULL << 39)
+#define HCR_APK (1ULL << 40)
+#define HCR_API (1ULL << 41)
+#define HCR_NV (1ULL << 42)
+#define HCR_NV1 (1ULL << 43)
+#define HCR_AT (1ULL << 44)
+#define HCR_NV2 (1ULL << 45)
+#define HCR_FWB (1ULL << 46)
+#define HCR_FIEN (1ULL << 47)
+#define HCR_GPF (1ULL << 48)
+#define HCR_TID4 (1ULL << 49)
+#define HCR_TICAB (1ULL << 50)
+#define HCR_AMVOFFEN (1ULL << 51)
+#define HCR_TOCU (1ULL << 52)
+#define HCR_ENSCXT (1ULL << 53)
+#define HCR_TTLBIS (1ULL << 54)
+#define HCR_TTLBOS (1ULL << 55)
+#define HCR_ATA (1ULL << 56)
+#define HCR_DCT (1ULL << 57)
+#define HCR_TID5 (1ULL << 58)
+#define HCR_TWEDEN (1ULL << 59)
+#define HCR_TWEDEL MAKE_64BIT_MASK(60, 4)
 
-#define HCRX_ENAS0    (1ULL << 0)
-#define HCRX_ENALS    (1ULL << 1)
-#define HCRX_ENASR    (1ULL << 2)
-#define HCRX_FNXS     (1ULL << 3)
-#define HCRX_FGTNXS   (1ULL << 4)
-#define HCRX_SMPME    (1ULL << 5)
-#define HCRX_TALLINT  (1ULL << 6)
-#define HCRX_VINMI    (1ULL << 7)
-#define HCRX_VFNMI    (1ULL << 8)
-#define HCRX_CMOW     (1ULL << 9)
-#define HCRX_MCE2     (1ULL << 10)
-#define HCRX_MSCEN    (1ULL << 11)
+#define HCRX_ENAS0 (1ULL << 0)
+#define HCRX_ENALS (1ULL << 1)
+#define HCRX_ENASR (1ULL << 2)
+#define HCRX_FNXS (1ULL << 3)
+#define HCRX_FGTNXS (1ULL << 4)
+#define HCRX_SMPME (1ULL << 5)
+#define HCRX_TALLINT (1ULL << 6)
+#define HCRX_VINMI (1ULL << 7)
+#define HCRX_VFNMI (1ULL << 8)
+#define HCRX_CMOW (1ULL << 9)
+#define HCRX_MCE2 (1ULL << 10)
+#define HCRX_MSCEN (1ULL << 11)
 
-#define HPFAR_NS      (1ULL << 63)
+#define HPFAR_NS (1ULL << 63)
 
-#define SCR_NS                (1ULL << 0)
-#define SCR_IRQ               (1ULL << 1)
-#define SCR_FIQ               (1ULL << 2)
-#define SCR_EA                (1ULL << 3)
-#define SCR_FW                (1ULL << 4)
-#define SCR_AW                (1ULL << 5)
-#define SCR_NET               (1ULL << 6)
-#define SCR_SMD               (1ULL << 7)
-#define SCR_HCE               (1ULL << 8)
-#define SCR_SIF               (1ULL << 9)
-#define SCR_RW                (1ULL << 10)
-#define SCR_ST                (1ULL << 11)
-#define SCR_TWI               (1ULL << 12)
-#define SCR_TWE               (1ULL << 13)
-#define SCR_TLOR              (1ULL << 14)
-#define SCR_TERR              (1ULL << 15)
-#define SCR_APK               (1ULL << 16)
-#define SCR_API               (1ULL << 17)
-#define SCR_EEL2              (1ULL << 18)
-#define SCR_EASE              (1ULL << 19)
-#define SCR_NMEA              (1ULL << 20)
-#define SCR_FIEN              (1ULL << 21)
-#define SCR_ENSCXT            (1ULL << 25)
-#define SCR_ATA               (1ULL << 26)
-#define SCR_FGTEN             (1ULL << 27)
-#define SCR_ECVEN             (1ULL << 28)
-#define SCR_TWEDEN            (1ULL << 29)
-#define SCR_TWEDEL            MAKE_64BIT_MASK(30, 4)
-#define SCR_TME               (1ULL << 34)
-#define SCR_AMVOFFEN          (1ULL << 35)
-#define SCR_ENAS0             (1ULL << 36)
-#define SCR_ADEN              (1ULL << 37)
-#define SCR_HXEN              (1ULL << 38)
-#define SCR_TRNDR             (1ULL << 40)
-#define SCR_ENTP2             (1ULL << 41)
-#define SCR_GPF               (1ULL << 48)
-#define SCR_NSE               (1ULL << 62)
+#define SCR_NS (1ULL << 0)
+#define SCR_IRQ (1ULL << 1)
+#define SCR_FIQ (1ULL << 2)
+#define SCR_EA (1ULL << 3)
+#define SCR_FW (1ULL << 4)
+#define SCR_AW (1ULL << 5)
+#define SCR_NET (1ULL << 6)
+#define SCR_SMD (1ULL << 7)
+#define SCR_HCE (1ULL << 8)
+#define SCR_SIF (1ULL << 9)
+#define SCR_RW (1ULL << 10)
+#define SCR_ST (1ULL << 11)
+#define SCR_TWI (1ULL << 12)
+#define SCR_TWE (1ULL << 13)
+#define SCR_TLOR (1ULL << 14)
+#define SCR_TERR (1ULL << 15)
+#define SCR_APK (1ULL << 16)
+#define SCR_API (1ULL << 17)
+#define SCR_EEL2 (1ULL << 18)
+#define SCR_EASE (1ULL << 19)
+#define SCR_NMEA (1ULL << 20)
+#define SCR_FIEN (1ULL << 21)
+#define SCR_ENSCXT (1ULL << 25)
+#define SCR_ATA (1ULL << 26)
+#define SCR_FGTEN (1ULL << 27)
+#define SCR_ECVEN (1ULL << 28)
+#define SCR_TWEDEN (1ULL << 29)
+#define SCR_TWEDEL MAKE_64BIT_MASK(30, 4)
+#define SCR_TME (1ULL << 34)
+#define SCR_AMVOFFEN (1ULL << 35)
+#define SCR_ENAS0 (1ULL << 36)
+#define SCR_ADEN (1ULL << 37)
+#define SCR_HXEN (1ULL << 38)
+#define SCR_TRNDR (1ULL << 40)
+#define SCR_ENTP2 (1ULL << 41)
+#define SCR_GPF (1ULL << 48)
+#define SCR_NSE (1ULL << 62)
 
 #define HSTR_TTEE (1 << 16)
 #define HSTR_TJDBX (1 << 17)
@@ -1785,24 +1786,24 @@ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
 #define FPSR_MASK 0xf800009f
 #define FPCR_MASK 0x07ff9f00
 
-#define FPCR_IOE    (1 << 8)    /* Invalid Operation exception trap enable */
-#define FPCR_DZE    (1 << 9)    /* Divide by Zero exception trap enable */
-#define FPCR_OFE    (1 << 10)   /* Overflow exception trap enable */
-#define FPCR_UFE    (1 << 11)   /* Underflow exception trap enable */
-#define FPCR_IXE    (1 << 12)   /* Inexact exception trap enable */
-#define FPCR_IDE    (1 << 15)   /* Input Denormal exception trap enable */
-#define FPCR_FZ16   (1 << 19)   /* ARMv8.2+, FP16 flush-to-zero */
+#define FPCR_IOE (1 << 8) /* Invalid Operation exception trap enable */
+#define FPCR_DZE (1 << 9) /* Divide by Zero exception trap enable */
+#define FPCR_OFE (1 << 10) /* Overflow exception trap enable */
+#define FPCR_UFE (1 << 11) /* Underflow exception trap enable */
+#define FPCR_IXE (1 << 12) /* Inexact exception trap enable */
+#define FPCR_IDE (1 << 15) /* Input Denormal exception trap enable */
+#define FPCR_FZ16 (1 << 19) /* ARMv8.2+, FP16 flush-to-zero */
 #define FPCR_RMODE_MASK (3 << 22) /* Rounding mode */
-#define FPCR_FZ     (1 << 24)   /* Flush-to-zero enable bit */
-#define FPCR_DN     (1 << 25)   /* Default NaN enable bit */
-#define FPCR_AHP    (1 << 26)   /* Alternative half-precision */
-#define FPCR_QC     (1 << 27)   /* Cumulative saturation bit */
-#define FPCR_V      (1 << 28)   /* FP overflow flag */
-#define FPCR_C      (1 << 29)   /* FP carry flag */
-#define FPCR_Z      (1 << 30)   /* FP zero flag */
-#define FPCR_N      (1 << 31)   /* FP negative flag */
+#define FPCR_FZ (1 << 24) /* Flush-to-zero enable bit */
+#define FPCR_DN (1 << 25) /* Default NaN enable bit */
+#define FPCR_AHP (1 << 26) /* Alternative half-precision */
+#define FPCR_QC (1 << 27) /* Cumulative saturation bit */
+#define FPCR_V (1 << 28) /* FP overflow flag */
+#define FPCR_C (1 << 29) /* FP carry flag */
+#define FPCR_Z (1 << 30) /* FP zero flag */
+#define FPCR_N (1 << 31) /* FP negative flag */
 
-#define FPCR_LTPSIZE_SHIFT 16   /* LTPSIZE, M-profile only */
+#define FPCR_LTPSIZE_SHIFT 16 /* LTPSIZE, M-profile only */
 #define FPCR_LTPSIZE_MASK (7 << FPCR_LTPSIZE_SHIFT)
 #define FPCR_LTPSIZE_LENGTH 3
 
@@ -1832,25 +1833,25 @@ static inline void vfp_set_fpcr(CPUARMState *env, uint32_t val)
 }
 
 enum arm_cpu_mode {
-  ARM_CPU_MODE_USR = 0x10,
-  ARM_CPU_MODE_FIQ = 0x11,
-  ARM_CPU_MODE_IRQ = 0x12,
-  ARM_CPU_MODE_SVC = 0x13,
-  ARM_CPU_MODE_MON = 0x16,
-  ARM_CPU_MODE_ABT = 0x17,
-  ARM_CPU_MODE_HYP = 0x1a,
-  ARM_CPU_MODE_UND = 0x1b,
-  ARM_CPU_MODE_SYS = 0x1f
+    ARM_CPU_MODE_USR = 0x10,
+    ARM_CPU_MODE_FIQ = 0x11,
+    ARM_CPU_MODE_IRQ = 0x12,
+    ARM_CPU_MODE_SVC = 0x13,
+    ARM_CPU_MODE_MON = 0x16,
+    ARM_CPU_MODE_ABT = 0x17,
+    ARM_CPU_MODE_HYP = 0x1a,
+    ARM_CPU_MODE_UND = 0x1b,
+    ARM_CPU_MODE_SYS = 0x1f
 };
 
 /* VFP system registers.  */
-#define ARM_VFP_FPSID   0
-#define ARM_VFP_FPSCR   1
-#define ARM_VFP_MVFR2   5
-#define ARM_VFP_MVFR1   6
-#define ARM_VFP_MVFR0   7
-#define ARM_VFP_FPEXC   8
-#define ARM_VFP_FPINST  9
+#define ARM_VFP_FPSID 0
+#define ARM_VFP_FPSCR 1
+#define ARM_VFP_MVFR2 5
+#define ARM_VFP_MVFR1 6
+#define ARM_VFP_MVFR0 7
+#define ARM_VFP_FPEXC 8
+#define ARM_VFP_FPINST 9
 #define ARM_VFP_FPINST2 10
 /* These ones are M-profile only */
 #define ARM_VFP_FPSCR_NZCVQC 2
@@ -1863,8 +1864,8 @@ enum arm_cpu_mode {
 #define QEMU_VFP_FPSCR_NZCV 0xffff
 
 /* iwMMXt coprocessor control registers.  */
-#define ARM_IWMMXT_wCID  0
-#define ARM_IWMMXT_wCon  1
+#define ARM_IWMMXT_wCID 0
+#define ARM_IWMMXT_wCon 1
 #define ARM_IWMMXT_wCSSF 2
 #define ARM_IWMMXT_wCASF 3
 #define ARM_IWMMXT_wCGR0 8
@@ -1996,13 +1997,10 @@ FIELD(V7M_FPCCR, LSPENS, 29, 1)
 FIELD(V7M_FPCCR, LSPEN, 30, 1)
 FIELD(V7M_FPCCR, ASPEN, 31, 1)
 /* These bits are banked. Others are non-banked and live in the M_REG_S bank */
-#define R_V7M_FPCCR_BANKED_MASK                 \
-    (R_V7M_FPCCR_LSPACT_MASK |                  \
-     R_V7M_FPCCR_USER_MASK |                    \
-     R_V7M_FPCCR_THREAD_MASK |                  \
-     R_V7M_FPCCR_MMRDY_MASK |                   \
-     R_V7M_FPCCR_SPLIMVIOL_MASK |               \
-     R_V7M_FPCCR_UFRDY_MASK |                   \
+#define R_V7M_FPCCR_BANKED_MASK                            \
+    (R_V7M_FPCCR_LSPACT_MASK | R_V7M_FPCCR_USER_MASK |     \
+     R_V7M_FPCCR_THREAD_MASK | R_V7M_FPCCR_MMRDY_MASK |    \
+     R_V7M_FPCCR_SPLIMVIOL_MASK | R_V7M_FPCCR_UFRDY_MASK | \
      R_V7M_FPCCR_ASPEN_MASK)
 
 /* v7M VPR bits */
@@ -2035,14 +2033,14 @@ FIELD(CCSIDR_EL1, LINESIZE, 0, 3)
 FIELD(CCSIDR_EL1, ASSOCIATIVITY, 3, 10)
 FIELD(CCSIDR_EL1, NUMSETS, 13, 15)
 
-FIELD(CTR_EL0,  IMINLINE, 0, 4)
-FIELD(CTR_EL0,  L1IP, 14, 2)
-FIELD(CTR_EL0,  DMINLINE, 16, 4)
-FIELD(CTR_EL0,  ERG, 20, 4)
-FIELD(CTR_EL0,  CWG, 24, 4)
-FIELD(CTR_EL0,  IDC, 28, 1)
-FIELD(CTR_EL0,  DIC, 29, 1)
-FIELD(CTR_EL0,  TMINLINE, 32, 6)
+FIELD(CTR_EL0, IMINLINE, 0, 4)
+FIELD(CTR_EL0, L1IP, 14, 2)
+FIELD(CTR_EL0, DMINLINE, 16, 4)
+FIELD(CTR_EL0, ERG, 20, 4)
+FIELD(CTR_EL0, CWG, 24, 4)
+FIELD(CTR_EL0, IDC, 28, 1)
+FIELD(CTR_EL0, DIC, 29, 1)
+FIELD(CTR_EL0, TMINLINE, 32, 6)
 
 FIELD(MIDR_EL1, REVISION, 0, 4)
 FIELD(MIDR_EL1, PARTNUM, 4, 12)
@@ -2398,19 +2396,19 @@ QEMU_BUILD_BUG_ON(ARRAY_SIZE(((ARMCPU *)0)->ccsidr) <= R_V7M_CSSELR_INDEX_MASK);
  * mapping in linux-user/elfload.c:get_elf_hwcap().
  */
 enum arm_features {
-    ARM_FEATURE_AUXCR,  /* ARM1026 Auxiliary control register.  */
+    ARM_FEATURE_AUXCR, /* ARM1026 Auxiliary control register.  */
     ARM_FEATURE_XSCALE, /* Intel XScale extensions.  */
     ARM_FEATURE_IWMMXT, /* Intel iwMMXt extension.  */
     ARM_FEATURE_V6,
     ARM_FEATURE_V6K,
     ARM_FEATURE_V7,
     ARM_FEATURE_THUMB2,
-    ARM_FEATURE_PMSA,   /* no MMU; may have Memory Protection Unit */
+    ARM_FEATURE_PMSA, /* no MMU; may have Memory Protection Unit */
     ARM_FEATURE_NEON,
     ARM_FEATURE_M, /* Microcontroller profile.  */
     ARM_FEATURE_OMAPCP, /* OMAP specific CP15 ops handling.  */
     ARM_FEATURE_THUMB2EE,
-    ARM_FEATURE_V7MP,    /* v7 Multiprocessing Extensions */
+    ARM_FEATURE_V7MP, /* v7 Multiprocessing Extensions */
     ARM_FEATURE_V7VE, /* v7 Virtualization Extensions (non-EL2 parts) */
     ARM_FEATURE_V4T,
     ARM_FEATURE_V5,
@@ -2452,10 +2450,10 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp);
  */
 
 typedef enum ARMSecuritySpace {
-    ARMSS_Secure     = 0,
-    ARMSS_NonSecure  = 1,
-    ARMSS_Root       = 2,
-    ARMSS_Realm      = 3,
+    ARMSS_Secure = 0,
+    ARMSS_NonSecure = 1,
+    ARMSS_Root = 2,
+    ARMSS_Realm = 3,
 } ARMSecuritySpace;
 
 /* Return true if @space is secure, in the pre-v9 sense. */
@@ -2503,7 +2501,7 @@ static inline bool arm_is_el3_or_mon(CPUARMState *env)
             /* CPU currently in AArch64 state and EL3 */
             return true;
         } else if (!is_a64(env) &&
-                (env->uncached_cpsr & CPSR_M) == ARM_CPU_MODE_MON) {
+                   (env->uncached_cpsr & CPSR_M) == ARM_CPU_MODE_MON) {
             /* CPU currently in AArch32 state and monitor mode */
             return true;
         }
@@ -2536,8 +2534,8 @@ static inline bool arm_is_secure(CPUARMState *env)
  */
 static inline bool arm_is_el2_enabled_secstate(CPUARMState *env, bool secure)
 {
-    return arm_feature(env, ARM_FEATURE_EL2)
-           && (!secure || (env->cp15.scr_el3 & SCR_EEL2));
+    return arm_feature(env, ARM_FEATURE_EL2) &&
+           (!secure || (env->cp15.scr_el3 & SCR_EEL2));
 }
 
 static inline bool arm_is_el2_enabled(CPUARMState *env)
@@ -2629,24 +2627,23 @@ static inline bool arm_el_is_aa64(CPUARMState *env, int el)
  */
 static inline bool access_secure_reg(CPUARMState *env)
 {
-    bool ret = (arm_feature(env, ARM_FEATURE_EL3) &&
-                !arm_el_is_aa64(env, 3) &&
+    bool ret = (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
                 !(env->cp15.scr_el3 & SCR_NS));
 
     return ret;
 }
 
 /* Macros for accessing a specified CP register bank */
-#define A32_BANKED_REG_GET(_env, _regname, _secure)    \
+#define A32_BANKED_REG_GET(_env, _regname, _secure) \
     ((_secure) ? (_env)->cp15._regname##_s : (_env)->cp15._regname##_ns)
 
-#define A32_BANKED_REG_SET(_env, _regname, _secure, _val)   \
-    do {                                                \
-        if (_secure) {                                   \
-            (_env)->cp15._regname##_s = (_val);            \
-        } else {                                        \
-            (_env)->cp15._regname##_ns = (_val);           \
-        }                                               \
+#define A32_BANKED_REG_SET(_env, _regname, _secure, _val) \
+    do {                                                  \
+        if (_secure) {                                    \
+            (_env)->cp15._regname##_s = (_val);           \
+        } else {                                          \
+            (_env)->cp15._regname##_ns = (_val);          \
+        }                                                 \
     } while (0)
 
 /* Macros for automatically accessing a specific CP register bank depending on
@@ -2654,11 +2651,11 @@ static inline bool access_secure_reg(CPUARMState *env)
  * supporting instruction translation reads/writes as these are dependent
  * solely on the SCR.NS bit and not the mode.
  */
-#define A32_BANKED_CURRENT_REG_GET(_env, _regname)        \
-    A32_BANKED_REG_GET((_env), _regname,                \
+#define A32_BANKED_CURRENT_REG_GET(_env, _regname) \
+    A32_BANKED_REG_GET((_env), _regname,           \
                        (arm_is_secure(_env) && !arm_el_is_aa64((_env), 3)))
 
-#define A32_BANKED_CURRENT_REG_SET(_env, _regname, _val)                       \
+#define A32_BANKED_CURRENT_REG_SET(_env, _regname, _val)                    \
     A32_BANKED_REG_SET((_env), _regname,                                    \
                        (arm_is_secure(_env) && !arm_el_is_aa64((_env), 3)), \
                        (_val))
@@ -2692,7 +2689,7 @@ static inline int arm_current_el(CPUARMState *env)
 {
     if (arm_feature(env, ARM_FEATURE_M)) {
         return arm_v7m_is_handler_mode(env) ||
-            !(env->v7m.control[env->v7m.secure] & 1);
+               !(env->v7m.control[env->v7m.secure] & 1);
     }
 
     if (is_a64(env)) {
@@ -2757,8 +2754,8 @@ bool write_list_to_cpustate(ARMCPU *cpu);
  */
 bool write_cpustate_to_list(ARMCPU *cpu, bool kvm_sync);
 
-#define ARM_CPUID_TI915T      0x54029152
-#define ARM_CPUID_TI925T      0x54029252
+#define ARM_CPUID_TI915T 0x54029152
+#define ARM_CPUID_TI925T 0x54029252
 
 #define ARM_CPU_TYPE_SUFFIX "-" TYPE_ARM_CPU
 #define ARM_CPU_TYPE_NAME(name) (name ARM_CPU_TYPE_SUFFIX)
@@ -2865,14 +2862,14 @@ bool write_cpustate_to_list(ARMCPU *cpu, bool kvm_sync);
  * For M profile we arrange them to have a bit for priv, a bit for negpri
  * and a bit for secure.
  */
-#define ARM_MMU_IDX_A     0x10  /* A profile */
-#define ARM_MMU_IDX_NOTLB 0x20  /* does not have a TLB */
-#define ARM_MMU_IDX_M     0x40  /* M profile */
+#define ARM_MMU_IDX_A 0x10 /* A profile */
+#define ARM_MMU_IDX_NOTLB 0x20 /* does not have a TLB */
+#define ARM_MMU_IDX_M 0x40 /* M profile */
 
 /* Meanings of the bits for M profile mmu idx values */
-#define ARM_MMU_IDX_M_PRIV   0x1
+#define ARM_MMU_IDX_M_PRIV 0x1
 #define ARM_MMU_IDX_M_NEGPRI 0x2
-#define ARM_MMU_IDX_M_S      0x4  /* Secure */
+#define ARM_MMU_IDX_M_S 0x4 /* Secure */
 
 #define ARM_MMU_IDX_TYPE_MASK \
     (ARM_MMU_IDX_A | ARM_MMU_IDX_M | ARM_MMU_IDX_NOTLB)
@@ -2882,14 +2879,14 @@ typedef enum ARMMMUIdx {
     /*
      * A-profile.
      */
-    ARMMMUIdx_E10_0     = 0 | ARM_MMU_IDX_A,
-    ARMMMUIdx_E20_0     = 1 | ARM_MMU_IDX_A,
-    ARMMMUIdx_E10_1     = 2 | ARM_MMU_IDX_A,
-    ARMMMUIdx_E20_2     = 3 | ARM_MMU_IDX_A,
+    ARMMMUIdx_E10_0 = 0 | ARM_MMU_IDX_A,
+    ARMMMUIdx_E20_0 = 1 | ARM_MMU_IDX_A,
+    ARMMMUIdx_E10_1 = 2 | ARM_MMU_IDX_A,
+    ARMMMUIdx_E20_2 = 3 | ARM_MMU_IDX_A,
     ARMMMUIdx_E10_1_PAN = 4 | ARM_MMU_IDX_A,
     ARMMMUIdx_E20_2_PAN = 5 | ARM_MMU_IDX_A,
-    ARMMMUIdx_E2        = 6 | ARM_MMU_IDX_A,
-    ARMMMUIdx_E3        = 7 | ARM_MMU_IDX_A,
+    ARMMMUIdx_E2 = 6 | ARM_MMU_IDX_A,
+    ARMMMUIdx_E3 = 7 | ARM_MMU_IDX_A,
 
     /*
      * Used for second stage of an S12 page table walk, or for descriptor
@@ -2897,13 +2894,13 @@ typedef enum ARMMMUIdx {
      * are in use simultaneously for SecureEL2: the security state for
      * the S2 ptw is selected by the NS bit from the S1 ptw.
      */
-    ARMMMUIdx_Stage2_S  = 8 | ARM_MMU_IDX_A,
-    ARMMMUIdx_Stage2    = 9 | ARM_MMU_IDX_A,
+    ARMMMUIdx_Stage2_S = 8 | ARM_MMU_IDX_A,
+    ARMMMUIdx_Stage2 = 9 | ARM_MMU_IDX_A,
 
     /* TLBs with 1-1 mapping to the physical address spaces. */
-    ARMMMUIdx_Phys_S     = 10 | ARM_MMU_IDX_A,
-    ARMMMUIdx_Phys_NS    = 11 | ARM_MMU_IDX_A,
-    ARMMMUIdx_Phys_Root  = 12 | ARM_MMU_IDX_A,
+    ARMMMUIdx_Phys_S = 10 | ARM_MMU_IDX_A,
+    ARMMMUIdx_Phys_NS = 11 | ARM_MMU_IDX_A,
+    ARMMMUIdx_Phys_Root = 12 | ARM_MMU_IDX_A,
     ARMMMUIdx_Phys_Realm = 13 | ARM_MMU_IDX_A,
 
     /*
@@ -2996,10 +2993,10 @@ static inline bool arm_v7m_csselr_razwi(ARMCPU *cpu)
 static inline bool arm_sctlr_b(CPUARMState *env)
 {
     return
-        /* We need not implement SCTLR.ITD in user-mode emulation, so
-         * let linux-user ignore the fact that it conflicts with SCTLR_B.
-         * This lets people run BE32 binaries with "-cpu any".
-         */
+    /* We need not implement SCTLR.ITD in user-mode emulation, so
+     * let linux-user ignore the fact that it conflicts with SCTLR_B.
+     * This lets people run BE32 binaries with "-cpu any".
+     */
 #ifndef CONFIG_USER_ONLY
         !arm_feature(env, ARM_FEATURE_V7) &&
 #endif
@@ -3077,7 +3074,7 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
  */
 FIELD(TBFLAG_ANY, AARCH64_STATE, 0, 1)
 FIELD(TBFLAG_ANY, SS_ACTIVE, 1, 1)
-FIELD(TBFLAG_ANY, PSTATE__SS, 2, 1)      /* Not cached. */
+FIELD(TBFLAG_ANY, PSTATE__SS, 2, 1) /* Not cached. */
 FIELD(TBFLAG_ANY, BE_DATA, 3, 1)
 FIELD(TBFLAG_ANY, MMUIDX, 4, 4)
 /* Target EL if we take a floating-point-disabled exception */
@@ -3091,14 +3088,14 @@ FIELD(TBFLAG_ANY, FGT_SVC, 13, 1)
 /*
  * Bit usage when in AArch32 state, both A- and M-profile.
  */
-FIELD(TBFLAG_AM32, CONDEXEC, 24, 8)      /* Not cached. */
-FIELD(TBFLAG_AM32, THUMB, 23, 1)         /* Not cached. */
+FIELD(TBFLAG_AM32, CONDEXEC, 24, 8) /* Not cached. */
+FIELD(TBFLAG_AM32, THUMB, 23, 1) /* Not cached. */
 
 /*
  * Bit usage when in AArch32 state, for A-profile only.
  */
-FIELD(TBFLAG_A32, VECLEN, 0, 3)         /* Not cached. */
-FIELD(TBFLAG_A32, VECSTRIDE, 3, 2)     /* Not cached. */
+FIELD(TBFLAG_A32, VECLEN, 0, 3) /* Not cached. */
+FIELD(TBFLAG_A32, VECSTRIDE, 3, 2) /* Not cached. */
 /*
  * We store the bottom two bits of the CPAR as TB flags and handle
  * checks on the other bits at runtime. This shares the same bits as
@@ -3106,8 +3103,8 @@ FIELD(TBFLAG_A32, VECSTRIDE, 3, 2)     /* Not cached. */
  * Not cached, because VECLEN+VECSTRIDE are not cached.
  */
 FIELD(TBFLAG_A32, XSCALE_CPAR, 5, 2)
-FIELD(TBFLAG_A32, VFPEN, 7, 1)         /* Partially cached, minus FPEXC. */
-FIELD(TBFLAG_A32, SCTLR__B, 8, 1)      /* Cannot overlap with SCTLR_B */
+FIELD(TBFLAG_A32, VFPEN, 7, 1) /* Partially cached, minus FPEXC. */
+FIELD(TBFLAG_A32, SCTLR__B, 8, 1) /* Cannot overlap with SCTLR_B */
 FIELD(TBFLAG_A32, HSTR_ACTIVE, 9, 1)
 /*
  * Indicates whether cp register reads and writes by guest code should access
@@ -3129,13 +3126,13 @@ FIELD(TBFLAG_M32, HANDLER, 0, 1)
 /* Whether we should generate stack-limit checks */
 FIELD(TBFLAG_M32, STACKCHECK, 1, 1)
 /* Set if FPCCR.LSPACT is set */
-FIELD(TBFLAG_M32, LSPACT, 2, 1)                 /* Not cached. */
+FIELD(TBFLAG_M32, LSPACT, 2, 1) /* Not cached. */
 /* Set if we must create a new FP context */
-FIELD(TBFLAG_M32, NEW_FP_CTXT_NEEDED, 3, 1)     /* Not cached. */
+FIELD(TBFLAG_M32, NEW_FP_CTXT_NEEDED, 3, 1) /* Not cached. */
 /* Set if FPCCR.S does not match current security state */
-FIELD(TBFLAG_M32, FPCCR_S_WRONG, 4, 1)          /* Not cached. */
+FIELD(TBFLAG_M32, FPCCR_S_WRONG, 4, 1) /* Not cached. */
 /* Set if MVE insns are definitely not predicated by VPR or LTPSIZE */
-FIELD(TBFLAG_M32, MVE_NO_PRED, 5, 1)            /* Not cached. */
+FIELD(TBFLAG_M32, MVE_NO_PRED, 5, 1) /* Not cached. */
 /* Set if in secure mode */
 FIELD(TBFLAG_M32, SECURE, 6, 1)
 
@@ -3148,7 +3145,7 @@ FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
 FIELD(TBFLAG_A64, VL, 4, 4)
 FIELD(TBFLAG_A64, PAUTH_ACTIVE, 8, 1)
 FIELD(TBFLAG_A64, BT, 9, 1)
-FIELD(TBFLAG_A64, BTYPE, 10, 2)         /* Not cached. */
+FIELD(TBFLAG_A64, BTYPE, 10, 2) /* Not cached. */
 FIELD(TBFLAG_A64, TBID, 12, 2)
 FIELD(TBFLAG_A64, UNPRIV, 14, 1)
 FIELD(TBFLAG_A64, ATA, 15, 1)
@@ -3178,11 +3175,11 @@ FIELD(TBFLAG_A64, NAA, 30, 1)
 #define DP_TBFLAG_AM32(DST, WHICH, VAL) \
     (DST.flags2 = FIELD_DP32(DST.flags2, TBFLAG_AM32, WHICH, VAL))
 
-#define EX_TBFLAG_ANY(IN, WHICH)   FIELD_EX32(IN.flags, TBFLAG_ANY, WHICH)
-#define EX_TBFLAG_A64(IN, WHICH)   FIELD_EX32(IN.flags2, TBFLAG_A64, WHICH)
-#define EX_TBFLAG_A32(IN, WHICH)   FIELD_EX32(IN.flags2, TBFLAG_A32, WHICH)
-#define EX_TBFLAG_M32(IN, WHICH)   FIELD_EX32(IN.flags2, TBFLAG_M32, WHICH)
-#define EX_TBFLAG_AM32(IN, WHICH)  FIELD_EX32(IN.flags2, TBFLAG_AM32, WHICH)
+#define EX_TBFLAG_ANY(IN, WHICH) FIELD_EX32(IN.flags, TBFLAG_ANY, WHICH)
+#define EX_TBFLAG_A64(IN, WHICH) FIELD_EX32(IN.flags2, TBFLAG_A64, WHICH)
+#define EX_TBFLAG_A32(IN, WHICH) FIELD_EX32(IN.flags2, TBFLAG_A32, WHICH)
+#define EX_TBFLAG_M32(IN, WHICH) FIELD_EX32(IN.flags2, TBFLAG_M32, WHICH)
+#define EX_TBFLAG_AM32(IN, WHICH) FIELD_EX32(IN.flags2, TBFLAG_AM32, WHICH)
 
 /**
  * cpu_mmu_index:
@@ -3244,14 +3241,14 @@ static inline bool arm_cpu_bswap_data(CPUARMState *env)
 {
     return
 #if TARGET_BIG_ENDIAN
-       1 ^
+        1 ^
 #endif
-       arm_cpu_data_is_big_endian(env);
+        arm_cpu_data_is_big_endian(env);
 }
 #endif
 
-void cpu_get_tb_cpu_state(CPUARMState *env, vaddr *pc,
-                          uint64_t *cs_base, uint32_t *flags);
+void cpu_get_tb_cpu_state(CPUARMState *env, vaddr *pc, uint64_t *cs_base,
+                          uint32_t *flags);
 
 enum {
     QEMU_PSCI_CONDUIT_DISABLED = 0,
@@ -3287,7 +3284,7 @@ static inline AddressSpace *arm_addressspace(CPUState *cs, MemTxAttrs attrs)
  * are guaranteed to subsequently be called.
  */
 void arm_register_pre_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook,
-                                 void *opaque);
+                                     void *opaque);
 /**
  * arm_register_el_change_hook:
  * Register a hook function which will be called immediately after this
@@ -3298,8 +3295,8 @@ void arm_register_pre_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook,
  * Note that any registered hooks registered here are guaranteed to be called
  * if pre-change hooks have been.
  */
-void arm_register_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook, void
-        *opaque);
+void arm_register_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hook,
+                                 void *opaque);
 
 /**
  * arm_rebuild_hflags:
@@ -3342,13 +3339,13 @@ extern const uint64_t pred_esz_masks[5];
  * Note that with the Linux kernel, PROT_MTE may not be cleared by mprotect
  * mprotect but PROT_BTI may be cleared.  C.f. the kernel's VM_ARCH_CLEAR.
  */
-#define PAGE_BTI            PAGE_TARGET_1
-#define PAGE_MTE            PAGE_TARGET_2
-#define PAGE_TARGET_STICKY  PAGE_MTE
+#define PAGE_BTI PAGE_TARGET_1
+#define PAGE_MTE PAGE_TARGET_2
+#define PAGE_TARGET_STICKY PAGE_MTE
 
 /* We associate one allocation tag per 16 bytes, the minimum.  */
 #define LOG2_TAG_GRANULE 4
-#define TAG_GRANULE      (1 << LOG2_TAG_GRANULE)
+#define TAG_GRANULE (1 << LOG2_TAG_GRANULE)
 
 #ifdef CONFIG_USER_ONLY
 #define TARGET_PAGE_DATA_SIZE (TARGET_PAGE_SIZE >> (LOG2_TAG_GRANULE + 1))
@@ -3527,7 +3524,7 @@ static inline bool isar_feature_aa32_mve(const ARMISARegisters *id)
      * else for A-profile.
      */
     return isar_feature_aa32_mprofile(id) &&
-        FIELD_EX32(id->mvfr1, MVFR1, MVE) > 0;
+           FIELD_EX32(id->mvfr1, MVFR1, MVE) > 0;
 }
 
 static inline bool isar_feature_aa32_mve_fp(const ARMISARegisters *id)
@@ -3538,7 +3535,7 @@ static inline bool isar_feature_aa32_mve_fp(const ARMISARegisters *id)
      * else for A-profile.
      */
     return isar_feature_aa32_mprofile(id) &&
-        FIELD_EX32(id->mvfr1, MVFR1, MVE) >= 2;
+           FIELD_EX32(id->mvfr1, MVFR1, MVE) >= 2;
 }
 
 static inline bool isar_feature_aa32_vfp_simd(const ARMISARegisters *id)
@@ -3656,21 +3653,21 @@ static inline bool isar_feature_aa32_pmuv3p1(const ARMISARegisters *id)
 {
     /* 0xf means "non-standard IMPDEF PMU" */
     return FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) >= 4 &&
-        FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
+           FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
 }
 
 static inline bool isar_feature_aa32_pmuv3p4(const ARMISARegisters *id)
 {
     /* 0xf means "non-standard IMPDEF PMU" */
     return FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) >= 5 &&
-        FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
+           FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
 }
 
 static inline bool isar_feature_aa32_pmuv3p5(const ARMISARegisters *id)
 {
     /* 0xf means "non-standard IMPDEF PMU" */
     return FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) >= 6 &&
-        FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
+           FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
 }
 
 static inline bool isar_feature_aa32_hpd(const ARMISARegisters *id)
@@ -3827,11 +3824,10 @@ static inline bool isar_feature_aa64_pauth(const ARMISARegisters *id)
      * Return true if any form of pauth is enabled, as this
      * predicate controls migration of the 128-bit keys.
      */
-    return (id->id_aa64isar1 &
-            (FIELD_DP64(0, ID_AA64ISAR1, APA, 0xf) |
-             FIELD_DP64(0, ID_AA64ISAR1, API, 0xf) |
-             FIELD_DP64(0, ID_AA64ISAR1, GPA, 0xf) |
-             FIELD_DP64(0, ID_AA64ISAR1, GPI, 0xf))) != 0;
+    return (id->id_aa64isar1 & (FIELD_DP64(0, ID_AA64ISAR1, APA, 0xf) |
+                                FIELD_DP64(0, ID_AA64ISAR1, API, 0xf) |
+                                FIELD_DP64(0, ID_AA64ISAR1, GPA, 0xf) |
+                                FIELD_DP64(0, ID_AA64ISAR1, GPI, 0xf))) != 0;
 }
 
 static inline bool isar_feature_aa64_pauth_arch(const ARMISARegisters *id)
@@ -4023,19 +4019,19 @@ static inline bool isar_feature_aa64_sme(const ARMISARegisters *id)
 static inline bool isar_feature_aa64_pmuv3p1(const ARMISARegisters *id)
 {
     return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >= 4 &&
-        FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
+           FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
 }
 
 static inline bool isar_feature_aa64_pmuv3p4(const ARMISARegisters *id)
 {
     return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >= 5 &&
-        FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
+           FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
 }
 
 static inline bool isar_feature_aa64_pmuv3p5(const ARMISARegisters *id)
 {
     return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >= 6 &&
-        FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
+           FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
 }
 
 static inline bool isar_feature_aa64_rcpc_8_3(const ARMISARegisters *id)
@@ -4152,11 +4148,11 @@ static inline bool isar_feature_aa64_scxtnum(const ARMISARegisters *id)
 {
     int key = FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, CSV2);
     if (key >= 2) {
-        return true;      /* FEAT_CSV2_2 */
+        return true; /* FEAT_CSV2_2 */
     }
     if (key == 1) {
         key = FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, CSV2_FRAC);
-        return key >= 2;  /* FEAT_CSV2_1p2 */
+        return key >= 2; /* FEAT_CSV2_1p2 */
     }
     return false;
 }
@@ -4302,7 +4298,10 @@ static inline bool isar_feature_any_evt(const ARMISARegisters *id)
 /*
  * Forward to the above feature tests given an ARMCPU pointer.
  */
-#define cpu_isar_feature(name, cpu) \
-    ({ ARMCPU *cpu_ = (cpu); isar_feature_##name(&cpu_->isar); })
+#define cpu_isar_feature(name, cpu)       \
+    ({                                    \
+        ARMCPU *cpu_ = (cpu);             \
+        isar_feature_##name(&cpu_->isar); \
+    })
 
 #endif

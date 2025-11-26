@@ -78,7 +78,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
     bool valid;
     CPUState *cs = env_cpu(env);
     S390CPU *cpu = S390_CPU(cs);
-    uint64_t addr =  env->regs[r1];
+    uint64_t addr = env->regs[r1];
     uint64_t subcode = env->regs[r3];
     IplParameterBlock *iplb;
 
@@ -131,7 +131,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
             s390_cpu_pv_mem_read(cpu, 0, iplb, be32_to_cpu(iplb->len));
         }
 
-        valid = subcode == DIAG308_PV_SET ? iplb_valid_pv(iplb) : iplb_valid(iplb);
+        valid =
+            subcode == DIAG308_PV_SET ? iplb_valid_pv(iplb) : iplb_valid(iplb);
         if (!valid) {
             env->regs[r1 + 1] = DIAG_308_RC_INVALID;
             goto out;
@@ -139,7 +140,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
 
         s390_ipl_update_diag308(iplb);
         env->regs[r1 + 1] = DIAG_308_RC_OK;
-out:
+    out:
         g_free(iplb);
         return;
     case DIAG308_STORE:

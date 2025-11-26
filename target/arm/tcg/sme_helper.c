@@ -95,21 +95,22 @@ void helper_sme_zero(CPUARMState *env, uint32_t imm, uint32_t svl)
 /*
  * Move Zreg vector to ZArray column.
  */
-#define DO_MOVA_C(NAME, TYPE, H)                                        \
-void HELPER(NAME)(void *za, void *vn, void *vg, uint32_t desc)          \
-{                                                                       \
-    int i, oprsz = simd_oprsz(desc);                                    \
-    for (i = 0; i < oprsz; ) {                                          \
-        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));                 \
-        do {                                                            \
-            if (pg & 1) {                                               \
-                *(TYPE *)(za + tile_vslice_offset(i)) = *(TYPE *)(vn + H(i)); \
-            }                                                           \
-            i += sizeof(TYPE);                                          \
-            pg >>= sizeof(TYPE);                                        \
-        } while (i & 15);                                               \
-    }                                                                   \
-}
+#define DO_MOVA_C(NAME, TYPE, H)                                   \
+    void HELPER(NAME)(void *za, void *vn, void *vg, uint32_t desc) \
+    {                                                              \
+        int i, oprsz = simd_oprsz(desc);                           \
+        for (i = 0; i < oprsz;) {                                  \
+            uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));        \
+            do {                                                   \
+                if (pg & 1) {                                      \
+                    *(TYPE *)(za + tile_vslice_offset(i)) =        \
+                        *(TYPE *)(vn + H(i));                      \
+                }                                                  \
+                i += sizeof(TYPE);                                 \
+                pg >>= sizeof(TYPE);                               \
+            } while (i & 15);                                      \
+        }                                                          \
+    }
 
 DO_MOVA_C(sme_mova_cz_b, uint8_t, H1)
 DO_MOVA_C(sme_mova_cz_h, uint16_t, H1_2)
@@ -152,21 +153,22 @@ void HELPER(sme_mova_cz_q)(void *za, void *vn, void *vg, uint32_t desc)
 /*
  * Move ZArray column to Zreg vector.
  */
-#define DO_MOVA_Z(NAME, TYPE, H)                                        \
-void HELPER(NAME)(void *vd, void *za, void *vg, uint32_t desc)          \
-{                                                                       \
-    int i, oprsz = simd_oprsz(desc);                                    \
-    for (i = 0; i < oprsz; ) {                                          \
-        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));                 \
-        do {                                                            \
-            if (pg & 1) {                                               \
-                *(TYPE *)(vd + H(i)) = *(TYPE *)(za + tile_vslice_offset(i)); \
-            }                                                           \
-            i += sizeof(TYPE);                                          \
-            pg >>= sizeof(TYPE);                                        \
-        } while (i & 15);                                               \
-    }                                                                   \
-}
+#define DO_MOVA_Z(NAME, TYPE, H)                                   \
+    void HELPER(NAME)(void *vd, void *za, void *vg, uint32_t desc) \
+    {                                                              \
+        int i, oprsz = simd_oprsz(desc);                           \
+        for (i = 0; i < oprsz;) {                                  \
+            uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));        \
+            do {                                                   \
+                if (pg & 1) {                                      \
+                    *(TYPE *)(vd + H(i)) =                         \
+                        *(TYPE *)(za + tile_vslice_offset(i));     \
+                }                                                  \
+                i += sizeof(TYPE);                                 \
+                pg >>= sizeof(TYPE);                               \
+            } while (i & 15);                                      \
+        }                                                          \
+    }
 
 DO_MOVA_Z(sme_mova_zc_b, uint8_t, H1)
 DO_MOVA_Z(sme_mova_zc_h, uint16_t, H1_2)
@@ -318,85 +320,87 @@ static void copy_vertical_q(void *vdst, const void *vsrc, size_t len)
  * Host and TLB primitives for vertical tile slice addressing.
  */
 
-#define DO_LD(NAME, TYPE, HOST, TLB)                                        \
-static inline void sme_##NAME##_v_host(void *za, intptr_t off, void *host)  \
-{                                                                           \
-    TYPE val = HOST(host);                                                  \
-    *(TYPE *)(za + tile_vslice_offset(off)) = val;                          \
-}                                                                           \
-static inline void sme_##NAME##_v_tlb(CPUARMState *env, void *za,           \
-                        intptr_t off, target_ulong addr, uintptr_t ra)      \
-{                                                                           \
-    TYPE val = TLB(env, useronly_clean_ptr(addr), ra);                      \
-    *(TYPE *)(za + tile_vslice_offset(off)) = val;                          \
-}
+#define DO_LD(NAME, TYPE, HOST, TLB)                                           \
+    static inline void sme_##NAME##_v_host(void *za, intptr_t off, void *host) \
+    {                                                                          \
+        TYPE val = HOST(host);                                                 \
+        *(TYPE *)(za + tile_vslice_offset(off)) = val;                         \
+    }                                                                          \
+    static inline void sme_##NAME##_v_tlb(CPUARMState *env, void *za,          \
+                                          intptr_t off, target_ulong addr,     \
+                                          uintptr_t ra)                        \
+    {                                                                          \
+        TYPE val = TLB(env, useronly_clean_ptr(addr), ra);                     \
+        *(TYPE *)(za + tile_vslice_offset(off)) = val;                         \
+    }
 
-#define DO_ST(NAME, TYPE, HOST, TLB)                                        \
-static inline void sme_##NAME##_v_host(void *za, intptr_t off, void *host)  \
-{                                                                           \
-    TYPE val = *(TYPE *)(za + tile_vslice_offset(off));                     \
-    HOST(host, val);                                                        \
-}                                                                           \
-static inline void sme_##NAME##_v_tlb(CPUARMState *env, void *za,           \
-                        intptr_t off, target_ulong addr, uintptr_t ra)      \
-{                                                                           \
-    TYPE val = *(TYPE *)(za + tile_vslice_offset(off));                     \
-    TLB(env, useronly_clean_ptr(addr), val, ra);                            \
-}
+#define DO_ST(NAME, TYPE, HOST, TLB)                                           \
+    static inline void sme_##NAME##_v_host(void *za, intptr_t off, void *host) \
+    {                                                                          \
+        TYPE val = *(TYPE *)(za + tile_vslice_offset(off));                    \
+        HOST(host, val);                                                       \
+    }                                                                          \
+    static inline void sme_##NAME##_v_tlb(CPUARMState *env, void *za,          \
+                                          intptr_t off, target_ulong addr,     \
+                                          uintptr_t ra)                        \
+    {                                                                          \
+        TYPE val = *(TYPE *)(za + tile_vslice_offset(off));                    \
+        TLB(env, useronly_clean_ptr(addr), val, ra);                           \
+    }
 
 /*
  * The ARMVectorReg elements are stored in host-endian 64-bit units.
  * For 128-bit quantities, the sequence defined by the Elem[] pseudocode
  * corresponds to storing the two 64-bit pieces in little-endian order.
  */
-#define DO_LDQ(HNAME, VNAME, BE, HOST, TLB)                                 \
-static inline void HNAME##_host(void *za, intptr_t off, void *host)         \
-{                                                                           \
-    uint64_t val0 = HOST(host), val1 = HOST(host + 8);                      \
-    uint64_t *ptr = za + off;                                               \
-    ptr[0] = BE ? val1 : val0, ptr[1] = BE ? val0 : val1;                   \
-}                                                                           \
-static inline void VNAME##_v_host(void *za, intptr_t off, void *host)       \
-{                                                                           \
-    HNAME##_host(za, tile_vslice_offset(off), host);                        \
-}                                                                           \
-static inline void HNAME##_tlb(CPUARMState *env, void *za, intptr_t off,    \
-                               target_ulong addr, uintptr_t ra)             \
-{                                                                           \
-    uint64_t val0 = TLB(env, useronly_clean_ptr(addr), ra);                 \
-    uint64_t val1 = TLB(env, useronly_clean_ptr(addr + 8), ra);             \
-    uint64_t *ptr = za + off;                                               \
-    ptr[0] = BE ? val1 : val0, ptr[1] = BE ? val0 : val1;                   \
-}                                                                           \
-static inline void VNAME##_v_tlb(CPUARMState *env, void *za, intptr_t off,  \
-                               target_ulong addr, uintptr_t ra)             \
-{                                                                           \
-    HNAME##_tlb(env, za, tile_vslice_offset(off), addr, ra);                \
-}
+#define DO_LDQ(HNAME, VNAME, BE, HOST, TLB)                                    \
+    static inline void HNAME##_host(void *za, intptr_t off, void *host)        \
+    {                                                                          \
+        uint64_t val0 = HOST(host), val1 = HOST(host + 8);                     \
+        uint64_t *ptr = za + off;                                              \
+        ptr[0] = BE ? val1 : val0, ptr[1] = BE ? val0 : val1;                  \
+    }                                                                          \
+    static inline void VNAME##_v_host(void *za, intptr_t off, void *host)      \
+    {                                                                          \
+        HNAME##_host(za, tile_vslice_offset(off), host);                       \
+    }                                                                          \
+    static inline void HNAME##_tlb(CPUARMState *env, void *za, intptr_t off,   \
+                                   target_ulong addr, uintptr_t ra)            \
+    {                                                                          \
+        uint64_t val0 = TLB(env, useronly_clean_ptr(addr), ra);                \
+        uint64_t val1 = TLB(env, useronly_clean_ptr(addr + 8), ra);            \
+        uint64_t *ptr = za + off;                                              \
+        ptr[0] = BE ? val1 : val0, ptr[1] = BE ? val0 : val1;                  \
+    }                                                                          \
+    static inline void VNAME##_v_tlb(CPUARMState *env, void *za, intptr_t off, \
+                                     target_ulong addr, uintptr_t ra)          \
+    {                                                                          \
+        HNAME##_tlb(env, za, tile_vslice_offset(off), addr, ra);               \
+    }
 
-#define DO_STQ(HNAME, VNAME, BE, HOST, TLB)                                 \
-static inline void HNAME##_host(void *za, intptr_t off, void *host)         \
-{                                                                           \
-    uint64_t *ptr = za + off;                                               \
-    HOST(host, ptr[BE]);                                                    \
-    HOST(host + 1, ptr[!BE]);                                               \
-}                                                                           \
-static inline void VNAME##_v_host(void *za, intptr_t off, void *host)       \
-{                                                                           \
-    HNAME##_host(za, tile_vslice_offset(off), host);                        \
-}                                                                           \
-static inline void HNAME##_tlb(CPUARMState *env, void *za, intptr_t off,    \
-                               target_ulong addr, uintptr_t ra)             \
-{                                                                           \
-    uint64_t *ptr = za + off;                                               \
-    TLB(env, useronly_clean_ptr(addr), ptr[BE], ra);                        \
-    TLB(env, useronly_clean_ptr(addr + 8), ptr[!BE], ra);                   \
-}                                                                           \
-static inline void VNAME##_v_tlb(CPUARMState *env, void *za, intptr_t off,  \
-                               target_ulong addr, uintptr_t ra)             \
-{                                                                           \
-    HNAME##_tlb(env, za, tile_vslice_offset(off), addr, ra);                \
-}
+#define DO_STQ(HNAME, VNAME, BE, HOST, TLB)                                    \
+    static inline void HNAME##_host(void *za, intptr_t off, void *host)        \
+    {                                                                          \
+        uint64_t *ptr = za + off;                                              \
+        HOST(host, ptr[BE]);                                                   \
+        HOST(host + 1, ptr[!BE]);                                              \
+    }                                                                          \
+    static inline void VNAME##_v_host(void *za, intptr_t off, void *host)      \
+    {                                                                          \
+        HNAME##_host(za, tile_vslice_offset(off), host);                       \
+    }                                                                          \
+    static inline void HNAME##_tlb(CPUARMState *env, void *za, intptr_t off,   \
+                                   target_ulong addr, uintptr_t ra)            \
+    {                                                                          \
+        uint64_t *ptr = za + off;                                              \
+        TLB(env, useronly_clean_ptr(addr), ptr[BE], ra);                       \
+        TLB(env, useronly_clean_ptr(addr + 8), ptr[!BE], ra);                  \
+    }                                                                          \
+    static inline void VNAME##_v_tlb(CPUARMState *env, void *za, intptr_t off, \
+                                     target_ulong addr, uintptr_t ra)          \
+    {                                                                          \
+        HNAME##_tlb(env, za, tile_vslice_offset(off), addr, ra);               \
+    }
 
 DO_LD(ld1b, uint8_t, ldub_p, cpu_ldub_data_ra)
 DO_LD(ld1h_be, uint16_t, lduw_be_p, cpu_lduw_be_data_ra)
@@ -429,14 +433,11 @@ DO_STQ(sve_st1qq_le, sme_st1q_le, 0, stq_le_p, cpu_stq_le_data_ra)
  * Common helper for all contiguous predicated loads.
  */
 
-static inline QEMU_ALWAYS_INLINE
-void sme_ld1(CPUARMState *env, void *za, uint64_t *vg,
-             const target_ulong addr, uint32_t desc, const uintptr_t ra,
-             const int esz, uint32_t mtedesc, bool vertical,
-             sve_ldst1_host_fn *host_fn,
-             sve_ldst1_tlb_fn *tlb_fn,
-             ClearFn *clr_fn,
-             CopyFn *cpy_fn)
+static inline QEMU_ALWAYS_INLINE void
+sme_ld1(CPUARMState *env, void *za, uint64_t *vg, const target_ulong addr,
+        uint32_t desc, const uintptr_t ra, const int esz, uint32_t mtedesc,
+        bool vertical, sve_ldst1_host_fn *host_fn, sve_ldst1_tlb_fn *tlb_fn,
+        ClearFn *clr_fn, CopyFn *cpy_fn)
 {
     const intptr_t reg_max = simd_oprsz(desc);
     const intptr_t esize = 1 << esz;
@@ -456,16 +457,16 @@ void sme_ld1(CPUARMState *env, void *za, uint64_t *vg,
     sve_cont_ldst_pages(&info, FAULT_ALL, env, addr, MMU_DATA_LOAD, ra);
 
     /* Handle watchpoints for all active elements. */
-    sve_cont_ldst_watchpoints(&info, env, vg, addr, esize, esize,
-                              BP_MEM_READ, ra);
+    sve_cont_ldst_watchpoints(&info, env, vg, addr, esize, esize, BP_MEM_READ,
+                              ra);
 
     /*
      * Handle mte checks for all active elements.
      * Since TBI must be set for MTE, !mtedesc => !mte_active.
      */
     if (mtedesc) {
-        sve_cont_ldst_mte_check(&info, env, vg, addr, esize, esize,
-                                mtedesc, ra);
+        sve_cont_ldst_mte_check(&info, env, vg, addr, esize, esize, mtedesc,
+                                ra);
     }
 
     flags = info.page[0].flags | info.page[1].flags;
@@ -479,7 +480,7 @@ void sme_ld1(CPUARMState *env, void *za, uint64_t *vg,
          * which for ARM will raise SyncExternal.  Perform the load
          * into scratch memory to preserve register state until the end.
          */
-        ARMVectorReg scratch = { };
+        ARMVectorReg scratch = {};
 
         reg_off = info.reg_off_first[0];
         reg_last = info.reg_off_last[1];
@@ -557,14 +558,11 @@ void sme_ld1(CPUARMState *env, void *za, uint64_t *vg,
     }
 }
 
-static inline QEMU_ALWAYS_INLINE
-void sme_ld1_mte(CPUARMState *env, void *za, uint64_t *vg,
-                 target_ulong addr, uint32_t desc, uintptr_t ra,
-                 const int esz, bool vertical,
-                 sve_ldst1_host_fn *host_fn,
-                 sve_ldst1_tlb_fn *tlb_fn,
-                 ClearFn *clr_fn,
-                 CopyFn *cpy_fn)
+static inline QEMU_ALWAYS_INLINE void
+sme_ld1_mte(CPUARMState *env, void *za, uint64_t *vg, target_ulong addr,
+            uint32_t desc, uintptr_t ra, const int esz, bool vertical,
+            sve_ldst1_host_fn *host_fn, sve_ldst1_tlb_fn *tlb_fn,
+            ClearFn *clr_fn, CopyFn *cpy_fn)
 {
     uint32_t mtedesc = desc >> (SIMD_DATA_SHIFT + SVE_MTEDESC_SHIFT);
     int bit55 = extract64(addr, 55, 1);
@@ -578,39 +576,41 @@ void sme_ld1_mte(CPUARMState *env, void *za, uint64_t *vg,
         mtedesc = 0;
     }
 
-    sme_ld1(env, za, vg, addr, desc, ra, esz, mtedesc, vertical,
-            host_fn, tlb_fn, clr_fn, cpy_fn);
+    sme_ld1(env, za, vg, addr, desc, ra, esz, mtedesc, vertical, host_fn,
+            tlb_fn, clr_fn, cpy_fn);
 }
 
-#define DO_LD(L, END, ESZ)                                                 \
-void HELPER(sme_ld1##L##END##_h)(CPUARMState *env, void *za, void *vg,     \
-                                 target_ulong addr, uint32_t desc)         \
-{                                                                          \
-    sme_ld1(env, za, vg, addr, desc, GETPC(), ESZ, 0, false,               \
-            sve_ld1##L##L##END##_host, sve_ld1##L##L##END##_tlb,           \
-            clear_horizontal, copy_horizontal);                            \
-}                                                                          \
-void HELPER(sme_ld1##L##END##_v)(CPUARMState *env, void *za, void *vg,     \
-                                 target_ulong addr, uint32_t desc)         \
-{                                                                          \
-    sme_ld1(env, za, vg, addr, desc, GETPC(), ESZ, 0, true,                \
-            sme_ld1##L##END##_v_host, sme_ld1##L##END##_v_tlb,             \
-            clear_vertical_##L, copy_vertical_##L);                        \
-}                                                                          \
-void HELPER(sme_ld1##L##END##_h_mte)(CPUARMState *env, void *za, void *vg, \
-                                     target_ulong addr, uint32_t desc)     \
-{                                                                          \
-    sme_ld1_mte(env, za, vg, addr, desc, GETPC(), ESZ, false,              \
-                sve_ld1##L##L##END##_host, sve_ld1##L##L##END##_tlb,       \
-                clear_horizontal, copy_horizontal);                        \
-}                                                                          \
-void HELPER(sme_ld1##L##END##_v_mte)(CPUARMState *env, void *za, void *vg, \
-                                     target_ulong addr, uint32_t desc)     \
-{                                                                          \
-    sme_ld1_mte(env, za, vg, addr, desc, GETPC(), ESZ, true,               \
-                sme_ld1##L##END##_v_host, sme_ld1##L##END##_v_tlb,         \
-                clear_vertical_##L, copy_vertical_##L);                    \
-}
+#define DO_LD(L, END, ESZ)                                                  \
+    void HELPER(sme_ld1##L##END##_h)(CPUARMState * env, void *za, void *vg, \
+                                     target_ulong addr, uint32_t desc)      \
+    {                                                                       \
+        sme_ld1(env, za, vg, addr, desc, GETPC(), ESZ, 0, false,            \
+                sve_ld1##L##L##END##_host, sve_ld1##L##L##END##_tlb,        \
+                clear_horizontal, copy_horizontal);                         \
+    }                                                                       \
+    void HELPER(sme_ld1##L##END##_v)(CPUARMState * env, void *za, void *vg, \
+                                     target_ulong addr, uint32_t desc)      \
+    {                                                                       \
+        sme_ld1(env, za, vg, addr, desc, GETPC(), ESZ, 0, true,             \
+                sme_ld1##L##END##_v_host, sme_ld1##L##END##_v_tlb,          \
+                clear_vertical_##L, copy_vertical_##L);                     \
+    }                                                                       \
+    void HELPER(sme_ld1##L##END##_h_mte)(CPUARMState * env, void *za,       \
+                                         void *vg, target_ulong addr,       \
+                                         uint32_t desc)                     \
+    {                                                                       \
+        sme_ld1_mte(env, za, vg, addr, desc, GETPC(), ESZ, false,           \
+                    sve_ld1##L##L##END##_host, sve_ld1##L##L##END##_tlb,    \
+                    clear_horizontal, copy_horizontal);                     \
+    }                                                                       \
+    void HELPER(sme_ld1##L##END##_v_mte)(CPUARMState * env, void *za,       \
+                                         void *vg, target_ulong addr,       \
+                                         uint32_t desc)                     \
+    {                                                                       \
+        sme_ld1_mte(env, za, vg, addr, desc, GETPC(), ESZ, true,            \
+                    sme_ld1##L##END##_v_host, sme_ld1##L##END##_v_tlb,      \
+                    clear_vertical_##L, copy_vertical_##L);                 \
+    }
 
 DO_LD(b, , MO_8)
 DO_LD(h, _be, MO_16)
@@ -628,12 +628,10 @@ DO_LD(q, _le, MO_128)
  * Common helper for all contiguous predicated stores.
  */
 
-static inline QEMU_ALWAYS_INLINE
-void sme_st1(CPUARMState *env, void *za, uint64_t *vg,
-             const target_ulong addr, uint32_t desc, const uintptr_t ra,
-             const int esz, uint32_t mtedesc, bool vertical,
-             sve_ldst1_host_fn *host_fn,
-             sve_ldst1_tlb_fn *tlb_fn)
+static inline QEMU_ALWAYS_INLINE void
+sme_st1(CPUARMState *env, void *za, uint64_t *vg, const target_ulong addr,
+        uint32_t desc, const uintptr_t ra, const int esz, uint32_t mtedesc,
+        bool vertical, sve_ldst1_host_fn *host_fn, sve_ldst1_tlb_fn *tlb_fn)
 {
     const intptr_t reg_max = simd_oprsz(desc);
     const intptr_t esize = 1 << esz;
@@ -652,16 +650,16 @@ void sme_st1(CPUARMState *env, void *za, uint64_t *vg,
     sve_cont_ldst_pages(&info, FAULT_ALL, env, addr, MMU_DATA_STORE, ra);
 
     /* Handle watchpoints for all active elements. */
-    sve_cont_ldst_watchpoints(&info, env, vg, addr, esize, esize,
-                              BP_MEM_WRITE, ra);
+    sve_cont_ldst_watchpoints(&info, env, vg, addr, esize, esize, BP_MEM_WRITE,
+                              ra);
 
     /*
      * Handle mte checks for all active elements.
      * Since TBI must be set for MTE, !mtedesc => !mte_active.
      */
     if (mtedesc) {
-        sve_cont_ldst_mte_check(&info, env, vg, addr, esize, esize,
-                                mtedesc, ra);
+        sve_cont_ldst_mte_check(&info, env, vg, addr, esize, esize, mtedesc,
+                                ra);
     }
 
     flags = info.page[0].flags | info.page[1].flags;
@@ -737,11 +735,10 @@ void sme_st1(CPUARMState *env, void *za, uint64_t *vg,
     }
 }
 
-static inline QEMU_ALWAYS_INLINE
-void sme_st1_mte(CPUARMState *env, void *za, uint64_t *vg, target_ulong addr,
-                 uint32_t desc, uintptr_t ra, int esz, bool vertical,
-                 sve_ldst1_host_fn *host_fn,
-                 sve_ldst1_tlb_fn *tlb_fn)
+static inline QEMU_ALWAYS_INLINE void
+sme_st1_mte(CPUARMState *env, void *za, uint64_t *vg, target_ulong addr,
+            uint32_t desc, uintptr_t ra, int esz, bool vertical,
+            sve_ldst1_host_fn *host_fn, sve_ldst1_tlb_fn *tlb_fn)
 {
     uint32_t mtedesc = desc >> (SIMD_DATA_SHIFT + SVE_MTEDESC_SHIFT);
     int bit55 = extract64(addr, 55, 1);
@@ -755,35 +752,37 @@ void sme_st1_mte(CPUARMState *env, void *za, uint64_t *vg, target_ulong addr,
         mtedesc = 0;
     }
 
-    sme_st1(env, za, vg, addr, desc, ra, esz, mtedesc,
-            vertical, host_fn, tlb_fn);
+    sme_st1(env, za, vg, addr, desc, ra, esz, mtedesc, vertical, host_fn,
+            tlb_fn);
 }
 
-#define DO_ST(L, END, ESZ)                                                 \
-void HELPER(sme_st1##L##END##_h)(CPUARMState *env, void *za, void *vg,     \
-                                 target_ulong addr, uint32_t desc)         \
-{                                                                          \
-    sme_st1(env, za, vg, addr, desc, GETPC(), ESZ, 0, false,               \
-            sve_st1##L##L##END##_host, sve_st1##L##L##END##_tlb);          \
-}                                                                          \
-void HELPER(sme_st1##L##END##_v)(CPUARMState *env, void *za, void *vg,     \
-                                 target_ulong addr, uint32_t desc)         \
-{                                                                          \
-    sme_st1(env, za, vg, addr, desc, GETPC(), ESZ, 0, true,                \
-            sme_st1##L##END##_v_host, sme_st1##L##END##_v_tlb);            \
-}                                                                          \
-void HELPER(sme_st1##L##END##_h_mte)(CPUARMState *env, void *za, void *vg, \
-                                     target_ulong addr, uint32_t desc)     \
-{                                                                          \
-    sme_st1_mte(env, za, vg, addr, desc, GETPC(), ESZ, false,              \
-                sve_st1##L##L##END##_host, sve_st1##L##L##END##_tlb);      \
-}                                                                          \
-void HELPER(sme_st1##L##END##_v_mte)(CPUARMState *env, void *za, void *vg, \
-                                     target_ulong addr, uint32_t desc)     \
-{                                                                          \
-    sme_st1_mte(env, za, vg, addr, desc, GETPC(), ESZ, true,               \
-                sme_st1##L##END##_v_host, sme_st1##L##END##_v_tlb);        \
-}
+#define DO_ST(L, END, ESZ)                                                  \
+    void HELPER(sme_st1##L##END##_h)(CPUARMState * env, void *za, void *vg, \
+                                     target_ulong addr, uint32_t desc)      \
+    {                                                                       \
+        sme_st1(env, za, vg, addr, desc, GETPC(), ESZ, 0, false,            \
+                sve_st1##L##L##END##_host, sve_st1##L##L##END##_tlb);       \
+    }                                                                       \
+    void HELPER(sme_st1##L##END##_v)(CPUARMState * env, void *za, void *vg, \
+                                     target_ulong addr, uint32_t desc)      \
+    {                                                                       \
+        sme_st1(env, za, vg, addr, desc, GETPC(), ESZ, 0, true,             \
+                sme_st1##L##END##_v_host, sme_st1##L##END##_v_tlb);         \
+    }                                                                       \
+    void HELPER(sme_st1##L##END##_h_mte)(CPUARMState * env, void *za,       \
+                                         void *vg, target_ulong addr,       \
+                                         uint32_t desc)                     \
+    {                                                                       \
+        sme_st1_mte(env, za, vg, addr, desc, GETPC(), ESZ, false,           \
+                    sve_st1##L##L##END##_host, sve_st1##L##L##END##_tlb);   \
+    }                                                                       \
+    void HELPER(sme_st1##L##END##_v_mte)(CPUARMState * env, void *za,       \
+                                         void *vg, target_ulong addr,       \
+                                         uint32_t desc)                     \
+    {                                                                       \
+        sme_st1_mte(env, za, vg, addr, desc, GETPC(), ESZ, true,            \
+                    sme_st1##L##END##_v_host, sme_st1##L##END##_v_tlb);     \
+    }
 
 DO_ST(b, , MO_8)
 DO_ST(h, _be, MO_16)
@@ -797,22 +796,23 @@ DO_ST(q, _le, MO_128)
 
 #undef DO_ST
 
-void HELPER(sme_addha_s)(void *vzda, void *vzn, void *vpn,
-                         void *vpm, uint32_t desc)
+void HELPER(sme_addha_s)(void *vzda, void *vzn, void *vpn, void *vpm,
+                         uint32_t desc)
 {
     intptr_t row, col, oprsz = simd_oprsz(desc) / 4;
     uint64_t *pn = vpn, *pm = vpm;
     uint32_t *zda = vzda, *zn = vzn;
 
-    for (row = 0; row < oprsz; ) {
+    for (row = 0; row < oprsz;) {
         uint64_t pa = pn[row >> 4];
         do {
             if (pa & 1) {
-                for (col = 0; col < oprsz; ) {
+                for (col = 0; col < oprsz;) {
                     uint64_t pb = pm[col >> 4];
                     do {
                         if (pb & 1) {
-                            zda[tile_vslice_index(row) + H4(col)] += zn[H4(col)];
+                            zda[tile_vslice_index(row) + H4(col)] +=
+                                zn[H4(col)];
                         }
                         pb >>= 4;
                     } while (++col & 15);
@@ -823,8 +823,8 @@ void HELPER(sme_addha_s)(void *vzda, void *vzn, void *vpn,
     }
 }
 
-void HELPER(sme_addha_d)(void *vzda, void *vzn, void *vpn,
-                         void *vpm, uint32_t desc)
+void HELPER(sme_addha_d)(void *vzda, void *vzn, void *vpn, void *vpm,
+                         uint32_t desc)
 {
     intptr_t row, col, oprsz = simd_oprsz(desc) / 8;
     uint8_t *pn = vpn, *pm = vpm;
@@ -841,19 +841,19 @@ void HELPER(sme_addha_d)(void *vzda, void *vzn, void *vpn,
     }
 }
 
-void HELPER(sme_addva_s)(void *vzda, void *vzn, void *vpn,
-                         void *vpm, uint32_t desc)
+void HELPER(sme_addva_s)(void *vzda, void *vzn, void *vpn, void *vpm,
+                         uint32_t desc)
 {
     intptr_t row, col, oprsz = simd_oprsz(desc) / 4;
     uint64_t *pn = vpn, *pm = vpm;
     uint32_t *zda = vzda, *zn = vzn;
 
-    for (row = 0; row < oprsz; ) {
+    for (row = 0; row < oprsz;) {
         uint64_t pa = pn[row >> 4];
         do {
             if (pa & 1) {
                 uint32_t zn_row = zn[H4(row)];
-                for (col = 0; col < oprsz; ) {
+                for (col = 0; col < oprsz;) {
                     uint64_t pb = pm[col >> 4];
                     do {
                         if (pb & 1) {
@@ -868,8 +868,8 @@ void HELPER(sme_addva_s)(void *vzda, void *vzn, void *vpn,
     }
 }
 
-void HELPER(sme_addva_d)(void *vzda, void *vzn, void *vpn,
-                         void *vpm, uint32_t desc)
+void HELPER(sme_addva_d)(void *vzda, void *vzn, void *vpn, void *vpm,
+                         uint32_t desc)
 {
     intptr_t row, col, oprsz = simd_oprsz(desc) / 8;
     uint8_t *pn = vpn, *pm = vpm;
@@ -887,8 +887,8 @@ void HELPER(sme_addva_d)(void *vzda, void *vzn, void *vpn,
     }
 }
 
-void HELPER(sme_fmopa_s)(void *vza, void *vzn, void *vzm, void *vpn,
-                         void *vpm, void *vst, uint32_t desc)
+void HELPER(sme_fmopa_s)(void *vza, void *vzn, void *vzm, void *vpn, void *vpm,
+                         void *vst, uint32_t desc)
 {
     intptr_t row, col, oprsz = simd_maxsz(desc);
     uint32_t neg = simd_data(desc) << 31;
@@ -903,14 +903,14 @@ void HELPER(sme_fmopa_s)(void *vza, void *vzn, void *vzm, void *vpn,
     fpst = *(float_status *)vst;
     set_default_nan_mode(true, &fpst);
 
-    for (row = 0; row < oprsz; ) {
+    for (row = 0; row < oprsz;) {
         uint16_t pa = pn[H2(row >> 4)];
         do {
             if (pa & 1) {
                 void *vza_row = vza + tile_vslice_offset(row);
                 uint32_t n = *(uint32_t *)(vzn + H1_4(row)) ^ neg;
 
-                for (col = 0; col < oprsz; ) {
+                for (col = 0; col < oprsz;) {
                     uint16_t pb = pm[H2(col >> 4)];
                     do {
                         if (pb & 1) {
@@ -929,8 +929,8 @@ void HELPER(sme_fmopa_s)(void *vza, void *vzn, void *vzm, void *vpn,
     }
 }
 
-void HELPER(sme_fmopa_d)(void *vza, void *vzn, void *vzm, void *vpn,
-                         void *vpm, void *vst, uint32_t desc)
+void HELPER(sme_fmopa_d)(void *vza, void *vzn, void *vzm, void *vpn, void *vpm,
+                         void *vst, uint32_t desc)
 {
     intptr_t row, col, oprsz = simd_oprsz(desc) / 8;
     uint64_t neg = (uint64_t)simd_data(desc) << 63;
@@ -1002,8 +1002,8 @@ static float32 f16_dotadd(float32 sum, uint32_t e1, uint32_t e2,
     return float32_add(sum, t32, s_std);
 }
 
-void HELPER(sme_fmopa_h)(void *vza, void *vzn, void *vzm, void *vpn,
-                         void *vpm, void *vst, uint32_t desc)
+void HELPER(sme_fmopa_h)(void *vza, void *vzn, void *vzm, void *vpn, void *vpm,
+                         void *vst, uint32_t desc)
 {
     intptr_t row, col, oprsz = simd_maxsz(desc);
     uint32_t neg = simd_data(desc) * 0x80008000u;
@@ -1020,7 +1020,7 @@ void HELPER(sme_fmopa_h)(void *vza, void *vzn, void *vzm, void *vpn,
     fpst_odd = fpst_std;
     set_float_rounding_mode(float_round_to_odd, &fpst_odd);
 
-    for (row = 0; row < oprsz; ) {
+    for (row = 0; row < oprsz;) {
         uint16_t prow = pn[H2(row >> 4)];
         do {
             void *vza_row = vza + tile_vslice_offset(row);
@@ -1028,7 +1028,7 @@ void HELPER(sme_fmopa_h)(void *vza, void *vzn, void *vzm, void *vpn,
 
             n = f16mop_adj_pair(n, prow, neg);
 
-            for (col = 0; col < oprsz; ) {
+            for (col = 0; col < oprsz;) {
                 uint16_t pcol = pm[H2(col >> 4)];
                 do {
                     if (prow & pcol & 0b0101) {
@@ -1049,14 +1049,14 @@ void HELPER(sme_fmopa_h)(void *vza, void *vzn, void *vzm, void *vpn,
     }
 }
 
-void HELPER(sme_bfmopa)(void *vza, void *vzn, void *vzm, void *vpn,
-                        void *vpm, uint32_t desc)
+void HELPER(sme_bfmopa)(void *vza, void *vzn, void *vzm, void *vpn, void *vpm,
+                        uint32_t desc)
 {
     intptr_t row, col, oprsz = simd_maxsz(desc);
     uint32_t neg = simd_data(desc) * 0x80008000u;
     uint16_t *pn = vpn, *pm = vpm;
 
-    for (row = 0; row < oprsz; ) {
+    for (row = 0; row < oprsz;) {
         uint16_t prow = pn[H2(row >> 4)];
         do {
             void *vza_row = vza + tile_vslice_offset(row);
@@ -1064,7 +1064,7 @@ void HELPER(sme_bfmopa)(void *vza, void *vzn, void *vzm, void *vpn,
 
             n = f16mop_adj_pair(n, prow, neg);
 
-            for (col = 0; col < oprsz; ) {
+            for (col = 0; col < oprsz;) {
                 uint16_t pcol = pm[H2(col >> 4)];
                 do {
                     if (prow & pcol & 0b0101) {
@@ -1088,8 +1088,7 @@ void HELPER(sme_bfmopa)(void *vza, void *vzn, void *vzm, void *vpn,
 typedef uint64_t IMOPFn(uint64_t, uint64_t, uint64_t, uint8_t, bool);
 
 static inline void do_imopa(uint64_t *za, uint64_t *zn, uint64_t *zm,
-                            uint8_t *pn, uint8_t *pm,
-                            uint32_t desc, IMOPFn *fn)
+                            uint8_t *pn, uint8_t *pm, uint32_t desc, IMOPFn *fn)
 {
     intptr_t row, col, oprsz = simd_oprsz(desc) / 8;
     bool neg = simd_data(desc);
@@ -1108,40 +1107,42 @@ static inline void do_imopa(uint64_t *za, uint64_t *zn, uint64_t *zm,
     }
 }
 
-#define DEF_IMOP_32(NAME, NTYPE, MTYPE) \
-static uint64_t NAME(uint64_t n, uint64_t m, uint64_t a, uint8_t p, bool neg) \
-{                                                                           \
-    uint32_t sum0 = 0, sum1 = 0;                                            \
-    /* Apply P to N as a mask, making the inactive elements 0. */           \
-    n &= expand_pred_b(p);                                                  \
-    sum0 += (NTYPE)(n >> 0) * (MTYPE)(m >> 0);                              \
-    sum0 += (NTYPE)(n >> 8) * (MTYPE)(m >> 8);                              \
-    sum0 += (NTYPE)(n >> 16) * (MTYPE)(m >> 16);                            \
-    sum0 += (NTYPE)(n >> 24) * (MTYPE)(m >> 24);                            \
-    sum1 += (NTYPE)(n >> 32) * (MTYPE)(m >> 32);                            \
-    sum1 += (NTYPE)(n >> 40) * (MTYPE)(m >> 40);                            \
-    sum1 += (NTYPE)(n >> 48) * (MTYPE)(m >> 48);                            \
-    sum1 += (NTYPE)(n >> 56) * (MTYPE)(m >> 56);                            \
-    if (neg) {                                                              \
-        sum0 = (uint32_t)a - sum0, sum1 = (uint32_t)(a >> 32) - sum1;       \
-    } else {                                                                \
-        sum0 = (uint32_t)a + sum0, sum1 = (uint32_t)(a >> 32) + sum1;       \
-    }                                                                       \
-    return ((uint64_t)sum1 << 32) | sum0;                                   \
-}
+#define DEF_IMOP_32(NAME, NTYPE, MTYPE)                                   \
+    static uint64_t NAME(uint64_t n, uint64_t m, uint64_t a, uint8_t p,   \
+                         bool neg)                                        \
+    {                                                                     \
+        uint32_t sum0 = 0, sum1 = 0;                                      \
+        /* Apply P to N as a mask, making the inactive elements 0. */     \
+        n &= expand_pred_b(p);                                            \
+        sum0 += (NTYPE)(n >> 0) * (MTYPE)(m >> 0);                        \
+        sum0 += (NTYPE)(n >> 8) * (MTYPE)(m >> 8);                        \
+        sum0 += (NTYPE)(n >> 16) * (MTYPE)(m >> 16);                      \
+        sum0 += (NTYPE)(n >> 24) * (MTYPE)(m >> 24);                      \
+        sum1 += (NTYPE)(n >> 32) * (MTYPE)(m >> 32);                      \
+        sum1 += (NTYPE)(n >> 40) * (MTYPE)(m >> 40);                      \
+        sum1 += (NTYPE)(n >> 48) * (MTYPE)(m >> 48);                      \
+        sum1 += (NTYPE)(n >> 56) * (MTYPE)(m >> 56);                      \
+        if (neg) {                                                        \
+            sum0 = (uint32_t)a - sum0, sum1 = (uint32_t)(a >> 32) - sum1; \
+        } else {                                                          \
+            sum0 = (uint32_t)a + sum0, sum1 = (uint32_t)(a >> 32) + sum1; \
+        }                                                                 \
+        return ((uint64_t)sum1 << 32) | sum0;                             \
+    }
 
-#define DEF_IMOP_64(NAME, NTYPE, MTYPE) \
-static uint64_t NAME(uint64_t n, uint64_t m, uint64_t a, uint8_t p, bool neg) \
-{                                                                           \
-    uint64_t sum = 0;                                                       \
-    /* Apply P to N as a mask, making the inactive elements 0. */           \
-    n &= expand_pred_h(p);                                                  \
-    sum += (NTYPE)(n >> 0) * (MTYPE)(m >> 0);                               \
-    sum += (NTYPE)(n >> 16) * (MTYPE)(m >> 16);                             \
-    sum += (NTYPE)(n >> 32) * (MTYPE)(m >> 32);                             \
-    sum += (NTYPE)(n >> 48) * (MTYPE)(m >> 48);                             \
-    return neg ? a - sum : a + sum;                                         \
-}
+#define DEF_IMOP_64(NAME, NTYPE, MTYPE)                                 \
+    static uint64_t NAME(uint64_t n, uint64_t m, uint64_t a, uint8_t p, \
+                         bool neg)                                      \
+    {                                                                   \
+        uint64_t sum = 0;                                               \
+        /* Apply P to N as a mask, making the inactive elements 0. */   \
+        n &= expand_pred_h(p);                                          \
+        sum += (NTYPE)(n >> 0) * (MTYPE)(m >> 0);                       \
+        sum += (NTYPE)(n >> 16) * (MTYPE)(m >> 16);                     \
+        sum += (NTYPE)(n >> 32) * (MTYPE)(m >> 32);                     \
+        sum += (NTYPE)(n >> 48) * (MTYPE)(m >> 48);                     \
+        return neg ? a - sum : a + sum;                                 \
+    }
 
 DEF_IMOP_32(smopa_s, int8_t, int8_t)
 DEF_IMOP_32(umopa_s, uint8_t, uint8_t)
@@ -1153,10 +1154,12 @@ DEF_IMOP_64(umopa_d, uint16_t, uint16_t)
 DEF_IMOP_64(sumopa_d, int16_t, uint16_t)
 DEF_IMOP_64(usmopa_d, uint16_t, int16_t)
 
-#define DEF_IMOPH(NAME) \
-    void HELPER(sme_##NAME)(void *vza, void *vzn, void *vzm, void *vpn,      \
-                            void *vpm, uint32_t desc)                        \
-    { do_imopa(vza, vzn, vzm, vpn, vpm, desc, NAME); }
+#define DEF_IMOPH(NAME)                                                 \
+    void HELPER(sme_##NAME)(void *vza, void *vzn, void *vzm, void *vpn, \
+                            void *vpm, uint32_t desc)                   \
+    {                                                                   \
+        do_imopa(vza, vzn, vzm, vpn, vpm, desc, NAME);                  \
+    }
 
 DEF_IMOPH(smopa_s)
 DEF_IMOPH(umopa_s)

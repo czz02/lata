@@ -44,110 +44,104 @@
  */
 
 /* Macros for complex addressing modes */
-#define GET_EA_ap \
-    do { \
-        fEA_IMM(UiV); \
+#define GET_EA_ap                  \
+    do {                           \
+        fEA_IMM(UiV);              \
         tcg_gen_movi_tl(ReV, UiV); \
     } while (0)
-#define GET_EA_pr \
-    do { \
-        fEA_REG(RxV); \
+#define GET_EA_pr        \
+    do {                 \
+        fEA_REG(RxV);    \
         fPM_M(RxV, MuV); \
     } while (0)
-#define GET_EA_pbr \
-    do { \
-        gen_helper_fbrev(EA, RxV); \
+#define GET_EA_pbr                     \
+    do {                               \
+        gen_helper_fbrev(EA, RxV);     \
         tcg_gen_add_tl(RxV, RxV, MuV); \
     } while (0)
-#define GET_EA_pi \
-    do { \
-        fEA_REG(RxV); \
+#define GET_EA_pi        \
+    do {                 \
+        fEA_REG(RxV);    \
         fPM_I(RxV, siV); \
     } while (0)
-#define GET_EA_pci \
-    do { \
-        TCGv tcgv_siV = tcg_constant_tl(siV); \
-        tcg_gen_mov_tl(EA, RxV); \
-        gen_helper_fcircadd(RxV, RxV, tcgv_siV, MuV, \
+#define GET_EA_pci                                       \
+    do {                                                 \
+        TCGv tcgv_siV = tcg_constant_tl(siV);            \
+        tcg_gen_mov_tl(EA, RxV);                         \
+        gen_helper_fcircadd(RxV, RxV, tcgv_siV, MuV,     \
                             hex_gpr[HEX_REG_CS0 + MuN]); \
     } while (0)
-#define GET_EA_pcr(SHIFT) \
-    do { \
-        TCGv ireg = tcg_temp_new(); \
-        tcg_gen_mov_tl(EA, RxV); \
-        gen_read_ireg(ireg, MuV, (SHIFT)); \
+#define GET_EA_pcr(SHIFT)                                                     \
+    do {                                                                      \
+        TCGv ireg = tcg_temp_new();                                           \
+        tcg_gen_mov_tl(EA, RxV);                                              \
+        gen_read_ireg(ireg, MuV, (SHIFT));                                    \
         gen_helper_fcircadd(RxV, RxV, ireg, MuV, hex_gpr[HEX_REG_CS0 + MuN]); \
     } while (0)
 
 /* Instructions with multiple definitions */
 #define fGEN_TCG_LOAD_AP(RES, SIZE, SIGN) \
-    do { \
-        fMUST_IMMEXT(UiV); \
-        fEA_IMM(UiV); \
-        fLOAD(1, SIZE, SIGN, EA, RES); \
-        tcg_gen_movi_tl(ReV, UiV); \
+    do {                                  \
+        fMUST_IMMEXT(UiV);                \
+        fEA_IMM(UiV);                     \
+        fLOAD(1, SIZE, SIGN, EA, RES);    \
+        tcg_gen_movi_tl(ReV, UiV);        \
     } while (0)
 
-#define fGEN_TCG_L4_loadrub_ap(SHORTCODE) \
-    fGEN_TCG_LOAD_AP(RdV, 1, u)
-#define fGEN_TCG_L4_loadrb_ap(SHORTCODE) \
-    fGEN_TCG_LOAD_AP(RdV, 1, s)
-#define fGEN_TCG_L4_loadruh_ap(SHORTCODE) \
-    fGEN_TCG_LOAD_AP(RdV, 2, u)
-#define fGEN_TCG_L4_loadrh_ap(SHORTCODE) \
-    fGEN_TCG_LOAD_AP(RdV, 2, s)
-#define fGEN_TCG_L4_loadri_ap(SHORTCODE) \
-    fGEN_TCG_LOAD_AP(RdV, 4, u)
-#define fGEN_TCG_L4_loadrd_ap(SHORTCODE) \
-    fGEN_TCG_LOAD_AP(RddV, 8, u)
+#define fGEN_TCG_L4_loadrub_ap(SHORTCODE) fGEN_TCG_LOAD_AP(RdV, 1, u)
+#define fGEN_TCG_L4_loadrb_ap(SHORTCODE) fGEN_TCG_LOAD_AP(RdV, 1, s)
+#define fGEN_TCG_L4_loadruh_ap(SHORTCODE) fGEN_TCG_LOAD_AP(RdV, 2, u)
+#define fGEN_TCG_L4_loadrh_ap(SHORTCODE) fGEN_TCG_LOAD_AP(RdV, 2, s)
+#define fGEN_TCG_L4_loadri_ap(SHORTCODE) fGEN_TCG_LOAD_AP(RdV, 4, u)
+#define fGEN_TCG_L4_loadrd_ap(SHORTCODE) fGEN_TCG_LOAD_AP(RddV, 8, u)
 
-#define fGEN_TCG_L2_loadrub_pci(SHORTCODE)    SHORTCODE
-#define fGEN_TCG_L2_loadrb_pci(SHORTCODE)     SHORTCODE
-#define fGEN_TCG_L2_loadruh_pci(SHORTCODE)    SHORTCODE
-#define fGEN_TCG_L2_loadrh_pci(SHORTCODE)     SHORTCODE
-#define fGEN_TCG_L2_loadri_pci(SHORTCODE)     SHORTCODE
-#define fGEN_TCG_L2_loadrd_pci(SHORTCODE)     SHORTCODE
+#define fGEN_TCG_L2_loadrub_pci(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrb_pci(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadruh_pci(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrh_pci(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadri_pci(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrd_pci(SHORTCODE) SHORTCODE
 
-#define fGEN_TCG_LOAD_pcr(SHIFT, LOAD) \
-    do { \
-        TCGv ireg = tcg_temp_new(); \
-        tcg_gen_mov_tl(EA, RxV); \
-        gen_read_ireg(ireg, MuV, SHIFT); \
+#define fGEN_TCG_LOAD_pcr(SHIFT, LOAD)                                        \
+    do {                                                                      \
+        TCGv ireg = tcg_temp_new();                                           \
+        tcg_gen_mov_tl(EA, RxV);                                              \
+        gen_read_ireg(ireg, MuV, SHIFT);                                      \
         gen_helper_fcircadd(RxV, RxV, ireg, MuV, hex_gpr[HEX_REG_CS0 + MuN]); \
-        LOAD; \
+        LOAD;                                                                 \
     } while (0)
 
 #define fGEN_TCG_L2_loadrub_pcr(SHORTCODE) \
-      fGEN_TCG_LOAD_pcr(0, fLOAD(1, 1, u, EA, RdV))
+    fGEN_TCG_LOAD_pcr(0, fLOAD(1, 1, u, EA, RdV))
 #define fGEN_TCG_L2_loadrb_pcr(SHORTCODE) \
-      fGEN_TCG_LOAD_pcr(0, fLOAD(1, 1, s, EA, RdV))
+    fGEN_TCG_LOAD_pcr(0, fLOAD(1, 1, s, EA, RdV))
 #define fGEN_TCG_L2_loadruh_pcr(SHORTCODE) \
-      fGEN_TCG_LOAD_pcr(1, fLOAD(1, 2, u, EA, RdV))
+    fGEN_TCG_LOAD_pcr(1, fLOAD(1, 2, u, EA, RdV))
 #define fGEN_TCG_L2_loadrh_pcr(SHORTCODE) \
-      fGEN_TCG_LOAD_pcr(1, fLOAD(1, 2, s, EA, RdV))
+    fGEN_TCG_LOAD_pcr(1, fLOAD(1, 2, s, EA, RdV))
 #define fGEN_TCG_L2_loadri_pcr(SHORTCODE) \
-      fGEN_TCG_LOAD_pcr(2, fLOAD(1, 4, u, EA, RdV))
+    fGEN_TCG_LOAD_pcr(2, fLOAD(1, 4, u, EA, RdV))
 #define fGEN_TCG_L2_loadrd_pcr(SHORTCODE) \
-      fGEN_TCG_LOAD_pcr(3, fLOAD(1, 8, u, EA, RddV))
+    fGEN_TCG_LOAD_pcr(3, fLOAD(1, 8, u, EA, RddV))
 
-#define fGEN_TCG_L2_loadrub_pr(SHORTCODE)      SHORTCODE
-#define fGEN_TCG_L2_loadrub_pbr(SHORTCODE)     SHORTCODE
-#define fGEN_TCG_L2_loadrub_pi(SHORTCODE)      SHORTCODE
-#define fGEN_TCG_L2_loadrb_pr(SHORTCODE)       SHORTCODE
-#define fGEN_TCG_L2_loadrb_pbr(SHORTCODE)      SHORTCODE
-#define fGEN_TCG_L2_loadrb_pi(SHORTCODE)       SHORTCODE
-#define fGEN_TCG_L2_loadruh_pr(SHORTCODE)      SHORTCODE
-#define fGEN_TCG_L2_loadruh_pbr(SHORTCODE)     SHORTCODE
-#define fGEN_TCG_L2_loadruh_pi(SHORTCODE)      SHORTCODE
-#define fGEN_TCG_L2_loadrh_pr(SHORTCODE)       SHORTCODE
-#define fGEN_TCG_L2_loadrh_pbr(SHORTCODE)      SHORTCODE
-#define fGEN_TCG_L2_loadrh_pi(SHORTCODE)       SHORTCODE
-#define fGEN_TCG_L2_loadri_pr(SHORTCODE)       SHORTCODE
-#define fGEN_TCG_L2_loadri_pbr(SHORTCODE)      SHORTCODE
-#define fGEN_TCG_L2_loadri_pi(SHORTCODE)       SHORTCODE
-#define fGEN_TCG_L2_loadrd_pr(SHORTCODE)       SHORTCODE
-#define fGEN_TCG_L2_loadrd_pbr(SHORTCODE)      SHORTCODE
-#define fGEN_TCG_L2_loadrd_pi(SHORTCODE)       SHORTCODE
+#define fGEN_TCG_L2_loadrub_pr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrub_pbr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrub_pi(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrb_pr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrb_pbr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrb_pi(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadruh_pr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadruh_pbr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadruh_pi(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrh_pr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrh_pbr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrh_pi(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadri_pr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadri_pbr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadri_pi(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrd_pr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrd_pbr(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L2_loadrd_pi(SHORTCODE) SHORTCODE
 
 /*
  * These instructions load 2 bytes and places them in
@@ -156,16 +150,16 @@
  * The SIGN argument determines whether to zero-extend or
  * sign-extend.
  */
-#define fGEN_TCG_loadbXw2(GET_EA, SIGN) \
-    do { \
-        TCGv tmp = tcg_temp_new(); \
-        TCGv byte = tcg_temp_new(); \
-        GET_EA; \
-        fLOAD(1, 2, u, EA, tmp); \
-        tcg_gen_movi_tl(RdV, 0); \
-        for (int i = 0; i < 2; i++) { \
+#define fGEN_TCG_loadbXw2(GET_EA, SIGN)                               \
+    do {                                                              \
+        TCGv tmp = tcg_temp_new();                                    \
+        TCGv byte = tcg_temp_new();                                   \
+        GET_EA;                                                       \
+        fLOAD(1, 2, u, EA, tmp);                                      \
+        tcg_gen_movi_tl(RdV, 0);                                      \
+        for (int i = 0; i < 2; i++) {                                 \
             gen_set_half(i, RdV, gen_get_byte(byte, i, tmp, (SIGN))); \
-        } \
+        }                                                             \
     } while (0)
 
 #define fGEN_TCG_L2_loadbzw2_io(SHORTCODE) \
@@ -176,26 +170,16 @@
     fGEN_TCG_loadbXw2(fEA_RI(RsV, siV), true)
 #define fGEN_TCG_L4_loadbsw2_ur(SHORTCODE) \
     fGEN_TCG_loadbXw2(fEA_IRs(UiV, RtV, uiV), true)
-#define fGEN_TCG_L4_loadbzw2_ap(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_ap, false)
-#define fGEN_TCG_L2_loadbzw2_pr(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_pr, false)
-#define fGEN_TCG_L2_loadbzw2_pbr(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_pbr, false)
-#define fGEN_TCG_L2_loadbzw2_pi(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_pi, false)
-#define fGEN_TCG_L4_loadbsw2_ap(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_ap, true)
-#define fGEN_TCG_L2_loadbsw2_pr(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_pr, true)
-#define fGEN_TCG_L2_loadbsw2_pbr(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_pbr, true)
-#define fGEN_TCG_L2_loadbsw2_pi(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_pi, true)
-#define fGEN_TCG_L2_loadbzw2_pci(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_pci, false)
-#define fGEN_TCG_L2_loadbsw2_pci(SHORTCODE) \
-    fGEN_TCG_loadbXw2(GET_EA_pci, true)
+#define fGEN_TCG_L4_loadbzw2_ap(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_ap, false)
+#define fGEN_TCG_L2_loadbzw2_pr(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_pr, false)
+#define fGEN_TCG_L2_loadbzw2_pbr(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_pbr, false)
+#define fGEN_TCG_L2_loadbzw2_pi(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_pi, false)
+#define fGEN_TCG_L4_loadbsw2_ap(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_ap, true)
+#define fGEN_TCG_L2_loadbsw2_pr(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_pr, true)
+#define fGEN_TCG_L2_loadbsw2_pbr(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_pbr, true)
+#define fGEN_TCG_L2_loadbsw2_pi(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_pi, true)
+#define fGEN_TCG_L2_loadbzw2_pci(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_pci, false)
+#define fGEN_TCG_L2_loadbsw2_pci(SHORTCODE) fGEN_TCG_loadbXw2(GET_EA_pci, true)
 #define fGEN_TCG_L2_loadbzw2_pcr(SHORTCODE) \
     fGEN_TCG_loadbXw2(GET_EA_pcr(1), false)
 #define fGEN_TCG_L2_loadbsw2_pcr(SHORTCODE) \
@@ -208,16 +192,16 @@
  * The SIGN argument determines whether to zero-extend or
  * sign-extend.
  */
-#define fGEN_TCG_loadbXw4(GET_EA, SIGN) \
-    do { \
-        TCGv tmp = tcg_temp_new(); \
-        TCGv byte = tcg_temp_new(); \
-        GET_EA; \
-        fLOAD(1, 4, u, EA, tmp);  \
-        tcg_gen_movi_i64(RddV, 0); \
-        for (int i = 0; i < 4; i++) { \
-            gen_set_half_i64(i, RddV, gen_get_byte(byte, i, tmp, (SIGN)));  \
-        }  \
+#define fGEN_TCG_loadbXw4(GET_EA, SIGN)                                    \
+    do {                                                                   \
+        TCGv tmp = tcg_temp_new();                                         \
+        TCGv byte = tcg_temp_new();                                        \
+        GET_EA;                                                            \
+        fLOAD(1, 4, u, EA, tmp);                                           \
+        tcg_gen_movi_i64(RddV, 0);                                         \
+        for (int i = 0; i < 4; i++) {                                      \
+            gen_set_half_i64(i, RddV, gen_get_byte(byte, i, tmp, (SIGN))); \
+        }                                                                  \
     } while (0)
 
 #define fGEN_TCG_L2_loadbzw4_io(SHORTCODE) \
@@ -228,44 +212,34 @@
     fGEN_TCG_loadbXw4(fEA_RI(RsV, siV), true)
 #define fGEN_TCG_L4_loadbsw4_ur(SHORTCODE) \
     fGEN_TCG_loadbXw4(fEA_IRs(UiV, RtV, uiV), true)
-#define fGEN_TCG_L2_loadbzw4_pci(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_pci, false)
-#define fGEN_TCG_L2_loadbsw4_pci(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_pci, true)
+#define fGEN_TCG_L2_loadbzw4_pci(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_pci, false)
+#define fGEN_TCG_L2_loadbsw4_pci(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_pci, true)
 #define fGEN_TCG_L2_loadbzw4_pcr(SHORTCODE) \
     fGEN_TCG_loadbXw4(GET_EA_pcr(2), false)
 #define fGEN_TCG_L2_loadbsw4_pcr(SHORTCODE) \
     fGEN_TCG_loadbXw4(GET_EA_pcr(2), true)
-#define fGEN_TCG_L4_loadbzw4_ap(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_ap, false)
-#define fGEN_TCG_L2_loadbzw4_pr(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_pr, false)
-#define fGEN_TCG_L2_loadbzw4_pbr(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_pbr, false)
-#define fGEN_TCG_L2_loadbzw4_pi(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_pi, false)
-#define fGEN_TCG_L4_loadbsw4_ap(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_ap, true)
-#define fGEN_TCG_L2_loadbsw4_pr(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_pr, true)
-#define fGEN_TCG_L2_loadbsw4_pbr(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_pbr, true)
-#define fGEN_TCG_L2_loadbsw4_pi(SHORTCODE) \
-    fGEN_TCG_loadbXw4(GET_EA_pi, true)
+#define fGEN_TCG_L4_loadbzw4_ap(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_ap, false)
+#define fGEN_TCG_L2_loadbzw4_pr(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_pr, false)
+#define fGEN_TCG_L2_loadbzw4_pbr(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_pbr, false)
+#define fGEN_TCG_L2_loadbzw4_pi(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_pi, false)
+#define fGEN_TCG_L4_loadbsw4_ap(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_ap, true)
+#define fGEN_TCG_L2_loadbsw4_pr(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_pr, true)
+#define fGEN_TCG_L2_loadbsw4_pbr(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_pbr, true)
+#define fGEN_TCG_L2_loadbsw4_pi(SHORTCODE) fGEN_TCG_loadbXw4(GET_EA_pi, true)
 
 /*
  * These instructions load a half word, shift the destination right by 16 bits
  * and place the loaded value in the high half word of the destination pair.
  * The GET_EA macro determines the addressing mode.
  */
-#define fGEN_TCG_loadalignh(GET_EA) \
-    do { \
-        TCGv tmp = tcg_temp_new(); \
-        TCGv_i64 tmp_i64 = tcg_temp_new_i64(); \
-        GET_EA;  \
-        fLOAD(1, 2, u, EA, tmp);  \
-        tcg_gen_extu_i32_i64(tmp_i64, tmp); \
-        tcg_gen_shri_i64(RyyV, RyyV, 16); \
+#define fGEN_TCG_loadalignh(GET_EA)                       \
+    do {                                                  \
+        TCGv tmp = tcg_temp_new();                        \
+        TCGv_i64 tmp_i64 = tcg_temp_new_i64();            \
+        GET_EA;                                           \
+        fLOAD(1, 2, u, EA, tmp);                          \
+        tcg_gen_extu_i32_i64(tmp_i64, tmp);               \
+        tcg_gen_shri_i64(RyyV, RyyV, 16);                 \
         tcg_gen_deposit_i64(RyyV, RyyV, tmp_i64, 48, 16); \
     } while (0)
 
@@ -273,28 +247,22 @@
     fGEN_TCG_loadalignh(fEA_IRs(UiV, RtV, uiV))
 #define fGEN_TCG_L2_loadalignh_io(SHORTCODE) \
     fGEN_TCG_loadalignh(fEA_RI(RsV, siV))
-#define fGEN_TCG_L2_loadalignh_pci(SHORTCODE) \
-    fGEN_TCG_loadalignh(GET_EA_pci)
-#define fGEN_TCG_L2_loadalignh_pcr(SHORTCODE) \
-    fGEN_TCG_loadalignh(GET_EA_pcr(1))
-#define fGEN_TCG_L4_loadalignh_ap(SHORTCODE) \
-    fGEN_TCG_loadalignh(GET_EA_ap)
-#define fGEN_TCG_L2_loadalignh_pr(SHORTCODE) \
-    fGEN_TCG_loadalignh(GET_EA_pr)
-#define fGEN_TCG_L2_loadalignh_pbr(SHORTCODE) \
-    fGEN_TCG_loadalignh(GET_EA_pbr)
-#define fGEN_TCG_L2_loadalignh_pi(SHORTCODE) \
-    fGEN_TCG_loadalignh(GET_EA_pi)
+#define fGEN_TCG_L2_loadalignh_pci(SHORTCODE) fGEN_TCG_loadalignh(GET_EA_pci)
+#define fGEN_TCG_L2_loadalignh_pcr(SHORTCODE) fGEN_TCG_loadalignh(GET_EA_pcr(1))
+#define fGEN_TCG_L4_loadalignh_ap(SHORTCODE) fGEN_TCG_loadalignh(GET_EA_ap)
+#define fGEN_TCG_L2_loadalignh_pr(SHORTCODE) fGEN_TCG_loadalignh(GET_EA_pr)
+#define fGEN_TCG_L2_loadalignh_pbr(SHORTCODE) fGEN_TCG_loadalignh(GET_EA_pbr)
+#define fGEN_TCG_L2_loadalignh_pi(SHORTCODE) fGEN_TCG_loadalignh(GET_EA_pi)
 
 /* Same as above, but loads a byte instead of half word */
-#define fGEN_TCG_loadalignb(GET_EA) \
-    do { \
-        TCGv tmp = tcg_temp_new(); \
-        TCGv_i64 tmp_i64 = tcg_temp_new_i64(); \
-        GET_EA;  \
-        fLOAD(1, 1, u, EA, tmp);  \
-        tcg_gen_extu_i32_i64(tmp_i64, tmp); \
-        tcg_gen_shri_i64(RyyV, RyyV, 8); \
+#define fGEN_TCG_loadalignb(GET_EA)                      \
+    do {                                                 \
+        TCGv tmp = tcg_temp_new();                       \
+        TCGv_i64 tmp_i64 = tcg_temp_new_i64();           \
+        GET_EA;                                          \
+        fLOAD(1, 1, u, EA, tmp);                         \
+        tcg_gen_extu_i32_i64(tmp_i64, tmp);              \
+        tcg_gen_shri_i64(RyyV, RyyV, 8);                 \
         tcg_gen_deposit_i64(RyyV, RyyV, tmp_i64, 56, 8); \
     } while (0)
 
@@ -302,18 +270,12 @@
     fGEN_TCG_loadalignb(fEA_RI(RsV, siV))
 #define fGEN_TCG_L4_loadalignb_ur(SHORTCODE) \
     fGEN_TCG_loadalignb(fEA_IRs(UiV, RtV, uiV))
-#define fGEN_TCG_L2_loadalignb_pci(SHORTCODE) \
-    fGEN_TCG_loadalignb(GET_EA_pci)
-#define fGEN_TCG_L2_loadalignb_pcr(SHORTCODE) \
-    fGEN_TCG_loadalignb(GET_EA_pcr(0))
-#define fGEN_TCG_L4_loadalignb_ap(SHORTCODE) \
-    fGEN_TCG_loadalignb(GET_EA_ap)
-#define fGEN_TCG_L2_loadalignb_pr(SHORTCODE) \
-    fGEN_TCG_loadalignb(GET_EA_pr)
-#define fGEN_TCG_L2_loadalignb_pbr(SHORTCODE) \
-    fGEN_TCG_loadalignb(GET_EA_pbr)
-#define fGEN_TCG_L2_loadalignb_pi(SHORTCODE) \
-    fGEN_TCG_loadalignb(GET_EA_pi)
+#define fGEN_TCG_L2_loadalignb_pci(SHORTCODE) fGEN_TCG_loadalignb(GET_EA_pci)
+#define fGEN_TCG_L2_loadalignb_pcr(SHORTCODE) fGEN_TCG_loadalignb(GET_EA_pcr(0))
+#define fGEN_TCG_L4_loadalignb_ap(SHORTCODE) fGEN_TCG_loadalignb(GET_EA_ap)
+#define fGEN_TCG_L2_loadalignb_pr(SHORTCODE) fGEN_TCG_loadalignb(GET_EA_pr)
+#define fGEN_TCG_L2_loadalignb_pbr(SHORTCODE) fGEN_TCG_loadalignb(GET_EA_pbr)
+#define fGEN_TCG_L2_loadalignb_pi(SHORTCODE) fGEN_TCG_loadalignb(GET_EA_pi)
 
 /*
  * Predicated loads
@@ -325,16 +287,16 @@
  *      tnew     true "new" value                  if (p0.new) r0 = memb(r2+#0)
  *      fnew     false "new" value                 if (!p0.new) r0 = memb(r2+#0)
  */
-#define fGEN_TCG_PRED_LOAD(GET_EA, PRED, SIZE, SIGN) \
-    do { \
-        TCGv LSB = tcg_temp_new(); \
-        TCGLabel *label = gen_new_label(); \
-        tcg_gen_movi_tl(EA, 0); \
-        PRED;  \
-        CHECK_NOSHUF_PRED(GET_EA, SIZE, LSB); \
+#define fGEN_TCG_PRED_LOAD(GET_EA, PRED, SIZE, SIGN)    \
+    do {                                                \
+        TCGv LSB = tcg_temp_new();                      \
+        TCGLabel *label = gen_new_label();              \
+        tcg_gen_movi_tl(EA, 0);                         \
+        PRED;                                           \
+        CHECK_NOSHUF_PRED(GET_EA, SIZE, LSB);           \
         tcg_gen_brcondi_tl(TCG_COND_EQ, LSB, 0, label); \
-        fLOAD(1, SIZE, SIGN, EA, RdV); \
-        gen_set_label(label); \
+        fLOAD(1, SIZE, SIGN, EA, RdV);                  \
+        gen_set_label(label);                           \
     } while (0)
 
 #define fGEN_TCG_L2_ploadrubt_pi(SHORTCODE) \
@@ -352,8 +314,12 @@
 #define fGEN_TCG_L2_ploadrbtnew_pi(SHORTCODE) \
     fGEN_TCG_PRED_LOAD(GET_EA_pi, fLSBNEW(PtN), 1, s)
 #define fGEN_TCG_L2_ploadrbfnew_pi(SHORTCODE) \
-    fGEN_TCG_PRED_LOAD({ fEA_REG(RxV); fPM_I(RxV, siV); }, \
-                       fLSBNEWNOT(PtN), 1, s)
+    fGEN_TCG_PRED_LOAD(                       \
+        {                                     \
+            fEA_REG(RxV);                     \
+            fPM_I(RxV, siV);                  \
+        },                                    \
+        fLSBNEWNOT(PtN), 1, s)
 
 #define fGEN_TCG_L2_ploadruht_pi(SHORTCODE) \
     fGEN_TCG_PRED_LOAD(GET_EA_pi, fLSBOLD(PtV), 2, u)
@@ -382,16 +348,16 @@
     fGEN_TCG_PRED_LOAD(GET_EA_pi, fLSBNEWNOT(PtN), 4, u)
 
 /* Predicated loads into a register pair */
-#define fGEN_TCG_PRED_LOAD_PAIR(GET_EA, PRED) \
-    do { \
-        TCGv LSB = tcg_temp_new(); \
-        TCGLabel *label = gen_new_label(); \
-        tcg_gen_movi_tl(EA, 0); \
-        PRED;  \
-        CHECK_NOSHUF_PRED(GET_EA, 8, LSB); \
+#define fGEN_TCG_PRED_LOAD_PAIR(GET_EA, PRED)           \
+    do {                                                \
+        TCGv LSB = tcg_temp_new();                      \
+        TCGLabel *label = gen_new_label();              \
+        tcg_gen_movi_tl(EA, 0);                         \
+        PRED;                                           \
+        CHECK_NOSHUF_PRED(GET_EA, 8, LSB);              \
         tcg_gen_brcondi_tl(TCG_COND_EQ, LSB, 0, label); \
-        fLOAD(1, 8, u, EA, RddV); \
-        gen_set_label(label); \
+        fLOAD(1, 8, u, EA, RddV);                       \
+        gen_set_label(label);                           \
     } while (0)
 
 #define fGEN_TCG_L2_ploadrdt_pi(SHORTCODE) \
@@ -404,86 +370,66 @@
     fGEN_TCG_PRED_LOAD_PAIR(GET_EA_pi, fLSBNEWNOT(PtN))
 
 /* load-locked and store-locked */
-#define fGEN_TCG_L2_loadw_locked(SHORTCODE) \
-    SHORTCODE
-#define fGEN_TCG_L4_loadd_locked(SHORTCODE) \
-    SHORTCODE
-#define fGEN_TCG_S2_storew_locked(SHORTCODE) \
-    SHORTCODE
-#define fGEN_TCG_S4_stored_locked(SHORTCODE) \
-    SHORTCODE
+#define fGEN_TCG_L2_loadw_locked(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L4_loadd_locked(SHORTCODE) SHORTCODE
+#define fGEN_TCG_S2_storew_locked(SHORTCODE) SHORTCODE
+#define fGEN_TCG_S4_stored_locked(SHORTCODE) SHORTCODE
 
-#define fGEN_TCG_STORE(SHORTCODE) \
-    do { \
+#define fGEN_TCG_STORE(SHORTCODE)                 \
+    do {                                          \
         TCGv HALF G_GNUC_UNUSED = tcg_temp_new(); \
         TCGv BYTE G_GNUC_UNUSED = tcg_temp_new(); \
-        SHORTCODE; \
+        SHORTCODE;                                \
     } while (0)
 
-#define fGEN_TCG_STORE_pcr(SHIFT, STORE) \
-    do { \
-        TCGv ireg = tcg_temp_new(); \
-        TCGv HALF G_GNUC_UNUSED = tcg_temp_new(); \
-        TCGv BYTE G_GNUC_UNUSED = tcg_temp_new(); \
-        tcg_gen_mov_tl(EA, RxV); \
-        gen_read_ireg(ireg, MuV, SHIFT); \
+#define fGEN_TCG_STORE_pcr(SHIFT, STORE)                                      \
+    do {                                                                      \
+        TCGv ireg = tcg_temp_new();                                           \
+        TCGv HALF G_GNUC_UNUSED = tcg_temp_new();                             \
+        TCGv BYTE G_GNUC_UNUSED = tcg_temp_new();                             \
+        tcg_gen_mov_tl(EA, RxV);                                              \
+        gen_read_ireg(ireg, MuV, SHIFT);                                      \
         gen_helper_fcircadd(RxV, RxV, ireg, MuV, hex_gpr[HEX_REG_CS0 + MuN]); \
-        STORE; \
+        STORE;                                                                \
     } while (0)
 
-#define fGEN_TCG_S2_storerb_pbr(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
-#define fGEN_TCG_S2_storerb_pci(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerb_pbr(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerb_pci(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
 #define fGEN_TCG_S2_storerb_pcr(SHORTCODE) \
     fGEN_TCG_STORE_pcr(0, fSTORE(1, 1, EA, fGETBYTE(0, RtV)))
 
-#define fGEN_TCG_S2_storerh_pbr(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
-#define fGEN_TCG_S2_storerh_pci(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerh_pbr(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerh_pci(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
 #define fGEN_TCG_S2_storerh_pcr(SHORTCODE) \
     fGEN_TCG_STORE_pcr(1, fSTORE(1, 2, EA, fGETHALF(0, RtV)))
 
-#define fGEN_TCG_S2_storerf_pbr(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
-#define fGEN_TCG_S2_storerf_pci(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerf_pbr(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerf_pci(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
 #define fGEN_TCG_S2_storerf_pcr(SHORTCODE) \
     fGEN_TCG_STORE_pcr(1, fSTORE(1, 2, EA, fGETHALF(1, RtV)))
 
-#define fGEN_TCG_S2_storeri_pbr(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
-#define fGEN_TCG_S2_storeri_pci(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storeri_pbr(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storeri_pci(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
 #define fGEN_TCG_S2_storeri_pcr(SHORTCODE) \
     fGEN_TCG_STORE_pcr(2, fSTORE(1, 4, EA, RtV))
 
-#define fGEN_TCG_S2_storerd_pbr(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
-#define fGEN_TCG_S2_storerd_pci(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerd_pbr(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerd_pci(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
 #define fGEN_TCG_S2_storerd_pcr(SHORTCODE) \
     fGEN_TCG_STORE_pcr(3, fSTORE(1, 8, EA, RttV))
 
-#define fGEN_TCG_S2_storerbnew_pbr(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
-#define fGEN_TCG_S2_storerbnew_pci(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerbnew_pbr(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerbnew_pci(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
 #define fGEN_TCG_S2_storerbnew_pcr(SHORTCODE) \
     fGEN_TCG_STORE_pcr(0, fSTORE(1, 1, EA, fGETBYTE(0, NtN)))
 
-#define fGEN_TCG_S2_storerhnew_pbr(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
-#define fGEN_TCG_S2_storerhnew_pci(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerhnew_pbr(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerhnew_pci(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
 #define fGEN_TCG_S2_storerhnew_pcr(SHORTCODE) \
     fGEN_TCG_STORE_pcr(1, fSTORE(1, 2, EA, fGETHALF(0, NtN)))
 
-#define fGEN_TCG_S2_storerinew_pbr(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
-#define fGEN_TCG_S2_storerinew_pci(SHORTCODE) \
-    fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerinew_pbr(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
+#define fGEN_TCG_S2_storerinew_pci(SHORTCODE) fGEN_TCG_STORE(SHORTCODE)
 #define fGEN_TCG_S2_storerinew_pcr(SHORTCODE) \
     fGEN_TCG_STORE_pcr(2, fSTORE(1, 4, EA, NtN))
 
@@ -492,28 +438,35 @@
 
 /* In linux-user mode, these are not modelled, suppress compiler warning */
 #define fGEN_TCG_Y2_dcinva(SHORTCODE) \
-    do { RsV = RsV; } while (0)
+    do {                              \
+        RsV = RsV;                    \
+    } while (0)
 #define fGEN_TCG_Y2_dccleaninva(SHORTCODE) \
-    do { RsV = RsV; } while (0)
+    do {                                   \
+        RsV = RsV;                         \
+    } while (0)
 #define fGEN_TCG_Y2_dccleana(SHORTCODE) \
-    do { RsV = RsV; } while (0)
+    do {                                \
+        RsV = RsV;                      \
+    } while (0)
 #define fGEN_TCG_Y2_icinva(SHORTCODE) \
-    do { RsV = RsV; } while (0)
+    do {                              \
+        RsV = RsV;                    \
+    } while (0)
 
 /*
  * allocframe(#uiV)
  *     RxV == r29
  */
-#define fGEN_TCG_S2_allocframe(SHORTCODE) \
-    gen_allocframe(ctx, RxV, uiV)
+#define fGEN_TCG_S2_allocframe(SHORTCODE) gen_allocframe(ctx, RxV, uiV)
 
 /* sub-instruction version (no RxV, so handle it manually) */
-#define fGEN_TCG_SS2_allocframe(SHORTCODE) \
-    do { \
-        TCGv r29 = tcg_temp_new(); \
+#define fGEN_TCG_SS2_allocframe(SHORTCODE)        \
+    do {                                          \
+        TCGv r29 = tcg_temp_new();                \
         tcg_gen_mov_tl(r29, hex_gpr[HEX_REG_SP]); \
-        gen_allocframe(ctx, r29, uiV); \
-        gen_log_reg_write(ctx, HEX_REG_SP, r29); \
+        gen_allocframe(ctx, r29, uiV);            \
+        gen_log_reg_write(ctx, HEX_REG_SP, r29);  \
     } while (0)
 
 /*
@@ -521,15 +474,14 @@
  *     RddV == r31:30
  *     RsV  == r30
  */
-#define fGEN_TCG_L2_deallocframe(SHORTCODE) \
-    gen_deallocframe(ctx, RddV, RsV)
+#define fGEN_TCG_L2_deallocframe(SHORTCODE) gen_deallocframe(ctx, RddV, RsV)
 
 /* sub-instruction version (no RddV/RsV, so handle it manually) */
-#define fGEN_TCG_SL2_deallocframe(SHORTCODE) \
-    do { \
-        TCGv_i64 r31_30 = tcg_temp_new_i64(); \
+#define fGEN_TCG_SL2_deallocframe(SHORTCODE)                \
+    do {                                                    \
+        TCGv_i64 r31_30 = tcg_temp_new_i64();               \
         gen_deallocframe(ctx, r31_30, hex_gpr[HEX_REG_FP]); \
-        gen_log_reg_write_pair(ctx, HEX_REG_FP, r31_30); \
+        gen_log_reg_write_pair(ctx, HEX_REG_FP, r31_30);    \
     } while (0)
 
 /*
@@ -537,17 +489,16 @@
  * Assembler mapped to
  * r31:30 = dealloc_return(r30):raw
  */
-#define fGEN_TCG_L4_return(SHORTCODE) \
-    gen_return(ctx, RddV, RsV)
+#define fGEN_TCG_L4_return(SHORTCODE) gen_return(ctx, RddV, RsV)
 
 /*
  * sub-instruction version (no RddV, so handle it manually)
  */
-#define fGEN_TCG_SL2_return(SHORTCODE) \
-    do { \
+#define fGEN_TCG_SL2_return(SHORTCODE)                        \
+    do {                                                      \
         TCGv_i64 RddV = get_result_gpr_pair(ctx, HEX_REG_FP); \
-        gen_return(ctx, RddV, hex_gpr[HEX_REG_FP]); \
-        gen_log_reg_write_pair(ctx, HEX_REG_FP, RddV); \
+        gen_return(ctx, RddV, hex_gpr[HEX_REG_FP]);           \
+        gen_log_reg_write_pair(ctx, HEX_REG_FP, RddV);        \
     } while (0)
 
 /*
@@ -589,19 +540,19 @@
  * Mathematical operations with more than one definition require
  * special handling
  */
-#define fGEN_TCG_A5_ACS(SHORTCODE) \
-    do { \
-        gen_helper_vacsh_pred(PeV, cpu_env, RxxV, RssV, RttV); \
-        gen_helper_vacsh_val(RxxV, cpu_env, RxxV, RssV, RttV, \
+#define fGEN_TCG_A5_ACS(SHORTCODE)                               \
+    do {                                                         \
+        gen_helper_vacsh_pred(PeV, cpu_env, RxxV, RssV, RttV);   \
+        gen_helper_vacsh_val(RxxV, cpu_env, RxxV, RssV, RttV,    \
                              tcg_constant_tl(ctx->need_commit)); \
     } while (0)
 
-#define fGEN_TCG_S2_cabacdecbin(SHORTCODE) \
-    do { \
-        TCGv p0 = tcg_temp_new(); \
-        gen_helper_cabacdecbin_pred(p0, RssV, RttV); \
+#define fGEN_TCG_S2_cabacdecbin(SHORTCODE)            \
+    do {                                              \
+        TCGv p0 = tcg_temp_new();                     \
+        gen_helper_cabacdecbin_pred(p0, RssV, RttV);  \
         gen_helper_cabacdecbin_val(RddV, RssV, RttV); \
-        gen_log_pred_write(ctx, 0, p0); \
+        gen_log_pred_write(ctx, 0, p0);               \
     } while (0)
 
 /*
@@ -611,12 +562,12 @@
  * The helper packs the 2 32-bit results into a 64-bit value,
  * so unpack them into the proper results.
  */
-#define fGEN_TCG_F2_sfrecipa(SHORTCODE) \
-    do { \
-        TCGv_i64 tmp = tcg_temp_new_i64(); \
-        gen_helper_sfrecipa(tmp, cpu_env, RsV, RtV);  \
-        tcg_gen_extrh_i64_i32(RdV, tmp); \
-        tcg_gen_extrl_i64_i32(PeV, tmp); \
+#define fGEN_TCG_F2_sfrecipa(SHORTCODE)              \
+    do {                                             \
+        TCGv_i64 tmp = tcg_temp_new_i64();           \
+        gen_helper_sfrecipa(tmp, cpu_env, RsV, RtV); \
+        tcg_gen_extrh_i64_i32(RdV, tmp);             \
+        tcg_gen_extrl_i64_i32(PeV, tmp);             \
     } while (0)
 
 /*
@@ -626,12 +577,12 @@
  * The helper packs the 2 32-bit results into a 64-bit value,
  * so unpack them into the proper results.
  */
-#define fGEN_TCG_F2_sfinvsqrta(SHORTCODE) \
-    do { \
-        TCGv_i64 tmp = tcg_temp_new_i64(); \
+#define fGEN_TCG_F2_sfinvsqrta(SHORTCODE)         \
+    do {                                          \
+        TCGv_i64 tmp = tcg_temp_new_i64();        \
         gen_helper_sfinvsqrta(tmp, cpu_env, RsV); \
-        tcg_gen_extrh_i64_i32(RdV, tmp); \
-        tcg_gen_extrl_i64_i32(PeV, tmp); \
+        tcg_gen_extrh_i64_i32(RdV, tmp);          \
+        tcg_gen_extrl_i64_i32(PeV, tmp);          \
     } while (0)
 
 /*
@@ -639,31 +590,31 @@
  * Predicate register is used as an extra input and output.
  * r5:4 = add(r1:0, r3:2, p1):carry
  */
-#define fGEN_TCG_A4_addp_c(SHORTCODE) \
-    do { \
-        TCGv_i64 carry = tcg_temp_new_i64(); \
-        TCGv_i64 zero = tcg_constant_i64(0); \
-        tcg_gen_extu_i32_i64(carry, PxV); \
-        tcg_gen_andi_i64(carry, carry, 1); \
+#define fGEN_TCG_A4_addp_c(SHORTCODE)                           \
+    do {                                                        \
+        TCGv_i64 carry = tcg_temp_new_i64();                    \
+        TCGv_i64 zero = tcg_constant_i64(0);                    \
+        tcg_gen_extu_i32_i64(carry, PxV);                       \
+        tcg_gen_andi_i64(carry, carry, 1);                      \
         tcg_gen_add2_i64(RddV, carry, RssV, zero, carry, zero); \
         tcg_gen_add2_i64(RddV, carry, RddV, carry, RttV, zero); \
-        tcg_gen_extrl_i64_i32(PxV, carry); \
-        gen_8bitsof(PxV, PxV); \
+        tcg_gen_extrl_i64_i32(PxV, carry);                      \
+        gen_8bitsof(PxV, PxV);                                  \
     } while (0)
 
 /* r5:4 = sub(r1:0, r3:2, p1):carry */
-#define fGEN_TCG_A4_subp_c(SHORTCODE) \
-    do { \
-        TCGv_i64 carry = tcg_temp_new_i64(); \
-        TCGv_i64 zero = tcg_constant_i64(0); \
-        TCGv_i64 not_RttV = tcg_temp_new_i64(); \
-        tcg_gen_extu_i32_i64(carry, PxV); \
-        tcg_gen_andi_i64(carry, carry, 1); \
-        tcg_gen_not_i64(not_RttV, RttV); \
-        tcg_gen_add2_i64(RddV, carry, RssV, zero, carry, zero); \
+#define fGEN_TCG_A4_subp_c(SHORTCODE)                               \
+    do {                                                            \
+        TCGv_i64 carry = tcg_temp_new_i64();                        \
+        TCGv_i64 zero = tcg_constant_i64(0);                        \
+        TCGv_i64 not_RttV = tcg_temp_new_i64();                     \
+        tcg_gen_extu_i32_i64(carry, PxV);                           \
+        tcg_gen_andi_i64(carry, carry, 1);                          \
+        tcg_gen_not_i64(not_RttV, RttV);                            \
+        tcg_gen_add2_i64(RddV, carry, RssV, zero, carry, zero);     \
         tcg_gen_add2_i64(RddV, carry, RddV, carry, not_RttV, zero); \
-        tcg_gen_extrl_i64_i32(PxV, carry); \
-        gen_8bitsof(PxV, PxV); \
+        tcg_gen_extrl_i64_i32(PxV, carry);                          \
+        gen_8bitsof(PxV, PxV);                                      \
     } while (0)
 
 /*
@@ -673,66 +624,46 @@
  * is greater than the bit from the second operand.
  * r5:4,p1 = vminub(r1:0, r3:2)
  */
-#define fGEN_TCG_A6_vminub_RdP(SHORTCODE) \
-    do { \
-        TCGv left = tcg_temp_new(); \
-        TCGv right = tcg_temp_new(); \
-        TCGv tmp = tcg_temp_new(); \
-        tcg_gen_movi_tl(PeV, 0); \
-        tcg_gen_movi_i64(RddV, 0); \
-        for (int i = 0; i < 8; i++) { \
-            gen_get_byte_i64(left, i, RttV, false); \
-            gen_get_byte_i64(right, i, RssV, false); \
+#define fGEN_TCG_A6_vminub_RdP(SHORTCODE)                      \
+    do {                                                       \
+        TCGv left = tcg_temp_new();                            \
+        TCGv right = tcg_temp_new();                           \
+        TCGv tmp = tcg_temp_new();                             \
+        tcg_gen_movi_tl(PeV, 0);                               \
+        tcg_gen_movi_i64(RddV, 0);                             \
+        for (int i = 0; i < 8; i++) {                          \
+            gen_get_byte_i64(left, i, RttV, false);            \
+            gen_get_byte_i64(right, i, RssV, false);           \
             tcg_gen_setcond_tl(TCG_COND_GT, tmp, left, right); \
-            tcg_gen_deposit_tl(PeV, PeV, tmp, i, 1); \
-            tcg_gen_umin_tl(tmp, left, right); \
-            gen_set_byte_i64(i, RddV, tmp); \
-        } \
+            tcg_gen_deposit_tl(PeV, PeV, tmp, i, 1);           \
+            tcg_gen_umin_tl(tmp, left, right);                 \
+            gen_set_byte_i64(i, RddV, tmp);                    \
+        }                                                      \
     } while (0)
 
-#define fGEN_TCG_J2_call(SHORTCODE) \
-    gen_call(ctx, riV)
-#define fGEN_TCG_J2_callr(SHORTCODE) \
-    gen_callr(ctx, RsV)
-#define fGEN_TCG_J2_callrh(SHORTCODE) \
-    gen_callr(ctx, RsV)
+#define fGEN_TCG_J2_call(SHORTCODE) gen_call(ctx, riV)
+#define fGEN_TCG_J2_callr(SHORTCODE) gen_callr(ctx, RsV)
+#define fGEN_TCG_J2_callrh(SHORTCODE) gen_callr(ctx, RsV)
 
-#define fGEN_TCG_J2_callt(SHORTCODE) \
-    gen_cond_call(ctx, PuV, TCG_COND_EQ, riV)
-#define fGEN_TCG_J2_callf(SHORTCODE) \
-    gen_cond_call(ctx, PuV, TCG_COND_NE, riV)
-#define fGEN_TCG_J2_callrt(SHORTCODE) \
-    gen_cond_callr(ctx, TCG_COND_EQ, PuV, RsV)
-#define fGEN_TCG_J2_callrf(SHORTCODE) \
-    gen_cond_callr(ctx, TCG_COND_NE, PuV, RsV)
+#define fGEN_TCG_J2_callt(SHORTCODE) gen_cond_call(ctx, PuV, TCG_COND_EQ, riV)
+#define fGEN_TCG_J2_callf(SHORTCODE) gen_cond_call(ctx, PuV, TCG_COND_NE, riV)
+#define fGEN_TCG_J2_callrt(SHORTCODE) gen_cond_callr(ctx, TCG_COND_EQ, PuV, RsV)
+#define fGEN_TCG_J2_callrf(SHORTCODE) gen_cond_callr(ctx, TCG_COND_NE, PuV, RsV)
 
-#define fGEN_TCG_J2_loop0r(SHORTCODE) \
-    gen_loop0r(ctx, RsV, riV)
-#define fGEN_TCG_J2_loop1r(SHORTCODE) \
-    gen_loop1r(ctx, RsV, riV)
-#define fGEN_TCG_J2_loop0i(SHORTCODE) \
-    gen_loop0i(ctx, UiV, riV)
-#define fGEN_TCG_J2_loop1i(SHORTCODE) \
-    gen_loop1i(ctx, UiV, riV)
-#define fGEN_TCG_J2_ploop1sr(SHORTCODE) \
-    gen_ploopNsr(ctx, 1, RsV, riV)
-#define fGEN_TCG_J2_ploop1si(SHORTCODE) \
-    gen_ploopNsi(ctx, 1, UiV, riV)
-#define fGEN_TCG_J2_ploop2sr(SHORTCODE) \
-    gen_ploopNsr(ctx, 2, RsV, riV)
-#define fGEN_TCG_J2_ploop2si(SHORTCODE) \
-    gen_ploopNsi(ctx, 2, UiV, riV)
-#define fGEN_TCG_J2_ploop3sr(SHORTCODE) \
-    gen_ploopNsr(ctx, 3, RsV, riV)
-#define fGEN_TCG_J2_ploop3si(SHORTCODE) \
-    gen_ploopNsi(ctx, 3, UiV, riV)
+#define fGEN_TCG_J2_loop0r(SHORTCODE) gen_loop0r(ctx, RsV, riV)
+#define fGEN_TCG_J2_loop1r(SHORTCODE) gen_loop1r(ctx, RsV, riV)
+#define fGEN_TCG_J2_loop0i(SHORTCODE) gen_loop0i(ctx, UiV, riV)
+#define fGEN_TCG_J2_loop1i(SHORTCODE) gen_loop1i(ctx, UiV, riV)
+#define fGEN_TCG_J2_ploop1sr(SHORTCODE) gen_ploopNsr(ctx, 1, RsV, riV)
+#define fGEN_TCG_J2_ploop1si(SHORTCODE) gen_ploopNsi(ctx, 1, UiV, riV)
+#define fGEN_TCG_J2_ploop2sr(SHORTCODE) gen_ploopNsr(ctx, 2, RsV, riV)
+#define fGEN_TCG_J2_ploop2si(SHORTCODE) gen_ploopNsi(ctx, 2, UiV, riV)
+#define fGEN_TCG_J2_ploop3sr(SHORTCODE) gen_ploopNsr(ctx, 3, RsV, riV)
+#define fGEN_TCG_J2_ploop3si(SHORTCODE) gen_ploopNsi(ctx, 3, UiV, riV)
 
-#define fGEN_TCG_J2_endloop0(SHORTCODE) \
-    gen_endloop0(ctx)
-#define fGEN_TCG_J2_endloop1(SHORTCODE) \
-    gen_endloop1(ctx)
-#define fGEN_TCG_J2_endloop01(SHORTCODE) \
-    gen_endloop01(ctx)
+#define fGEN_TCG_J2_endloop0(SHORTCODE) gen_endloop0(ctx)
+#define fGEN_TCG_J2_endloop1(SHORTCODE) gen_endloop1(ctx)
+#define fGEN_TCG_J2_endloop01(SHORTCODE) gen_endloop01(ctx)
 
 /*
  * Compound compare and jump instructions
@@ -912,54 +843,45 @@
     gen_cmpnd_tstbit0_jmp(ctx, 1, RsV, TCG_COND_NE, riV)
 
 /* p0 = cmp.eq(r0, #7) */
-#define fGEN_TCG_SA1_cmpeqi(SHORTCODE) \
-    do { \
-        TCGv p0 = tcg_temp_new(); \
+#define fGEN_TCG_SA1_cmpeqi(SHORTCODE)           \
+    do {                                         \
+        TCGv p0 = tcg_temp_new();                \
         gen_comparei(TCG_COND_EQ, p0, RsV, uiV); \
-        gen_log_pred_write(ctx, 0, p0); \
+        gen_log_pred_write(ctx, 0, p0);          \
     } while (0)
 
-#define fGEN_TCG_J2_jump(SHORTCODE) \
-    gen_jump(ctx, riV)
-#define fGEN_TCG_J2_jumpr(SHORTCODE) \
-    gen_jumpr(ctx, RsV)
-#define fGEN_TCG_J2_jumprh(SHORTCODE) \
-    gen_jumpr(ctx, RsV)
+#define fGEN_TCG_J2_jump(SHORTCODE) gen_jump(ctx, riV)
+#define fGEN_TCG_J2_jumpr(SHORTCODE) gen_jumpr(ctx, RsV)
+#define fGEN_TCG_J2_jumprh(SHORTCODE) gen_jumpr(ctx, RsV)
 #define fGEN_TCG_J4_jumpseti(SHORTCODE) \
-    do { \
-        tcg_gen_movi_tl(RdV, UiV); \
-        gen_jump(ctx, riV); \
+    do {                                \
+        tcg_gen_movi_tl(RdV, UiV);      \
+        gen_jump(ctx, riV);             \
     } while (0)
 
-#define fGEN_TCG_cond_jumpt(COND) \
-    do { \
-        TCGv LSB = tcg_temp_new(); \
-        COND; \
+#define fGEN_TCG_cond_jumpt(COND)                  \
+    do {                                           \
+        TCGv LSB = tcg_temp_new();                 \
+        COND;                                      \
         gen_cond_jump(ctx, TCG_COND_EQ, LSB, riV); \
     } while (0)
-#define fGEN_TCG_cond_jumpf(COND) \
-    do { \
-        TCGv LSB = tcg_temp_new(); \
-        COND; \
+#define fGEN_TCG_cond_jumpf(COND)                  \
+    do {                                           \
+        TCGv LSB = tcg_temp_new();                 \
+        COND;                                      \
         gen_cond_jump(ctx, TCG_COND_NE, LSB, riV); \
     } while (0)
 
-#define fGEN_TCG_J2_jumpt(SHORTCODE) \
-    fGEN_TCG_cond_jumpt(fLSBOLD(PuV))
-#define fGEN_TCG_J2_jumptpt(SHORTCODE) \
-    fGEN_TCG_cond_jumpt(fLSBOLD(PuV))
-#define fGEN_TCG_J2_jumpf(SHORTCODE) \
-    fGEN_TCG_cond_jumpf(fLSBOLD(PuV))
-#define fGEN_TCG_J2_jumpfpt(SHORTCODE) \
-    fGEN_TCG_cond_jumpf(fLSBOLD(PuV))
+#define fGEN_TCG_J2_jumpt(SHORTCODE) fGEN_TCG_cond_jumpt(fLSBOLD(PuV))
+#define fGEN_TCG_J2_jumptpt(SHORTCODE) fGEN_TCG_cond_jumpt(fLSBOLD(PuV))
+#define fGEN_TCG_J2_jumpf(SHORTCODE) fGEN_TCG_cond_jumpf(fLSBOLD(PuV))
+#define fGEN_TCG_J2_jumpfpt(SHORTCODE) fGEN_TCG_cond_jumpf(fLSBOLD(PuV))
 #define fGEN_TCG_J2_jumptnew(SHORTCODE) \
     gen_cond_jump(ctx, TCG_COND_EQ, PuN, riV)
 #define fGEN_TCG_J2_jumptnewpt(SHORTCODE) \
     gen_cond_jump(ctx, TCG_COND_EQ, PuN, riV)
-#define fGEN_TCG_J2_jumpfnewpt(SHORTCODE) \
-    fGEN_TCG_cond_jumpf(fLSBNEW(PuN))
-#define fGEN_TCG_J2_jumpfnew(SHORTCODE) \
-    fGEN_TCG_cond_jumpf(fLSBNEW(PuN))
+#define fGEN_TCG_J2_jumpfnewpt(SHORTCODE) fGEN_TCG_cond_jumpf(fLSBNEW(PuN))
+#define fGEN_TCG_J2_jumpfnew(SHORTCODE) fGEN_TCG_cond_jumpf(fLSBNEW(PuN))
 #define fGEN_TCG_J2_jumprz(SHORTCODE) \
     fGEN_TCG_cond_jumpt(tcg_gen_setcondi_tl(TCG_COND_NE, LSB, RsV, 0))
 #define fGEN_TCG_J2_jumprzpt(SHORTCODE) \
@@ -977,35 +899,27 @@
 #define fGEN_TCG_J2_jumprltezpt(SHORTCODE) \
     fGEN_TCG_cond_jumpt(tcg_gen_setcondi_tl(TCG_COND_LE, LSB, RsV, 0))
 
-#define fGEN_TCG_cond_jumprt(COND) \
-    do { \
-        TCGv LSB = tcg_temp_new(); \
-        COND; \
+#define fGEN_TCG_cond_jumprt(COND)                  \
+    do {                                            \
+        TCGv LSB = tcg_temp_new();                  \
+        COND;                                       \
         gen_cond_jumpr(ctx, RsV, TCG_COND_EQ, LSB); \
     } while (0)
-#define fGEN_TCG_cond_jumprf(COND) \
-    do { \
-        TCGv LSB = tcg_temp_new(); \
-        COND; \
+#define fGEN_TCG_cond_jumprf(COND)                  \
+    do {                                            \
+        TCGv LSB = tcg_temp_new();                  \
+        COND;                                       \
         gen_cond_jumpr(ctx, RsV, TCG_COND_NE, LSB); \
     } while (0)
 
-#define fGEN_TCG_J2_jumprt(SHORTCODE) \
-    fGEN_TCG_cond_jumprt(fLSBOLD(PuV))
-#define fGEN_TCG_J2_jumprtpt(SHORTCODE) \
-    fGEN_TCG_cond_jumprt(fLSBOLD(PuV))
-#define fGEN_TCG_J2_jumprf(SHORTCODE) \
-    fGEN_TCG_cond_jumprf(fLSBOLD(PuV))
-#define fGEN_TCG_J2_jumprfpt(SHORTCODE) \
-    fGEN_TCG_cond_jumprf(fLSBOLD(PuV))
-#define fGEN_TCG_J2_jumprtnew(SHORTCODE) \
-    fGEN_TCG_cond_jumprt(fLSBNEW(PuN))
-#define fGEN_TCG_J2_jumprtnewpt(SHORTCODE) \
-    fGEN_TCG_cond_jumprt(fLSBNEW(PuN))
-#define fGEN_TCG_J2_jumprfnew(SHORTCODE) \
-    fGEN_TCG_cond_jumprf(fLSBNEW(PuN))
-#define fGEN_TCG_J2_jumprfnewpt(SHORTCODE) \
-    fGEN_TCG_cond_jumprf(fLSBNEW(PuN))
+#define fGEN_TCG_J2_jumprt(SHORTCODE) fGEN_TCG_cond_jumprt(fLSBOLD(PuV))
+#define fGEN_TCG_J2_jumprtpt(SHORTCODE) fGEN_TCG_cond_jumprt(fLSBOLD(PuV))
+#define fGEN_TCG_J2_jumprf(SHORTCODE) fGEN_TCG_cond_jumprf(fLSBOLD(PuV))
+#define fGEN_TCG_J2_jumprfpt(SHORTCODE) fGEN_TCG_cond_jumprf(fLSBOLD(PuV))
+#define fGEN_TCG_J2_jumprtnew(SHORTCODE) fGEN_TCG_cond_jumprt(fLSBNEW(PuN))
+#define fGEN_TCG_J2_jumprtnewpt(SHORTCODE) fGEN_TCG_cond_jumprt(fLSBNEW(PuN))
+#define fGEN_TCG_J2_jumprfnew(SHORTCODE) fGEN_TCG_cond_jumprf(fLSBNEW(PuN))
+#define fGEN_TCG_J2_jumprfnewpt(SHORTCODE) fGEN_TCG_cond_jumprf(fLSBNEW(PuN))
 
 /*
  * New value compare & jump instructions
@@ -1113,43 +1027,38 @@
 
 /* r0 = r1 ; jump address */
 #define fGEN_TCG_J4_jumpsetr(SHORTCODE) \
-    do { \
-        tcg_gen_mov_tl(RdV, RsV); \
-        gen_jump(ctx, riV); \
+    do {                                \
+        tcg_gen_mov_tl(RdV, RsV);       \
+        gen_jump(ctx, riV);             \
     } while (0)
 
 /* if (p0.new) r0 = #0 */
-#define fGEN_TCG_SA1_clrtnew(SHORTCODE) \
-    do { \
-        tcg_gen_movcond_tl(TCG_COND_EQ, RdV, \
-                           ctx->new_pred_value[0], tcg_constant_tl(0), \
-                           RdV, tcg_constant_tl(0)); \
+#define fGEN_TCG_SA1_clrtnew(SHORTCODE)                                  \
+    do {                                                                 \
+        tcg_gen_movcond_tl(TCG_COND_EQ, RdV, ctx->new_pred_value[0],     \
+                           tcg_constant_tl(0), RdV, tcg_constant_tl(0)); \
     } while (0)
 
 /* if (!p0.new) r0 = #0 */
-#define fGEN_TCG_SA1_clrfnew(SHORTCODE) \
-    do { \
-        tcg_gen_movcond_tl(TCG_COND_NE, RdV, \
-                           ctx->new_pred_value[0], tcg_constant_tl(0), \
-                           RdV, tcg_constant_tl(0)); \
+#define fGEN_TCG_SA1_clrfnew(SHORTCODE)                                  \
+    do {                                                                 \
+        tcg_gen_movcond_tl(TCG_COND_NE, RdV, ctx->new_pred_value[0],     \
+                           tcg_constant_tl(0), RdV, tcg_constant_tl(0)); \
     } while (0)
 
-#define fGEN_TCG_J2_pause(SHORTCODE) \
-    do { \
-        uiV = uiV; \
+#define fGEN_TCG_J2_pause(SHORTCODE)                        \
+    do {                                                    \
+        uiV = uiV;                                          \
         tcg_gen_movi_tl(hex_gpr[HEX_REG_PC], ctx->next_PC); \
     } while (0)
 
 /* r0 = asr(r1, r2):sat */
-#define fGEN_TCG_S2_asr_r_r_sat(SHORTCODE) \
-    gen_asr_r_r_sat(ctx, RdV, RsV, RtV)
+#define fGEN_TCG_S2_asr_r_r_sat(SHORTCODE) gen_asr_r_r_sat(ctx, RdV, RsV, RtV)
 
 /* r0 = asl(r1, r2):sat */
-#define fGEN_TCG_S2_asl_r_r_sat(SHORTCODE) \
-    gen_asl_r_r_sat(ctx, RdV, RsV, RtV)
+#define fGEN_TCG_S2_asl_r_r_sat(SHORTCODE) gen_asl_r_r_sat(ctx, RdV, RsV, RtV)
 
-#define fGEN_TCG_SL2_jumpr31(SHORTCODE) \
-    gen_jumpr(ctx, hex_gpr[HEX_REG_LR])
+#define fGEN_TCG_SL2_jumpr31(SHORTCODE) gen_jumpr(ctx, hex_gpr[HEX_REG_LR])
 
 #define fGEN_TCG_SL2_jumpr31_t(SHORTCODE) \
     gen_cond_jumpr31(ctx, TCG_COND_EQ, hex_pred[0])
@@ -1162,46 +1071,44 @@
     gen_cond_jumpr31(ctx, TCG_COND_NE, ctx->new_pred_value[0])
 
 /* Count trailing zeros/ones */
-#define fGEN_TCG_S2_ct0(SHORTCODE) \
-    do { \
+#define fGEN_TCG_S2_ct0(SHORTCODE)     \
+    do {                               \
         tcg_gen_ctzi_tl(RdV, RsV, 32); \
     } while (0)
-#define fGEN_TCG_S2_ct1(SHORTCODE) \
-    do { \
-        tcg_gen_not_tl(RdV, RsV); \
+#define fGEN_TCG_S2_ct1(SHORTCODE)     \
+    do {                               \
+        tcg_gen_not_tl(RdV, RsV);      \
         tcg_gen_ctzi_tl(RdV, RdV, 32); \
     } while (0)
-#define fGEN_TCG_S2_ct0p(SHORTCODE) \
-    do { \
+#define fGEN_TCG_S2_ct0p(SHORTCODE)        \
+    do {                                   \
         TCGv_i64 tmp = tcg_temp_new_i64(); \
-        tcg_gen_ctzi_i64(tmp, RssV, 64); \
-        tcg_gen_extrl_i64_i32(RdV, tmp); \
+        tcg_gen_ctzi_i64(tmp, RssV, 64);   \
+        tcg_gen_extrl_i64_i32(RdV, tmp);   \
     } while (0)
-#define fGEN_TCG_S2_ct1p(SHORTCODE) \
-    do { \
+#define fGEN_TCG_S2_ct1p(SHORTCODE)        \
+    do {                                   \
         TCGv_i64 tmp = tcg_temp_new_i64(); \
-        tcg_gen_not_i64(tmp, RssV); \
-        tcg_gen_ctzi_i64(tmp, tmp, 64); \
-        tcg_gen_extrl_i64_i32(RdV, tmp); \
+        tcg_gen_not_i64(tmp, RssV);        \
+        tcg_gen_ctzi_i64(tmp, tmp, 64);    \
+        tcg_gen_extrl_i64_i32(RdV, tmp);   \
     } while (0)
 
-#define fGEN_TCG_S2_insert(SHORTCODE) \
-    do { \
-        int width = uiV; \
-        int offset = UiV; \
-        if (width != 0) { \
-            if (offset + width > 32) { \
-                width = 32 - offset; \
-            } \
+#define fGEN_TCG_S2_insert(SHORTCODE)                         \
+    do {                                                      \
+        int width = uiV;                                      \
+        int offset = UiV;                                     \
+        if (width != 0) {                                     \
+            if (offset + width > 32) {                        \
+                width = 32 - offset;                          \
+            }                                                 \
             tcg_gen_deposit_tl(RxV, RxV, RsV, offset, width); \
-        } \
+        }                                                     \
     } while (0)
-#define fGEN_TCG_S2_insert_rp(SHORTCODE) \
-    gen_insert_rp(ctx, RxV, RsV, RttV)
+#define fGEN_TCG_S2_insert_rp(SHORTCODE) gen_insert_rp(ctx, RxV, RsV, RttV)
 #define fGEN_TCG_S2_asr_r_svw_trun(SHORTCODE) \
     gen_asr_r_svw_trun(ctx, RdV, RssV, RtV)
-#define fGEN_TCG_A2_swiz(SHORTCODE) \
-    tcg_gen_bswap_tl(RdV, RsV)
+#define fGEN_TCG_A2_swiz(SHORTCODE) tcg_gen_bswap_tl(RdV, RsV)
 
 /* Floating point */
 #define fGEN_TCG_F2_conv_sf2df(SHORTCODE) \
@@ -1212,8 +1119,7 @@
     gen_helper_conv_uw2sf(RdV, cpu_env, RsV)
 #define fGEN_TCG_F2_conv_uw2df(SHORTCODE) \
     gen_helper_conv_uw2df(RddV, cpu_env, RsV)
-#define fGEN_TCG_F2_conv_w2sf(SHORTCODE) \
-    gen_helper_conv_w2sf(RdV, cpu_env, RsV)
+#define fGEN_TCG_F2_conv_w2sf(SHORTCODE) gen_helper_conv_w2sf(RdV, cpu_env, RsV)
 #define fGEN_TCG_F2_conv_w2df(SHORTCODE) \
     gen_helper_conv_w2df(RddV, cpu_env, RsV)
 #define fGEN_TCG_F2_conv_ud2sf(SHORTCODE) \
@@ -1226,8 +1132,7 @@
     gen_helper_conv_d2df(RddV, cpu_env, RssV)
 #define fGEN_TCG_F2_conv_sf2uw(SHORTCODE) \
     gen_helper_conv_sf2uw(RdV, cpu_env, RsV)
-#define fGEN_TCG_F2_conv_sf2w(SHORTCODE) \
-    gen_helper_conv_sf2w(RdV, cpu_env, RsV)
+#define fGEN_TCG_F2_conv_sf2w(SHORTCODE) gen_helper_conv_sf2w(RdV, cpu_env, RsV)
 #define fGEN_TCG_F2_conv_sf2ud(SHORTCODE) \
     gen_helper_conv_sf2ud(RddV, cpu_env, RsV)
 #define fGEN_TCG_F2_conv_sf2d(SHORTCODE) \
@@ -1256,10 +1161,8 @@
     gen_helper_conv_df2ud_chop(RddV, cpu_env, RssV)
 #define fGEN_TCG_F2_conv_df2d_chop(SHORTCODE) \
     gen_helper_conv_df2d_chop(RddV, cpu_env, RssV)
-#define fGEN_TCG_F2_sfadd(SHORTCODE) \
-    gen_helper_sfadd(RdV, cpu_env, RsV, RtV)
-#define fGEN_TCG_F2_sfsub(SHORTCODE) \
-    gen_helper_sfsub(RdV, cpu_env, RsV, RtV)
+#define fGEN_TCG_F2_sfadd(SHORTCODE) gen_helper_sfadd(RdV, cpu_env, RsV, RtV)
+#define fGEN_TCG_F2_sfsub(SHORTCODE) gen_helper_sfsub(RdV, cpu_env, RsV, RtV)
 #define fGEN_TCG_F2_sfcmpeq(SHORTCODE) \
     gen_helper_sfcmpeq(PdV, cpu_env, RsV, RtV)
 #define fGEN_TCG_F2_sfcmpgt(SHORTCODE) \
@@ -1268,29 +1171,22 @@
     gen_helper_sfcmpge(PdV, cpu_env, RsV, RtV)
 #define fGEN_TCG_F2_sfcmpuo(SHORTCODE) \
     gen_helper_sfcmpuo(PdV, cpu_env, RsV, RtV)
-#define fGEN_TCG_F2_sfmax(SHORTCODE) \
-    gen_helper_sfmax(RdV, cpu_env, RsV, RtV)
-#define fGEN_TCG_F2_sfmin(SHORTCODE) \
-    gen_helper_sfmin(RdV, cpu_env, RsV, RtV)
-#define fGEN_TCG_F2_sfclass(SHORTCODE) \
-    do { \
-        TCGv imm = tcg_constant_tl(uiV); \
+#define fGEN_TCG_F2_sfmax(SHORTCODE) gen_helper_sfmax(RdV, cpu_env, RsV, RtV)
+#define fGEN_TCG_F2_sfmin(SHORTCODE) gen_helper_sfmin(RdV, cpu_env, RsV, RtV)
+#define fGEN_TCG_F2_sfclass(SHORTCODE)              \
+    do {                                            \
+        TCGv imm = tcg_constant_tl(uiV);            \
         gen_helper_sfclass(PdV, cpu_env, RsV, imm); \
     } while (0)
 #define fGEN_TCG_F2_sffixupn(SHORTCODE) \
     gen_helper_sffixupn(RdV, cpu_env, RsV, RtV)
 #define fGEN_TCG_F2_sffixupd(SHORTCODE) \
     gen_helper_sffixupd(RdV, cpu_env, RsV, RtV)
-#define fGEN_TCG_F2_sffixupr(SHORTCODE) \
-    gen_helper_sffixupr(RdV, cpu_env, RsV)
-#define fGEN_TCG_F2_dfadd(SHORTCODE) \
-    gen_helper_dfadd(RddV, cpu_env, RssV, RttV)
-#define fGEN_TCG_F2_dfsub(SHORTCODE) \
-    gen_helper_dfsub(RddV, cpu_env, RssV, RttV)
-#define fGEN_TCG_F2_dfmax(SHORTCODE) \
-    gen_helper_dfmax(RddV, cpu_env, RssV, RttV)
-#define fGEN_TCG_F2_dfmin(SHORTCODE) \
-    gen_helper_dfmin(RddV, cpu_env, RssV, RttV)
+#define fGEN_TCG_F2_sffixupr(SHORTCODE) gen_helper_sffixupr(RdV, cpu_env, RsV)
+#define fGEN_TCG_F2_dfadd(SHORTCODE) gen_helper_dfadd(RddV, cpu_env, RssV, RttV)
+#define fGEN_TCG_F2_dfsub(SHORTCODE) gen_helper_dfsub(RddV, cpu_env, RssV, RttV)
+#define fGEN_TCG_F2_dfmax(SHORTCODE) gen_helper_dfmax(RddV, cpu_env, RssV, RttV)
+#define fGEN_TCG_F2_dfmin(SHORTCODE) gen_helper_dfmin(RddV, cpu_env, RssV, RttV)
 #define fGEN_TCG_F2_dfcmpeq(SHORTCODE) \
     gen_helper_dfcmpeq(PdV, cpu_env, RssV, RttV)
 #define fGEN_TCG_F2_dfcmpgt(SHORTCODE) \
@@ -1299,13 +1195,12 @@
     gen_helper_dfcmpge(PdV, cpu_env, RssV, RttV)
 #define fGEN_TCG_F2_dfcmpuo(SHORTCODE) \
     gen_helper_dfcmpuo(PdV, cpu_env, RssV, RttV)
-#define fGEN_TCG_F2_dfclass(SHORTCODE) \
-    do { \
-        TCGv imm = tcg_constant_tl(uiV); \
+#define fGEN_TCG_F2_dfclass(SHORTCODE)               \
+    do {                                             \
+        TCGv imm = tcg_constant_tl(uiV);             \
         gen_helper_dfclass(PdV, cpu_env, RssV, imm); \
     } while (0)
-#define fGEN_TCG_F2_sfmpy(SHORTCODE) \
-    gen_helper_sfmpy(RdV, cpu_env, RsV, RtV)
+#define fGEN_TCG_F2_sfmpy(SHORTCODE) gen_helper_sfmpy(RdV, cpu_env, RsV, RtV)
 #define fGEN_TCG_F2_sffma(SHORTCODE) \
     gen_helper_sffma(RxV, cpu_env, RxV, RsV, RtV)
 #define fGEN_TCG_F2_sffma_sc(SHORTCODE) \
@@ -1324,49 +1219,52 @@
 
 /* Nothing to do for these in qemu, need to suppress compiler warnings */
 #define fGEN_TCG_Y4_l2fetch(SHORTCODE) \
-    do { \
-        RsV = RsV; \
-        RtV = RtV; \
+    do {                               \
+        RsV = RsV;                     \
+        RtV = RtV;                     \
     } while (0)
 #define fGEN_TCG_Y5_l2fetch(SHORTCODE) \
-    do { \
-        RsV = RsV; \
+    do {                               \
+        RsV = RsV;                     \
     } while (0)
 #define fGEN_TCG_Y2_isync(SHORTCODE) \
-    do { } while (0)
+    do {                             \
+    } while (0)
 #define fGEN_TCG_Y2_barrier(SHORTCODE) \
-    do { } while (0)
+    do {                               \
+    } while (0)
 #define fGEN_TCG_Y2_syncht(SHORTCODE) \
-    do { } while (0)
+    do {                              \
+    } while (0)
 #define fGEN_TCG_Y2_dcfetchbo(SHORTCODE) \
-    do { \
-        RsV = RsV; \
-        uiV = uiV; \
+    do {                                 \
+        RsV = RsV;                       \
+        uiV = uiV;                       \
     } while (0)
 
-#define fGEN_TCG_L2_loadw_aq(SHORTCODE)                 SHORTCODE
-#define fGEN_TCG_L4_loadd_aq(SHORTCODE)                 SHORTCODE
+#define fGEN_TCG_L2_loadw_aq(SHORTCODE) SHORTCODE
+#define fGEN_TCG_L4_loadd_aq(SHORTCODE) SHORTCODE
 
 /* Nothing to do for these in qemu, need to suppress compiler warnings */
 #define fGEN_TCG_R6_release_at_vi(SHORTCODE) \
-    do { \
-        RsV = RsV; \
+    do {                                     \
+        RsV = RsV;                           \
     } while (0)
 #define fGEN_TCG_R6_release_st_vi(SHORTCODE) \
-    do { \
-        RsV = RsV; \
+    do {                                     \
+        RsV = RsV;                           \
     } while (0)
 
-#define fGEN_TCG_S2_storew_rl_at_vi(SHORTCODE)          SHORTCODE
-#define fGEN_TCG_S4_stored_rl_at_vi(SHORTCODE)          SHORTCODE
-#define fGEN_TCG_S2_storew_rl_st_vi(SHORTCODE)          SHORTCODE
-#define fGEN_TCG_S4_stored_rl_st_vi(SHORTCODE)          SHORTCODE
+#define fGEN_TCG_S2_storew_rl_at_vi(SHORTCODE) SHORTCODE
+#define fGEN_TCG_S4_stored_rl_at_vi(SHORTCODE) SHORTCODE
+#define fGEN_TCG_S2_storew_rl_st_vi(SHORTCODE) SHORTCODE
+#define fGEN_TCG_S4_stored_rl_st_vi(SHORTCODE) SHORTCODE
 
-#define fGEN_TCG_J2_trap0(SHORTCODE) \
-    do { \
-        uiV = uiV; \
+#define fGEN_TCG_J2_trap0(SHORTCODE)                        \
+    do {                                                    \
+        uiV = uiV;                                          \
         tcg_gen_movi_tl(hex_gpr[HEX_REG_PC], ctx->pkt->pc); \
-        TCGv excp = tcg_constant_tl(HEX_EXCP_TRAP0); \
-        gen_helper_raise_exception(cpu_env, excp); \
+        TCGv excp = tcg_constant_tl(HEX_EXCP_TRAP0);        \
+        gen_helper_raise_exception(cpu_env, excp);          \
     } while (0)
 #endif

@@ -23,10 +23,10 @@
 #include "fpu/softfloat.h"
 
 #define QUIET_NAN 0x7fc00000
-#define ADD_NAN   0x7fc00001
-#define SQRT_NAN  0x7fc00004
-#define DIV_NAN   0x7fc00008
-#define MUL_NAN   0x7fc00002
+#define ADD_NAN 0x7fc00001
+#define SQRT_NAN 0x7fc00004
+#define DIV_NAN 0x7fc00008
+#define MUL_NAN 0x7fc00002
 #define FPU_FS PSW_USB_C
 #define FPU_FI PSW_USB_V
 #define FPU_FV PSW_USB_SV
@@ -39,13 +39,10 @@
 /* we don't care about input_denormal */
 static inline uint8_t f_get_excp_flags(CPUTriCoreState *env)
 {
-    return get_float_exception_flags(&env->fp_status)
-           & (float_flag_invalid
-              | float_flag_overflow
-              | float_flag_underflow
-              | float_flag_output_denormal
-              | float_flag_divbyzero
-              | float_flag_inexact);
+    return get_float_exception_flags(&env->fp_status) &
+           (float_flag_invalid | float_flag_overflow | float_flag_underflow |
+            float_flag_output_denormal | float_flag_divbyzero |
+            float_flag_inexact);
 }
 
 static inline float32 f_maddsub_nan_result(float32 arg1, float32 arg2,
@@ -117,30 +114,29 @@ static void f_update_psw_flags(CPUTriCoreState *env, uint8_t flags)
     env->FPU_FS = some_excp;
 }
 
-#define FADD_SUB(op)                                                           \
-uint32_t helper_f##op(CPUTriCoreState *env, uint32_t r1, uint32_t r2)          \
-{                                                                              \
-    float32 arg1 = make_float32(r1);                                           \
-    float32 arg2 = make_float32(r2);                                           \
-    uint32_t flags;                                                            \
-    float32 f_result;                                                          \
-                                                                               \
-    f_result = float32_##op(arg2, arg1, &env->fp_status);                      \
-    flags = f_get_excp_flags(env);                                             \
-    if (flags) {                                                               \
-        /* If the output is a NaN, but the inputs aren't,                      \
-           we return a unique value.  */                                       \
-        if ((flags & float_flag_invalid)                                       \
-            && !float32_is_any_nan(arg1)                                       \
-            && !float32_is_any_nan(arg2)) {                                    \
-            f_result = ADD_NAN;                                                \
-        }                                                                      \
-        f_update_psw_flags(env, flags);                                        \
-    } else {                                                                   \
-        env->FPU_FS = 0;                                                       \
-    }                                                                          \
-    return (uint32_t)f_result;                                                 \
-}
+#define FADD_SUB(op)                                                         \
+    uint32_t helper_f##op(CPUTriCoreState *env, uint32_t r1, uint32_t r2)    \
+    {                                                                        \
+        float32 arg1 = make_float32(r1);                                     \
+        float32 arg2 = make_float32(r2);                                     \
+        uint32_t flags;                                                      \
+        float32 f_result;                                                    \
+                                                                             \
+        f_result = float32_##op(arg2, arg1, &env->fp_status);                \
+        flags = f_get_excp_flags(env);                                       \
+        if (flags) {                                                         \
+            /* If the output is a NaN, but the inputs aren't,                \
+               we return a unique value.  */                                 \
+            if ((flags & float_flag_invalid) && !float32_is_any_nan(arg1) && \
+                !float32_is_any_nan(arg2)) {                                 \
+                f_result = ADD_NAN;                                          \
+            }                                                                \
+            f_update_psw_flags(env, flags);                                  \
+        } else {                                                             \
+            env->FPU_FS = 0;                                                 \
+        }                                                                    \
+        return (uint32_t)f_result;                                           \
+    }
 FADD_SUB(add)
 FADD_SUB(sub)
 
@@ -157,17 +153,15 @@ uint32_t helper_fmul(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
     if (flags) {
         /* If the output is a NaN, but the inputs aren't,
            we return a unique value.  */
-        if ((flags & float_flag_invalid)
-            && !float32_is_any_nan(arg1)
-            && !float32_is_any_nan(arg2)) {
-                f_result = MUL_NAN;
+        if ((flags & float_flag_invalid) && !float32_is_any_nan(arg1) &&
+            !float32_is_any_nan(arg2)) {
+            f_result = MUL_NAN;
         }
         f_update_psw_flags(env, flags);
     } else {
         env->FPU_FS = 0;
     }
     return (uint32_t)f_result;
-
 }
 
 /*
@@ -191,16 +185,15 @@ uint32_t helper_fmul(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
  * from the real hardware
  */
 static const uint8_t target_qseed_significand_table[128] = {
-    253, 252, 245, 244, 239, 238, 231, 230, 225, 224, 217, 216,
-    211, 210, 205, 204, 201, 200, 195, 194, 189, 188, 185, 184,
-    179, 178, 175, 174, 169, 168, 165, 164, 161, 160, 157, 156,
-    153, 152, 149, 148, 145, 144, 141, 140, 137, 136, 133, 132,
-    131, 130, 127, 126, 123, 122, 121, 120, 117, 116, 115, 114,
-    111, 110, 109, 108, 103, 102, 99, 98, 93, 92, 89, 88, 83,
-    82, 79, 78, 75, 74, 71, 70, 67, 66, 63, 62, 59, 58, 55,
-    54, 53, 52, 49, 48, 45, 44, 43, 42, 39, 38, 37, 36, 33,
-    32, 31, 30, 27, 26, 25, 24, 23, 22, 19, 18, 17, 16, 15,
-    14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2
+    253, 252, 245, 244, 239, 238, 231, 230, 225, 224, 217, 216, 211, 210, 205,
+    204, 201, 200, 195, 194, 189, 188, 185, 184, 179, 178, 175, 174, 169, 168,
+    165, 164, 161, 160, 157, 156, 153, 152, 149, 148, 145, 144, 141, 140, 137,
+    136, 133, 132, 131, 130, 127, 126, 123, 122, 121, 120, 117, 116, 115, 114,
+    111, 110, 109, 108, 103, 102, 99,  98,  93,  92,  89,  88,  83,  82,  79,
+    78,  75,  74,  71,  70,  67,  66,  63,  62,  59,  58,  55,  54,  53,  52,
+    49,  48,  45,  44,  43,  42,  39,  38,  37,  36,  33,  32,  31,  30,  27,
+    26,  25,  24,  23,  22,  19,  18,  17,  16,  15,  14,  13,  12,  11,  10,
+    9,   8,   7,   6,   5,   4,   3,   2
 };
 
 uint32_t helper_qseed(CPUTriCoreState *env, uint32_t r1)
@@ -240,15 +233,15 @@ uint32_t helper_qseed(CPUTriCoreState *env, uint32_t r1)
         result = deposit32(result, 15, 8, new_M);
     }
 
-    if (float32_is_signaling_nan(arg1, &env->fp_status)
-        || result == float32_sqrt_nan) {
+    if (float32_is_signaling_nan(arg1, &env->fp_status) ||
+        result == float32_sqrt_nan) {
         env->FPU_FI = 1 << 31;
         env->FPU_FS = 1;
     } else {
         env->FPU_FS = 0;
     }
 
-    return (uint32_t) result;
+    return (uint32_t)result;
 }
 
 uint32_t helper_fdiv(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
@@ -258,16 +251,15 @@ uint32_t helper_fdiv(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
     float32 arg2 = make_float32(r2);
     float32 f_result;
 
-    f_result = float32_div(arg1, arg2 , &env->fp_status);
+    f_result = float32_div(arg1, arg2, &env->fp_status);
 
     flags = f_get_excp_flags(env);
     if (flags) {
         /* If the output is a NaN, but the inputs aren't,
            we return a unique value.  */
-        if ((flags & float_flag_invalid)
-            && !float32_is_any_nan(arg1)
-            && !float32_is_any_nan(arg2)) {
-                f_result = DIV_NAN;
+        if ((flags & float_flag_invalid) && !float32_is_any_nan(arg1) &&
+            !float32_is_any_nan(arg2)) {
+            f_result = DIV_NAN;
         }
         f_update_psw_flags(env, flags);
     } else {
@@ -277,8 +269,8 @@ uint32_t helper_fdiv(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
     return (uint32_t)f_result;
 }
 
-uint32_t helper_fmadd(CPUTriCoreState *env, uint32_t r1,
-                      uint32_t r2, uint32_t r3)
+uint32_t helper_fmadd(CPUTriCoreState *env, uint32_t r1, uint32_t r2,
+                      uint32_t r3)
 {
     uint32_t flags;
     float32 arg1 = make_float32(r1);
@@ -303,8 +295,8 @@ uint32_t helper_fmadd(CPUTriCoreState *env, uint32_t r1,
     return (uint32_t)f_result;
 }
 
-uint32_t helper_fmsub(CPUTriCoreState *env, uint32_t r1,
-                      uint32_t r2, uint32_t r3)
+uint32_t helper_fmsub(CPUTriCoreState *env, uint32_t r1, uint32_t r2,
+                      uint32_t r3)
 {
     uint32_t flags;
     float32 arg1 = make_float32(r1);
@@ -458,7 +450,7 @@ uint32_t helper_ftouz(CPUTriCoreState *env, uint32_t arg)
 
 void helper_updfl(CPUTriCoreState *env, uint32_t arg)
 {
-    env->FPU_FS =  extract32(arg, 7, 1) & extract32(arg, 15, 1);
+    env->FPU_FS = extract32(arg, 7, 1) & extract32(arg, 15, 1);
     env->FPU_FI = (extract32(arg, 6, 1) & extract32(arg, 14, 1)) << 31;
     env->FPU_FV = (extract32(arg, 5, 1) & extract32(arg, 13, 1)) << 31;
     env->FPU_FZ = (extract32(arg, 4, 1) & extract32(arg, 12, 1)) << 31;

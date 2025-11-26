@@ -37,8 +37,7 @@
 
 static struct XtensaConfigList *xtensa_cores;
 
-static void add_translator_to_hash(GHashTable *translator,
-                                   const char *name,
+static void add_translator_to_hash(GHashTable *translator, const char *name,
                                    const XtensaOpcodeOps *opcode)
 {
     if (!g_hash_table_insert(translator, (void *)name, (void *)opcode)) {
@@ -54,25 +53,22 @@ static GHashTable *hash_opcode_translators(const XtensaOpcodeTranslators *t)
 
     for (i = 0; i < t->num_opcodes; ++i) {
         if (t->opcode[i].op_flags & XTENSA_OP_NAME_ARRAY) {
-            const char * const *name = t->opcode[i].name;
+            const char *const *name = t->opcode[i].name;
 
             for (j = 0; name[j]; ++j) {
-                add_translator_to_hash(translator,
-                                       (void *)name[j],
+                add_translator_to_hash(translator, (void *)name[j],
                                        (void *)(t->opcode + i));
             }
         } else {
-            add_translator_to_hash(translator,
-                                   (void *)t->opcode[i].name,
+            add_translator_to_hash(translator, (void *)t->opcode[i].name,
                                    (void *)(t->opcode + i));
         }
     }
     return translator;
 }
 
-static XtensaOpcodeOps *
-xtensa_find_opcode_ops(const XtensaOpcodeTranslators *t,
-                       const char *name)
+static XtensaOpcodeOps *xtensa_find_opcode_ops(const XtensaOpcodeTranslators *t,
+                                               const char *name)
 {
     static GHashTable *translators;
     GHashTable *translator;
@@ -140,8 +136,8 @@ static void init_libisa(XtensaConfig *config)
         config->regfile[i] = xtensa_get_regfile_by_name(name, entries, bits);
 #ifdef DEBUG
         if (config->regfile[i] == NULL) {
-            fprintf(stderr, "regfile '%s' not found for %s\n",
-                    name, config->name);
+            fprintf(stderr, "regfile '%s' not found for %s\n", name,
+                    config->name);
         }
 #endif
     }
@@ -208,7 +204,7 @@ static uint32_t check_hw_breakpoints(CPUXtensaState *env)
 
     for (i = 0; i < env->config->ndbreak; ++i) {
         if (env->cpu_watchpoint[i] &&
-                env->cpu_watchpoint[i]->flags & BP_WATCHPOINT_HIT) {
+            env->cpu_watchpoint[i]->flags & BP_WATCHPOINT_HIT) {
             return DEBUGCAUSE_DB | (i << DEBUGCAUSE_DBNUM_SHIFT);
         }
     }
@@ -244,41 +240,38 @@ void xtensa_cpu_list(void)
 }
 
 #ifndef CONFIG_USER_ONLY
-void xtensa_cpu_do_unaligned_access(CPUState *cs,
-                                    vaddr addr, MMUAccessType access_type,
-                                    int mmu_idx, uintptr_t retaddr)
+void xtensa_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+                                    MMUAccessType access_type, int mmu_idx,
+                                    uintptr_t retaddr)
 {
     XtensaCPU *cpu = XTENSA_CPU(cs);
     CPUXtensaState *env = &cpu->env;
 
-    assert(xtensa_option_enabled(env->config,
-                                 XTENSA_OPTION_UNALIGNED_EXCEPTION));
+    assert(
+        xtensa_option_enabled(env->config, XTENSA_OPTION_UNALIGNED_EXCEPTION));
     cpu_restore_state(CPU(cpu), retaddr);
-    HELPER(exception_cause_vaddr)(env,
-                                  env->pc, LOAD_STORE_ALIGNMENT_CAUSE,
-                                  addr);
+    HELPER(exception_cause_vaddr)
+    (env, env->pc, LOAD_STORE_ALIGNMENT_CAUSE, addr);
 }
 
 bool xtensa_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr)
+                         MMUAccessType access_type, int mmu_idx, bool probe,
+                         uintptr_t retaddr)
 {
     XtensaCPU *cpu = XTENSA_CPU(cs);
     CPUXtensaState *env = &cpu->env;
     uint32_t paddr;
     uint32_t page_size;
     unsigned access;
-    int ret = xtensa_get_physical_addr(env, true, address, access_type,
-                                       mmu_idx, &paddr, &page_size, &access);
+    int ret = xtensa_get_physical_addr(env, true, address, access_type, mmu_idx,
+                                       &paddr, &page_size, &access);
 
-    qemu_log_mask(CPU_LOG_MMU, "%s(%08" VADDR_PRIx
-                  ", %d, %d) -> %08x, ret = %d\n",
-                  __func__, address, access_type, mmu_idx, paddr, ret);
+    qemu_log_mask(CPU_LOG_MMU,
+                  "%s(%08" VADDR_PRIx ", %d, %d) -> %08x, ret = %d\n", __func__,
+                  address, access_type, mmu_idx, paddr, ret);
 
     if (ret == 0) {
-        tlb_set_page(cs,
-                     address & TARGET_PAGE_MASK,
-                     paddr & TARGET_PAGE_MASK,
+        tlb_set_page(cs, address & TARGET_PAGE_MASK, paddr & TARGET_PAGE_MASK,
                      access, mmu_idx, page_size);
         return true;
     } else if (probe) {
@@ -298,11 +291,11 @@ void xtensa_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
     CPUXtensaState *env = &cpu->env;
 
     cpu_restore_state(cs, retaddr);
-    HELPER(exception_cause_vaddr)(env, env->pc,
-                                  access_type == MMU_INST_FETCH ?
-                                  INSTR_PIF_ADDR_ERROR_CAUSE :
-                                  LOAD_STORE_PIF_ADDR_ERROR_CAUSE,
-                                  addr);
+    HELPER(exception_cause_vaddr)
+    (env, env->pc,
+     access_type == MMU_INST_FETCH ? INSTR_PIF_ADDR_ERROR_CAUSE :
+                                     LOAD_STORE_PIF_ADDR_ERROR_CAUSE,
+     addr);
 }
 
 void xtensa_runstall(CPUXtensaState *env, bool runstall)

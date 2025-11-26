@@ -24,8 +24,8 @@
 
 enum {
 
-#define DEF_PP_ICLASS32(TYPE, SLOTS, UNITS)    ICLASS_FROM_TYPE(TYPE),
-#define DEF_EE_ICLASS32(TYPE, SLOTS, UNITS)    ICLASS_FROM_TYPE(TYPE),
+#define DEF_PP_ICLASS32(TYPE, SLOTS, UNITS) ICLASS_FROM_TYPE(TYPE),
+#define DEF_EE_ICLASS32(TYPE, SLOTS, UNITS) ICLASS_FROM_TYPE(TYPE),
 #include "imported/iclass.def"
 #undef DEF_PP_ICLASS32
 #undef DEF_EE_ICLASS32
@@ -36,13 +36,13 @@ enum {
 };
 
 typedef enum {
-    SLOTS_0          = (1 << 0),
-    SLOTS_1          = (1 << 1),
-    SLOTS_2          = (1 << 2),
-    SLOTS_3          = (1 << 3),
-    SLOTS_01         = SLOTS_0 | SLOTS_1,
-    SLOTS_23         = SLOTS_2 | SLOTS_3,
-    SLOTS_0123       = SLOTS_0 | SLOTS_1 | SLOTS_2 | SLOTS_3,
+    SLOTS_0 = (1 << 0),
+    SLOTS_1 = (1 << 1),
+    SLOTS_2 = (1 << 2),
+    SLOTS_3 = (1 << 3),
+    SLOTS_01 = SLOTS_0 | SLOTS_1,
+    SLOTS_23 = SLOTS_2 | SLOTS_3,
+    SLOTS_0123 = SLOTS_0 | SLOTS_1 | SLOTS_2 | SLOTS_3,
 } SlotMask;
 
 SlotMask find_iclass_slots(Opcode opcode, int itype);

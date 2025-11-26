@@ -43,8 +43,8 @@ static int __s390_pv_cmd(uint32_t cmd, const char *cmdname, void *data)
 
     if (rc) {
         error_report("KVM PV command %d (%s) failed: header rc %x rrc %x "
-                     "IOCTL rc: %d", cmd, cmdname, pv_cmd.rc, pv_cmd.rrc,
-                     rc);
+                     "IOCTL rc: %d",
+                     cmd, cmdname, pv_cmd.rc, pv_cmd.rrc, rc);
     }
     return rc;
 }
@@ -54,15 +54,15 @@ static int __s390_pv_cmd(uint32_t cmd, const char *cmdname, void *data)
  * we can print it on an error.
  */
 #define s390_pv_cmd(cmd, data) __s390_pv_cmd(cmd, #cmd, data)
-#define s390_pv_cmd_exit(cmd, data)    \
-{                                      \
-    int rc;                            \
-                                       \
-    rc = __s390_pv_cmd(cmd, #cmd, data);\
-    if (rc) {                          \
-        exit(1);                       \
-    }                                  \
-}
+#define s390_pv_cmd_exit(cmd, data)          \
+    {                                        \
+        int rc;                              \
+                                             \
+        rc = __s390_pv_cmd(cmd, #cmd, data); \
+        if (rc) {                            \
+            exit(1);                         \
+        }                                    \
+    }
 
 int s390_pv_query_info(void)
 {
@@ -79,8 +79,8 @@ int s390_pv_query_info(void)
 
     rc = s390_pv_cmd(KVM_PV_INFO, &info);
     if (rc) {
-        error_report("KVM PV INFO cmd %x failed: %s",
-                     info.header.id, strerror(-rc));
+        error_report("KVM PV INFO cmd %x failed: %s", info.header.id,
+                     strerror(-rc));
         return rc;
     }
     memcpy(&info_vm, &info.vm, sizeof(info.vm));
@@ -89,8 +89,8 @@ int s390_pv_query_info(void)
     info.header.len_max = sizeof(info.header) + sizeof(info.dump);
     rc = s390_pv_cmd(KVM_PV_INFO, &info);
     if (rc) {
-        error_report("KVM PV INFO cmd %x failed: %s",
-                     info.header.id, strerror(-rc));
+        error_report("KVM PV INFO cmd %x failed: %s", info.header.id,
+                     strerror(-rc));
         return rc;
     }
 
@@ -107,13 +107,13 @@ int s390_pv_vm_enable(void)
 
 void s390_pv_vm_disable(void)
 {
-     s390_pv_cmd_exit(KVM_PV_DISABLE, NULL);
+    s390_pv_cmd_exit(KVM_PV_DISABLE, NULL);
 }
 
 static void *s390_pv_do_unprot_async_fn(void *p)
 {
-     s390_pv_cmd_exit(KVM_PV_ASYNC_CLEANUP_PERFORM, NULL);
-     return NULL;
+    s390_pv_cmd_exit(KVM_PV_ASYNC_CLEANUP_PERFORM, NULL);
+    return NULL;
 }
 
 bool s390_pv_vm_try_disable_async(S390CcwMachineState *ms)
@@ -295,7 +295,8 @@ struct S390PVGuestClass {
 static uint32_t s390_pv_get_max_cpus(void)
 {
     int offset_cpu = s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) ?
-        offsetof(ReadInfo, entries) : SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET;
+                         offsetof(ReadInfo, entries) :
+                         SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET;
 
     return (TARGET_PAGE_SIZE - offset_cpu) / sizeof(CPUEntry);
 }
@@ -326,8 +327,7 @@ int s390_pv_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
     }
 
     if (!s390_has_feat(S390_FEAT_UNPACK)) {
-        error_setg(errp,
-                   "CPU model does not support Protected Virtualization");
+        error_setg(errp, "CPU model does not support Protected Virtualization");
         return -1;
     }
 
@@ -340,12 +340,9 @@ int s390_pv_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
     return 0;
 }
 
-OBJECT_DEFINE_TYPE_WITH_INTERFACES(S390PVGuest,
-                                   s390_pv_guest,
-                                   S390_PV_GUEST,
+OBJECT_DEFINE_TYPE_WITH_INTERFACES(S390PVGuest, s390_pv_guest, S390_PV_GUEST,
                                    CONFIDENTIAL_GUEST_SUPPORT,
-                                   { TYPE_USER_CREATABLE },
-                                   { NULL })
+                                   { TYPE_USER_CREATABLE }, { NULL })
 
 static void s390_pv_guest_class_init(ObjectClass *oc, void *data)
 {

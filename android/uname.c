@@ -70,35 +70,35 @@ const char *cpu_to_uname_machine(CPUArchState *cpu_env)
 }
 
 
-#define COPY_UTSNAME_FIELD(dest, src) \
-  do { \
-      memcpy((dest), (src), MIN(sizeof(src), sizeof(dest))); \
-      (dest)[sizeof(dest) - 1] = '\0'; \
-  } while (0)
+#define COPY_UTSNAME_FIELD(dest, src)                          \
+    do {                                                       \
+        memcpy((dest), (src), MIN(sizeof(src), sizeof(dest))); \
+        (dest)[sizeof(dest) - 1] = '\0';                       \
+    } while (0)
 
 int sys_uname(struct new_utsname *buf)
 {
-  struct utsname uts_buf;
+    struct utsname uts_buf;
 
-  if (uname(&uts_buf) < 0)
-      return (-1);
+    if (uname(&uts_buf) < 0)
+        return (-1);
 
-  /*
-   * Just in case these have some differences, we
-   * translate utsname to new_utsname (which is the
-   * struct linux kernel uses).
-   */
+    /*
+     * Just in case these have some differences, we
+     * translate utsname to new_utsname (which is the
+     * struct linux kernel uses).
+     */
 
-  memset(buf, 0, sizeof(*buf));
-  COPY_UTSNAME_FIELD(buf->sysname, uts_buf.sysname);
-  COPY_UTSNAME_FIELD(buf->nodename, uts_buf.nodename);
-  COPY_UTSNAME_FIELD(buf->release, uts_buf.release);
-  COPY_UTSNAME_FIELD(buf->version, uts_buf.version);
-  COPY_UTSNAME_FIELD(buf->machine, uts_buf.machine);
+    memset(buf, 0, sizeof(*buf));
+    COPY_UTSNAME_FIELD(buf->sysname, uts_buf.sysname);
+    COPY_UTSNAME_FIELD(buf->nodename, uts_buf.nodename);
+    COPY_UTSNAME_FIELD(buf->release, uts_buf.release);
+    COPY_UTSNAME_FIELD(buf->version, uts_buf.version);
+    COPY_UTSNAME_FIELD(buf->machine, uts_buf.machine);
 #ifdef _GNU_SOURCE
-  COPY_UTSNAME_FIELD(buf->domainname, uts_buf.domainname);
+    COPY_UTSNAME_FIELD(buf->domainname, uts_buf.domainname);
 #endif
-  return (0);
+    return (0);
 
 #undef COPY_UTSNAME_FIELD
 }

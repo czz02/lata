@@ -36,18 +36,16 @@
 #include "fpu_helper.h"
 
 const char regnames[32][3] = {
-    "r0", "at", "v0", "v1", "a0", "a1", "a2", "a3",
-    "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
-    "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
-    "t8", "t9", "k0", "k1", "gp", "sp", "s8", "ra",
+    "r0", "at", "v0", "v1", "a0", "a1", "a2", "a3", "t0", "t1", "t2",
+    "t3", "t4", "t5", "t6", "t7", "s0", "s1", "s2", "s3", "s4", "s5",
+    "s6", "s7", "t8", "t9", "k0", "k1", "gp", "sp", "s8", "ra",
 };
 
 static void fpu_dump_fpr(fpr_t *fpr, FILE *f, bool is_fpu64)
 {
     if (is_fpu64) {
         qemu_fprintf(f, "w:%08x d:%016" PRIx64 " fd:%13g fs:%13g psu: %13g\n",
-                     fpr->w[FP_ENDIAN_IDX], fpr->d,
-                     (double)fpr->fd,
+                     fpr->w[FP_ENDIAN_IDX], fpr->d, (double)fpr->fd,
                      (double)fpr->fs[FP_ENDIAN_IDX],
                      (double)fpr->fs[!FP_ENDIAN_IDX]);
     } else {
@@ -56,8 +54,7 @@ static void fpu_dump_fpr(fpr_t *fpr, FILE *f, bool is_fpu64)
         tmp.w[FP_ENDIAN_IDX] = fpr->w[FP_ENDIAN_IDX];
         tmp.w[!FP_ENDIAN_IDX] = (fpr + 1)->w[FP_ENDIAN_IDX];
         qemu_fprintf(f, "w:%08x d:%016" PRIx64 " fd:%13g fs:%13g psu:%13g\n",
-                     tmp.w[FP_ENDIAN_IDX], tmp.d,
-                     (double)tmp.fd,
+                     tmp.w[FP_ENDIAN_IDX], tmp.d, (double)tmp.fd,
                      (double)tmp.fs[FP_ENDIAN_IDX],
                      (double)tmp.fs[!FP_ENDIAN_IDX]);
     }
@@ -84,32 +81,33 @@ static void mips_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     CPUMIPSState *env = &cpu->env;
     int i;
 
-    qemu_fprintf(f, "pc=0x" TARGET_FMT_lx " HI=0x" TARGET_FMT_lx
-                 " LO=0x" TARGET_FMT_lx " ds %04x "
-                 TARGET_FMT_lx " " TARGET_FMT_ld "\n",
+    qemu_fprintf(f,
+                 "pc=0x" TARGET_FMT_lx " HI=0x" TARGET_FMT_lx
+                 " LO=0x" TARGET_FMT_lx " ds %04x " TARGET_FMT_lx
+                 " " TARGET_FMT_ld "\n",
                  env->active_tc.PC, env->active_tc.HI[0], env->active_tc.LO[0],
                  env->hflags, env->btarget, env->bcond);
     for (i = 0; i < 32; i++) {
         if ((i & 3) == 0) {
             qemu_fprintf(f, "GPR%02d:", i);
         }
-        qemu_fprintf(f, " %s " TARGET_FMT_lx,
-                     regnames[i], env->active_tc.gpr[i]);
+        qemu_fprintf(f, " %s " TARGET_FMT_lx, regnames[i],
+                     env->active_tc.gpr[i]);
         if ((i & 3) == 3) {
             qemu_fprintf(f, "\n");
         }
     }
 
-    qemu_fprintf(f, "CP0 Status  0x%08x Cause   0x%08x EPC    0x"
-                 TARGET_FMT_lx "\n",
-                 env->CP0_Status, env->CP0_Cause, env->CP0_EPC);
-    qemu_fprintf(f, "    Config0 0x%08x Config1 0x%08x LLAddr 0x%016"
-                 PRIx64 "\n",
+    qemu_fprintf(
+        f, "CP0 Status  0x%08x Cause   0x%08x EPC    0x" TARGET_FMT_lx "\n",
+        env->CP0_Status, env->CP0_Cause, env->CP0_EPC);
+    qemu_fprintf(f,
+                 "    Config0 0x%08x Config1 0x%08x LLAddr 0x%016" PRIx64 "\n",
                  env->CP0_Config0, env->CP0_Config1, env->CP0_LLAddr);
-    qemu_fprintf(f, "    Config2 0x%08x Config3 0x%08x\n",
-                 env->CP0_Config2, env->CP0_Config3);
-    qemu_fprintf(f, "    Config4 0x%08x Config5 0x%08x\n",
-                 env->CP0_Config4, env->CP0_Config5);
+    qemu_fprintf(f, "    Config2 0x%08x Config3 0x%08x\n", env->CP0_Config2,
+                 env->CP0_Config3);
+    qemu_fprintf(f, "    Config4 0x%08x Config5 0x%08x\n", env->CP0_Config4,
+                 env->CP0_Config5);
     if ((flags & CPU_DUMP_FPU) && (env->hflags & MIPS_HFLAG_FPU)) {
         fpu_dump_state(env, f, flags);
     }
@@ -254,14 +252,14 @@ static void mips_cpu_reset_hold(Object *obj)
 
 #if defined(CONFIG_USER_ONLY)
     env->CP0_Status = (MIPS_HFLAG_UM << CP0St_KSU);
-# ifdef TARGET_MIPS64
+#ifdef TARGET_MIPS64
     /* Enable 64-bit register mode.  */
     env->CP0_Status |= (1 << CP0St_PX);
-# endif
-# ifdef TARGET_ABI_MIPSN64
+#endif
+#ifdef TARGET_ABI_MIPSN64
     /* Enable 64-bit address mode.  */
     env->CP0_Status |= (1 << CP0St_UX);
-# endif
+#endif
     /*
      * Enable access to the CPUNum, SYNCI_Step, CC, and CCRes RDHWR
      * hardware registers.
@@ -273,21 +271,21 @@ static void mips_cpu_reset_hold(Object *obj)
     if (env->CP0_Config3 & (1 << CP0C3_DSPP)) {
         env->CP0_Status |= (1 << CP0St_MX);
     }
-# if defined(TARGET_MIPS64)
+#if defined(TARGET_MIPS64)
     /* For MIPS64, init FR bit to 1 if FPU unit is there and bit is writable. */
     if ((env->CP0_Config1 & (1 << CP0C1_FP)) &&
         (env->CP0_Status_rw_bitmask & (1 << CP0St_FR))) {
         env->CP0_Status |= (1 << CP0St_FR);
     }
-# endif
+#endif
 #else /* !CONFIG_USER_ONLY */
     if (env->hflags & MIPS_HFLAG_BMASK) {
         /*
          * If the exception was raised from a delay slot,
          * come back to the jump.
          */
-        env->CP0_ErrorEPC = (env->active_tc.PC
-                             - (env->hflags & MIPS_HFLAG_B16 ? 2 : 4));
+        env->CP0_ErrorEPC =
+            (env->active_tc.PC - (env->hflags & MIPS_HFLAG_B16 ? 2 : 4));
     } else {
         env->CP0_ErrorEPC = env->active_tc.PC;
     }
@@ -300,13 +298,13 @@ static void mips_cpu_reset_hold(Object *obj)
     if (env->CP0_Config3 & (1 << CP0C3_CMGCR)) {
         env->CP0_CMGCRBase = 0x1fbf8000 >> 4;
     }
-    env->CP0_EntryHi_ASID_mask = (env->CP0_Config5 & (1 << CP0C5_MI)) ?
-            0x0 : (env->CP0_Config4 & (1 << CP0C4_AE)) ? 0x3ff : 0xff;
+    env->CP0_EntryHi_ASID_mask = (env->CP0_Config5 & (1 << CP0C5_MI)) ? 0x0 :
+                                 (env->CP0_Config4 & (1 << CP0C4_AE)) ? 0x3ff :
+                                                                        0xff;
     env->CP0_Status = (1 << CP0St_BEV) | (1 << CP0St_ERL);
     if (env->insn_flags & INSN_LOONGSON2F) {
         /* Loongson-2F has those bits hardcoded to 1 */
-        env->CP0_Status |= (1 << CP0St_KX) | (1 << CP0St_SX) |
-                            (1 << CP0St_UX);
+        env->CP0_Status |= (1 << CP0St_KX) | (1 << CP0St_SX) | (1 << CP0St_UX);
     }
 
     /*
@@ -360,21 +358,22 @@ static void mips_cpu_reset_hold(Object *obj)
      * whether segmentation control is presented to the guest.
      */
     /* KSeg3 (seg0 0xE0000000..0xFFFFFFFF) */
-    env->CP0_SegCtl0 =   (CP0SC_AM_MK << CP0SC_AM);
+    env->CP0_SegCtl0 = (CP0SC_AM_MK << CP0SC_AM);
     /* KSeg2 (seg1 0xC0000000..0xDFFFFFFF) */
     env->CP0_SegCtl0 |= ((CP0SC_AM_MSK << CP0SC_AM)) << 16;
     /* KSeg1 (seg2 0xA0000000..0x9FFFFFFF) */
-    env->CP0_SegCtl1 =   (0 << CP0SC_PA) | (CP0SC_AM_UK << CP0SC_AM) |
-                         (2 << CP0SC_C);
+    env->CP0_SegCtl1 =
+        (0 << CP0SC_PA) | (CP0SC_AM_UK << CP0SC_AM) | (2 << CP0SC_C);
     /* KSeg0 (seg3 0x80000000..0x9FFFFFFF) */
-    env->CP0_SegCtl1 |= ((0 << CP0SC_PA) | (CP0SC_AM_UK << CP0SC_AM) |
-                         (3 << CP0SC_C)) << 16;
+    env->CP0_SegCtl1 |=
+        ((0 << CP0SC_PA) | (CP0SC_AM_UK << CP0SC_AM) | (3 << CP0SC_C)) << 16;
     /* USeg (seg4 0x40000000..0x7FFFFFFF) */
-    env->CP0_SegCtl2 =   (2 << CP0SC_PA) | (CP0SC_AM_MUSK << CP0SC_AM) |
-                         (1 << CP0SC_EU) | (2 << CP0SC_C);
+    env->CP0_SegCtl2 = (2 << CP0SC_PA) | (CP0SC_AM_MUSK << CP0SC_AM) |
+                       (1 << CP0SC_EU) | (2 << CP0SC_C);
     /* USeg (seg5 0x00000000..0x3FFFFFFF) */
     env->CP0_SegCtl2 |= ((0 << CP0SC_PA) | (CP0SC_AM_MUSK << CP0SC_AM) |
-                         (1 << CP0SC_EU) | (2 << CP0SC_C)) << 16;
+                         (1 << CP0SC_EU) | (2 << CP0SC_C))
+                        << 16;
     /* XKPhys (note, SegCtl2.XR = 0, so XAM won't be used) */
     env->CP0_SegCtl1 |= (CP0SC_AM_UK << CP0SC1_XAM);
 #endif /* !CONFIG_USER_ONLY */
@@ -445,7 +444,7 @@ static void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info)
 /*
  * Since commit 6af0bf9c7c3 this model assumes a CPU clocked at 200MHz.
  */
-#define CPU_FREQ_HZ_DEFAULT     200000000
+#define CPU_FREQ_HZ_DEFAULT 200000000
 
 static void mips_cp0_period_set(MIPSCPU *cpu)
 {
@@ -470,7 +469,8 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
             g_autofree char *cpu_freq_str = freq_to_str(CPU_FREQ_HZ_DEFAULT);
 
             warn_report("CPU input clock is not connected to any output clock, "
-                        "using default frequency of %s.", cpu_freq_str);
+                        "using default frequency of %s.",
+                        cpu_freq_str);
         }
 #endif
         /* Initialize the frequency in case the clock remains unconnected. */
@@ -511,10 +511,9 @@ static void mips_cpu_initfn(Object *obj)
     env->cpu_model = mcc->cpu_def;
 #ifndef CONFIG_USER_ONLY
     if (mcc->cpu_def->lcsr_cpucfg2 & (1 << CPUCFG2_LCSRP)) {
-        memory_region_init_io(&env->iocsr.mr, OBJECT(cpu), NULL,
-                                env, "iocsr", UINT64_MAX);
-        address_space_init(&env->iocsr.as,
-                            &env->iocsr.mr, "IOCSR");
+        memory_region_init_io(&env->iocsr.mr, OBJECT(cpu), NULL, env, "iocsr",
+                              UINT64_MAX);
+        address_space_init(&env->iocsr.as, &env->iocsr.mr, "IOCSR");
     }
 #endif
 }
@@ -638,8 +637,8 @@ static void mips_cpu_register_types(void)
 
 type_init(mips_cpu_register_types)
 
-/* Could be used by generic CPU object */
-MIPSCPU *mips_cpu_create_with_clock(const char *cpu_type, Clock *cpu_refclk)
+    /* Could be used by generic CPU object */
+    MIPSCPU *mips_cpu_create_with_clock(const char *cpu_type, Clock *cpu_refclk)
 {
     DeviceState *cpu;
 

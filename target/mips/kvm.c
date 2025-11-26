@@ -7,7 +7,7 @@
  *
  * Copyright (C) 2012-2014 Imagination Technologies Ltd.
  * Authors: Sanjay Lal <sanjayl@kymasys.com>
-*/
+ */
 
 #include "qemu/osdep.h"
 #include <sys/ioctl.h>
@@ -27,8 +27,12 @@
 
 #define DEBUG_KVM 0
 
-#define DPRINTF(fmt, ...) \
-    do { if (DEBUG_KVM) { fprintf(stderr, fmt, ## __VA_ARGS__); } } while (0)
+#define DPRINTF(fmt, ...)                        \
+    do {                                         \
+        if (DEBUG_KVM) {                         \
+            fprintf(stderr, fmt, ##__VA_ARGS__); \
+        }                                        \
+    } while (0)
 
 static int kvm_mips_fpu_cap;
 static int kvm_mips_msa_cap;
@@ -141,13 +145,13 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
     qemu_mutex_lock_iothread();
 
     if ((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-            cpu_mips_io_interrupts_pending(cpu)) {
+        cpu_mips_io_interrupts_pending(cpu)) {
         intr.cpu = -1;
         intr.irq = 2;
         r = kvm_vcpu_ioctl(cs, KVM_INTERRUPT, &intr);
         if (r < 0) {
-            error_report("%s: cpu %d: failed to inject IRQ %x",
-                         __func__, cs->cpu_index, intr.irq);
+            error_report("%s: cpu %d: failed to inject IRQ %x", __func__,
+                         cs->cpu_index, intr.irq);
         }
     }
 
@@ -171,8 +175,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
     DPRINTF("%s\n", __func__);
     switch (run->exit_reason) {
     default:
-        error_report("%s: unknown exit reason %d",
-                     __func__, run->exit_reason);
+        error_report("%s: unknown exit reason %d", __func__, run->exit_reason);
         ret = -1;
         break;
     }
@@ -233,56 +236,53 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int irq, int level)
     return 0;
 }
 
-#define MIPS_CP0_32(_R, _S)                                     \
+#define MIPS_CP0_32(_R, _S) \
     (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
 
-#define MIPS_CP0_64(_R, _S)                                     \
+#define MIPS_CP0_64(_R, _S) \
     (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
 
-#define KVM_REG_MIPS_CP0_INDEX          MIPS_CP0_32(0, 0)
-#define KVM_REG_MIPS_CP0_RANDOM         MIPS_CP0_32(1, 0)
-#define KVM_REG_MIPS_CP0_CONTEXT        MIPS_CP0_64(4, 0)
-#define KVM_REG_MIPS_CP0_USERLOCAL      MIPS_CP0_64(4, 2)
-#define KVM_REG_MIPS_CP0_PAGEMASK       MIPS_CP0_32(5, 0)
-#define KVM_REG_MIPS_CP0_PAGEGRAIN      MIPS_CP0_32(5, 1)
-#define KVM_REG_MIPS_CP0_PWBASE         MIPS_CP0_64(5, 5)
-#define KVM_REG_MIPS_CP0_PWFIELD        MIPS_CP0_64(5, 6)
-#define KVM_REG_MIPS_CP0_PWSIZE         MIPS_CP0_64(5, 7)
-#define KVM_REG_MIPS_CP0_WIRED          MIPS_CP0_32(6, 0)
-#define KVM_REG_MIPS_CP0_PWCTL          MIPS_CP0_32(6, 6)
-#define KVM_REG_MIPS_CP0_HWRENA         MIPS_CP0_32(7, 0)
-#define KVM_REG_MIPS_CP0_BADVADDR       MIPS_CP0_64(8, 0)
-#define KVM_REG_MIPS_CP0_COUNT          MIPS_CP0_32(9, 0)
-#define KVM_REG_MIPS_CP0_ENTRYHI        MIPS_CP0_64(10, 0)
-#define KVM_REG_MIPS_CP0_COMPARE        MIPS_CP0_32(11, 0)
-#define KVM_REG_MIPS_CP0_STATUS         MIPS_CP0_32(12, 0)
-#define KVM_REG_MIPS_CP0_CAUSE          MIPS_CP0_32(13, 0)
-#define KVM_REG_MIPS_CP0_EPC            MIPS_CP0_64(14, 0)
-#define KVM_REG_MIPS_CP0_PRID           MIPS_CP0_32(15, 0)
-#define KVM_REG_MIPS_CP0_EBASE          MIPS_CP0_64(15, 1)
-#define KVM_REG_MIPS_CP0_CONFIG         MIPS_CP0_32(16, 0)
-#define KVM_REG_MIPS_CP0_CONFIG1        MIPS_CP0_32(16, 1)
-#define KVM_REG_MIPS_CP0_CONFIG2        MIPS_CP0_32(16, 2)
-#define KVM_REG_MIPS_CP0_CONFIG3        MIPS_CP0_32(16, 3)
-#define KVM_REG_MIPS_CP0_CONFIG4        MIPS_CP0_32(16, 4)
-#define KVM_REG_MIPS_CP0_CONFIG5        MIPS_CP0_32(16, 5)
-#define KVM_REG_MIPS_CP0_CONFIG6        MIPS_CP0_32(16, 6)
-#define KVM_REG_MIPS_CP0_XCONTEXT       MIPS_CP0_64(20, 0)
-#define KVM_REG_MIPS_CP0_ERROREPC       MIPS_CP0_64(30, 0)
-#define KVM_REG_MIPS_CP0_KSCRATCH1      MIPS_CP0_64(31, 2)
-#define KVM_REG_MIPS_CP0_KSCRATCH2      MIPS_CP0_64(31, 3)
-#define KVM_REG_MIPS_CP0_KSCRATCH3      MIPS_CP0_64(31, 4)
-#define KVM_REG_MIPS_CP0_KSCRATCH4      MIPS_CP0_64(31, 5)
-#define KVM_REG_MIPS_CP0_KSCRATCH5      MIPS_CP0_64(31, 6)
-#define KVM_REG_MIPS_CP0_KSCRATCH6      MIPS_CP0_64(31, 7)
+#define KVM_REG_MIPS_CP0_INDEX MIPS_CP0_32(0, 0)
+#define KVM_REG_MIPS_CP0_RANDOM MIPS_CP0_32(1, 0)
+#define KVM_REG_MIPS_CP0_CONTEXT MIPS_CP0_64(4, 0)
+#define KVM_REG_MIPS_CP0_USERLOCAL MIPS_CP0_64(4, 2)
+#define KVM_REG_MIPS_CP0_PAGEMASK MIPS_CP0_32(5, 0)
+#define KVM_REG_MIPS_CP0_PAGEGRAIN MIPS_CP0_32(5, 1)
+#define KVM_REG_MIPS_CP0_PWBASE MIPS_CP0_64(5, 5)
+#define KVM_REG_MIPS_CP0_PWFIELD MIPS_CP0_64(5, 6)
+#define KVM_REG_MIPS_CP0_PWSIZE MIPS_CP0_64(5, 7)
+#define KVM_REG_MIPS_CP0_WIRED MIPS_CP0_32(6, 0)
+#define KVM_REG_MIPS_CP0_PWCTL MIPS_CP0_32(6, 6)
+#define KVM_REG_MIPS_CP0_HWRENA MIPS_CP0_32(7, 0)
+#define KVM_REG_MIPS_CP0_BADVADDR MIPS_CP0_64(8, 0)
+#define KVM_REG_MIPS_CP0_COUNT MIPS_CP0_32(9, 0)
+#define KVM_REG_MIPS_CP0_ENTRYHI MIPS_CP0_64(10, 0)
+#define KVM_REG_MIPS_CP0_COMPARE MIPS_CP0_32(11, 0)
+#define KVM_REG_MIPS_CP0_STATUS MIPS_CP0_32(12, 0)
+#define KVM_REG_MIPS_CP0_CAUSE MIPS_CP0_32(13, 0)
+#define KVM_REG_MIPS_CP0_EPC MIPS_CP0_64(14, 0)
+#define KVM_REG_MIPS_CP0_PRID MIPS_CP0_32(15, 0)
+#define KVM_REG_MIPS_CP0_EBASE MIPS_CP0_64(15, 1)
+#define KVM_REG_MIPS_CP0_CONFIG MIPS_CP0_32(16, 0)
+#define KVM_REG_MIPS_CP0_CONFIG1 MIPS_CP0_32(16, 1)
+#define KVM_REG_MIPS_CP0_CONFIG2 MIPS_CP0_32(16, 2)
+#define KVM_REG_MIPS_CP0_CONFIG3 MIPS_CP0_32(16, 3)
+#define KVM_REG_MIPS_CP0_CONFIG4 MIPS_CP0_32(16, 4)
+#define KVM_REG_MIPS_CP0_CONFIG5 MIPS_CP0_32(16, 5)
+#define KVM_REG_MIPS_CP0_CONFIG6 MIPS_CP0_32(16, 6)
+#define KVM_REG_MIPS_CP0_XCONTEXT MIPS_CP0_64(20, 0)
+#define KVM_REG_MIPS_CP0_ERROREPC MIPS_CP0_64(30, 0)
+#define KVM_REG_MIPS_CP0_KSCRATCH1 MIPS_CP0_64(31, 2)
+#define KVM_REG_MIPS_CP0_KSCRATCH2 MIPS_CP0_64(31, 3)
+#define KVM_REG_MIPS_CP0_KSCRATCH3 MIPS_CP0_64(31, 4)
+#define KVM_REG_MIPS_CP0_KSCRATCH4 MIPS_CP0_64(31, 5)
+#define KVM_REG_MIPS_CP0_KSCRATCH5 MIPS_CP0_64(31, 6)
+#define KVM_REG_MIPS_CP0_KSCRATCH6 MIPS_CP0_64(31, 7)
 
 static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
                                        int32_t *addr)
 {
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)addr
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)addr };
 
     return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &cp0reg);
 }
@@ -290,10 +290,7 @@ static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
 static inline int kvm_mips_put_one_ureg(CPUState *cs, uint64_t reg_id,
                                         uint32_t *addr)
 {
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)addr
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)addr };
 
     return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &cp0reg);
 }
@@ -302,10 +299,7 @@ static inline int kvm_mips_put_one_ulreg(CPUState *cs, uint64_t reg_id,
                                          target_ulong *addr)
 {
     uint64_t val64 = *addr;
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)&val64
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)&val64 };
 
     return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &cp0reg);
 }
@@ -313,10 +307,7 @@ static inline int kvm_mips_put_one_ulreg(CPUState *cs, uint64_t reg_id,
 static inline int kvm_mips_put_one_reg64(CPUState *cs, uint64_t reg_id,
                                          int64_t *addr)
 {
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)addr
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)addr };
 
     return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &cp0reg);
 }
@@ -324,10 +315,7 @@ static inline int kvm_mips_put_one_reg64(CPUState *cs, uint64_t reg_id,
 static inline int kvm_mips_put_one_ureg64(CPUState *cs, uint64_t reg_id,
                                           uint64_t *addr)
 {
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)addr
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)addr };
 
     return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &cp0reg);
 }
@@ -335,10 +323,7 @@ static inline int kvm_mips_put_one_ureg64(CPUState *cs, uint64_t reg_id,
 static inline int kvm_mips_get_one_reg(CPUState *cs, uint64_t reg_id,
                                        int32_t *addr)
 {
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)addr
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)addr };
 
     return kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &cp0reg);
 }
@@ -346,10 +331,7 @@ static inline int kvm_mips_get_one_reg(CPUState *cs, uint64_t reg_id,
 static inline int kvm_mips_get_one_ureg(CPUState *cs, uint64_t reg_id,
                                         uint32_t *addr)
 {
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)addr
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)addr };
 
     return kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &cp0reg);
 }
@@ -359,10 +341,7 @@ static inline int kvm_mips_get_one_ulreg(CPUState *cs, uint64_t reg_id,
 {
     int ret;
     uint64_t val64 = 0;
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)&val64
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)&val64 };
 
     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &cp0reg);
     if (ret >= 0) {
@@ -374,10 +353,7 @@ static inline int kvm_mips_get_one_ulreg(CPUState *cs, uint64_t reg_id,
 static inline int kvm_mips_get_one_reg64(CPUState *cs, uint64_t reg_id,
                                          int64_t *addr)
 {
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)addr
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)addr };
 
     return kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &cp0reg);
 }
@@ -385,48 +361,28 @@ static inline int kvm_mips_get_one_reg64(CPUState *cs, uint64_t reg_id,
 static inline int kvm_mips_get_one_ureg64(CPUState *cs, uint64_t reg_id,
                                           uint64_t *addr)
 {
-    struct kvm_one_reg cp0reg = {
-        .id = reg_id,
-        .addr = (uintptr_t)addr
-    };
+    struct kvm_one_reg cp0reg = { .id = reg_id, .addr = (uintptr_t)addr };
 
     return kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &cp0reg);
 }
 
-#define KVM_REG_MIPS_CP0_CONFIG_MASK    (1U << CP0C0_M)
-#define KVM_REG_MIPS_CP0_CONFIG1_MASK   ((1U << CP0C1_M) | \
-                                         (1U << CP0C1_FP))
-#define KVM_REG_MIPS_CP0_CONFIG2_MASK   (1U << CP0C2_M)
-#define KVM_REG_MIPS_CP0_CONFIG3_MASK   ((1U << CP0C3_M) | \
-                                         (1U << CP0C3_MSAP))
-#define KVM_REG_MIPS_CP0_CONFIG4_MASK   (1U << CP0C4_M)
-#define KVM_REG_MIPS_CP0_CONFIG5_MASK   ((1U << CP0C5_MSAEn) | \
-                                         (1U << CP0C5_UFE) | \
-                                         (1U << CP0C5_FRE) | \
-                                         (1U << CP0C5_UFR))
-#define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
-                                         (0x3fU << CP0C6_KPOS) | \
-                                         (1U << CP0C6_KE) | \
-                                         (1U << CP0C6_VTLBONLY) | \
-                                         (1U << CP0C6_LASX) | \
-                                         (1U << CP0C6_SSEN) | \
-                                         (1U << CP0C6_DISDRTIME) | \
-                                         (1U << CP0C6_PIXNUEN) | \
-                                         (1U << CP0C6_SCRAND) | \
-                                         (1U << CP0C6_LLEXCEN) | \
-                                         (1U << CP0C6_DISVC) | \
-                                         (1U << CP0C6_VCLRU) | \
-                                         (1U << CP0C6_DCLRU) | \
-                                         (1U << CP0C6_PIXUEN) | \
-                                         (1U << CP0C6_DISBLKLYEN) | \
-                                         (1U << CP0C6_UMEMUALEN) | \
-                                         (1U << CP0C6_SFBEN) | \
-                                         (1U << CP0C6_FLTINT) | \
-                                         (1U << CP0C6_VLTINT) | \
-                                         (1U << CP0C6_DISBTB) | \
-                                         (3U << CP0C6_STPREFCTL) | \
-                                         (1U << CP0C6_INSTPREF) | \
-                                         (1U << CP0C6_DATAPREF))
+#define KVM_REG_MIPS_CP0_CONFIG_MASK (1U << CP0C0_M)
+#define KVM_REG_MIPS_CP0_CONFIG1_MASK ((1U << CP0C1_M) | (1U << CP0C1_FP))
+#define KVM_REG_MIPS_CP0_CONFIG2_MASK (1U << CP0C2_M)
+#define KVM_REG_MIPS_CP0_CONFIG3_MASK ((1U << CP0C3_M) | (1U << CP0C3_MSAP))
+#define KVM_REG_MIPS_CP0_CONFIG4_MASK (1U << CP0C4_M)
+#define KVM_REG_MIPS_CP0_CONFIG5_MASK                              \
+    ((1U << CP0C5_MSAEn) | (1U << CP0C5_UFE) | (1U << CP0C5_FRE) | \
+     (1U << CP0C5_UFR))
+#define KVM_REG_MIPS_CP0_CONFIG6_MASK                                         \
+    ((1U << CP0C6_BPPASS) | (0x3fU << CP0C6_KPOS) | (1U << CP0C6_KE) |        \
+     (1U << CP0C6_VTLBONLY) | (1U << CP0C6_LASX) | (1U << CP0C6_SSEN) |       \
+     (1U << CP0C6_DISDRTIME) | (1U << CP0C6_PIXNUEN) | (1U << CP0C6_SCRAND) | \
+     (1U << CP0C6_LLEXCEN) | (1U << CP0C6_DISVC) | (1U << CP0C6_VCLRU) |      \
+     (1U << CP0C6_DCLRU) | (1U << CP0C6_PIXUEN) | (1U << CP0C6_DISBLKLYEN) |  \
+     (1U << CP0C6_UMEMUALEN) | (1U << CP0C6_SFBEN) | (1U << CP0C6_FLTINT) |   \
+     (1U << CP0C6_VLTINT) | (1U << CP0C6_DISBTB) | (3U << CP0C6_STPREFCTL) |  \
+     (1U << CP0C6_INSTPREF) | (1U << CP0C6_DATAPREF))
 
 static inline int kvm_mips_change_one_reg(CPUState *cs, uint64_t reg_id,
                                           int32_t *addr, int32_t mask)
@@ -624,8 +580,9 @@ static int kvm_mips_put_fpu_registers(CPUState *cs, int level)
                     err = kvm_mips_put_one_ureg64(cs, KVM_REG_MIPS_FPR_64(i),
                                                   &env->active_fpu.fpr[i].d);
                 } else {
-                    err = kvm_mips_get_one_ureg(cs, KVM_REG_MIPS_FPR_32(i),
-                                    &env->active_fpu.fpr[i].w[FP_ENDIAN_IDX]);
+                    err = kvm_mips_get_one_ureg(
+                        cs, KVM_REG_MIPS_FPR_32(i),
+                        &env->active_fpu.fpr[i].w[FP_ENDIAN_IDX]);
                 }
                 if (err < 0) {
                     DPRINTF("%s: Failed to put FPR%u (%d)\n", __func__, i, err);
@@ -639,8 +596,7 @@ static int kvm_mips_put_fpu_registers(CPUState *cs, int level)
     if (ase_msa_available(env)) {
         /* MSA Control Registers */
         if (level == KVM_PUT_FULL_STATE) {
-            err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_MSA_IR,
-                                       &env->msair);
+            err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_MSA_IR, &env->msair);
             if (err < 0) {
                 DPRINTF("%s: Failed to put MSA_IR (%d)\n", __func__, err);
                 ret = err;
@@ -704,8 +660,9 @@ static int kvm_mips_get_fpu_registers(CPUState *cs)
                     err = kvm_mips_get_one_ureg64(cs, KVM_REG_MIPS_FPR_64(i),
                                                   &env->active_fpu.fpr[i].d);
                 } else {
-                    err = kvm_mips_get_one_ureg(cs, KVM_REG_MIPS_FPR_32(i),
-                                    &env->active_fpu.fpr[i].w[FP_ENDIAN_IDX]);
+                    err = kvm_mips_get_one_ureg(
+                        cs, KVM_REG_MIPS_FPR_32(i),
+                        &env->active_fpu.fpr[i].w[FP_ENDIAN_IDX]);
                 }
                 if (err < 0) {
                     DPRINTF("%s: Failed to get FPR%u (%d)\n", __func__, i, err);
@@ -718,8 +675,7 @@ static int kvm_mips_get_fpu_registers(CPUState *cs)
     /* Only get MSA state if we're emulating a CPU with MSA */
     if (ase_msa_available(env)) {
         /* MSA Control Registers */
-        err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_MSA_IR,
-                                   &env->msair);
+        err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_MSA_IR, &env->msair);
         if (err < 0) {
             DPRINTF("%s: Failed to get MSA_IR (%d)\n", __func__, err);
             ret = err;
@@ -767,8 +723,8 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
         DPRINTF("%s: Failed to put CP0_RANDOM (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT,
-                                 &env->CP0_Context);
+    err =
+        kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT, &env->CP0_Context);
     if (err < 0) {
         DPRINTF("%s: Failed to put CP0_CONTEXT (%d)\n", __func__, err);
         ret = err;
@@ -779,8 +735,8 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
         DPRINTF("%s: Failed to put CP0_USERLOCAL (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_PAGEMASK,
-                               &env->CP0_PageMask);
+    err =
+        kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_PAGEMASK, &env->CP0_PageMask);
     if (err < 0) {
         DPRINTF("%s: Failed to put CP0_PAGEMASK (%d)\n", __func__, err);
         ret = err;
@@ -791,20 +747,18 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
         DPRINTF("%s: Failed to put CP0_PAGEGRAIN (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE,
-                               &env->CP0_PWBase);
+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE, &env->CP0_PWBase);
     if (err < 0) {
         DPRINTF("%s: Failed to put CP0_PWBASE (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD,
-                               &env->CP0_PWField);
+    err =
+        kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD, &env->CP0_PWField);
     if (err < 0) {
         DPRINTF("%s: Failed to put CP0_PWField (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE,
-                               &env->CP0_PWSize);
+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE, &env->CP0_PWSize);
     if (err < 0) {
         DPRINTF("%s: Failed to put CP0_PWSIZE (%d)\n", __func__, err);
         ret = err;
@@ -839,14 +793,13 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
         }
     }
 
-    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_ENTRYHI,
-                                 &env->CP0_EntryHi);
+    err =
+        kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_ENTRYHI, &env->CP0_EntryHi);
     if (err < 0) {
         DPRINTF("%s: Failed to put CP0_ENTRYHI (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_COMPARE,
-                               &env->CP0_Compare);
+    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_COMPARE, &env->CP0_Compare);
     if (err < 0) {
         DPRINTF("%s: Failed to put CP0_COMPARE (%d)\n", __func__, err);
         ret = err;
@@ -871,51 +824,51 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
         DPRINTF("%s: Failed to put CP0_EBASE (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG,
-                                  &env->CP0_Config0,
-                                  KVM_REG_MIPS_CP0_CONFIG_MASK);
+    err =
+        kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG, &env->CP0_Config0,
+                                KVM_REG_MIPS_CP0_CONFIG_MASK);
     if (err < 0) {
         DPRINTF("%s: Failed to change CP0_CONFIG (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG1,
-                                  &env->CP0_Config1,
-                                  KVM_REG_MIPS_CP0_CONFIG1_MASK);
+    err =
+        kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG1, &env->CP0_Config1,
+                                KVM_REG_MIPS_CP0_CONFIG1_MASK);
     if (err < 0) {
         DPRINTF("%s: Failed to change CP0_CONFIG1 (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG2,
-                                  &env->CP0_Config2,
-                                  KVM_REG_MIPS_CP0_CONFIG2_MASK);
+    err =
+        kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG2, &env->CP0_Config2,
+                                KVM_REG_MIPS_CP0_CONFIG2_MASK);
     if (err < 0) {
         DPRINTF("%s: Failed to change CP0_CONFIG2 (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG3,
-                                  &env->CP0_Config3,
-                                  KVM_REG_MIPS_CP0_CONFIG3_MASK);
+    err =
+        kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG3, &env->CP0_Config3,
+                                KVM_REG_MIPS_CP0_CONFIG3_MASK);
     if (err < 0) {
         DPRINTF("%s: Failed to change CP0_CONFIG3 (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG4,
-                                  &env->CP0_Config4,
-                                  KVM_REG_MIPS_CP0_CONFIG4_MASK);
+    err =
+        kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG4, &env->CP0_Config4,
+                                KVM_REG_MIPS_CP0_CONFIG4_MASK);
     if (err < 0) {
         DPRINTF("%s: Failed to change CP0_CONFIG4 (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG5,
-                                  &env->CP0_Config5,
-                                  KVM_REG_MIPS_CP0_CONFIG5_MASK);
+    err =
+        kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG5, &env->CP0_Config5,
+                                KVM_REG_MIPS_CP0_CONFIG5_MASK);
     if (err < 0) {
         DPRINTF("%s: Failed to change CP0_CONFIG5 (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG6,
-                                  &env->CP0_Config6,
-                                  KVM_REG_MIPS_CP0_CONFIG6_MASK);
+    err =
+        kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG6, &env->CP0_Config6,
+                                KVM_REG_MIPS_CP0_CONFIG6_MASK);
     if (err < 0) {
         DPRINTF("%s: Failed to change CP0_CONFIG6 (%d)\n", __func__, err);
         ret = err;
@@ -988,8 +941,8 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
         DPRINTF("%s: Failed to get CP0_RANDOM (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT,
-                                 &env->CP0_Context);
+    err =
+        kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT, &env->CP0_Context);
     if (err < 0) {
         DPRINTF("%s: Failed to get CP0_CONTEXT (%d)\n", __func__, err);
         ret = err;
@@ -1000,8 +953,8 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
         DPRINTF("%s: Failed to get CP0_USERLOCAL (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_PAGEMASK,
-                               &env->CP0_PageMask);
+    err =
+        kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_PAGEMASK, &env->CP0_PageMask);
     if (err < 0) {
         DPRINTF("%s: Failed to get CP0_PAGEMASK (%d)\n", __func__, err);
         ret = err;
@@ -1012,20 +965,18 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
         DPRINTF("%s: Failed to get CP0_PAGEGRAIN (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE,
-                               &env->CP0_PWBase);
+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE, &env->CP0_PWBase);
     if (err < 0) {
         DPRINTF("%s: Failed to get CP0_PWBASE (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD,
-                               &env->CP0_PWField);
+    err =
+        kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD, &env->CP0_PWField);
     if (err < 0) {
         DPRINTF("%s: Failed to get CP0_PWFIELD (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE,
-                               &env->CP0_PWSize);
+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE, &env->CP0_PWSize);
     if (err < 0) {
         DPRINTF("%s: Failed to get CP0_PWSIZE (%d)\n", __func__, err);
         ret = err;
@@ -1051,14 +1002,13 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
         DPRINTF("%s: Failed to get CP0_BADVADDR (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_ENTRYHI,
-                                 &env->CP0_EntryHi);
+    err =
+        kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_ENTRYHI, &env->CP0_EntryHi);
     if (err < 0) {
         DPRINTF("%s: Failed to get CP0_ENTRYHI (%d)\n", __func__, err);
         ret = err;
     }
-    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_COMPARE,
-                               &env->CP0_Compare);
+    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_COMPARE, &env->CP0_Compare);
     if (err < 0) {
         DPRINTF("%s: Failed to get CP0_COMPARE (%d)\n", __func__, err);
         ret = err;
@@ -1250,8 +1200,8 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
     return 0;
 }
 
-int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
-                                int vector, PCIDevice *dev)
+int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route, int vector,
+                                PCIDevice *dev)
 {
     return 0;
 }

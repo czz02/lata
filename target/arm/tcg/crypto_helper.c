@@ -19,17 +19,17 @@
 #include "vec_internal.h"
 
 union CRYPTO_STATE {
-    uint8_t    bytes[16];
-    uint32_t   words[4];
-    uint64_t   l[2];
+    uint8_t bytes[16];
+    uint32_t words[4];
+    uint64_t l[2];
 };
 
 #if HOST_BIG_ENDIAN
-#define CR_ST_BYTE(state, i)   ((state).bytes[(15 - (i)) ^ 8])
-#define CR_ST_WORD(state, i)   ((state).words[(3 - (i)) ^ 2])
+#define CR_ST_BYTE(state, i) ((state).bytes[(15 - (i)) ^ 8])
+#define CR_ST_WORD(state, i) ((state).words[(3 - (i)) ^ 2])
 #else
-#define CR_ST_BYTE(state, i)   ((state).bytes[i])
-#define CR_ST_WORD(state, i)   ((state).words[i])
+#define CR_ST_BYTE(state, i) ((state).bytes[i])
+#define CR_ST_WORD(state, i) ((state).words[i])
 #endif
 
 /*
@@ -45,7 +45,7 @@ static void clear_tail_16(void *vd, uint32_t desc)
     clear_tail(vd, opr_sz, max_sz);
 }
 
-static const AESState aes_zero = { };
+static const AESState aes_zero = {};
 
 void HELPER(crypto_aese)(void *vd, void *vn, void *vm, uint32_t desc)
 {
@@ -179,8 +179,8 @@ void HELPER(crypto_sha1su0)(void *vd, void *vn, void *vm, uint32_t desc)
     clear_tail_16(vd, desc);
 }
 
-static inline void crypto_sha1_3reg(uint64_t *rd, uint64_t *rn,
-                                    uint64_t *rm, uint32_t desc,
+static inline void crypto_sha1_3reg(uint64_t *rd, uint64_t *rn, uint64_t *rm,
+                                    uint32_t desc,
                                     uint32_t (*fn)(union CRYPTO_STATE *d))
 {
     union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
@@ -191,8 +191,7 @@ static inline void crypto_sha1_3reg(uint64_t *rd, uint64_t *rn,
     for (i = 0; i < 4; i++) {
         uint32_t t = fn(&d);
 
-        t += rol32(CR_ST_WORD(d, 0), 5) + CR_ST_WORD(n, 0)
-             + CR_ST_WORD(m, i);
+        t += rol32(CR_ST_WORD(d, 0), 5) + CR_ST_WORD(n, 0) + CR_ST_WORD(m, i);
 
         CR_ST_WORD(n, 0) = CR_ST_WORD(d, 3);
         CR_ST_WORD(d, 3) = CR_ST_WORD(d, 2);
@@ -305,17 +304,16 @@ void HELPER(crypto_sha256h)(void *vd, void *vn, void *vm, uint32_t desc)
     int i;
 
     for (i = 0; i < 4; i++) {
-        uint32_t t = cho(CR_ST_WORD(n, 0), CR_ST_WORD(n, 1), CR_ST_WORD(n, 2))
-                     + CR_ST_WORD(n, 3) + S1(CR_ST_WORD(n, 0))
-                     + CR_ST_WORD(m, i);
+        uint32_t t = cho(CR_ST_WORD(n, 0), CR_ST_WORD(n, 1), CR_ST_WORD(n, 2)) +
+                     CR_ST_WORD(n, 3) + S1(CR_ST_WORD(n, 0)) + CR_ST_WORD(m, i);
 
         CR_ST_WORD(n, 3) = CR_ST_WORD(n, 2);
         CR_ST_WORD(n, 2) = CR_ST_WORD(n, 1);
         CR_ST_WORD(n, 1) = CR_ST_WORD(n, 0);
         CR_ST_WORD(n, 0) = CR_ST_WORD(d, 3) + t;
 
-        t += maj(CR_ST_WORD(d, 0), CR_ST_WORD(d, 1), CR_ST_WORD(d, 2))
-             + S0(CR_ST_WORD(d, 0));
+        t += maj(CR_ST_WORD(d, 0), CR_ST_WORD(d, 1), CR_ST_WORD(d, 2)) +
+             S0(CR_ST_WORD(d, 0));
 
         CR_ST_WORD(d, 3) = CR_ST_WORD(d, 2);
         CR_ST_WORD(d, 2) = CR_ST_WORD(d, 1);
@@ -340,9 +338,8 @@ void HELPER(crypto_sha256h2)(void *vd, void *vn, void *vm, uint32_t desc)
     int i;
 
     for (i = 0; i < 4; i++) {
-        uint32_t t = cho(CR_ST_WORD(d, 0), CR_ST_WORD(d, 1), CR_ST_WORD(d, 2))
-                     + CR_ST_WORD(d, 3) + S1(CR_ST_WORD(d, 0))
-                     + CR_ST_WORD(m, i);
+        uint32_t t = cho(CR_ST_WORD(d, 0), CR_ST_WORD(d, 1), CR_ST_WORD(d, 2)) +
+                     CR_ST_WORD(d, 3) + S1(CR_ST_WORD(d, 0)) + CR_ST_WORD(m, i);
 
         CR_ST_WORD(d, 3) = CR_ST_WORD(d, 2);
         CR_ST_WORD(d, 2) = CR_ST_WORD(d, 1);
@@ -540,9 +537,9 @@ void HELPER(crypto_sm3partw2)(void *vd, void *vn, void *vm, uint32_t desc)
     clear_tail_16(vd, desc);
 }
 
-static inline void QEMU_ALWAYS_INLINE
-crypto_sm3tt(uint64_t *rd, uint64_t *rn, uint64_t *rm,
-             uint32_t desc, uint32_t opcode)
+static inline void QEMU_ALWAYS_INLINE crypto_sm3tt(uint64_t *rd, uint64_t *rn,
+                                                   uint64_t *rm, uint32_t desc,
+                                                   uint32_t opcode)
 {
     union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
     union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
@@ -591,9 +588,11 @@ crypto_sm3tt(uint64_t *rd, uint64_t *rn, uint64_t *rm,
     clear_tail_16(rd, desc);
 }
 
-#define DO_SM3TT(NAME, OPCODE) \
+#define DO_SM3TT(NAME, OPCODE)                                     \
     void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc) \
-    { crypto_sm3tt(vd, vn, vm, desc, OPCODE); }
+    {                                                              \
+        crypto_sm3tt(vd, vn, vm, desc, OPCODE);                    \
+    }
 
 DO_SM3TT(crypto_sm3tt1a, 0)
 DO_SM3TT(crypto_sm3tt1b, 1)
@@ -609,18 +608,14 @@ static void do_crypto_sm4e(uint64_t *rd, uint64_t *rn, uint64_t *rm)
     uint32_t t, i;
 
     for (i = 0; i < 4; i++) {
-        t = CR_ST_WORD(d, (i + 1) % 4) ^
-            CR_ST_WORD(d, (i + 2) % 4) ^
-            CR_ST_WORD(d, (i + 3) % 4) ^
-            CR_ST_WORD(n, i);
+        t = CR_ST_WORD(d, (i + 1) % 4) ^ CR_ST_WORD(d, (i + 2) % 4) ^
+            CR_ST_WORD(d, (i + 3) % 4) ^ CR_ST_WORD(n, i);
 
-        t = sm4_sbox[t & 0xff] |
-            sm4_sbox[(t >> 8) & 0xff] << 8 |
-            sm4_sbox[(t >> 16) & 0xff] << 16 |
-            sm4_sbox[(t >> 24) & 0xff] << 24;
+        t = sm4_sbox[t & 0xff] | sm4_sbox[(t >> 8) & 0xff] << 8 |
+            sm4_sbox[(t >> 16) & 0xff] << 16 | sm4_sbox[(t >> 24) & 0xff] << 24;
 
-        CR_ST_WORD(d, i) ^= t ^ rol32(t, 2) ^ rol32(t, 10) ^ rol32(t, 18) ^
-                            rol32(t, 24);
+        CR_ST_WORD(d, i) ^=
+            t ^ rol32(t, 2) ^ rol32(t, 10) ^ rol32(t, 18) ^ rol32(t, 24);
     }
 
     rd[0] = d.l[0];
@@ -646,15 +641,11 @@ static void do_crypto_sm4ekey(uint64_t *rd, uint64_t *rn, uint64_t *rm)
 
     d = n;
     for (i = 0; i < 4; i++) {
-        t = CR_ST_WORD(d, (i + 1) % 4) ^
-            CR_ST_WORD(d, (i + 2) % 4) ^
-            CR_ST_WORD(d, (i + 3) % 4) ^
-            CR_ST_WORD(m, i);
+        t = CR_ST_WORD(d, (i + 1) % 4) ^ CR_ST_WORD(d, (i + 2) % 4) ^
+            CR_ST_WORD(d, (i + 3) % 4) ^ CR_ST_WORD(m, i);
 
-        t = sm4_sbox[t & 0xff] |
-            sm4_sbox[(t >> 8) & 0xff] << 8 |
-            sm4_sbox[(t >> 16) & 0xff] << 16 |
-            sm4_sbox[(t >> 24) & 0xff] << 24;
+        t = sm4_sbox[t & 0xff] | sm4_sbox[(t >> 8) & 0xff] << 8 |
+            sm4_sbox[(t >> 16) & 0xff] << 16 | sm4_sbox[(t >> 24) & 0xff] << 24;
 
         CR_ST_WORD(d, i) ^= t ^ rol32(t, 13) ^ rol32(t, 23);
     }
@@ -663,7 +654,7 @@ static void do_crypto_sm4ekey(uint64_t *rd, uint64_t *rn, uint64_t *rm)
     rd[1] = d.l[1];
 }
 
-void HELPER(crypto_sm4ekey)(void *vd, void *vn, void* vm, uint32_t desc)
+void HELPER(crypto_sm4ekey)(void *vd, void *vn, void *vm, uint32_t desc)
 {
     intptr_t i, opr_sz = simd_oprsz(desc);
 

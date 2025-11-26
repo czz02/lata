@@ -48,7 +48,8 @@ static const CompatInfo compat_table[] = {
     /*
      * Ordered from oldest to newest - the code relies on this
      */
-    { /* POWER6, ISA2.05 */
+    {
+        /* POWER6, ISA2.05 */
         .name = "power6",
         .pvr = CPU_POWERPC_LOGICAL_2_05,
         .pcr = PCR_COMPAT_3_10 | PCR_COMPAT_3_00 | PCR_COMPAT_2_07 |
@@ -56,7 +57,8 @@ static const CompatInfo compat_table[] = {
         .pcr_level = PCR_COMPAT_2_05,
         .max_vthreads = 2,
     },
-    { /* POWER7, ISA2.06 */
+    {
+        /* POWER7, ISA2.06 */
         .name = "power7",
         .pvr = CPU_POWERPC_LOGICAL_2_06,
         .pcr = PCR_COMPAT_3_10 | PCR_COMPAT_3_00 | PCR_COMPAT_2_07 |
@@ -72,14 +74,16 @@ static const CompatInfo compat_table[] = {
         .pcr_level = PCR_COMPAT_2_06,
         .max_vthreads = 4,
     },
-    { /* POWER8, ISA2.07 */
+    {
+        /* POWER8, ISA2.07 */
         .name = "power8",
         .pvr = CPU_POWERPC_LOGICAL_2_07,
         .pcr = PCR_COMPAT_3_10 | PCR_COMPAT_3_00 | PCR_COMPAT_2_07,
         .pcr_level = PCR_COMPAT_2_07,
         .max_vthreads = 8,
     },
-    { /* POWER9, ISA3.00 */
+    {
+        /* POWER9, ISA3.00 */
         .name = "power9",
         .pvr = CPU_POWERPC_LOGICAL_3_00,
         .pcr = PCR_COMPAT_3_10 | PCR_COMPAT_3_00,
@@ -93,7 +97,8 @@ static const CompatInfo compat_table[] = {
          */
         .max_vthreads = 8,
     },
-    { /* POWER10, ISA3.10 */
+    {
+        /* POWER10, ISA3.10 */
         .name = "power10",
         .pvr = CPU_POWERPC_LOGICAL_3_10,
         .pcr = PCR_COMPAT_3_10,
@@ -168,10 +173,10 @@ int ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
     if (!compat_pvr) {
         pcr = 0;
     } else if (!compat) {
-        error_setg(errp, "Unknown compatibility PVR 0x%08"PRIx32, compat_pvr);
+        error_setg(errp, "Unknown compatibility PVR 0x%08" PRIx32, compat_pvr);
         return -EINVAL;
     } else if (!ppc_check_compat(cpu, compat_pvr, 0, 0)) {
-        error_setg(errp, "Compatibility PVR 0x%08"PRIx32" not valid for CPU",
+        error_setg(errp, "Compatibility PVR 0x%08" PRIx32 " not valid for CPU",
                    compat_pvr);
         return -EINVAL;
     } else {
@@ -212,7 +217,7 @@ int ppc_set_compat_all(uint32_t compat_pvr, Error **errp)
 {
     CPUState *cs;
 
-    CPU_FOREACH(cs) {
+    CPU_FOREACH (cs) {
         SetCompatState s = {
             .compat_pvr = compat_pvr,
             .errp = errp,
@@ -281,7 +286,6 @@ static void ppc_compat_prop_set(Object *obj, Visitor *v, const char *name,
             if (strcmp(value, compat_table[i].name) == 0) {
                 compat = &compat_table[i];
                 break;
-
             }
         }
 
@@ -305,9 +309,8 @@ void ppc_compat_add_property(Object *obj, const char *name,
     gchar *names, *desc;
     int i;
 
-    object_property_add(obj, name, "string",
-                        ppc_compat_prop_get, ppc_compat_prop_set, NULL,
-                        compat_pvr);
+    object_property_add(obj, name, "string", ppc_compat_prop_get,
+                        ppc_compat_prop_set, NULL, compat_pvr);
 
     for (i = 0; i < ARRAY_SIZE(compat_table); i++) {
         /*

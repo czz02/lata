@@ -91,10 +91,10 @@ static uint32_t vfp_get_fpscr_from_host(CPUARMState *env)
     i = get_float_exception_flags(&env->vfp.fp_status);
     i |= get_float_exception_flags(&env->vfp.standard_fp_status);
     /* FZ16 does not generate an input denormal exception.  */
-    i |= (get_float_exception_flags(&env->vfp.fp_status_f16)
-          & ~float_flag_input_denormal);
-    i |= (get_float_exception_flags(&env->vfp.standard_fp_status_f16)
-          & ~float_flag_input_denormal);
+    i |= (get_float_exception_flags(&env->vfp.fp_status_f16) &
+          ~float_flag_input_denormal);
+    i |= (get_float_exception_flags(&env->vfp.standard_fp_status_f16) &
+          ~float_flag_input_denormal);
     return vfp_exceptbits_from_host(i);
 }
 
@@ -170,9 +170,8 @@ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
 {
     uint32_t i, fpscr;
 
-    fpscr = env->vfp.xregs[ARM_VFP_FPSCR]
-            | (env->vfp.vec_len << 16)
-            | (env->vfp.vec_stride << 20);
+    fpscr = env->vfp.xregs[ARM_VFP_FPSCR] | (env->vfp.vec_len << 16) |
+            (env->vfp.vec_stride << 20);
 
     /*
      * M-profile LTPSIZE overlaps A-profile Stride; whichever of the
@@ -216,12 +215,11 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
         env->vfp.vec_len = extract32(val, 16, 3);
         env->vfp.vec_stride = extract32(val, 20, 2);
     } else if (cpu_isar_feature(aa32_mve, cpu)) {
-        env->v7m.ltpsize = extract32(val, FPCR_LTPSIZE_SHIFT,
-                                     FPCR_LTPSIZE_LENGTH);
+        env->v7m.ltpsize =
+            extract32(val, FPCR_LTPSIZE_SHIFT, FPCR_LTPSIZE_LENGTH);
     }
 
-    if (arm_feature(env, ARM_FEATURE_NEON) ||
-        cpu_isar_feature(aa32_mve, cpu)) {
+    if (arm_feature(env, ARM_FEATURE_NEON) || cpu_isar_feature(aa32_mve, cpu)) {
         /*
          * The bit we set within fpscr_q is arbitrary; the register as a
          * whole being zero/non-zero is what counts.
@@ -252,24 +250,25 @@ void vfp_set_fpscr(CPUARMState *env, uint32_t val)
 
 #ifdef CONFIG_TCG
 
-#define VFP_HELPER(name, p) HELPER(glue(glue(vfp_,name),p))
+#define VFP_HELPER(name, p) HELPER(glue(glue(vfp_, name), p))
 
-#define VFP_BINOP(name) \
-dh_ctype_f16 VFP_HELPER(name, h)(dh_ctype_f16 a, dh_ctype_f16 b, void *fpstp) \
-{ \
-    float_status *fpst = fpstp; \
-    return float16_ ## name(a, b, fpst); \
-} \
-float32 VFP_HELPER(name, s)(float32 a, float32 b, void *fpstp) \
-{ \
-    float_status *fpst = fpstp; \
-    return float32_ ## name(a, b, fpst); \
-} \
-float64 VFP_HELPER(name, d)(float64 a, float64 b, void *fpstp) \
-{ \
-    float_status *fpst = fpstp; \
-    return float64_ ## name(a, b, fpst); \
-}
+#define VFP_BINOP(name)                                              \
+    dh_ctype_f16 VFP_HELPER(name, h)(dh_ctype_f16 a, dh_ctype_f16 b, \
+                                     void *fpstp)                    \
+    {                                                                \
+        float_status *fpst = fpstp;                                  \
+        return float16_##name(a, b, fpst);                           \
+    }                                                                \
+    float32 VFP_HELPER(name, s)(float32 a, float32 b, void *fpstp)   \
+    {                                                                \
+        float_status *fpst = fpstp;                                  \
+        return float32_##name(a, b, fpst);                           \
+    }                                                                \
+    float64 VFP_HELPER(name, d)(float64 a, float64 b, void *fpstp)   \
+    {                                                                \
+        float_status *fpst = fpstp;                                  \
+        return float64_##name(a, b, fpst);                           \
+    }
 VFP_BINOP(add)
 VFP_BINOP(sub)
 VFP_BINOP(mul)
@@ -349,60 +348,59 @@ static void softfloat_to_vfp_compare(CPUARMState *env, FloatRelation cmp)
 }
 
 /* XXX: check quiet/signaling case */
-#define DO_VFP_cmp(P, FLOATTYPE, ARGTYPE, FPST) \
-void VFP_HELPER(cmp, P)(ARGTYPE a, ARGTYPE b, CPUARMState *env)  \
-{ \
-    softfloat_to_vfp_compare(env, \
-        FLOATTYPE ## _compare_quiet(a, b, &env->vfp.FPST)); \
-} \
-void VFP_HELPER(cmpe, P)(ARGTYPE a, ARGTYPE b, CPUARMState *env) \
-{ \
-    softfloat_to_vfp_compare(env, \
-        FLOATTYPE ## _compare(a, b, &env->vfp.FPST)); \
-}
+#define DO_VFP_cmp(P, FLOATTYPE, ARGTYPE, FPST)                              \
+    void VFP_HELPER(cmp, P)(ARGTYPE a, ARGTYPE b, CPUARMState * env)         \
+    {                                                                        \
+        softfloat_to_vfp_compare(                                            \
+            env, FLOATTYPE##_compare_quiet(a, b, &env->vfp.FPST));           \
+    }                                                                        \
+    void VFP_HELPER(cmpe, P)(ARGTYPE a, ARGTYPE b, CPUARMState * env)        \
+    {                                                                        \
+        softfloat_to_vfp_compare(env,                                        \
+                                 FLOATTYPE##_compare(a, b, &env->vfp.FPST)); \
+    }
 DO_VFP_cmp(h, float16, dh_ctype_f16, fp_status_f16)
-DO_VFP_cmp(s, float32, float32, fp_status)
-DO_VFP_cmp(d, float64, float64, fp_status)
+    DO_VFP_cmp(s, float32, float32, fp_status)
+        DO_VFP_cmp(d, float64, float64, fp_status)
 #undef DO_VFP_cmp
 
 /* Integer to float and float to integer conversions */
 
 #define CONV_ITOF(name, ftype, fsz, sign)                           \
-ftype HELPER(name)(uint32_t x, void *fpstp)                         \
-{                                                                   \
-    float_status *fpst = fpstp;                                     \
-    return sign##int32_to_##float##fsz((sign##int32_t)x, fpst);     \
-}
+    ftype HELPER(name)(uint32_t x, void *fpstp)                     \
+    {                                                               \
+        float_status *fpst = fpstp;                                 \
+        return sign##int32_to_##float##fsz((sign##int32_t)x, fpst); \
+    }
 
-#define CONV_FTOI(name, ftype, fsz, sign, round)                \
-sign##int32_t HELPER(name)(ftype x, void *fpstp)                \
-{                                                               \
-    float_status *fpst = fpstp;                                 \
-    if (float##fsz##_is_any_nan(x)) {                           \
-        float_raise(float_flag_invalid, fpst);                  \
-        return 0;                                               \
-    }                                                           \
-    return float##fsz##_to_##sign##int32##round(x, fpst);       \
-}
+#define CONV_FTOI(name, ftype, fsz, sign, round)              \
+    sign##int32_t HELPER(name)(ftype x, void *fpstp)          \
+    {                                                         \
+        float_status *fpst = fpstp;                           \
+        if (float##fsz##_is_any_nan(x)) {                     \
+            float_raise(float_flag_invalid, fpst);            \
+            return 0;                                         \
+        }                                                     \
+        return float##fsz##_to_##sign##int32##round(x, fpst); \
+    }
 
-#define FLOAT_CONVS(name, p, ftype, fsz, sign)            \
-    CONV_ITOF(vfp_##name##to##p, ftype, fsz, sign)        \
-    CONV_FTOI(vfp_to##name##p, ftype, fsz, sign, )        \
+#define FLOAT_CONVS(name, p, ftype, fsz, sign)     \
+    CONV_ITOF(vfp_##name##to##p, ftype, fsz, sign) \
+    CONV_FTOI(vfp_to##name##p, ftype, fsz, sign, ) \
     CONV_FTOI(vfp_to##name##z##p, ftype, fsz, sign, _round_to_zero)
 
-FLOAT_CONVS(si, h, uint32_t, 16, )
-FLOAT_CONVS(si, s, float32, 32, )
-FLOAT_CONVS(si, d, float64, 64, )
-FLOAT_CONVS(ui, h, uint32_t, 16, u)
-FLOAT_CONVS(ui, s, float32, 32, u)
-FLOAT_CONVS(ui, d, float64, 64, u)
+            FLOAT_CONVS(si, h, uint32_t, 16, ) FLOAT_CONVS(si, s, float32, 32, )
+                FLOAT_CONVS(si, d, float64, 64, )
+                    FLOAT_CONVS(ui, h, uint32_t, 16, u)
+                        FLOAT_CONVS(ui, s, float32, 32, u)
+                            FLOAT_CONVS(ui, d, float64, 64, u)
 
 #undef CONV_ITOF
 #undef CONV_FTOI
 #undef FLOAT_CONVS
 
-/* floating point conversion */
-float64 VFP_HELPER(fcvtd, s)(float32 x, CPUARMState *env)
+    /* floating point conversion */
+    float64 VFP_HELPER(fcvtd, s)(float32 x, CPUARMState *env)
 {
     return float32_to_float64(x, &env->vfp.fp_status);
 }
@@ -431,48 +429,49 @@ uint32_t HELPER(bfcvt_pair)(uint64_t pair, void *status)
  * round-to-nearest so either helper will work.) AArch32 float-to-fix
  * must round-to-zero.
  */
-#define VFP_CONV_FIX_FLOAT(name, p, fsz, ftype, isz, itype)            \
-ftype HELPER(vfp_##name##to##p)(uint##isz##_t  x, uint32_t shift,      \
-                                     void *fpstp) \
-{ return itype##_to_##float##fsz##_scalbn(x, -shift, fpstp); }
+#define VFP_CONV_FIX_FLOAT(name, p, fsz, ftype, isz, itype)          \
+    ftype HELPER(vfp_##name##to##p)(uint##isz##_t x, uint32_t shift, \
+                                    void *fpstp)                     \
+    {                                                                \
+        return itype##_to_##float##fsz##_scalbn(x, -shift, fpstp);   \
+    }
 
-#define VFP_CONV_FIX_FLOAT_ROUND(name, p, fsz, ftype, isz, itype)      \
-    ftype HELPER(vfp_##name##to##p##_round_to_nearest)(uint##isz##_t  x, \
-                                                     uint32_t shift,   \
-                                                     void *fpstp)      \
-    {                                                                  \
-        ftype ret;                                                     \
-        float_status *fpst = fpstp;                                    \
-        FloatRoundMode oldmode = fpst->float_rounding_mode;            \
-        fpst->float_rounding_mode = float_round_nearest_even;          \
-        ret = itype##_to_##float##fsz##_scalbn(x, -shift, fpstp);      \
-        fpst->float_rounding_mode = oldmode;                           \
-        return ret;                                                    \
+#define VFP_CONV_FIX_FLOAT_ROUND(name, p, fsz, ftype, isz, itype) \
+    ftype HELPER(vfp_##name##to##p##_round_to_nearest)(           \
+        uint##isz##_t x, uint32_t shift, void *fpstp)             \
+    {                                                             \
+        ftype ret;                                                \
+        float_status *fpst = fpstp;                               \
+        FloatRoundMode oldmode = fpst->float_rounding_mode;       \
+        fpst->float_rounding_mode = float_round_nearest_even;     \
+        ret = itype##_to_##float##fsz##_scalbn(x, -shift, fpstp); \
+        fpst->float_rounding_mode = oldmode;                      \
+        return ret;                                               \
     }
 
 #define VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype, ROUND, suff) \
-uint##isz##_t HELPER(vfp_to##name##p##suff)(ftype x, uint32_t shift,      \
-                                            void *fpst)                   \
-{                                                                         \
-    if (unlikely(float##fsz##_is_any_nan(x))) {                           \
-        float_raise(float_flag_invalid, fpst);                            \
-        return 0;                                                         \
-    }                                                                     \
-    return float##fsz##_to_##itype##_scalbn(x, ROUND, shift, fpst);       \
-}
+    uint##isz##_t HELPER(vfp_to##name##p##suff)(ftype x, uint32_t shift,       \
+                                                void *fpst)                    \
+    {                                                                          \
+        if (unlikely(float##fsz##_is_any_nan(x))) {                            \
+            float_raise(float_flag_invalid, fpst);                             \
+            return 0;                                                          \
+        }                                                                      \
+        return float##fsz##_to_##itype##_scalbn(x, ROUND, shift, fpst);        \
+    }
 
-#define VFP_CONV_FIX(name, p, fsz, ftype, isz, itype)            \
-VFP_CONV_FIX_FLOAT(name, p, fsz, ftype, isz, itype)              \
-VFP_CONV_FIX_FLOAT_ROUND(name, p, fsz, ftype, isz, itype)        \
-VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype,        \
-                         float_round_to_zero, _round_to_zero)    \
-VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype,        \
-                         get_float_rounding_mode(fpst), )
+#define VFP_CONV_FIX(name, p, fsz, ftype, isz, itype)             \
+    VFP_CONV_FIX_FLOAT(name, p, fsz, ftype, isz, itype)           \
+    VFP_CONV_FIX_FLOAT_ROUND(name, p, fsz, ftype, isz, itype)     \
+    VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype,     \
+                             float_round_to_zero, _round_to_zero) \
+    VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype,     \
+                             get_float_rounding_mode(fpst), )
 
-#define VFP_CONV_FIX_A64(name, p, fsz, ftype, isz, itype)        \
-VFP_CONV_FIX_FLOAT(name, p, fsz, ftype, isz, itype)              \
-VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype,        \
-                         get_float_rounding_mode(fpst), )
+#define VFP_CONV_FIX_A64(name, p, fsz, ftype, isz, itype)     \
+    VFP_CONV_FIX_FLOAT(name, p, fsz, ftype, isz, itype)       \
+    VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype, \
+                             get_float_rounding_mode(fpst), )
 
 VFP_CONV_FIX(sh, d, 64, float64, 64, int16)
 VFP_CONV_FIX(sl, d, 64, float64, 64, int32)
@@ -676,7 +675,7 @@ uint32_t HELPER(recpe_f16)(uint32_t input, void *fpstp)
             }
         }
         if (fpst->default_nan_mode) {
-            nan =  float16_default_nan(fpst);
+            nan = float16_default_nan(fpst);
         }
         return nan;
     } else if (float16_is_infinity(f16)) {
@@ -697,8 +696,8 @@ uint32_t HELPER(recpe_f16)(uint32_t input, void *fpstp)
         return float16_set_sign(float16_zero, float16_is_neg(f16));
     }
 
-    f64_frac = call_recip_estimate(&f16_exp, 29,
-                                   ((uint64_t) f16_frac) << (52 - 10));
+    f64_frac =
+        call_recip_estimate(&f16_exp, 29, ((uint64_t)f16_frac) << (52 - 10));
 
     /* result = sign : result_exp<4:0> : fraction<51:42> */
     f16_val = deposit32(0, 15, 1, f16_sign);
@@ -726,7 +725,7 @@ float32 HELPER(recpe_f32)(float32 input, void *fpstp)
             }
         }
         if (fpst->default_nan_mode) {
-            nan =  float32_default_nan(fpst);
+            nan = float32_default_nan(fpst);
         }
         return nan;
     } else if (float32_is_infinity(f32)) {
@@ -747,8 +746,8 @@ float32 HELPER(recpe_f32)(float32 input, void *fpstp)
         return float32_set_sign(float32_zero, float32_is_neg(f32));
     }
 
-    f64_frac = call_recip_estimate(&f32_exp, 253,
-                                   ((uint64_t) f32_frac) << (52 - 23));
+    f64_frac =
+        call_recip_estimate(&f32_exp, 253, ((uint64_t)f32_frac) << (52 - 23));
 
     /* result = sign : result_exp<7:0> : fraction<51:29> */
     f32_val = deposit32(0, 31, 1, f32_sign);
@@ -776,7 +775,7 @@ float64 HELPER(recpe_f64)(float64 input, void *fpstp)
             }
         }
         if (fpst->default_nan_mode) {
-            nan =  float64_default_nan(fpst);
+            nan = float64_default_nan(fpst);
         }
         return nan;
     } else if (float64_is_infinity(f64)) {
@@ -832,7 +831,7 @@ static int do_recip_sqrt_estimate(int a)
 }
 
 
-static uint64_t recip_sqrt_estimate(int *exp , int exp_off, uint64_t frac)
+static uint64_t recip_sqrt_estimate(int *exp, int exp_off, uint64_t frac)
 {
     int estimate;
     uint32_t scaled;
@@ -877,7 +876,7 @@ uint32_t HELPER(rsqrte_f16)(uint32_t input, void *fpstp)
             }
         }
         if (s->default_nan_mode) {
-            nan =  float16_default_nan(s);
+            nan = float16_default_nan(s);
         }
         return nan;
     } else if (float16_is_zero(f16)) {
@@ -893,7 +892,7 @@ uint32_t HELPER(rsqrte_f16)(uint32_t input, void *fpstp)
     /* Scale and normalize to a double-precision value between 0.25 and 1.0,
      * preserving the parity of the exponent.  */
 
-    f64_frac = ((uint64_t) f16_frac) << (52 - 10);
+    f64_frac = ((uint64_t)f16_frac) << (52 - 10);
 
     f64_frac = recip_sqrt_estimate(&f16_exp, 44, f64_frac);
 
@@ -923,7 +922,7 @@ float32 HELPER(rsqrte_f32)(float32 input, void *fpstp)
             }
         }
         if (s->default_nan_mode) {
-            nan =  float32_default_nan(s);
+            nan = float32_default_nan(s);
         }
         return nan;
     } else if (float32_is_zero(f32)) {
@@ -939,7 +938,7 @@ float32 HELPER(rsqrte_f32)(float32 input, void *fpstp)
     /* Scale and normalize to a double-precision value between 0.25 and 1.0,
      * preserving the parity of the exponent.  */
 
-    f64_frac = ((uint64_t) f32_frac) << 29;
+    f64_frac = ((uint64_t)f32_frac) << 29;
 
     f64_frac = recip_sqrt_estimate(&f32_exp, 380, f64_frac);
 
@@ -968,7 +967,7 @@ float64 HELPER(rsqrte_f64)(float64 input, void *fpstp)
             }
         }
         if (s->default_nan_mode) {
-            nan =  float64_default_nan(s);
+            nan = float64_default_nan(s);
         }
         return nan;
     } else if (float64_is_zero(f64)) {
@@ -1148,8 +1147,8 @@ uint32_t HELPER(vjcvt)(float64 value, CPUARMState *env)
     uint32_t z = (pair >> 32) == 0;
 
     /* Store Z, clear NCV, in FPSCR.NZCV.  */
-    env->vfp.xregs[ARM_VFP_FPSCR]
-        = (env->vfp.xregs[ARM_VFP_FPSCR] & ~CPSR_NZCV) | (z * CPSR_Z);
+    env->vfp.xregs[ARM_VFP_FPSCR] =
+        (env->vfp.xregs[ARM_VFP_FPSCR] & ~CPSR_NZCV) | (z * CPSR_Z);
 
     return result;
 }
@@ -1183,7 +1182,7 @@ static float32 frint_s(float32 f, float_status *fpst, int intsize)
         }
     }
 
- overflow:
+overflow:
     /*
      * Raise Invalid and return INT{N}_MIN as a float.  Revert any
      * inexact exception float32_round_to_int may have raised.
@@ -1231,7 +1230,7 @@ static float64 frint_d(float64 f, float_status *fpst, int intsize)
         }
     }
 
- overflow:
+overflow:
     /*
      * Raise Invalid and return INT{N}_MIN as a float.  Revert any
      * inexact exception float64_round_to_int may have raised.
@@ -1271,10 +1270,8 @@ void HELPER(check_hcr_el2_trap)(CPUARMState *env, uint32_t rt, uint32_t reg)
         g_assert_not_reached();
     }
 
-    syndrome = ((EC_FPIDTRAP << ARM_EL_EC_SHIFT)
-                | ARM_EL_IL
-                | (1 << 24) | (0xe << 20) | (7 << 14)
-                | (reg << 10) | (rt << 5) | 1);
+    syndrome = ((EC_FPIDTRAP << ARM_EL_EC_SHIFT) | ARM_EL_IL | (1 << 24) |
+                (0xe << 20) | (7 << 14) | (reg << 10) | (rt << 5) | 1);
 
     raise_exception(env, EXCP_HYP_TRAP, syndrome, 2);
 }

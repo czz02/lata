@@ -64,21 +64,24 @@
 
 #include CONFIG_DEVICES
 
-//#define DEBUG_KVM
+// #define DEBUG_KVM
 
 #ifdef DEBUG_KVM
-#define DPRINTF(fmt, ...) \
-    do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)
+#define DPRINTF(fmt, ...)                    \
+    do {                                     \
+        fprintf(stderr, fmt, ##__VA_ARGS__); \
+    } while (0)
 #else
 #define DPRINTF(fmt, ...) \
-    do { } while (0)
+    do {                  \
+    } while (0)
 #endif
 
 /* From arch/x86/kvm/lapic.h */
-#define KVM_APIC_BUS_CYCLE_NS       1
-#define KVM_APIC_BUS_FREQUENCY      (1000000000ULL / KVM_APIC_BUS_CYCLE_NS)
+#define KVM_APIC_BUS_CYCLE_NS 1
+#define KVM_APIC_BUS_FREQUENCY (1000000000ULL / KVM_APIC_BUS_CYCLE_NS)
 
-#define MSR_KVM_WALL_CLOCK  0x11
+#define MSR_KVM_WALL_CLOCK 0x11
 #define MSR_KVM_SYSTEM_TIME 0x12
 
 /* A 4096-byte buffer can hold the 8-byte kvm_msrs header, plus
@@ -88,9 +91,7 @@
 static void kvm_init_msrs(X86CPU *cpu);
 
 const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-    KVM_CAP_INFO(SET_TSS_ADDR),
-    KVM_CAP_INFO(EXT_CPUID),
-    KVM_CAP_INFO(MP_STATE),
+    KVM_CAP_INFO(SET_TSS_ADDR), KVM_CAP_INFO(EXT_CPUID), KVM_CAP_INFO(MP_STATE),
     KVM_CAP_LAST_INFO
 };
 
@@ -188,15 +189,15 @@ static bool kvm_x2apic_api_set_flags(uint64_t flags)
     return !kvm_vm_enable_cap(s, KVM_CAP_X2APIC_API, 0, flags);
 }
 
-#define MEMORIZE(fn, _result) \
-    ({ \
+#define MEMORIZE(fn, _result)   \
+    ({                          \
         static bool _memorized; \
-        \
-        if (_memorized) { \
-            return _result; \
-        } \
-        _memorized = true; \
-        _result = fn; \
+                                \
+        if (_memorized) {       \
+            return _result;     \
+        }                       \
+        _memorized = true;      \
+        _result = fn;           \
     })
 
 static bool has_x2apic_api;
@@ -209,9 +210,9 @@ bool kvm_has_x2apic_api(void)
 bool kvm_enable_x2apic(void)
 {
     return MEMORIZE(
-             kvm_x2apic_api_set_flags(KVM_X2APIC_API_USE_32BIT_IDS |
-                                      KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK),
-             has_x2apic_api);
+        kvm_x2apic_api_set_flags(KVM_X2APIC_API_USE_32BIT_IDS |
+                                 KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK),
+        has_x2apic_api);
 }
 
 bool kvm_hv_vpindex_settable(void)
@@ -251,7 +252,7 @@ void kvm_synchronize_all_tsc(void)
     CPUState *cpu;
 
     if (kvm_enabled()) {
-        CPU_FOREACH(cpu) {
+        CPU_FOREACH (cpu) {
             run_on_cpu(cpu, do_kvm_synchronize_tsc, RUN_ON_CPU_NULL);
         }
     }
@@ -302,16 +303,15 @@ static struct kvm_cpuid2 *get_supported_cpuid(KVMState *s)
 
 static bool host_tsx_broken(void)
 {
-    int family, model, stepping;\
+    int family, model, stepping;
     char vendor[CPUID_VENDOR_SZ + 1];
 
     host_cpu_vendor_fms(vendor, &family, &model, &stepping);
 
     /* Check if we are running on a Haswell host known to have broken TSX */
-    return !strcmp(vendor, CPUID_VENDOR_INTEL) &&
-           (family == 6) &&
-           ((model == 63 && stepping < 4) ||
-            model == 60 || model == 69 || model == 70);
+    return !strcmp(vendor, CPUID_VENDOR_INTEL) && (family == 6) &&
+           ((model == 63 && stepping < 4) || model == 60 || model == 69 ||
+            model == 70);
 }
 
 /* Returns the value for a specific register on the cpuid entry
@@ -338,9 +338,8 @@ static uint32_t cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry, int reg)
 
 /* Find matching entry for function/index on kvm_cpuid2 struct
  */
-static struct kvm_cpuid_entry2 *cpuid_find_entry(struct kvm_cpuid2 *cpuid,
-                                                 uint32_t function,
-                                                 uint32_t index)
+static struct kvm_cpuid_entry2 *
+cpuid_find_entry(struct kvm_cpuid2 *cpuid, uint32_t function, uint32_t index)
 {
     int i;
     for (i = 0; i < cpuid->nent; ++i) {
@@ -383,7 +382,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
          * and the irqchip is in the kernel.
          */
         if (kvm_irqchip_in_kernel() &&
-                kvm_check_extension(s, KVM_CAP_TSC_DEADLINE_TIMER)) {
+            kvm_check_extension(s, KVM_CAP_TSC_DEADLINE_TIMER)) {
             ret |= CPUID_EXT_TSC_DEADLINE_TIMER;
         }
 
@@ -395,8 +394,8 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
         }
 
         if (enable_cpu_pm) {
-            int disable_exits = kvm_check_extension(s,
-                                                    KVM_CAP_X86_DISABLE_EXITS);
+            int disable_exits =
+                kvm_check_extension(s, KVM_CAP_X86_DISABLE_EXITS);
 
             if (disable_exits & KVM_X86_DISABLE_EXITS_MWAIT) {
                 ret |= CPUID_EXT_MONITOR;
@@ -431,7 +430,8 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
         /* Not new instructions, just an optimization.  */
         uint32_t eax;
         host_cpuid(7, 1, &eax, &unused, &unused, &unused);
-        ret |= eax & (CPUID_7_1_EAX_FZRM | CPUID_7_1_EAX_FSRS | CPUID_7_1_EAX_FSRC);
+        ret |= eax &
+               (CPUID_7_1_EAX_FZRM | CPUID_7_1_EAX_FSRS | CPUID_7_1_EAX_FSRC);
     } else if (function == 7 && index == 2 && reg == R_EDX) {
         uint32_t edx;
         host_cpuid(7, 2, &unused, &unused, &unused, &edx);
@@ -444,11 +444,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
          * system call.  QEMU needs the full value, which is retrieved
          * with KVM_GET_DEVICE_ATTR.
          */
-        struct kvm_device_attr attr = {
-            .group = 0,
-            .attr = KVM_X86_XCOMP_GUEST_SUPP,
-            .addr = (unsigned long) &bitmask
-        };
+        struct kvm_device_attr attr = { .group = 0,
+                                        .attr = KVM_X86_XCOMP_GUEST_SUPP,
+                                        .addr = (unsigned long)&bitmask };
 
         bool sys_attr = kvm_check_extension(s, KVM_CAP_SYS_ATTRIBUTES);
         if (!sys_attr) {
@@ -459,7 +457,8 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
         if (rc < 0) {
             if (rc != -ENXIO) {
                 warn_report("KVM_GET_DEVICE_ATTR(0, KVM_X86_XCOMP_GUEST_SUPP) "
-                            "error: %d", rc);
+                            "error: %d",
+                            rc);
             }
             return ret;
         }
@@ -522,8 +521,8 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
 
     ret = kvm_ioctl(s, KVM_GET_MSRS, &msr_data);
     if (ret != 1) {
-        error_report("KVM get MSR (index=0x%x) feature failed, %s",
-            index, strerror(-ret));
+        error_report("KVM get MSR (index=0x%x) feature failed, %s", index,
+                     strerror(-ret));
         exit(1);
     }
 
@@ -618,7 +617,7 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr paddr, int code)
 
 static void emit_hypervisor_memory_failure(MemoryFailureAction action, bool ar)
 {
-    MemoryFailureFlags mff = {.action_required = ar, .recursive = false};
+    MemoryFailureFlags mff = { .action_required = ar, .recursive = false };
 
     qapi_event_send_memory_failure(MEMORY_FAILURE_RECIPIENT_HYPERVISOR, action,
                                    &mff);
@@ -659,21 +658,23 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
              */
             if (code == BUS_MCEERR_AR) {
                 error_report("Guest MCE Memory Error at QEMU addr %p and "
-                    "GUEST addr 0x%" HWADDR_PRIx " of type %s injected",
-                    addr, paddr, "BUS_MCEERR_AR");
+                             "GUEST addr 0x%" HWADDR_PRIx
+                             " of type %s injected",
+                             addr, paddr, "BUS_MCEERR_AR");
             } else {
-                 warn_report("Guest MCE Memory Error at QEMU addr %p and "
-                     "GUEST addr 0x%" HWADDR_PRIx " of type %s injected",
-                     addr, paddr, "BUS_MCEERR_AO");
+                warn_report("Guest MCE Memory Error at QEMU addr %p and "
+                            "GUEST addr 0x%" HWADDR_PRIx " of type %s injected",
+                            addr, paddr, "BUS_MCEERR_AO");
             }
 
             return;
         }
 
         if (code == BUS_MCEERR_AO) {
-            warn_report("Hardware memory error at addr %p of type %s "
+            warn_report(
+                "Hardware memory error at addr %p of type %s "
                 "for memory used by QEMU itself instead of guest system!",
-                 addr, "BUS_MCEERR_AO");
+                addr, "BUS_MCEERR_AO");
         }
     }
 
@@ -694,8 +695,7 @@ static void kvm_reset_exception(CPUX86State *env)
     env->exception_payload = 0;
 }
 
-static void kvm_queue_exception(CPUX86State *env,
-                                int32_t exception_nr,
+static void kvm_queue_exception(CPUX86State *env, int32_t exception_nr,
                                 uint8_t exception_has_payload,
                                 uint64_t exception_payload)
 {
@@ -774,14 +774,14 @@ unsigned long kvm_arch_vcpu_id(CPUState *cs)
 }
 
 #ifndef KVM_CPUID_SIGNATURE_NEXT
-#define KVM_CPUID_SIGNATURE_NEXT                0x40000100
+#define KVM_CPUID_SIGNATURE_NEXT 0x40000100
 #endif
 
 static bool hyperv_enabled(X86CPU *cpu)
 {
     return kvm_check_extension(kvm_state, KVM_CAP_HYPERV) > 0 &&
-        ((cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_NOTIFY) ||
-         cpu->hyperv_features || cpu->hyperv_passthrough);
+           ((cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_NOTIFY) ||
+            cpu->hyperv_features || cpu->hyperv_passthrough);
 }
 
 /*
@@ -790,14 +790,14 @@ static bool hyperv_enabled(X86CPU *cpu)
  */
 static inline bool freq_within_bounds(int freq, int target_freq)
 {
-        int max_freq = freq + (freq * 250 / 1000000);
-        int min_freq = freq - (freq * 250 / 1000000);
+    int max_freq = freq + (freq * 250 / 1000000);
+    int min_freq = freq - (freq * 250 / 1000000);
 
-        if (target_freq >= min_freq && target_freq <= max_freq) {
-                return true;
-        }
+    if (target_freq >= min_freq && target_freq <= max_freq) {
+        return true;
+    }
 
-        return false;
+    return false;
 }
 
 static int kvm_arch_set_tsc_khz(CPUState *cs)
@@ -812,7 +812,8 @@ static int kvm_arch_set_tsc_khz(CPUState *cs)
     }
 
     cur_freq = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-               kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) : -ENOTSUP;
+                   kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
+                   -ENOTSUP;
 
     /*
      * If TSC scaling is supported, attempt to set TSC frequency.
@@ -829,17 +830,16 @@ static int kvm_arch_set_tsc_khz(CPUState *cs)
         set_ioctl = true;
     }
 
-    r = set_ioctl ?
-        kvm_vcpu_ioctl(cs, KVM_SET_TSC_KHZ, env->tsc_khz) :
-        -ENOTSUP;
+    r = set_ioctl ? kvm_vcpu_ioctl(cs, KVM_SET_TSC_KHZ, env->tsc_khz) :
+                    -ENOTSUP;
 
     if (r < 0) {
         /* When KVM_SET_TSC_KHZ fails, it's an error only if the current
          * TSC frequency doesn't match the one we want.
          */
         cur_freq = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-                   kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
-                   -ENOTSUP;
+                       kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
+                       -ENOTSUP;
         if (cur_freq <= 0 || cur_freq != env->tsc_khz) {
             warn_report("TSC frequency mismatch between "
                         "VM (%" PRId64 " kHz) and host (%d kHz), "
@@ -857,8 +857,8 @@ static bool tsc_is_stable_and_known(CPUX86State *env)
     if (!env->tsc_khz) {
         return false;
     }
-    return (env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC)
-        || env->user_tsc_khz;
+    return (env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC) ||
+           env->user_tsc_khz;
 }
 
 #define DEFAULT_EVMCS_VERSION ((1 << 8) | 1)
@@ -872,167 +872,134 @@ static struct {
     } flags[2];
     uint64_t dependencies;
 } kvm_hyperv_properties[] = {
-    [HYPERV_FEAT_RELAXED] = {
-        .desc = "relaxed timing (hv-relaxed)",
-        .flags = {
-            {.func = HV_CPUID_ENLIGHTMENT_INFO, .reg = R_EAX,
-             .bits = HV_RELAXED_TIMING_RECOMMENDED}
-        }
-    },
-    [HYPERV_FEAT_VAPIC] = {
-        .desc = "virtual APIC (hv-vapic)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_APIC_ACCESS_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_TIME] = {
-        .desc = "clocksources (hv-time)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_TIME_REF_COUNT_AVAILABLE | HV_REFERENCE_TSC_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_CRASH] = {
-        .desc = "crash MSRs (hv-crash)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EDX,
-             .bits = HV_GUEST_CRASH_MSR_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_RESET] = {
-        .desc = "reset MSR (hv-reset)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_RESET_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_VPINDEX] = {
-        .desc = "VP_INDEX MSR (hv-vpindex)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_VP_INDEX_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_RUNTIME] = {
-        .desc = "VP_RUNTIME MSR (hv-runtime)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_VP_RUNTIME_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_SYNIC] = {
-        .desc = "synthetic interrupt controller (hv-synic)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_SYNIC_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_STIMER] = {
-        .desc = "synthetic timers (hv-stimer)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_SYNTIMERS_AVAILABLE}
-        },
-        .dependencies = BIT(HYPERV_FEAT_SYNIC) | BIT(HYPERV_FEAT_TIME)
-    },
-    [HYPERV_FEAT_FREQUENCIES] = {
-        .desc = "frequency MSRs (hv-frequencies)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_ACCESS_FREQUENCY_MSRS},
-            {.func = HV_CPUID_FEATURES, .reg = R_EDX,
-             .bits = HV_FREQUENCY_MSRS_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_REENLIGHTENMENT] = {
-        .desc = "reenlightenment MSRs (hv-reenlightenment)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EAX,
-             .bits = HV_ACCESS_REENLIGHTENMENTS_CONTROL}
-        }
-    },
-    [HYPERV_FEAT_TLBFLUSH] = {
-        .desc = "paravirtualized TLB flush (hv-tlbflush)",
-        .flags = {
-            {.func = HV_CPUID_ENLIGHTMENT_INFO, .reg = R_EAX,
-             .bits = HV_REMOTE_TLB_FLUSH_RECOMMENDED |
-             HV_EX_PROCESSOR_MASKS_RECOMMENDED}
-        },
-        .dependencies = BIT(HYPERV_FEAT_VPINDEX)
-    },
-    [HYPERV_FEAT_EVMCS] = {
-        .desc = "enlightened VMCS (hv-evmcs)",
-        .flags = {
-            {.func = HV_CPUID_ENLIGHTMENT_INFO, .reg = R_EAX,
-             .bits = HV_ENLIGHTENED_VMCS_RECOMMENDED}
-        },
-        .dependencies = BIT(HYPERV_FEAT_VAPIC)
-    },
-    [HYPERV_FEAT_IPI] = {
-        .desc = "paravirtualized IPI (hv-ipi)",
-        .flags = {
-            {.func = HV_CPUID_ENLIGHTMENT_INFO, .reg = R_EAX,
-             .bits = HV_CLUSTER_IPI_RECOMMENDED |
-             HV_EX_PROCESSOR_MASKS_RECOMMENDED}
-        },
-        .dependencies = BIT(HYPERV_FEAT_VPINDEX)
-    },
-    [HYPERV_FEAT_STIMER_DIRECT] = {
-        .desc = "direct mode synthetic timers (hv-stimer-direct)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EDX,
-             .bits = HV_STIMER_DIRECT_MODE_AVAILABLE}
-        },
-        .dependencies = BIT(HYPERV_FEAT_STIMER)
-    },
-    [HYPERV_FEAT_AVIC] = {
-        .desc = "AVIC/APICv support (hv-avic/hv-apicv)",
-        .flags = {
-            {.func = HV_CPUID_ENLIGHTMENT_INFO, .reg = R_EAX,
-             .bits = HV_DEPRECATING_AEOI_RECOMMENDED}
-        }
-    },
+    [HYPERV_FEAT_RELAXED] = { .desc = "relaxed timing (hv-relaxed)",
+                              .flags = { { .func = HV_CPUID_ENLIGHTMENT_INFO,
+                                           .reg = R_EAX,
+                                           .bits =
+                                               HV_RELAXED_TIMING_RECOMMENDED } } },
+    [HYPERV_FEAT_VAPIC] = { .desc = "virtual APIC (hv-vapic)",
+                            .flags = { { .func = HV_CPUID_FEATURES,
+                                         .reg = R_EAX,
+                                         .bits = HV_APIC_ACCESS_AVAILABLE } } },
+    [HYPERV_FEAT_TIME] = { .desc = "clocksources (hv-time)",
+                           .flags = { { .func = HV_CPUID_FEATURES,
+                                        .reg = R_EAX,
+                                        .bits =
+                                            HV_TIME_REF_COUNT_AVAILABLE |
+                                            HV_REFERENCE_TSC_AVAILABLE } } },
+    [HYPERV_FEAT_CRASH] = { .desc = "crash MSRs (hv-crash)",
+                            .flags = { { .func = HV_CPUID_FEATURES,
+                                         .reg = R_EDX,
+                                         .bits =
+                                             HV_GUEST_CRASH_MSR_AVAILABLE } } },
+    [HYPERV_FEAT_RESET] = { .desc = "reset MSR (hv-reset)",
+                            .flags = { { .func = HV_CPUID_FEATURES,
+                                         .reg = R_EAX,
+                                         .bits = HV_RESET_AVAILABLE } } },
+    [HYPERV_FEAT_VPINDEX] = { .desc = "VP_INDEX MSR (hv-vpindex)",
+                              .flags = { { .func = HV_CPUID_FEATURES,
+                                           .reg = R_EAX,
+                                           .bits = HV_VP_INDEX_AVAILABLE } } },
+    [HYPERV_FEAT_RUNTIME] = { .desc = "VP_RUNTIME MSR (hv-runtime)",
+                              .flags = { { .func = HV_CPUID_FEATURES,
+                                           .reg = R_EAX,
+                                           .bits =
+                                               HV_VP_RUNTIME_AVAILABLE } } },
+    [HYPERV_FEAT_SYNIC] = { .desc = "synthetic interrupt controller (hv-synic)",
+                            .flags = { { .func = HV_CPUID_FEATURES,
+                                         .reg = R_EAX,
+                                         .bits = HV_SYNIC_AVAILABLE } } },
+    [HYPERV_FEAT_STIMER] = { .desc = "synthetic timers (hv-stimer)",
+                             .flags = { { .func = HV_CPUID_FEATURES,
+                                          .reg = R_EAX,
+                                          .bits = HV_SYNTIMERS_AVAILABLE } },
+                             .dependencies = BIT(HYPERV_FEAT_SYNIC) |
+                                             BIT(HYPERV_FEAT_TIME) },
+    [HYPERV_FEAT_FREQUENCIES] = { .desc = "frequency MSRs (hv-frequencies)",
+                                  .flags = { { .func = HV_CPUID_FEATURES,
+                                               .reg = R_EAX,
+                                               .bits =
+                                                   HV_ACCESS_FREQUENCY_MSRS },
+                                             { .func = HV_CPUID_FEATURES,
+                                               .reg = R_EDX,
+                                               .bits =
+                                                   HV_FREQUENCY_MSRS_AVAILABLE } } },
+    [HYPERV_FEAT_REENLIGHTENMENT] = { .desc = "reenlightenment MSRs "
+                                              "(hv-reenlightenment)",
+                                      .flags = { { .func = HV_CPUID_FEATURES,
+                                                   .reg = R_EAX,
+                                                   .bits =
+                                                       HV_ACCESS_REENLIGHTENMENTS_CONTROL } } },
+    [HYPERV_FEAT_TLBFLUSH] = { .desc =
+                                   "paravirtualized TLB flush (hv-tlbflush)",
+                               .flags = { { .func = HV_CPUID_ENLIGHTMENT_INFO,
+                                            .reg = R_EAX,
+                                            .bits =
+                                                HV_REMOTE_TLB_FLUSH_RECOMMENDED |
+                                                HV_EX_PROCESSOR_MASKS_RECOMMENDED } },
+                               .dependencies = BIT(HYPERV_FEAT_VPINDEX) },
+    [HYPERV_FEAT_EVMCS] = { .desc = "enlightened VMCS (hv-evmcs)",
+                            .flags = { { .func = HV_CPUID_ENLIGHTMENT_INFO,
+                                         .reg = R_EAX,
+                                         .bits =
+                                             HV_ENLIGHTENED_VMCS_RECOMMENDED } },
+                            .dependencies = BIT(HYPERV_FEAT_VAPIC) },
+    [HYPERV_FEAT_IPI] = { .desc = "paravirtualized IPI (hv-ipi)",
+                          .flags = { { .func = HV_CPUID_ENLIGHTMENT_INFO,
+                                       .reg = R_EAX,
+                                       .bits =
+                                           HV_CLUSTER_IPI_RECOMMENDED |
+                                           HV_EX_PROCESSOR_MASKS_RECOMMENDED } },
+                          .dependencies = BIT(HYPERV_FEAT_VPINDEX) },
+    [HYPERV_FEAT_STIMER_DIRECT] = { .desc = "direct mode synthetic timers "
+                                            "(hv-stimer-direct)",
+                                    .flags = { { .func = HV_CPUID_FEATURES,
+                                                 .reg = R_EDX,
+                                                 .bits =
+                                                     HV_STIMER_DIRECT_MODE_AVAILABLE } },
+                                    .dependencies = BIT(HYPERV_FEAT_STIMER) },
+    [HYPERV_FEAT_AVIC] = { .desc = "AVIC/APICv support (hv-avic/hv-apicv)",
+                           .flags = { { .func = HV_CPUID_ENLIGHTMENT_INFO,
+                                        .reg = R_EAX,
+                                        .bits =
+                                            HV_DEPRECATING_AEOI_RECOMMENDED } } },
 #ifdef CONFIG_SYNDBG
-    [HYPERV_FEAT_SYNDBG] = {
-        .desc = "Enable synthetic kernel debugger channel (hv-syndbg)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EDX,
-             .bits = HV_FEATURE_DEBUG_MSRS_AVAILABLE}
-        },
-        .dependencies = BIT(HYPERV_FEAT_SYNIC) | BIT(HYPERV_FEAT_RELAXED)
-    },
+    [HYPERV_FEAT_SYNDBG] = { .desc = "Enable synthetic kernel debugger channel "
+                                     "(hv-syndbg)",
+                             .flags = { { .func = HV_CPUID_FEATURES,
+                                          .reg = R_EDX,
+                                          .bits =
+                                              HV_FEATURE_DEBUG_MSRS_AVAILABLE } },
+                             .dependencies = BIT(HYPERV_FEAT_SYNIC) |
+                                             BIT(HYPERV_FEAT_RELAXED) },
 #endif
-    [HYPERV_FEAT_MSR_BITMAP] = {
-        .desc = "enlightened MSR-Bitmap (hv-emsr-bitmap)",
-        .flags = {
-            {.func = HV_CPUID_NESTED_FEATURES, .reg = R_EAX,
-             .bits = HV_NESTED_MSR_BITMAP}
-        }
-    },
-    [HYPERV_FEAT_XMM_INPUT] = {
-        .desc = "XMM fast hypercall input (hv-xmm-input)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EDX,
-             .bits = HV_HYPERCALL_XMM_INPUT_AVAILABLE}
-        }
-    },
-    [HYPERV_FEAT_TLBFLUSH_EXT] = {
-        .desc = "Extended gva ranges for TLB flush hypercalls (hv-tlbflush-ext)",
-        .flags = {
-            {.func = HV_CPUID_FEATURES, .reg = R_EDX,
-             .bits = HV_EXT_GVA_RANGES_FLUSH_AVAILABLE}
-        },
-        .dependencies = BIT(HYPERV_FEAT_TLBFLUSH)
-    },
-    [HYPERV_FEAT_TLBFLUSH_DIRECT] = {
-        .desc = "direct TLB flush (hv-tlbflush-direct)",
-        .flags = {
-            {.func = HV_CPUID_NESTED_FEATURES, .reg = R_EAX,
-             .bits = HV_NESTED_DIRECT_FLUSH}
-        },
-        .dependencies = BIT(HYPERV_FEAT_VAPIC)
-    },
+    [HYPERV_FEAT_MSR_BITMAP] = { .desc =
+                                     "enlightened MSR-Bitmap (hv-emsr-bitmap)",
+                                 .flags = { { .func = HV_CPUID_NESTED_FEATURES,
+                                              .reg = R_EAX,
+                                              .bits =
+                                                  HV_NESTED_MSR_BITMAP } } },
+    [HYPERV_FEAT_XMM_INPUT] = { .desc =
+                                    "XMM fast hypercall input (hv-xmm-input)",
+                                .flags = { { .func = HV_CPUID_FEATURES,
+                                             .reg = R_EDX,
+                                             .bits =
+                                                 HV_HYPERCALL_XMM_INPUT_AVAILABLE } } },
+    [HYPERV_FEAT_TLBFLUSH_EXT] = { .desc = "Extended gva ranges for TLB flush "
+                                           "hypercalls (hv-tlbflush-ext)",
+                                   .flags = { { .func = HV_CPUID_FEATURES,
+                                                .reg = R_EDX,
+                                                .bits =
+                                                    HV_EXT_GVA_RANGES_FLUSH_AVAILABLE } },
+                                   .dependencies = BIT(HYPERV_FEAT_TLBFLUSH) },
+    [HYPERV_FEAT_TLBFLUSH_DIRECT] = { .desc = "direct TLB flush "
+                                              "(hv-tlbflush-direct)",
+                                      .flags = { { .func =
+                                                       HV_CPUID_NESTED_FEATURES,
+                                                   .reg = R_EAX,
+                                                   .bits =
+                                                       HV_NESTED_DIRECT_FLUSH } },
+                                      .dependencies = BIT(HYPERV_FEAT_VAPIC) },
 };
 
 static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max,
@@ -1078,8 +1045,7 @@ static struct kvm_cpuid2 *get_supported_hv_cpuid(CPUState *cs)
     int i;
     bool do_sys_ioctl;
 
-    do_sys_ioctl =
-        kvm_check_extension(kvm_state, KVM_CAP_SYS_HYPERV_CPUID) > 0;
+    do_sys_ioctl = kvm_check_extension(kvm_state, KVM_CAP_SYS_HYPERV_CPUID) > 0;
 
     /*
      * Non-empty KVM context is needed when KVM_CAP_SYS_HYPERV_CPUID is
@@ -1102,8 +1068,9 @@ static struct kvm_cpuid2 *get_supported_hv_cpuid(CPUState *cs)
      * information early, just check for the capability and set the bit
      * manually.
      */
-    if (!do_sys_ioctl && kvm_check_extension(cs->kvm_state,
-                            KVM_CAP_HYPERV_ENLIGHTENED_VMCS) > 0) {
+    if (!do_sys_ioctl &&
+        kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_ENLIGHTENED_VMCS) >
+            0) {
         for (i = 0; i < cpuid->nent; i++) {
             if (cpuid->entries[i].function == HV_CPUID_ENLIGHTMENT_INFO) {
                 cpuid->entries[i].eax |= HV_ENLIGHTENED_VMCS_RECOMMENDED;
@@ -1175,8 +1142,8 @@ static struct kvm_cpuid2 *get_supported_hv_cpuid_legacy(CPUState *cs)
     }
 
     if (has_msr_hv_synic) {
-        unsigned int cap = cpu->hyperv_synic_kvm_only ?
-            KVM_CAP_HYPERV_SYNIC : KVM_CAP_HYPERV_SYNIC2;
+        unsigned int cap = cpu->hyperv_synic_kvm_only ? KVM_CAP_HYPERV_SYNIC :
+                                                        KVM_CAP_HYPERV_SYNIC2;
 
         if (kvm_check_extension(cs->kvm_state, cap) > 0) {
             entry_feat->eax |= HV_SYNIC_AVAILABLE;
@@ -1193,19 +1160,17 @@ static struct kvm_cpuid2 *get_supported_hv_cpuid_legacy(CPUState *cs)
         entry_feat->ebx |= HV_PARTITION_DEBUGGING_ALLOWED;
     }
 
-    if (kvm_check_extension(cs->kvm_state,
-                            KVM_CAP_HYPERV_TLBFLUSH) > 0) {
+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_TLBFLUSH) > 0) {
         entry_recomm->eax |= HV_REMOTE_TLB_FLUSH_RECOMMENDED;
         entry_recomm->eax |= HV_EX_PROCESSOR_MASKS_RECOMMENDED;
     }
 
-    if (kvm_check_extension(cs->kvm_state,
-                            KVM_CAP_HYPERV_ENLIGHTENED_VMCS) > 0) {
+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_ENLIGHTENED_VMCS) >
+        0) {
         entry_recomm->eax |= HV_ENLIGHTENED_VMCS_RECOMMENDED;
     }
 
-    if (kvm_check_extension(cs->kvm_state,
-                            KVM_CAP_HYPERV_SEND_IPI) > 0) {
+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_SEND_IPI) > 0) {
         entry_recomm->eax |= HV_CLUSTER_IPI_RECOMMENDED;
         entry_recomm->eax |= HV_EX_PROCESSOR_MASKS_RECOMMENDED;
     }
@@ -1255,7 +1220,6 @@ static bool hyperv_feature_supported(CPUState *cs, int feature)
     int i, reg;
 
     for (i = 0; i < ARRAY_SIZE(kvm_hyperv_properties[feature].flags); i++) {
-
         func = kvm_hyperv_properties[feature].flags[i].func;
         reg = kvm_hyperv_properties[feature].flags[i].reg;
         bits = kvm_hyperv_properties[feature].flags[i].bits;
@@ -1358,8 +1322,8 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
             hv_cpuid_get_host(cs, HV_CPUID_VENDOR_AND_MAX_FUNCTIONS, R_ECX);
         cpu->hyperv_vendor_id[2] =
             hv_cpuid_get_host(cs, HV_CPUID_VENDOR_AND_MAX_FUNCTIONS, R_EDX);
-        cpu->hyperv_vendor = g_realloc(cpu->hyperv_vendor,
-                                       sizeof(cpu->hyperv_vendor_id) + 1);
+        cpu->hyperv_vendor =
+            g_realloc(cpu->hyperv_vendor, sizeof(cpu->hyperv_vendor_id) + 1);
         memcpy(cpu->hyperv_vendor, cpu->hyperv_vendor_id,
                sizeof(cpu->hyperv_vendor_id));
         cpu->hyperv_vendor[sizeof(cpu->hyperv_vendor_id)] = 0;
@@ -1379,15 +1343,14 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
             hv_cpuid_get_host(cs, HV_CPUID_VERSION, R_EBX) >> 16;
         cpu->hyperv_ver_id_minor =
             hv_cpuid_get_host(cs, HV_CPUID_VERSION, R_EBX) & 0xffff;
-        cpu->hyperv_ver_id_sp =
-            hv_cpuid_get_host(cs, HV_CPUID_VERSION, R_ECX);
+        cpu->hyperv_ver_id_sp = hv_cpuid_get_host(cs, HV_CPUID_VERSION, R_ECX);
         cpu->hyperv_ver_id_sb =
             hv_cpuid_get_host(cs, HV_CPUID_VERSION, R_EDX) >> 24;
         cpu->hyperv_ver_id_sn =
             hv_cpuid_get_host(cs, HV_CPUID_VERSION, R_EDX) & 0xffffff;
 
-        cpu->hv_max_vps = hv_cpuid_get_host(cs, HV_CPUID_IMPLEMENT_LIMITS,
-                                            R_EAX);
+        cpu->hv_max_vps =
+            hv_cpuid_get_host(cs, HV_CPUID_IMPLEMENT_LIMITS, R_EAX);
         cpu->hyperv_limits[0] =
             hv_cpuid_get_host(cs, HV_CPUID_IMPLEMENT_LIMITS, R_EBX);
         cpu->hyperv_limits[1] =
@@ -1446,8 +1409,7 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
 /*
  * Fill in Hyper-V CPUIDs. Returns the number of entries filled in cpuid_ent.
  */
-static int hyperv_fill_cpuids(CPUState *cs,
-                              struct kvm_cpuid_entry2 *cpuid_ent)
+static int hyperv_fill_cpuids(CPUState *cs, struct kvm_cpuid_entry2 *cpuid_ent)
 {
     X86CPU *cpu = X86_CPU(cs);
     struct kvm_cpuid_entry2 *c;
@@ -1456,8 +1418,8 @@ static int hyperv_fill_cpuids(CPUState *cs,
     uint32_t nested_eax =
         hv_build_cpuid_leaf(cs, HV_CPUID_NESTED_FEATURES, R_EAX);
 
-    max_cpuid_leaf = nested_eax ? HV_CPUID_NESTED_FEATURES :
-        HV_CPUID_IMPLEMENT_LIMITS;
+    max_cpuid_leaf =
+        nested_eax ? HV_CPUID_NESTED_FEATURES : HV_CPUID_IMPLEMENT_LIMITS;
 
     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNDBG)) {
         max_cpuid_leaf =
@@ -1481,11 +1443,11 @@ static int hyperv_fill_cpuids(CPUState *cs,
     c = &cpuid_ent[cpuid_i++];
     c->function = HV_CPUID_VERSION;
     c->eax = cpu->hyperv_ver_id_build;
-    c->ebx = (uint32_t)cpu->hyperv_ver_id_major << 16 |
-        cpu->hyperv_ver_id_minor;
+    c->ebx =
+        (uint32_t)cpu->hyperv_ver_id_major << 16 | cpu->hyperv_ver_id_minor;
     c->ecx = cpu->hyperv_ver_id_sp;
     c->edx = (uint32_t)cpu->hyperv_ver_id_sb << 24 |
-        (cpu->hyperv_ver_id_sn & 0xffffff);
+             (cpu->hyperv_ver_id_sn & 0xffffff);
 
     c = &cpuid_ent[cpuid_i++];
     c->function = HV_CPUID_FEATURES;
@@ -1520,7 +1482,7 @@ static int hyperv_fill_cpuids(CPUState *cs,
         c->eax |= HV_NO_NONARCH_CORESHARING;
     } else if (cpu->hyperv_no_nonarch_cs == ON_OFF_AUTO_AUTO) {
         c->eax |= hv_cpuid_get_host(cs, HV_CPUID_ENLIGHTMENT_INFO, R_EAX) &
-            HV_NO_NONARCH_CORESHARING;
+                  HV_NO_NONARCH_CORESHARING;
     }
 
     c = &cpuid_ent[cpuid_i++];
@@ -1549,7 +1511,8 @@ static int hyperv_fill_cpuids(CPUState *cs,
         c = &cpuid_ent[cpuid_i++];
         c->function = HV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS;
         c->eax = hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) ?
-            HV_CPUID_NESTED_FEATURES : HV_CPUID_IMPLEMENT_LIMITS;
+                     HV_CPUID_NESTED_FEATURES :
+                     HV_CPUID_IMPLEMENT_LIMITS;
         memcpy(signature, "Microsoft VS", 12);
         c->eax = 0;
         c->ebx = signature[0];
@@ -1588,7 +1551,7 @@ static bool evmcs_version_supported(uint16_t evmcs_version,
     uint8_t max_supported_version = supported_evmcs_version >> 8;
 
     return (min_version >= min_supported_version) &&
-        (max_version <= max_supported_version);
+           (max_version <= max_supported_version);
 }
 
 static int hyperv_init_vcpu(X86CPU *cpu)
@@ -1610,11 +1573,12 @@ static int hyperv_init_vcpu(X86CPU *cpu)
 
     if (cpu->hyperv_no_nonarch_cs == ON_OFF_AUTO_AUTO &&
         hv_no_nonarch_cs_mig_blocker == NULL) {
-        error_setg(&hv_no_nonarch_cs_mig_blocker,
-                   "'hv-no-nonarch-coresharing=auto' CPU flag prevents migration"
-                   " use explicit 'hv-no-nonarch-coresharing=on' instead (but"
-                   " make sure SMT is disabled and/or that vCPUs are properly"
-                   " pinned)");
+        error_setg(
+            &hv_no_nonarch_cs_mig_blocker,
+            "'hv-no-nonarch-coresharing=auto' CPU flag prevents migration"
+            " use explicit 'hv-no-nonarch-coresharing=on' instead (but"
+            " make sure SMT is disabled and/or that vCPUs are properly"
+            " pinned)");
         ret = migrate_add_blocker(hv_no_nonarch_cs_mig_blocker, &local_err);
         if (ret < 0) {
             error_report_err(local_err);
@@ -1641,8 +1605,8 @@ static int hyperv_init_vcpu(X86CPU *cpu)
     }
 
     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
-        uint32_t synic_cap = cpu->hyperv_synic_kvm_only ?
-            KVM_CAP_HYPERV_SYNIC : KVM_CAP_HYPERV_SYNIC2;
+        uint32_t synic_cap = cpu->hyperv_synic_kvm_only ? KVM_CAP_HYPERV_SYNIC :
+                                                          KVM_CAP_HYPERV_SYNIC2;
         ret = kvm_vcpu_enable_cap(cs, synic_cap, 0);
         if (ret < 0) {
             error_report("failed to turn on HyperV SynIC in KVM: %s",
@@ -1682,8 +1646,9 @@ static int hyperv_init_vcpu(X86CPU *cpu)
 
         if (!evmcs_version_supported(evmcs_version, supported_evmcs_version)) {
             error_report("eVMCS version range [%d..%d] is not supported by "
-                         "kernel (supported: [%d..%d])", evmcs_version & 0xff,
-                         evmcs_version >> 8, supported_evmcs_version & 0xff,
+                         "kernel (supported: [%d..%d])",
+                         evmcs_version & 0xff, evmcs_version >> 8,
+                         supported_evmcs_version & 0xff,
                          supported_evmcs_version >> 8);
             return -ENOTSUP;
         }
@@ -1703,7 +1668,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
 
 static Error *invtsc_mig_blocker;
 
-#define KVM_MAX_CPUID_ENTRIES  100
+#define KVM_MAX_CPUID_ENTRIES 100
 
 static void kvm_init_xsave(CPUX86State *env)
 {
@@ -1761,7 +1726,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
      */
     QEMU_BUILD_BUG_ON(sizeof(cpuid_data) !=
                       sizeof(struct kvm_cpuid2) +
-                      sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
+                          sizeof(struct kvm_cpuid_entry2) *
+                              KVM_MAX_CPUID_ENTRIES);
 
     X86CPU *cpu = X86_CPU(cs);
     CPUX86State *env = &cpu->env;
@@ -1792,8 +1758,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
      */
     if (!env->tsc_khz) {
         r = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-            kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
-            -ENOTSUP;
+                kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
+                -ENOTSUP;
         if (r > 0) {
             env->tsc_khz = r;
         }
@@ -1861,8 +1827,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
 
         c = &cpuid_data.entries[cpuid_i++];
         c->function = kvm_base + XEN_CPUID_TIME;
-        c->eax = ((!!tsc_is_stable_and_known(env) << 1) |
-            (!!(env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_RDTSCP) << 2));
+        c->eax =
+            ((!!tsc_is_stable_and_known(env) << 1) |
+             (!!(env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_RDTSCP) << 2));
         /* default=0 (emulate if necessary) */
         c->ebx = 0;
         /* guest tsc frequency */
@@ -1940,15 +1907,17 @@ int kvm_arch_init_vcpu(CPUState *cs)
             int times;
 
             c->function = i;
-            c->flags = KVM_CPUID_FLAG_STATEFUL_FUNC |
-                       KVM_CPUID_FLAG_STATE_READ_NEXT;
+            c->flags =
+                KVM_CPUID_FLAG_STATEFUL_FUNC | KVM_CPUID_FLAG_STATE_READ_NEXT;
             cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
             times = c->eax & 0xff;
 
             for (j = 1; j < times; ++j) {
                 if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-                    fprintf(stderr, "cpuid_data is full, no space for "
-                            "cpuid(eax:2):eax & 0xf = 0x%x\n", times);
+                    fprintf(stderr,
+                            "cpuid_data is full, no space for "
+                            "cpuid(eax:2):eax & 0xf = 0x%x\n",
+                            times);
                     abort();
                 }
                 c = &cpuid_data.entries[cpuid_i++];
@@ -1966,7 +1935,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
         case 4:
         case 0xb:
         case 0xd:
-            for (j = 0; ; j++) {
+            for (j = 0;; j++) {
                 if (i == 0xd && j == 64) {
                     break;
                 }
@@ -1993,8 +1962,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
                     continue;
                 }
                 if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-                    fprintf(stderr, "cpuid_data is full, no space for "
-                            "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
+                    fprintf(stderr,
+                            "cpuid_data is full, no space for "
+                            "cpuid(eax:0x%x,ecx:0x%x)\n",
+                            i, j);
                     abort();
                 }
                 c = &cpuid_data.entries[cpuid_i++];
@@ -2002,7 +1973,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
             break;
         case 0x7:
         case 0x12:
-            for (j = 0; ; j++) {
+            for (j = 0;; j++) {
                 c->function = i;
                 c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
                 c->index = j;
@@ -2013,8 +1984,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
                 }
 
                 if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-                    fprintf(stderr, "cpuid_data is full, no space for "
-                                "cpuid(eax:0x12,ecx:0x%x)\n", j);
+                    fprintf(stderr,
+                            "cpuid_data is full, no space for "
+                            "cpuid(eax:0x12,ecx:0x%x)\n",
+                            j);
                     abort();
                 }
                 c = &cpuid_data.entries[cpuid_i++];
@@ -2033,8 +2006,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
 
             for (j = 1; j <= times; ++j) {
                 if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-                    fprintf(stderr, "cpuid_data is full, no space for "
-                                "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
+                    fprintf(stderr,
+                            "cpuid_data is full, no space for "
+                            "cpuid(eax:0x%x,ecx:0x%x)\n",
+                            i, j);
                     abort();
                 }
                 c = &cpuid_data.entries[cpuid_i++];
@@ -2099,7 +2074,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
         switch (i) {
         case 0x8000001d:
             /* Query for all AMD cache information leaves */
-            for (j = 0; ; j++) {
+            for (j = 0;; j++) {
                 c->function = i;
                 c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
                 c->index = j;
@@ -2109,8 +2084,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
                     break;
                 }
                 if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-                    fprintf(stderr, "cpuid_data is full, no space for "
-                            "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
+                    fprintf(stderr,
+                            "cpuid_data is full, no space for "
+                            "cpuid(eax:0x%x,ecx:0x%x)\n",
+                            i, j);
                     abort();
                 }
                 c = &cpuid_data.entries[cpuid_i++];
@@ -2150,10 +2127,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
 
     cpuid_data.cpuid.nent = cpuid_i;
 
-    if (((env->cpuid_version >> 8)&0xF) >= 6
-        && (env->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) ==
-           (CPUID_MCE | CPUID_MCA)
-        && kvm_check_extension(cs->kvm_state, KVM_CAP_MCE) > 0) {
+    if (((env->cpuid_version >> 8) & 0xF) >= 6 &&
+        (env->features[FEAT_1_EDX] & (CPUID_MCE | CPUID_MCA)) ==
+            (CPUID_MCE | CPUID_MCA) &&
+        kvm_check_extension(cs->kvm_state, KVM_CAP_MCE) > 0) {
         uint64_t mcg_cap, unsupported_caps;
         int banks;
         int ret;
@@ -2165,8 +2142,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
         }
 
         if (banks < (env->mcg_cap & MCG_CAP_BANKS_MASK)) {
-            error_report("kvm: Unsupported MCE bank count (QEMU = %d, KVM = %d)",
-                         (int)(env->mcg_cap & MCG_CAP_BANKS_MASK), banks);
+            error_report(
+                "kvm: Unsupported MCE bank count (QEMU = %d, KVM = %d)",
+                (int)(env->mcg_cap & MCG_CAP_BANKS_MASK), banks);
             return -ENOTSUP;
         }
 
@@ -2192,8 +2170,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
 
     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
     if (c) {
-        has_msr_feature_control = !!(c->ecx & CPUID_EXT_VMX) ||
-                                  !!(c->ecx & CPUID_EXT_SMX);
+        has_msr_feature_control =
+            !!(c->ecx & CPUID_EXT_VMX) || !!(c->ecx & CPUID_EXT_SMX);
     }
 
     c = cpuid_find_entry(&cpuid_data.cpuid, 7, 0);
@@ -2222,11 +2200,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
     if (cpu->vmware_cpuid_freq
         /* Guests depend on 0x40000000 to detect this feature, so only expose
          * it if KVM exposes leaf 0x40000000. (Conflicts with Hyper-V) */
-        && cpu->expose_kvm
-        && kvm_base == KVM_CPUID_SIGNATURE
+        && cpu->expose_kvm &&
+        kvm_base == KVM_CPUID_SIGNATURE
         /* TSC clock must be stable and known for this feature. */
         && tsc_is_stable_and_known(env)) {
-
         c = &cpuid_data.entries[cpuid_i++];
         c->function = KVM_CPUID_SIGNATURE | 0x10;
         c->eax = env->tsc_khz;
@@ -2268,7 +2245,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
 
     return 0;
 
- fail:
+fail:
     migrate_del_blocker(invtsc_mig_blocker);
 
     return r;
@@ -2357,21 +2334,19 @@ static int kvm_get_supported_feature_msrs(KVMState *s)
     msr_list.nmsrs = 0;
     ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, &msr_list);
     if (ret < 0 && ret != -E2BIG) {
-        error_report("Fetch KVM feature MSR list failed: %s",
-            strerror(-ret));
+        error_report("Fetch KVM feature MSR list failed: %s", strerror(-ret));
         return ret;
     }
 
     assert(msr_list.nmsrs > 0);
     kvm_feature_msrs = g_malloc0(sizeof(msr_list) +
-                 msr_list.nmsrs * sizeof(msr_list.indices[0]));
+                                 msr_list.nmsrs * sizeof(msr_list.indices[0]));
 
     kvm_feature_msrs->nmsrs = msr_list.nmsrs;
     ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, kvm_feature_msrs);
 
     if (ret < 0) {
-        error_report("Fetch KVM feature MSR list failed: %s",
-            strerror(-ret));
+        error_report("Fetch KVM feature MSR list failed: %s", strerror(-ret));
         g_free(kvm_feature_msrs);
         kvm_feature_msrs = NULL;
         return ret;
@@ -2398,9 +2373,8 @@ static int kvm_get_supported_msrs(KVMState *s)
      * Old kernel modules had a bug and could write beyond the provided
      * memory. Allocate at least a safe amount of 1K.
      */
-    kvm_msr_list = g_malloc0(MAX(1024, sizeof(msr_list) +
-                                          msr_list.nmsrs *
-                                          sizeof(msr_list.indices[0])));
+    kvm_msr_list = g_malloc0(MAX(
+        1024, sizeof(msr_list) + msr_list.nmsrs * sizeof(msr_list.indices[0])));
 
     kvm_msr_list->nmsrs = msr_list.nmsrs;
     ret = kvm_ioctl(s, KVM_GET_MSR_INDEX_LIST, kvm_msr_list);
@@ -2531,10 +2505,11 @@ static MemoryRegion smram_as_mem;
 static void register_smram_listener(Notifier *n, void *unused)
 {
     MemoryRegion *smram =
-        (MemoryRegion *) object_resolve_path("/machine/smram", NULL);
+        (MemoryRegion *)object_resolve_path("/machine/smram", NULL);
 
     /* Outer container... */
-    memory_region_init(&smram_as_root, OBJECT(kvm_state), "mem-container-smram", ~0ull);
+    memory_region_init(&smram_as_root, OBJECT(kvm_state), "mem-container-smram",
+                       ~0ull);
     memory_region_set_enabled(&smram_as_root, true);
 
     /* ... with two regions inside: normal system memory with low
@@ -2604,7 +2579,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
         }
     }
 
-    has_triple_fault_event = kvm_check_extension(s, KVM_CAP_X86_TRIPLE_FAULT_EVENT);
+    has_triple_fault_event =
+        kvm_check_extension(s, KVM_CAP_X86_TRIPLE_FAULT_EVENT);
     if (has_triple_fault_event) {
         ret = kvm_vm_enable_cap(s, KVM_CAP_X86_TRIPLE_FAULT_EVENT, 0, true);
         if (ret < 0) {
@@ -2676,7 +2652,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
         return ret;
     }
 
-    shadow_mem = object_property_get_int(OBJECT(s), "kvm-shadow-mem", &error_abort);
+    shadow_mem =
+        object_property_get_int(OBJECT(s), "kvm-shadow-mem", &error_abort);
     if (shadow_mem != -1) {
         shadow_mem /= 4096;
         ret = kvm_vm_ioctl(s, KVM_SET_NR_MMU_PAGES, shadow_mem);
@@ -2701,14 +2678,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
 #define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
 #endif
         if (disable_exits) {
-            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
-                              KVM_X86_DISABLE_EXITS_HLT |
-                              KVM_X86_DISABLE_EXITS_PAUSE |
-                              KVM_X86_DISABLE_EXITS_CSTATE);
+            disable_exits &=
+                (KVM_X86_DISABLE_EXITS_MWAIT | KVM_X86_DISABLE_EXITS_HLT |
+                 KVM_X86_DISABLE_EXITS_PAUSE | KVM_X86_DISABLE_EXITS_CSTATE);
         }
 
-        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
-                                disable_exits);
+        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0, disable_exits);
         if (ret < 0) {
             error_report("kvm: guest stopping CPU not supported: %s",
                          strerror(-ret));
@@ -2739,17 +2714,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
 
     if (s->notify_vmexit != NOTIFY_VMEXIT_OPTION_DISABLE &&
         kvm_check_extension(s, KVM_CAP_X86_NOTIFY_VMEXIT)) {
-            uint64_t notify_window_flags =
-                ((uint64_t)s->notify_window << 32) |
-                KVM_X86_NOTIFY_VMEXIT_ENABLED |
-                KVM_X86_NOTIFY_VMEXIT_USER;
-            ret = kvm_vm_enable_cap(s, KVM_CAP_X86_NOTIFY_VMEXIT, 0,
-                                    notify_window_flags);
-            if (ret < 0) {
-                error_report("kvm: Failed to enable notify vmexit cap: %s",
-                             strerror(-ret));
-                return ret;
-            }
+        uint64_t notify_window_flags = ((uint64_t)s->notify_window << 32) |
+                                       KVM_X86_NOTIFY_VMEXIT_ENABLED |
+                                       KVM_X86_NOTIFY_VMEXIT_USER;
+        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_NOTIFY_VMEXIT, 0,
+                                notify_window_flags);
+        if (ret < 0) {
+            error_report("kvm: Failed to enable notify vmexit cap: %s",
+                         strerror(-ret));
+            return ret;
+        }
     }
     if (kvm_vm_check_extension(s, KVM_CAP_X86_USER_SPACE_MSR)) {
         bool r;
@@ -2815,12 +2789,9 @@ static void get_seg(SegmentCache *lhs, const struct kvm_segment *rhs)
     lhs->limit = rhs->limit;
     lhs->flags = (rhs->type << DESC_TYPE_SHIFT) |
                  ((rhs->present && !rhs->unusable) * DESC_P_MASK) |
-                 (rhs->dpl << DESC_DPL_SHIFT) |
-                 (rhs->db << DESC_B_SHIFT) |
-                 (rhs->s * DESC_S_MASK) |
-                 (rhs->l << DESC_L_SHIFT) |
-                 (rhs->g * DESC_G_MASK) |
-                 (rhs->avl * DESC_AVL_MASK);
+                 (rhs->dpl << DESC_DPL_SHIFT) | (rhs->db << DESC_B_SHIFT) |
+                 (rhs->s * DESC_S_MASK) | (rhs->l << DESC_L_SHIFT) |
+                 (rhs->g * DESC_G_MASK) | (rhs->avl * DESC_AVL_MASK);
 }
 
 static void kvm_getput_reg(__u64 *kvm_reg, target_ulong *qemu_reg, int set)
@@ -3172,8 +3143,7 @@ static uint64_t make_vmx_msr_value(uint32_t index, uint32_t features)
 static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
 {
     uint64_t kvm_vmx_basic =
-        kvm_arch_get_supported_msr_feature(kvm_state,
-                                           MSR_IA32_VMX_BASIC);
+        kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_VMX_BASIC);
 
     if (!kvm_vmx_basic) {
         /* If the kernel doesn't support VMX feature (kvm_intel.nested=0),
@@ -3183,27 +3153,27 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
     }
 
     uint64_t kvm_vmx_misc =
-        kvm_arch_get_supported_msr_feature(kvm_state,
-                                           MSR_IA32_VMX_MISC);
-    uint64_t kvm_vmx_ept_vpid =
-        kvm_arch_get_supported_msr_feature(kvm_state,
-                                           MSR_IA32_VMX_EPT_VPID_CAP);
+        kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_VMX_MISC);
+    uint64_t kvm_vmx_ept_vpid = kvm_arch_get_supported_msr_feature(
+        kvm_state, MSR_IA32_VMX_EPT_VPID_CAP);
 
     /*
      * If the guest is 64-bit, a value of 1 is allowed for the host address
      * space size vmexit control.
      */
-    uint64_t fixed_vmx_exit = f[FEAT_8000_0001_EDX] & CPUID_EXT2_LM
-        ? (uint64_t)VMX_VM_EXIT_HOST_ADDR_SPACE_SIZE << 32 : 0;
+    uint64_t fixed_vmx_exit = f[FEAT_8000_0001_EDX] & CPUID_EXT2_LM ?
+                                  (uint64_t)VMX_VM_EXIT_HOST_ADDR_SPACE_SIZE
+                                      << 32 :
+                                  0;
 
     /*
      * Bits 0-30, 32-44 and 50-53 come from the host.  KVM should
      * not change them for backwards compatibility.
      */
-    uint64_t fixed_vmx_basic = kvm_vmx_basic &
-        (MSR_VMX_BASIC_VMCS_REVISION_MASK |
-         MSR_VMX_BASIC_VMXON_REGION_SIZE_MASK |
-         MSR_VMX_BASIC_VMCS_MEM_TYPE_MASK);
+    uint64_t fixed_vmx_basic =
+        kvm_vmx_basic & (MSR_VMX_BASIC_VMCS_REVISION_MASK |
+                         MSR_VMX_BASIC_VMXON_REGION_SIZE_MASK |
+                         MSR_VMX_BASIC_VMCS_MEM_TYPE_MASK);
 
     /*
      * Same for bits 0-4 and 25-27.  Bits 16-24 (CR3 target count) can
@@ -3212,17 +3182,18 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
      * not support dual-monitor treatment and probably never will; mask
      * them out as well.
      */
-    uint64_t fixed_vmx_misc = kvm_vmx_misc &
-        (MSR_VMX_MISC_PREEMPTION_TIMER_SHIFT_MASK |
-         MSR_VMX_MISC_MAX_MSR_LIST_SIZE_MASK);
+    uint64_t fixed_vmx_misc =
+        kvm_vmx_misc & (MSR_VMX_MISC_PREEMPTION_TIMER_SHIFT_MASK |
+                        MSR_VMX_MISC_MAX_MSR_LIST_SIZE_MASK);
 
     /*
      * EPT memory types should not change either, so we do not bother
      * adding features for them.
      */
     uint64_t fixed_vmx_ept_mask =
-            (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_ENABLE_EPT ?
-             MSR_VMX_EPT_UC | MSR_VMX_EPT_WB : 0);
+        (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_ENABLE_EPT ?
+             MSR_VMX_EPT_UC | MSR_VMX_EPT_WB :
+             0);
     uint64_t fixed_vmx_ept_vpid = kvm_vmx_ept_vpid & fixed_vmx_ept_mask;
 
     kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_PROCBASED_CTLS,
@@ -3231,9 +3202,10 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
     kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_PINBASED_CTLS,
                       make_vmx_msr_value(MSR_IA32_VMX_TRUE_PINBASED_CTLS,
                                          f[FEAT_VMX_PINBASED_CTLS]));
-    kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_EXIT_CTLS,
-                      make_vmx_msr_value(MSR_IA32_VMX_TRUE_EXIT_CTLS,
-                                         f[FEAT_VMX_EXIT_CTLS]) | fixed_vmx_exit);
+    kvm_msr_entry_add(
+        cpu, MSR_IA32_VMX_TRUE_EXIT_CTLS,
+        make_vmx_msr_value(MSR_IA32_VMX_TRUE_EXIT_CTLS, f[FEAT_VMX_EXIT_CTLS]) |
+            fixed_vmx_exit);
     kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_ENTRY_CTLS,
                       make_vmx_msr_value(MSR_IA32_VMX_TRUE_ENTRY_CTLS,
                                          f[FEAT_VMX_ENTRY_CTLS]));
@@ -3256,8 +3228,7 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
      */
     kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR0_FIXED0,
                       CR0_PE_MASK | CR0_PG_MASK | CR0_NE_MASK);
-    kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0,
-                      CR4_VMXE_MASK);
+    kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0, CR4_VMXE_MASK);
 
     if (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_TSC_SCALING) {
         /* TSC multiplier (0x2032).  */
@@ -3270,13 +3241,12 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
 
 static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
 {
-    uint64_t kvm_perf_cap =
-        kvm_arch_get_supported_msr_feature(kvm_state,
-                                           MSR_IA32_PERF_CAPABILITIES);
+    uint64_t kvm_perf_cap = kvm_arch_get_supported_msr_feature(
+        kvm_state, MSR_IA32_PERF_CAPABILITIES);
 
     if (kvm_perf_cap) {
         kvm_msr_entry_add(cpu, MSR_IA32_PERF_CAPABILITIES,
-                        kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
+                          kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
     }
 }
 
@@ -3355,8 +3325,7 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
         kvm_msr_entry_add(cpu, MSR_TSC_ADJUST, env->tsc_adjust);
     }
     if (has_msr_misc_enable) {
-        kvm_msr_entry_add(cpu, MSR_IA32_MISC_ENABLE,
-                          env->msr_ia32_misc_enable);
+        kvm_msr_entry_add(cpu, MSR_IA32_MISC_ENABLE, env->msr_ia32_misc_enable);
     }
     if (has_msr_smbase) {
         kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, env->smbase);
@@ -3502,8 +3471,8 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
         if (has_msr_hv_runtime) {
             kvm_msr_entry_add(cpu, HV_X64_MSR_VP_RUNTIME, env->msr_hv_runtime);
         }
-        if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX)
-            && hv_vpindex_settable) {
+        if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX) &&
+            hv_vpindex_settable) {
             kvm_msr_entry_add(cpu, HV_X64_MSR_VP_INDEX,
                               hyperv_vp_index(CPU(cpu)));
         }
@@ -3516,8 +3485,7 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
                               env->msr_hv_synic_control);
             kvm_msr_entry_add(cpu, HV_X64_MSR_SIEFP,
                               env->msr_hv_synic_evt_page);
-            kvm_msr_entry_add(cpu, HV_X64_MSR_SIMP,
-                              env->msr_hv_synic_msg_page);
+            kvm_msr_entry_add(cpu, HV_X64_MSR_SIMP, env->msr_hv_synic_msg_page);
 
             for (j = 0; j < ARRAY_SIZE(env->msr_hv_synic_sint); j++) {
                 kvm_msr_entry_add(cpu, HV_X64_MSR_SINT0 + j,
@@ -3529,12 +3497,12 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
 
             for (j = 0; j < ARRAY_SIZE(env->msr_hv_stimer_config); j++) {
                 kvm_msr_entry_add(cpu, HV_X64_MSR_STIMER0_CONFIG + j * 2,
-                                env->msr_hv_stimer_config[j]);
+                                  env->msr_hv_stimer_config[j]);
             }
 
             for (j = 0; j < ARRAY_SIZE(env->msr_hv_stimer_count); j++) {
                 kvm_msr_entry_add(cpu, HV_X64_MSR_STIMER0_COUNT + j * 2,
-                                env->msr_hv_stimer_count[j]);
+                                  env->msr_hv_stimer_count[j]);
             }
         }
         if (env->features[FEAT_1_EDX] & CPUID_MTRR) {
@@ -3565,22 +3533,20 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
             }
         }
         if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
-                                                    0x14, 1, R_EAX) & 0x7;
+            int addr_num =
+                kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
 
-            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-                            env->msr_rtit_ctrl);
-            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-                            env->msr_rtit_status);
+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, env->msr_rtit_ctrl);
+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, env->msr_rtit_status);
             kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-                            env->msr_rtit_output_base);
+                              env->msr_rtit_output_base);
             kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK,
-                            env->msr_rtit_output_mask);
+                              env->msr_rtit_output_mask);
             kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH,
-                            env->msr_rtit_cr3_match);
+                              env->msr_rtit_cr3_match);
             for (i = 0; i < addr_num; i++) {
                 kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
-                            env->msr_rtit_addrs[i]);
+                                  env->msr_rtit_addrs[i]);
             }
         }
 
@@ -3596,10 +3562,8 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
         }
 
         if (env->features[FEAT_XSAVE] & CPUID_D_1_EAX_XFD) {
-            kvm_msr_entry_add(cpu, MSR_IA32_XFD,
-                              env->msr_xfd);
-            kvm_msr_entry_add(cpu, MSR_IA32_XFD_ERR,
-                              env->msr_xfd_err);
+            kvm_msr_entry_add(cpu, MSR_IA32_XFD, env->msr_xfd);
+            kvm_msr_entry_add(cpu, MSR_IA32_XFD_ERR, env->msr_xfd_err);
         }
 
         if (kvm_enabled() && cpu->enable_pmu &&
@@ -4058,8 +4022,7 @@ static int kvm_get_msrs(X86CPU *cpu)
 
     if (ret < cpu->kvm_msr_buf->nmsrs) {
         struct kvm_msr_entry *e = &cpu->kvm_msr_buf->entries[ret];
-        error_report("error: failed to get MSR 0x%" PRIx32,
-                     (uint32_t)e->index);
+        error_report("error: failed to get MSR 0x%" PRIx32, (uint32_t)e->index);
     }
 
     assert(ret == cpu->kvm_msr_buf->nmsrs);
@@ -4207,8 +4170,10 @@ static int kvm_get_msrs(X86CPU *cpu)
         case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
             env->msr_global_ovf_ctrl = msrs[i].data;
             break;
-        case MSR_CORE_PERF_FIXED_CTR0 ... MSR_CORE_PERF_FIXED_CTR0 + MAX_FIXED_COUNTERS - 1:
-            env->msr_fixed_counters[index - MSR_CORE_PERF_FIXED_CTR0] = msrs[i].data;
+        case MSR_CORE_PERF_FIXED_CTR0 ... MSR_CORE_PERF_FIXED_CTR0 +
+            MAX_FIXED_COUNTERS - 1:
+            env->msr_fixed_counters[index - MSR_CORE_PERF_FIXED_CTR0] =
+                msrs[i].data;
             break;
         case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR0 + MAX_GP_COUNTERS - 1:
             env->msr_gp_counters[index - MSR_P6_PERFCTR0] = msrs[i].data;
@@ -4229,7 +4194,8 @@ static int kvm_get_msrs(X86CPU *cpu)
             env->msr_hv_tsc = msrs[i].data;
             break;
         case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
-            env->msr_hv_crash_params[index - HV_X64_MSR_CRASH_P0] = msrs[i].data;
+            env->msr_hv_crash_params[index - HV_X64_MSR_CRASH_P0] =
+                msrs[i].data;
             break;
         case HV_X64_MSR_VP_RUNTIME:
             env->msr_hv_runtime = msrs[i].data;
@@ -4250,15 +4216,15 @@ static int kvm_get_msrs(X86CPU *cpu)
         case HV_X64_MSR_STIMER1_CONFIG:
         case HV_X64_MSR_STIMER2_CONFIG:
         case HV_X64_MSR_STIMER3_CONFIG:
-            env->msr_hv_stimer_config[(index - HV_X64_MSR_STIMER0_CONFIG)/2] =
-                                msrs[i].data;
+            env->msr_hv_stimer_config[(index - HV_X64_MSR_STIMER0_CONFIG) / 2] =
+                msrs[i].data;
             break;
         case HV_X64_MSR_STIMER0_COUNT:
         case HV_X64_MSR_STIMER1_COUNT:
         case HV_X64_MSR_STIMER2_COUNT:
         case HV_X64_MSR_STIMER3_COUNT:
-            env->msr_hv_stimer_count[(index - HV_X64_MSR_STIMER0_COUNT)/2] =
-                                msrs[i].data;
+            env->msr_hv_stimer_count[(index - HV_X64_MSR_STIMER0_COUNT) / 2] =
+                msrs[i].data;
             break;
         case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
             env->msr_hv_reenlightenment_control = msrs[i].data;
@@ -4308,10 +4274,10 @@ static int kvm_get_msrs(X86CPU *cpu)
         case MSR_MTRRfix4K_F8000:
             env->mtrr_fixed[10] = msrs[i].data;
             break;
-        case MSR_MTRRphysBase(0) ... MSR_MTRRphysMask(MSR_MTRRcap_VCNT - 1):
+        case MSR_MTRRphysBase(0)... MSR_MTRRphysMask(MSR_MTRRcap_VCNT - 1):
             if (index & 1) {
-                env->mtrr_var[MSR_MTRRphysIndex(index)].mask = msrs[i].data |
-                                                               mtrr_top_bits;
+                env->mtrr_var[MSR_MTRRphysIndex(index)].mask =
+                    msrs[i].data | mtrr_top_bits;
             } else {
                 env->mtrr_var[MSR_MTRRphysIndex(index)].base = msrs[i].data;
             }
@@ -4348,7 +4314,7 @@ static int kvm_get_msrs(X86CPU *cpu)
             break;
         case MSR_IA32_SGXLEPUBKEYHASH0 ... MSR_IA32_SGXLEPUBKEYHASH3:
             env->msr_ia32_sgxlepubkeyhash[index - MSR_IA32_SGXLEPUBKEYHASH0] =
-                           msrs[i].data;
+                msrs[i].data;
             break;
         case MSR_IA32_XFD:
             env->msr_xfd = msrs[i].data;
@@ -4460,7 +4426,8 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
              * from cs->interrupt_request.
              */
             events.smi.pending = cs->interrupt_request & CPU_INTERRUPT_SMI;
-            events.smi.latched_init = cs->interrupt_request & CPU_INTERRUPT_INIT;
+            events.smi.latched_init =
+                cs->interrupt_request & CPU_INTERRUPT_INIT;
             cs->interrupt_request &= ~(CPU_INTERRUPT_INIT | CPU_INTERRUPT_SMI);
         } else {
             /* Keep these in cs->interrupt_request.  */
@@ -4503,7 +4470,7 @@ static int kvm_get_vcpu_events(X86CPU *cpu)
     memset(&events, 0, sizeof(events));
     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_VCPU_EVENTS, &events);
     if (ret < 0) {
-       return ret;
+        return ret;
     }
 
     if (events.flags & KVM_VCPUEVENT_VALID_PAYLOAD) {
@@ -4515,9 +4482,9 @@ static int kvm_get_vcpu_events(X86CPU *cpu)
         env->exception_has_payload = false;
     }
     env->exception_injected = events.exception.injected;
-    env->exception_nr =
-        (env->exception_pending || env->exception_injected) ?
-        events.exception.nr : -1;
+    env->exception_nr = (env->exception_pending || env->exception_injected) ?
+                            events.exception.nr :
+                            -1;
     env->has_error_code = events.exception.has_error_code;
     env->error_code = events.exception.error_code;
 
@@ -4872,7 +4839,7 @@ int kvm_arch_get_registers(CPUState *cs)
     }
 #endif
     ret = 0;
- out:
+out:
     cpu_sync_bndcs_hflags(&cpu->env);
     return ret;
 }
@@ -4995,7 +4962,7 @@ MemTxAttrs kvm_arch_post_run(CPUState *cpu, struct kvm_run *run)
         kvm_rate_limit_on_bus_lock();
     }
 
-#ifdef CONFIG_XEN_EMU    
+#ifdef CONFIG_XEN_EMU
     /*
      * If the callback is asserted as a GSI (or PCI INTx) then check if
      * vcpu_info->evtchn_upcall_pending has been cleared, and deassert
@@ -5103,8 +5070,8 @@ static int kvm_handle_tpr_access(X86CPU *cpu)
     struct kvm_run *run = cs->kvm_run;
 
     apic_handle_tpr_access_report(cpu->apic_state, run->tpr_access.rip,
-                                  run->tpr_access.is_write ? TPR_ACCESS_WRITE
-                                                           : TPR_ACCESS_READ);
+                                  run->tpr_access.is_write ? TPR_ACCESS_WRITE :
+                                                             TPR_ACCESS_READ);
     return 1;
 }
 
@@ -5156,8 +5123,7 @@ static int find_hw_breakpoint(target_ulong addr, int len, int type)
     return -1;
 }
 
-int kvm_arch_insert_hw_breakpoint(target_ulong addr,
-                                  target_ulong len, int type)
+int kvm_arch_insert_hw_breakpoint(target_ulong addr, target_ulong len, int type)
 {
     switch (type) {
     case GDB_BREAKPOINT_HW:
@@ -5197,8 +5163,7 @@ int kvm_arch_insert_hw_breakpoint(target_ulong addr,
     return 0;
 }
 
-int kvm_arch_remove_hw_breakpoint(target_ulong addr,
-                                  target_ulong len, int type)
+int kvm_arch_remove_hw_breakpoint(target_ulong addr, target_ulong len, int type)
 {
     int n;
 
@@ -5219,8 +5184,7 @@ void kvm_arch_remove_all_hw_breakpoints(void)
 
 static CPUWatchpoint hw_watchpoint;
 
-static int kvm_handle_debug(X86CPU *cpu,
-                            struct kvm_debug_exit_arch *arch_info)
+static int kvm_handle_debug(X86CPU *cpu, struct kvm_debug_exit_arch *arch_info)
 {
     CPUState *cs = CPU(cpu);
     CPUX86State *env = &cpu->env;
@@ -5235,7 +5199,7 @@ static int kvm_handle_debug(X86CPU *cpu,
         } else {
             for (n = 0; n < 4; n++) {
                 if (arch_info->dr6 & (1 << n)) {
-                    switch ((arch_info->dr7 >> (16 + n*4)) & 0x3) {
+                    switch ((arch_info->dr7 >> (16 + n * 4)) & 0x3) {
                     case 0x0:
                         ret = EXCP_DEBUG;
                         break;
@@ -5264,8 +5228,7 @@ static int kvm_handle_debug(X86CPU *cpu,
 
         /* pass to guest */
         kvm_queue_exception(env, arch_info->exception,
-                            arch_info->exception == EXCP01_DB,
-                            arch_info->dr6);
+                            arch_info->exception == EXCP01_DB, arch_info->dr6);
         env->has_error_code = 0;
     }
 
@@ -5274,14 +5237,10 @@ static int kvm_handle_debug(X86CPU *cpu,
 
 void kvm_arch_update_guest_debug(CPUState *cpu, struct kvm_guest_debug *dbg)
 {
-    const uint8_t type_code[] = {
-        [GDB_BREAKPOINT_HW] = 0x0,
-        [GDB_WATCHPOINT_WRITE] = 0x1,
-        [GDB_WATCHPOINT_ACCESS] = 0x3
-    };
-    const uint8_t len_code[] = {
-        [1] = 0x0, [2] = 0x1, [4] = 0x3, [8] = 0x2
-    };
+    const uint8_t type_code[] = { [GDB_BREAKPOINT_HW] = 0x0,
+                                  [GDB_WATCHPOINT_WRITE] = 0x1,
+                                  [GDB_WATCHPOINT_ACCESS] = 0x3 };
+    const uint8_t len_code[] = { [1] = 0x0, [2] = 0x1, [4] = 0x3, [8] = 0x2 };
     int n;
 
     if (kvm_sw_breakpoints_active(cpu)) {
@@ -5292,9 +5251,10 @@ void kvm_arch_update_guest_debug(CPUState *cpu, struct kvm_guest_debug *dbg)
         dbg->arch.debugreg[7] = 0x0600;
         for (n = 0; n < nb_hw_breakpoint; n++) {
             dbg->arch.debugreg[n] = hw_breakpoint[n].addr;
-            dbg->arch.debugreg[7] |= (2 << (n * 2)) |
-                (type_code[hw_breakpoint[n].type] << (16 + n*4)) |
-                ((uint32_t)len_code[hw_breakpoint[n].len] << (18 + n*4));
+            dbg->arch.debugreg[7] |=
+                (2 << (n * 2)) |
+                (type_code[hw_breakpoint[n].type] << (16 + n * 4)) |
+                ((uint32_t)len_code[hw_breakpoint[n].len] << (18 + n * 4));
         }
     }
 }
@@ -5312,7 +5272,7 @@ static bool kvm_install_msr_filters(KVMState *s)
         if (handler->msr) {
             struct kvm_msr_filter_range *range = &filter.ranges[j++];
 
-            *range = (struct kvm_msr_filter_range) {
+            *range = (struct kvm_msr_filter_range){
                 .flags = 0,
                 .nmsrs = 1,
                 .base = handler->msr,
@@ -5344,14 +5304,14 @@ bool kvm_filter_msr(KVMState *s, uint32_t msr, QEMURDMSRHandler *rdmsr,
 
     for (i = 0; i < ARRAY_SIZE(msr_handlers); i++) {
         if (!msr_handlers[i].msr) {
-            msr_handlers[i] = (KVMMSRHandlers) {
+            msr_handlers[i] = (KVMMSRHandlers){
                 .msr = msr,
                 .rdmsr = rdmsr,
                 .wrmsr = wrmsr,
             };
 
             if (!kvm_install_msr_filters(s)) {
-                msr_handlers[i] = (KVMMSRHandlers) { };
+                msr_handlers[i] = (KVMMSRHandlers){};
                 return false;
             }
 
@@ -5471,13 +5431,13 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
         if (host_supports_vmx() && code == VMX_INVALID_GUEST_STATE) {
             fprintf(stderr,
                     "\nIf you're running a guest on an Intel machine without "
-                        "unrestricted mode\n"
+                    "unrestricted mode\n"
                     "support, the failure can be most likely due to the guest "
-                        "entering an invalid\n"
+                    "entering an invalid\n"
                     "state for Intel VT. For example, the guest maybe running "
-                        "in big real mode\n"
+                    "in big real mode\n"
                     "which is not supported on less recent Intel processors."
-                        "\n\n");
+                    "\n\n");
         }
         ret = -1;
         break;
@@ -5506,9 +5466,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
     case KVM_EXIT_NOTIFY:
         ctx_invalid = !!(run->notify.flags & KVM_NOTIFY_CONTEXT_INVALID);
         state = KVM_STATE(current_accel());
-        sprintf(str, "Encounter a notify exit with %svalid context in"
-                     " guest. There can be possible misbehaves in guest."
-                     " Please have a look.", ctx_invalid ? "in" : "");
+        sprintf(str,
+                "Encounter a notify exit with %svalid context in"
+                " guest. There can be possible misbehaves in guest."
+                " Please have a look.",
+                ctx_invalid ? "in" : "");
         if (ctx_invalid ||
             state->notify_vmexit == NOTIFY_VMEXIT_OPTION_INTERNAL_ERROR) {
             warn_report("KVM internal error: %s", str);
@@ -5548,8 +5510,7 @@ bool kvm_arch_stop_on_emulation_error(CPUState *cs)
     CPUX86State *env = &cpu->env;
 
     kvm_cpu_synchronize_state(cs);
-    return !(env->cr[0] & CR0_PE_MASK) ||
-           ((env->segs[R_CS].selector  & 3) != 3);
+    return !(env->cr[0] & CR0_PE_MASK) || ((env->segs[R_CS].selector & 3) != 3);
 }
 
 void kvm_arch_init_irq_routing(KVMState *s)
@@ -5615,7 +5576,8 @@ uint64_t kvm_swizzle_msi_ext_dest_id(uint64_t address)
      * there anyway, do nothing.
      */
     ext_id = address & (0xff << MSI_ADDR_DEST_IDX_SHIFT);
-    if (!ext_id || (ext_id & (1 << MSI_ADDR_DEST_IDX_SHIFT)) || (address >> 32)) {
+    if (!ext_id || (ext_id & (1 << MSI_ADDR_DEST_IDX_SHIFT)) ||
+        (address >> 32)) {
         return address;
     }
 
@@ -5641,9 +5603,9 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
             src.address |= route->u.msi.address_lo;
             src.data = route->u.msi.data;
 
-            ret = class->int_remap(iommu, &src, &dst, dev ?     \
-                                   pci_requester_id(dev) :      \
-                                   X86_IOMMU_SID_INVALID);
+            ret = class->int_remap(iommu, &src, &dst,
+                                   dev ? pci_requester_id(dev) :
+                                         X86_IOMMU_SID_INVALID);
             if (ret) {
                 trace_kvm_x86_fixup_msi_error(route->gsi);
                 return 1;
@@ -5684,18 +5646,18 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
 typedef struct MSIRouteEntry MSIRouteEntry;
 
 struct MSIRouteEntry {
-    PCIDevice *dev;             /* Device pointer */
-    int vector;                 /* MSI/MSIX vector index */
-    int virq;                   /* Virtual IRQ index */
+    PCIDevice *dev; /* Device pointer */
+    int vector; /* MSI/MSIX vector index */
+    int virq; /* Virtual IRQ index */
     QLIST_ENTRY(MSIRouteEntry) list;
 };
 
 /* List of used GSI routes */
-static QLIST_HEAD(, MSIRouteEntry) msi_route_list = \
-    QLIST_HEAD_INITIALIZER(msi_route_list);
+static QLIST_HEAD(, MSIRouteEntry)
+    msi_route_list = QLIST_HEAD_INITIALIZER(msi_route_list);
 
-void kvm_update_msi_routes_all(void *private, bool global,
-                               uint32_t index, uint32_t mask)
+void kvm_update_msi_routes_all(void *private, bool global, uint32_t index,
+                               uint32_t mask)
 {
     int cnt = 0, vector;
     MSIRouteEntry *entry;
@@ -5703,7 +5665,7 @@ void kvm_update_msi_routes_all(void *private, bool global,
     PCIDevice *dev;
 
     /* TODO: explicit route update */
-    QLIST_FOREACH(entry, &msi_route_list, list) {
+    QLIST_FOREACH (entry, &msi_route_list, list) {
         cnt++;
         vector = entry->vector;
         dev = entry->dev;
@@ -5724,8 +5686,8 @@ void kvm_update_msi_routes_all(void *private, bool global,
     trace_kvm_x86_update_msi_routes(cnt);
 }
 
-int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
-                                int vector, PCIDevice *dev)
+int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route, int vector,
+                                PCIDevice *dev)
 {
     static bool notify_list_inited = false;
     MSIRouteEntry *entry;
@@ -5750,8 +5712,7 @@ int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
          * IOMMU's IEC notify list if needed. */
         X86IOMMUState *iommu = x86_iommu_get_default();
         if (iommu) {
-            x86_iommu_iec_register_notifier(iommu,
-                                            kvm_update_msi_routes_all,
+            x86_iommu_iec_register_notifier(iommu, kvm_update_msi_routes_all,
                                             NULL);
         }
         notify_list_inited = true;
@@ -5762,7 +5723,7 @@ int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
 int kvm_arch_release_virq_post(int virq)
 {
     MSIRouteEntry *entry, *next;
-    QLIST_FOREACH_SAFE(entry, &msi_route_list, list, next) {
+    QLIST_FOREACH_SAFE (entry, &msi_route_list, list, next) {
         if (entry->virq == virq) {
             trace_kvm_x86_remove_msi_route(virq);
             QLIST_REMOVE(entry, list);
@@ -5788,7 +5749,7 @@ bool kvm_arch_cpu_check_are_resettable(void)
     return !sev_es_enabled();
 }
 
-#define ARCH_REQ_XCOMP_GUEST_PERM       0x1025
+#define ARCH_REQ_XCOMP_GUEST_PERM 0x1025
 
 void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
 {
@@ -5818,7 +5779,8 @@ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
              * any dynamic feature from kvm_arch_get_supported_cpuid.
              */
             warn_report("prctl(ARCH_REQ_XCOMP_GUEST_PERM) failure "
-                        "for feature bit %d", bit);
+                        "for feature bit %d",
+                        bit);
         }
         mask &= ~BIT_ULL(bit);
     }
@@ -5835,7 +5797,9 @@ static void kvm_arch_set_notify_vmexit(Object *obj, int value, Error **errp)
     KVMState *s = KVM_STATE(obj);
 
     if (s->fd != -1) {
-        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
+        error_setg(
+            errp,
+            "Cannot set properties after the accelerator has been initialized");
         return;
     }
 
@@ -5860,7 +5824,9 @@ static void kvm_arch_set_notify_window(Object *obj, Visitor *v,
     uint32_t value;
 
     if (s->fd != -1) {
-        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
+        error_setg(
+            errp,
+            "Cannot set properties after the accelerator has been initialized");
         return;
     }
 
@@ -5871,9 +5837,8 @@ static void kvm_arch_set_notify_window(Object *obj, Visitor *v,
     s->notify_window = value;
 }
 
-static void kvm_arch_get_xen_version(Object *obj, Visitor *v,
-                                     const char *name, void *opaque,
-                                     Error **errp)
+static void kvm_arch_get_xen_version(Object *obj, Visitor *v, const char *name,
+                                     void *opaque, Error **errp)
 {
     KVMState *s = KVM_STATE(obj);
     uint32_t value = s->xen_version;
@@ -5881,9 +5846,8 @@ static void kvm_arch_get_xen_version(Object *obj, Visitor *v,
     visit_type_uint32(v, name, &value, errp);
 }
 
-static void kvm_arch_set_xen_version(Object *obj, Visitor *v,
-                                     const char *name, void *opaque,
-                                     Error **errp)
+static void kvm_arch_set_xen_version(Object *obj, Visitor *v, const char *name,
+                                     void *opaque, Error **errp)
 {
     KVMState *s = KVM_STATE(obj);
     Error *error = NULL;
@@ -5957,25 +5921,23 @@ static void kvm_arch_set_xen_evtchn_max_pirq(Object *obj, Visitor *v,
 
 void kvm_arch_accel_class_init(ObjectClass *oc)
 {
-    object_class_property_add_enum(oc, "notify-vmexit", "NotifyVMexitOption",
-                                   &NotifyVmexitOption_lookup,
-                                   kvm_arch_get_notify_vmexit,
-                                   kvm_arch_set_notify_vmexit);
+    object_class_property_add_enum(
+        oc, "notify-vmexit", "NotifyVMexitOption", &NotifyVmexitOption_lookup,
+        kvm_arch_get_notify_vmexit, kvm_arch_set_notify_vmexit);
     object_class_property_set_description(oc, "notify-vmexit",
                                           "Enable notify VM exit");
 
     object_class_property_add(oc, "notify-window", "uint32",
                               kvm_arch_get_notify_window,
-                              kvm_arch_set_notify_window,
-                              NULL, NULL);
-    object_class_property_set_description(oc, "notify-window",
-                                          "Clock cycles without an event window "
-                                          "after which a notification VM exit occurs");
+                              kvm_arch_set_notify_window, NULL, NULL);
+    object_class_property_set_description(
+        oc, "notify-window",
+        "Clock cycles without an event window "
+        "after which a notification VM exit occurs");
 
     object_class_property_add(oc, "xen-version", "uint32",
                               kvm_arch_get_xen_version,
-                              kvm_arch_set_xen_version,
-                              NULL, NULL);
+                              kvm_arch_set_xen_version, NULL, NULL);
     object_class_property_set_description(oc, "xen-version",
                                           "Xen version to be emulated "
                                           "(in XENVER_version form "
@@ -5983,15 +5945,13 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
 
     object_class_property_add(oc, "xen-gnttab-max-frames", "uint16",
                               kvm_arch_get_xen_gnttab_max_frames,
-                              kvm_arch_set_xen_gnttab_max_frames,
-                              NULL, NULL);
-    object_class_property_set_description(oc, "xen-gnttab-max-frames",
-                                          "Maximum number of grant table frames");
+                              kvm_arch_set_xen_gnttab_max_frames, NULL, NULL);
+    object_class_property_set_description(
+        oc, "xen-gnttab-max-frames", "Maximum number of grant table frames");
 
     object_class_property_add(oc, "xen-evtchn-max-pirq", "uint16",
                               kvm_arch_get_xen_evtchn_max_pirq,
-                              kvm_arch_set_xen_evtchn_max_pirq,
-                              NULL, NULL);
+                              kvm_arch_set_xen_evtchn_max_pirq, NULL, NULL);
     object_class_property_set_description(oc, "xen-evtchn-max-pirq",
                                           "Maximum number of Xen PIRQs");
 }

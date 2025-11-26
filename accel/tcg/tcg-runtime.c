@@ -31,9 +31,9 @@
 #include "exec/log.h"
 #include "tcg/tcg.h"
 
-#define HELPER_H  "accel/tcg/tcg-runtime.h"
+#define HELPER_H "accel/tcg/tcg-runtime.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
 /* 32-bit helpers */
 

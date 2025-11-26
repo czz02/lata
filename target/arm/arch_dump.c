@@ -84,11 +84,10 @@ struct aarch64_note {
 
 #define AARCH64_NOTE_HEADER_SIZE offsetof(struct aarch64_note, prstatus)
 #define AARCH64_PRSTATUS_NOTE_SIZE \
-            (AARCH64_NOTE_HEADER_SIZE + sizeof(struct aarch64_elf_prstatus))
+    (AARCH64_NOTE_HEADER_SIZE + sizeof(struct aarch64_elf_prstatus))
 #define AARCH64_PRFPREG_NOTE_SIZE \
-            (AARCH64_NOTE_HEADER_SIZE + sizeof(struct aarch64_user_vfp_state))
-#define AARCH64_SVE_NOTE_SIZE(env) \
-            (AARCH64_NOTE_HEADER_SIZE + sve_size(env))
+    (AARCH64_NOTE_HEADER_SIZE + sizeof(struct aarch64_user_vfp_state))
+#define AARCH64_SVE_NOTE_SIZE(env) (AARCH64_NOTE_HEADER_SIZE + sve_size(env))
 
 static void aarch64_note_init(struct aarch64_note *note, DumpState *s,
                               const char *name, Elf64_Word namesz,
@@ -124,7 +123,7 @@ static int aarch64_write_elf64_prfpreg(WriteCoreDumpFunction f,
          * hosts use 2n+1 for the high half.
          */
         for (i = 0; i < 32; ++i) {
-            uint64_t tmp = note.vfp.vregs[2*i];
+            uint64_t tmp = note.vfp.vregs[2 * i];
             note.vfp.vregs[2 * i] = note.vfp.vregs[2 * i + 1];
             note.vfp.vregs[2 * i + 1] = tmp;
         }
@@ -180,9 +179,8 @@ static size_t sve_size(CPUARMState *env)
     return sve_size_vq(sve_current_vq(env));
 }
 
-static int aarch64_write_elf64_sve(WriteCoreDumpFunction f,
-                                   CPUARMState *env, int cpuid,
-                                   DumpState *s)
+static int aarch64_write_elf64_sve(WriteCoreDumpFunction f, CPUARMState *env,
+                                   int cpuid, DumpState *s)
 {
     struct aarch64_note *note;
     ARMCPU *cpu = env_archcpu(env);
@@ -231,8 +229,8 @@ static int aarch64_write_elf64_sve(WriteCoreDumpFunction f,
 }
 #endif
 
-int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                             int cpuid, DumpState *s)
+int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                             DumpState *s)
 {
     struct aarch64_note note;
     ARMCPU *cpu = ARM_CPU(cs);
@@ -319,13 +317,12 @@ struct arm_note {
 
 #define ARM_NOTE_HEADER_SIZE offsetof(struct arm_note, prstatus)
 #define ARM_PRSTATUS_NOTE_SIZE \
-            (ARM_NOTE_HEADER_SIZE + sizeof(struct arm_elf_prstatus))
+    (ARM_NOTE_HEADER_SIZE + sizeof(struct arm_elf_prstatus))
 #define ARM_VFP_NOTE_SIZE \
-            (ARM_NOTE_HEADER_SIZE + sizeof(struct arm_user_vfp_state))
+    (ARM_NOTE_HEADER_SIZE + sizeof(struct arm_user_vfp_state))
 
-static void arm_note_init(struct arm_note *note, DumpState *s,
-                          const char *name, Elf32_Word namesz,
-                          Elf32_Word type, Elf32_Word descsz)
+static void arm_note_init(struct arm_note *note, DumpState *s, const char *name,
+                          Elf32_Word namesz, Elf32_Word type, Elf32_Word descsz)
 {
     memset(note, 0, sizeof(*note));
 
@@ -358,8 +355,8 @@ static int arm_write_elf32_vfp(WriteCoreDumpFunction f, CPUARMState *env,
     return 0;
 }
 
-int arm_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-                             int cpuid, DumpState *s)
+int arm_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                             DumpState *s)
 {
     struct arm_note note;
     ARMCPU *cpu = ARM_CPU(cs);
@@ -408,7 +405,7 @@ int cpu_get_dump_info(ArchDumpInfo *info,
      * wrong. This is the same algorithm the crash utility uses when
      * attempting to guess as it loads non-dumpfile formatted files.
      */
-    QTAILQ_FOREACH(block, &guest_phys_blocks->head, next) {
+    QTAILQ_FOREACH (block, &guest_phys_blocks->head, next) {
         if (block->target_start < lowest_addr) {
             lowest_addr = block->target_start;
         }
@@ -435,8 +432,8 @@ int cpu_get_dump_info(ArchDumpInfo *info,
      * dump a hypervisor that happens to be running an opposite-endian
      * kernel.
      */
-    info->d_endian = (env->cp15.sctlr_el[1] & SCTLR_EE) != 0
-                     ? ELFDATA2MSB : ELFDATA2LSB;
+    info->d_endian =
+        (env->cp15.sctlr_el[1] & SCTLR_EE) != 0 ? ELFDATA2MSB : ELFDATA2LSB;
 
     return 0;
 }

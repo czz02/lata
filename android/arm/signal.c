@@ -51,7 +51,7 @@ struct target_ucontext {
     abi_ulong tuc_link;
     target_stack_t tuc_stack;
     struct target_sigcontext tuc_mcontext;
-    target_sigset_t  tuc_sigmask;       /* mask last for extensibility */
+    target_sigset_t tuc_sigmask; /* mask last for extensibility */
     char __unused[128 - sizeof(target_sigset_t)];
     abi_ulong tuc_regspace[128] __attribute__((__aligned__(8)));
 };
@@ -90,14 +90,12 @@ struct target_iwmmxt_sigframe {
 #define TARGET_VFP_MAGIC 0x56465001
 #define TARGET_IWMMXT_MAGIC 0x12ef842a
 
-struct sigframe
-{
+struct sigframe {
     struct target_ucontext uc;
     abi_ulong retcode[4];
 };
 
-struct rt_sigframe
-{
+struct rt_sigframe {
     struct target_siginfo info;
     struct sigframe sig;
 };
@@ -112,8 +110,8 @@ static abi_ptr sigreturn_fdpic_tramp;
  * We will create a table of 8 retcode variants in the sigtramp page.
  * Let each table entry use 3 words.
  */
-#define RETCODE_WORDS  3
-#define RETCODE_BYTES  (RETCODE_WORDS * 4)
+#define RETCODE_WORDS 3
+#define RETCODE_BYTES (RETCODE_WORDS * 4)
 
 static inline int valid_user_regs(CPUARMState *regs)
 {
@@ -148,8 +146,8 @@ setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
     __put_user(mask, &sc->oldmask);
 }
 
-static inline abi_ulong
-get_sigframe(struct target_sigaction *ka, CPUARMState *regs, int framesize)
+static inline abi_ulong get_sigframe(struct target_sigaction *ka,
+                                     CPUARMState *regs, int framesize)
 {
     unsigned long sp;
 
@@ -160,9 +158,8 @@ get_sigframe(struct target_sigaction *ka, CPUARMState *regs, int framesize)
     return (sp - framesize) & ~7;
 }
 
-static int
-setup_return(CPUARMState *env, struct target_sigaction *ka, int usig,
-             struct sigframe *frame, abi_ulong sp_addr)
+static int setup_return(CPUARMState *env, struct target_sigaction *ka, int usig,
+                        struct sigframe *frame, abi_ulong sp_addr)
 {
     abi_ulong handler = 0;
     abi_ulong handler_fdpic_GOT = 0;
@@ -177,8 +174,8 @@ setup_return(CPUARMState *env, struct target_sigaction *ka, int usig,
          * handler. The second word contains the value of the PIC
          * register (r9).  */
         abi_ulong funcdesc_ptr = ka->_sa_handler;
-        if (get_user_ual(handler, funcdesc_ptr)
-            || get_user_ual(handler_fdpic_GOT, funcdesc_ptr + 4)) {
+        if (get_user_ual(handler, funcdesc_ptr) ||
+            get_user_ual(handler_fdpic_GOT, funcdesc_ptr + 4)) {
             return 1;
         }
     } else {
@@ -205,8 +202,8 @@ setup_return(CPUARMState *env, struct target_sigaction *ka, int usig,
     if (ka->sa_flags & TARGET_SA_RESTORER) {
         if (is_fdpic) {
             __put_user((abi_ulong)ka->sa_restorer, &frame->retcode[3]);
-            retcode = (sigreturn_fdpic_tramp +
-                       retcode_idx * RETCODE_BYTES + thumb);
+            retcode =
+                (sigreturn_fdpic_tramp + retcode_idx * RETCODE_BYTES + thumb);
             copy_retcode = true;
         } else {
             retcode = ka->sa_restorer;
@@ -248,7 +245,7 @@ static abi_ulong *setup_sigframe_vfp(abi_ulong *regspace, CPUARMState *env)
     __put_user(env->vfp.xregs[ARM_VFP_FPEXC], &vfpframe->ufp_exc.fpexc);
     __put_user(env->vfp.xregs[ARM_VFP_FPINST], &vfpframe->ufp_exc.fpinst);
     __put_user(env->vfp.xregs[ARM_VFP_FPINST2], &vfpframe->ufp_exc.fpinst2);
-    return (abi_ulong*)(vfpframe+1);
+    return (abi_ulong *)(vfpframe + 1);
 }
 
 static abi_ulong *setup_sigframe_iwmmxt(abi_ulong *regspace, CPUARMState *env)
@@ -267,11 +264,11 @@ static abi_ulong *setup_sigframe_iwmmxt(abi_ulong *regspace, CPUARMState *env)
     __put_user(env->vfp.xregs[ARM_IWMMXT_wCGR1], &iwmmxtframe->wcgr1);
     __put_user(env->vfp.xregs[ARM_IWMMXT_wCGR2], &iwmmxtframe->wcgr2);
     __put_user(env->vfp.xregs[ARM_IWMMXT_wCGR3], &iwmmxtframe->wcgr3);
-    return (abi_ulong*)(iwmmxtframe+1);
+    return (abi_ulong *)(iwmmxtframe + 1);
 }
 
-static void setup_sigframe(struct target_ucontext *uc,
-                           target_sigset_t *set, CPUARMState *env)
+static void setup_sigframe(struct target_ucontext *uc, target_sigset_t *set,
+                           CPUARMState *env)
 {
     struct target_sigaltstack stack;
     int i;
@@ -297,13 +294,13 @@ static void setup_sigframe(struct target_ucontext *uc,
     /* Write terminating magic word */
     __put_user(0, regspace);
 
-    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
+    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
         __put_user(set->sig[i], &uc->tuc_sigmask.sig[i]);
     }
 }
 
-void setup_frame(int usig, struct target_sigaction *ka,
-                 target_sigset_t *set, CPUARMState *regs)
+void setup_frame(int usig, struct target_sigaction *ka, target_sigset_t *set,
+                 CPUARMState *regs)
 {
     struct sigframe *frame;
     abi_ulong frame_addr = get_sigframe(ka, regs, sizeof(*frame));
@@ -327,8 +324,8 @@ sigsegv:
 }
 
 void setup_rt_frame(int usig, struct target_sigaction *ka,
-                    target_siginfo_t *info,
-                    target_sigset_t *set, CPUARMState *env)
+                    target_siginfo_t *info, target_sigset_t *set,
+                    CPUARMState *env)
 {
     struct rt_sigframe *frame;
     abi_ulong frame_addr = get_sigframe(ka, env, sizeof(*frame));
@@ -359,8 +356,7 @@ sigsegv:
     force_sigsegv(usig);
 }
 
-static int
-restore_sigcontext(CPUARMState *env, struct target_sigcontext *sc)
+static int restore_sigcontext(CPUARMState *env, struct target_sigcontext *sc)
 {
     int err = 0;
     uint32_t cpsr;
@@ -416,11 +412,10 @@ static abi_ulong *restore_sigframe_vfp(CPUARMState *env, abi_ulong *regspace)
     env->vfp.xregs[ARM_VFP_FPEXC] = fpexc;
     __get_user(env->vfp.xregs[ARM_VFP_FPINST], &vfpframe->ufp_exc.fpinst);
     __get_user(env->vfp.xregs[ARM_VFP_FPINST2], &vfpframe->ufp_exc.fpinst2);
-    return (abi_ulong*)(vfpframe + 1);
+    return (abi_ulong *)(vfpframe + 1);
 }
 
-static abi_ulong *restore_sigframe_iwmmxt(CPUARMState *env,
-                                          abi_ulong *regspace)
+static abi_ulong *restore_sigframe_iwmmxt(CPUARMState *env, abi_ulong *regspace)
 {
     int i;
     abi_ulong magic, sz;
@@ -441,11 +436,10 @@ static abi_ulong *restore_sigframe_iwmmxt(CPUARMState *env,
     __get_user(env->vfp.xregs[ARM_IWMMXT_wCGR1], &iwmmxtframe->wcgr1);
     __get_user(env->vfp.xregs[ARM_IWMMXT_wCGR2], &iwmmxtframe->wcgr2);
     __get_user(env->vfp.xregs[ARM_IWMMXT_wCGR3], &iwmmxtframe->wcgr3);
-    return (abi_ulong*)(iwmmxtframe + 1);
+    return (abi_ulong *)(iwmmxtframe + 1);
 }
 
-static int do_sigframe_return(CPUARMState *env,
-                              target_ulong context_addr,
+static int do_sigframe_return(CPUARMState *env, target_ulong context_addr,
                               struct target_ucontext *uc)
 {
     sigset_t host_set;
@@ -504,8 +498,7 @@ long do_sigreturn(CPUARMState *env)
         goto badframe;
     }
 
-    if (do_sigframe_return(env,
-                           frame_addr + offsetof(struct sigframe, uc),
+    if (do_sigframe_return(env, frame_addr + offsetof(struct sigframe, uc),
                            &frame->uc)) {
         goto badframe;
     }
@@ -559,11 +552,11 @@ badframe:
  * Note that the kernel still adds the OABI syscall number to the trap,
  * presumably for backward ABI compatibility with unwinders.
  */
-#define ARM_MOV_R7_IMM(X)       (0xe3a07000 | (X))
-#define ARM_SWI_SYS(X)          (0xef000000 | (X) | ARM_SYSCALL_BASE)
+#define ARM_MOV_R7_IMM(X) (0xe3a07000 | (X))
+#define ARM_SWI_SYS(X) (0xef000000 | (X) | ARM_SYSCALL_BASE)
 
-#define THUMB_MOVS_R7_IMM(X)    (0x2700 | (X))
-#define THUMB_SWI_SYS           0xdf00
+#define THUMB_MOVS_R7_IMM(X) (0x2700 | (X))
+#define THUMB_SWI_SYS 0xdf00
 
 static void write_arm_sigreturn(uint32_t *rc, int syscall)
 {
@@ -585,9 +578,9 @@ static void write_thm_sigreturn(uint32_t *rc, int syscall)
 static void write_arm_fdpic_sigreturn(uint32_t *rc, int ofs)
 {
     assert(ofs <= 0xfff);
-    __put_user(0xe59d3000 | ofs, rc + 0);   /* ldr r3, [sp, #ofs] */
-    __put_user(0xe8930908, rc + 1);         /* ldm r3, { r3, r9 } */
-    __put_user(0xe12fff13, rc + 2);         /* bx  r3 */
+    __put_user(0xe59d3000 | ofs, rc + 0); /* ldr r3, [sp, #ofs] */
+    __put_user(0xe8930908, rc + 1); /* ldm r3, { r3, r9 } */
+    __put_user(0xe12fff13, rc + 2); /* bx  r3 */
     /* Wrote 12 of 12 bytes */
 }
 
@@ -596,10 +589,10 @@ static void write_thm_fdpic_sigreturn(void *vrc, int ofs)
     uint16_t *rc = vrc;
 
     assert((ofs & ~0x3fc) == 0);
-    __put_user(0x9b00 | (ofs >> 2), rc + 0);      /* ldr r3, [sp, #ofs] */
-    __put_user(0xcb0c, rc + 1);                   /* ldm r3, { r2, r3 } */
-    __put_user(0x4699, rc + 2);                   /* mov r9, r3 */
-    __put_user(0x4710, rc + 3);                   /* bx  r2 */
+    __put_user(0x9b00 | (ofs >> 2), rc + 0); /* ldr r3, [sp, #ofs] */
+    __put_user(0xcb0c, rc + 1); /* ldm r3, { r2, r3 } */
+    __put_user(0x4699, rc + 2); /* mov r9, r3 */
+    __put_user(0x4710, rc + 3); /* bx  r2 */
     /* Wrote 8 of 12 bytes */
 }
 
@@ -620,7 +613,7 @@ void setup_sigtramp(abi_ulong sigtramp_page)
     write_arm_fdpic_sigreturn(tramp + 4 * RETCODE_WORDS,
                               offsetof(struct sigframe, retcode[3]));
     write_thm_fdpic_sigreturn(tramp + 5 * RETCODE_WORDS,
-                                offsetof(struct sigframe, retcode[3]));
+                              offsetof(struct sigframe, retcode[3]));
     write_arm_fdpic_sigreturn(tramp + 6 * RETCODE_WORDS,
                               offsetof(struct rt_sigframe, sig.retcode[3]));
     write_thm_fdpic_sigreturn(tramp + 7 * RETCODE_WORDS,

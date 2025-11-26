@@ -27,52 +27,58 @@
 #include "semihosting/common-semi.h"
 #include "target/arm/syndrome.h"
 
-#define get_user_code_u32(x, gaddr, env)                \
-    ({ abi_long __r = get_user_u32((x), (gaddr));       \
-        if (!__r && bswap_code(arm_sctlr_b(env))) {     \
-            (x) = bswap32(x);                           \
-        }                                               \
-        __r;                                            \
+#define get_user_code_u32(x, gaddr, env)            \
+    ({                                              \
+        abi_long __r = get_user_u32((x), (gaddr));  \
+        if (!__r && bswap_code(arm_sctlr_b(env))) { \
+            (x) = bswap32(x);                       \
+        }                                           \
+        __r;                                        \
     })
 
-#define get_user_code_u16(x, gaddr, env)                \
-    ({ abi_long __r = get_user_u16((x), (gaddr));       \
-        if (!__r && bswap_code(arm_sctlr_b(env))) {     \
-            (x) = bswap16(x);                           \
-        }                                               \
-        __r;                                            \
+#define get_user_code_u16(x, gaddr, env)            \
+    ({                                              \
+        abi_long __r = get_user_u16((x), (gaddr));  \
+        if (!__r && bswap_code(arm_sctlr_b(env))) { \
+            (x) = bswap16(x);                       \
+        }                                           \
+        __r;                                        \
     })
 
-#define get_user_data_u32(x, gaddr, env)                \
-    ({ abi_long __r = get_user_u32((x), (gaddr));       \
-        if (!__r && arm_cpu_bswap_data(env)) {          \
-            (x) = bswap32(x);                           \
-        }                                               \
-        __r;                                            \
+#define get_user_data_u32(x, gaddr, env)           \
+    ({                                             \
+        abi_long __r = get_user_u32((x), (gaddr)); \
+        if (!__r && arm_cpu_bswap_data(env)) {     \
+            (x) = bswap32(x);                      \
+        }                                          \
+        __r;                                       \
     })
 
-#define get_user_data_u16(x, gaddr, env)                \
-    ({ abi_long __r = get_user_u16((x), (gaddr));       \
-        if (!__r && arm_cpu_bswap_data(env)) {          \
-            (x) = bswap16(x);                           \
-        }                                               \
-        __r;                                            \
+#define get_user_data_u16(x, gaddr, env)           \
+    ({                                             \
+        abi_long __r = get_user_u16((x), (gaddr)); \
+        if (!__r && arm_cpu_bswap_data(env)) {     \
+            (x) = bswap16(x);                      \
+        }                                          \
+        __r;                                       \
     })
 
-#define put_user_data_u32(x, gaddr, env)                \
-    ({ typeof(x) __x = (x);                             \
-        if (arm_cpu_bswap_data(env)) {                  \
-            __x = bswap32(__x);                         \
-        }                                               \
-        put_user_u32(__x, (gaddr));                     \
+#define put_user_data_u32(x, gaddr, env) \
+    ({                                   \
+        typeof(x) __x = (x);             \
+        if (arm_cpu_bswap_data(env)) {   \
+            __x = bswap32(__x);          \
+        }                                \
+        put_user_u32(__x, (gaddr));      \
     })
 
-#define put_user_data_u16(x, gaddr, env)                \
-    ({ typeof(x) __x = (x);                             \
-        if (arm_cpu_bswap_data(env)) {                  \
-            __x = bswap16(__x);                         \
-        }                                               \
-        put_user_u16(__x, (gaddr));                     \
+#define put_user_data_u16(x, gaddr, env) \
+    ({                                   \
+        typeof(x) __x = (x);             \
+        if (arm_cpu_bswap_data(env)) {   \
+            __x = bswap16(__x);          \
+        }                                \
+        put_user_u16(__x, (gaddr));      \
     })
 
 #ifdef CONFIG_ANDROID
@@ -94,10 +100,10 @@ void android_jni_run(void *state)
     pthread_mutex_unlock(&b2q_mutex);
     assert(cpu);
     thread_cpu = cpu;
-    jni_call_depth ++;
+    jni_call_depth++;
     assert(jni_call_depth < JNI_MAX_DEPTH);
     cpu_loop(cpu->env_ptr);
-    jni_call_depth --;
+    jni_call_depth--;
     // in_jni_run = false;
 }
 
@@ -116,7 +122,7 @@ void cpu_loop(CPUARMState *env)
         cpu_exec_end(cs);
         process_queued_cpu_work(cs);
 
-        if(trapnr == -1){
+        if (trapnr == -1) {
             assert(cs->running == 0);
             break;
         }
@@ -125,15 +131,9 @@ void cpu_loop(CPUARMState *env)
         case EXCP_SWI:
             /* On syscall, PSTATE.ZA is preserved, PSTATE.SM is cleared. */
             aarch64_set_svcr(env, 0, R_SVCR_SM_MASK);
-            ret = do_syscall(env,
-                             env->xregs[8],
-                             env->xregs[0],
-                             env->xregs[1],
-                             env->xregs[2],
-                             env->xregs[3],
-                             env->xregs[4],
-                             env->xregs[5],
-                             0, 0);
+            ret = do_syscall(env, env->xregs[8], env->xregs[0], env->xregs[1],
+                             env->xregs[2], env->xregs[3], env->xregs[4],
+                             env->xregs[5], 0, 0);
             if (ret == -QEMU_ERESTARTSYS) {
                 env->pc -= 4;
             } else if (ret != -QEMU_ESIGRETURN) {
@@ -202,7 +202,8 @@ void cpu_loop(CPUARMState *env)
             cpu_exec_step_atomic(cs);
             break;
         default:
-            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
+            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n",
+                      trapnr);
             abort();
         }
 
@@ -229,8 +230,7 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
     int i;
 
     if (!(arm_feature(env, ARM_FEATURE_AARCH64))) {
-        fprintf(stderr,
-                "The selected ARM CPU does not support 64 bit mode\n");
+        fprintf(stderr, "The selected ARM CPU does not support 64 bit mode\n");
         exit(EXIT_FAILURE);
     }
 
@@ -239,13 +239,13 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
     }
     env->pc = regs->pc;
     env->xregs[31] = regs->sp;
-// #if TARGET_BIG_ENDIAN
-//     env->cp15.sctlr_el[1] |= SCTLR_E0E;
-//     for (i = 1; i < 4; ++i) {
-//         env->cp15.sctlr_el[i] |= SCTLR_EE;
-//     }
-//     arm_rebuild_hflags(env);
-// #endif
+    // #if TARGET_BIG_ENDIAN
+    //     env->cp15.sctlr_el[1] |= SCTLR_E0E;
+    //     for (i = 1; i < 4; ++i) {
+    //         env->cp15.sctlr_el[i] |= SCTLR_EE;
+    //     }
+    //     arm_rebuild_hflags(env);
+    // #endif
 
     // if (cpu_isar_feature(aa64_pauth, cpu)) {
     //     qemu_guest_getrandom_nofail(&env->keys, sizeof(env->keys));

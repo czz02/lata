@@ -20,9 +20,10 @@ static inline bool fgt_svc(CPUARMState *env, int el)
      * because if this is AArch32 EL1 then arm_fgt_active() is false.
      * We also know el is 0 or 1.
      */
-    return el == 0 ?
-        FIELD_EX64(env->cp15.fgt_exec[FGTREG_HFGITR], HFGITR_EL2, SVC_EL0) :
-        FIELD_EX64(env->cp15.fgt_exec[FGTREG_HFGITR], HFGITR_EL2, SVC_EL1);
+    return el == 0 ? FIELD_EX64(env->cp15.fgt_exec[FGTREG_HFGITR], HFGITR_EL2,
+                                SVC_EL0) :
+                     FIELD_EX64(env->cp15.fgt_exec[FGTREG_HFGITR], HFGITR_EL2,
+                                SVC_EL1);
 }
 
 static CPUARMTBFlags rebuild_hflags_common(CPUARMState *env, int fp_el,
@@ -150,12 +151,10 @@ static CPUARMTBFlags rebuild_hflags_a32(CPUARMState *env, int fp_el,
      * AArch64.CheckFPAdvSIMDEnabled(), as called from
      * AArch32.CheckAdvSIMDOrFPEnabled().
      */
-    if (el == 0
-        && FIELD_EX64(env->svcr, SVCR, SM)
-        && (!arm_is_el2_enabled(env)
-            || (arm_el_is_aa64(env, 2) && !(env->cp15.hcr_el2 & HCR_TGE)))
-        && arm_el_is_aa64(env, 1)
-        && !sme_fa64(env, el)) {
+    if (el == 0 && FIELD_EX64(env->svcr, SVCR, SM) &&
+        (!arm_is_el2_enabled(env) ||
+         (arm_el_is_aa64(env, 2) && !(env->cp15.hcr_el2 & HCR_TGE))) &&
+        arm_el_is_aa64(env, 1) && !sme_fa64(env, el)) {
         DP_TBFLAG_A32(flags, SME_TRAP_NONSTREAMING, 1);
     }
 
@@ -302,18 +301,15 @@ static CPUARMTBFlags rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
          */
         if (allocation_tag_access_enabled(env, el, sctlr)) {
             DP_TBFLAG_A64(flags, ATA, 1);
-            if (tbid
-                && !(env->pstate & PSTATE_TCO)
-                && (sctlr & (el == 0 ? SCTLR_TCF0 : SCTLR_TCF))) {
+            if (tbid && !(env->pstate & PSTATE_TCO) &&
+                (sctlr & (el == 0 ? SCTLR_TCF0 : SCTLR_TCF))) {
                 DP_TBFLAG_A64(flags, MTE_ACTIVE, 1);
             }
         }
         /* And again for unprivileged accesses, if required.  */
-        if (EX_TBFLAG_A64(flags, UNPRIV)
-            && tbid
-            && !(env->pstate & PSTATE_TCO)
-            && (sctlr & SCTLR_TCF0)
-            && allocation_tag_access_enabled(env, 0, sctlr)) {
+        if (EX_TBFLAG_A64(flags, UNPRIV) && tbid &&
+            !(env->pstate & PSTATE_TCO) && (sctlr & SCTLR_TCF0) &&
+            allocation_tag_access_enabled(env, 0, sctlr)) {
             DP_TBFLAG_A64(flags, MTE0_ACTIVE, 1);
         }
         /* Cache TCMA as well as TBI. */
@@ -399,9 +395,10 @@ void assert_hflags_rebuild_correctly(CPUARMState *env)
     CPUARMTBFlags r = rebuild_hflags_internal(env);
 
     if (unlikely(c.flags != r.flags || c.flags2 != r.flags2)) {
-        fprintf(stderr, "TCG hflags mismatch "
-                        "(current:(0x%08x,0x" TARGET_FMT_lx ")"
-                        " rebuilt:(0x%08x,0x" TARGET_FMT_lx ")\n",
+        fprintf(stderr,
+                "TCG hflags mismatch "
+                "(current:(0x%08x,0x" TARGET_FMT_lx ")"
+                " rebuilt:(0x%08x,0x" TARGET_FMT_lx ")\n",
                 c.flags, c.flags2, r.flags, r.flags2);
         abort();
     }

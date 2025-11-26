@@ -78,8 +78,8 @@ void rx_cpu_do_interrupt(CPUState *cs)
             env->psw_ipl = env->ack_ipl;
             cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
             qemu_set_irq(env->ack, env->ack_irq);
-            qemu_log_mask(CPU_LOG_INT,
-                          "interrupt 0x%02x raised\n", env->ack_irq);
+            qemu_log_mask(CPU_LOG_INT, "interrupt 0x%02x raised\n",
+                          env->ack_irq);
         }
     } else {
         uint32_t vec = cs->exception_index;
@@ -126,15 +126,15 @@ bool rx_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
     CPURXState *env = &cpu->env;
     int accept = 0;
     /* hardware interrupt (Normal) */
-    if ((interrupt_request & CPU_INTERRUPT_HARD) &&
-        env->psw_i && (env->psw_ipl < env->req_ipl)) {
+    if ((interrupt_request & CPU_INTERRUPT_HARD) && env->psw_i &&
+        (env->psw_ipl < env->req_ipl)) {
         env->ack_irq = env->req_irq;
         env->ack_ipl = env->req_ipl;
         accept = 1;
     }
     /* hardware interrupt (FIR) */
-    if ((interrupt_request & CPU_INTERRUPT_FIR) &&
-        env->psw_i && (env->psw_ipl < 15)) {
+    if ((interrupt_request & CPU_INTERRUPT_FIR) && env->psw_i &&
+        (env->psw_ipl < 15)) {
         accept = 1;
     }
     if (accept) {

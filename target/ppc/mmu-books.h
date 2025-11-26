@@ -24,7 +24,16 @@
  * These correspond to the mmu_idx values computed in
  * hreg_compute_hflags_value. See the tables therein
  */
-static inline bool mmuidx_pr(int idx) { return !(idx & 1); }
-static inline bool mmuidx_real(int idx) { return idx & 2; }
-static inline bool mmuidx_hv(int idx) { return idx & 4; }
+static inline bool mmuidx_pr(int idx)
+{
+    return !(idx & 1);
+}
+static inline bool mmuidx_real(int idx)
+{
+    return idx & 2;
+}
+static inline bool mmuidx_hv(int idx)
+{
+    return idx & 4;
+}
 #endif /* PPC_MMU_BOOKS_H */

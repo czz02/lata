@@ -33,9 +33,9 @@
 static inline bool needs_byteswap(const CPUPPCState *env)
 {
 #if TARGET_BIG_ENDIAN
-  return FIELD_EX64(env->msr, MSR, LE);
+    return FIELD_EX64(env->msr, MSR, LE);
 #else
-  return !FIELD_EX64(env->msr, MSR, LE);
+    return !FIELD_EX64(env->msr, MSR, LE);
 #endif
 }
 
@@ -85,8 +85,8 @@ void helper_lmw(CPUPPCState *env, target_ulong addr, uint32_t reg)
 {
     uintptr_t raddr = GETPC();
     int mmu_idx = cpu_mmu_index(env, false);
-    void *host = probe_contiguous(env, addr, (32 - reg) * 4,
-                                  MMU_DATA_LOAD, mmu_idx, raddr);
+    void *host = probe_contiguous(env, addr, (32 - reg) * 4, MMU_DATA_LOAD,
+                                  mmu_idx, raddr);
 
     if (likely(host)) {
         /* Fast path -- the entire operation is in RAM at host.  */
@@ -107,8 +107,8 @@ void helper_stmw(CPUPPCState *env, target_ulong addr, uint32_t reg)
 {
     uintptr_t raddr = GETPC();
     int mmu_idx = cpu_mmu_index(env, false);
-    void *host = probe_contiguous(env, addr, (32 - reg) * 4,
-                                  MMU_DATA_STORE, mmu_idx, raddr);
+    void *host = probe_contiguous(env, addr, (32 - reg) * 4, MMU_DATA_STORE,
+                                  mmu_idx, raddr);
 
     if (likely(host)) {
         /* Fast path -- the entire operation is in RAM at host.  */
@@ -185,8 +185,7 @@ static void do_lsw(CPUPPCState *env, target_ulong addr, uint32_t nb,
     env->gpr[reg] = val;
 }
 
-void helper_lsw(CPUPPCState *env, target_ulong addr,
-                uint32_t nb, uint32_t reg)
+void helper_lsw(CPUPPCState *env, target_ulong addr, uint32_t nb, uint32_t reg)
 {
     do_lsw(env, addr, nb, reg, GETPC());
 }
@@ -197,24 +196,23 @@ void helper_lsw(CPUPPCState *env, target_ulong addr,
  * this is valid, but rA won't be loaded.  For now, I'll follow the
  * spec...
  */
-void helper_lswx(CPUPPCState *env, target_ulong addr, uint32_t reg,
-                 uint32_t ra, uint32_t rb)
+void helper_lswx(CPUPPCState *env, target_ulong addr, uint32_t reg, uint32_t ra,
+                 uint32_t rb)
 {
     if (likely(xer_bc != 0)) {
         int num_used_regs = DIV_ROUND_UP(xer_bc, 4);
         if (unlikely((ra != 0 && lsw_reg_in_range(reg, num_used_regs, ra)) ||
                      lsw_reg_in_range(reg, num_used_regs, rb))) {
             raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                                   POWERPC_EXCP_INVAL |
-                                   POWERPC_EXCP_INVAL_LSWX, GETPC());
+                                   POWERPC_EXCP_INVAL | POWERPC_EXCP_INVAL_LSWX,
+                                   GETPC());
         } else {
             do_lsw(env, addr, xer_bc, reg, GETPC());
         }
     }
 }
 
-void helper_stsw(CPUPPCState *env, target_ulong addr, uint32_t nb,
-                 uint32_t reg)
+void helper_stsw(CPUPPCState *env, target_ulong addr, uint32_t nb, uint32_t reg)
 {
     uintptr_t raddr = GETPC();
     int mmu_idx;
@@ -271,8 +269,8 @@ void helper_stsw(CPUPPCState *env, target_ulong addr, uint32_t nb,
     }
 }
 
-static void dcbz_common(CPUPPCState *env, target_ulong addr,
-                        uint32_t opcode, bool epid, uintptr_t retaddr)
+static void dcbz_common(CPUPPCState *env, target_ulong addr, uint32_t opcode,
+                        bool epid, uintptr_t retaddr)
 {
     target_ulong mask, dcbz_size = env->dcache_line_size;
     uint32_t i;
@@ -281,8 +279,8 @@ static void dcbz_common(CPUPPCState *env, target_ulong addr,
 
 #if defined(TARGET_PPC64)
     /* Check for dcbz vs dcbzl on 970 */
-    if (env->excp_model == POWERPC_EXCP_970 &&
-        !(opcode & 0x00200000) && ((env->spr[SPR_970_HID5] >> 7) & 0x3) == 1) {
+    if (env->excp_model == POWERPC_EXCP_970 && !(opcode & 0x00200000) &&
+        ((env->spr[SPR_970_HID5] >> 7) & 0x3) == 1) {
         dcbz_size = 32;
     }
 #endif
@@ -292,7 +290,7 @@ static void dcbz_common(CPUPPCState *env, target_ulong addr,
     addr &= mask;
 
     /* Check reservation */
-    if ((env->reserve_addr & mask) == addr)  {
+    if ((env->reserve_addr & mask) == addr) {
         env->reserve_addr = (target_ulong)-1ULL;
     }
 
@@ -384,25 +382,24 @@ target_ulong helper_lscbx(CPUPPCState *env, target_ulong addr, uint32_t reg,
  * little-endian PPC64 user-mode target.
  */
 
-#define LVE(name, access, swap, element)                        \
-    void helper_##name(CPUPPCState *env, ppc_avr_t *r,          \
-                       target_ulong addr)                       \
-    {                                                           \
-        size_t n_elems = ARRAY_SIZE(r->element);                \
-        int adjust = HI_IDX * (n_elems - 1);                    \
-        int sh = sizeof(r->element[0]) >> 1;                    \
-        int index = (addr & 0xf) >> sh;                         \
-        if (FIELD_EX64(env->msr, MSR, LE)) {                    \
-            index = n_elems - index - 1;                        \
-        }                                                       \
-                                                                \
-        if (needs_byteswap(env)) {                              \
-            r->element[LO_IDX ? index : (adjust - index)] =     \
-                swap(access(env, addr, GETPC()));               \
-        } else {                                                \
-            r->element[LO_IDX ? index : (adjust - index)] =     \
-                access(env, addr, GETPC());                     \
-        }                                                       \
+#define LVE(name, access, swap, element)                                  \
+    void helper_##name(CPUPPCState *env, ppc_avr_t *r, target_ulong addr) \
+    {                                                                     \
+        size_t n_elems = ARRAY_SIZE(r->element);                          \
+        int adjust = HI_IDX * (n_elems - 1);                              \
+        int sh = sizeof(r->element[0]) >> 1;                              \
+        int index = (addr & 0xf) >> sh;                                   \
+        if (FIELD_EX64(env->msr, MSR, LE)) {                              \
+            index = n_elems - index - 1;                                  \
+        }                                                                 \
+                                                                          \
+        if (needs_byteswap(env)) {                                        \
+            r->element[LO_IDX ? index : (adjust - index)] =               \
+                swap(access(env, addr, GETPC()));                         \
+        } else {                                                          \
+            r->element[LO_IDX ? index : (adjust - index)] =               \
+                access(env, addr, GETPC());                               \
+        }                                                                 \
     }
 #define I(x) (x)
 LVE(lvebx, cpu_ldub_data_ra, I, u8)
@@ -411,26 +408,25 @@ LVE(lvewx, cpu_ldl_data_ra, bswap32, u32)
 #undef I
 #undef LVE
 
-#define STVE(name, access, swap, element)                               \
-    void helper_##name(CPUPPCState *env, ppc_avr_t *r,                  \
-                       target_ulong addr)                               \
-    {                                                                   \
-        size_t n_elems = ARRAY_SIZE(r->element);                        \
-        int adjust = HI_IDX * (n_elems - 1);                            \
-        int sh = sizeof(r->element[0]) >> 1;                            \
-        int index = (addr & 0xf) >> sh;                                 \
-        if (FIELD_EX64(env->msr, MSR, LE)) {                            \
-            index = n_elems - index - 1;                                \
-        }                                                               \
-                                                                        \
-        if (needs_byteswap(env)) {                                      \
-            access(env, addr, swap(r->element[LO_IDX ? index :          \
-                                              (adjust - index)]),       \
-                        GETPC());                                       \
-        } else {                                                        \
-            access(env, addr, r->element[LO_IDX ? index :               \
-                                         (adjust - index)], GETPC());   \
-        }                                                               \
+#define STVE(name, access, swap, element)                                    \
+    void helper_##name(CPUPPCState *env, ppc_avr_t *r, target_ulong addr)    \
+    {                                                                        \
+        size_t n_elems = ARRAY_SIZE(r->element);                             \
+        int adjust = HI_IDX * (n_elems - 1);                                 \
+        int sh = sizeof(r->element[0]) >> 1;                                 \
+        int index = (addr & 0xf) >> sh;                                      \
+        if (FIELD_EX64(env->msr, MSR, LE)) {                                 \
+            index = n_elems - index - 1;                                     \
+        }                                                                    \
+                                                                             \
+        if (needs_byteswap(env)) {                                           \
+            access(env, addr,                                                \
+                   swap(r->element[LO_IDX ? index : (adjust - index)]),      \
+                   GETPC());                                                 \
+        } else {                                                             \
+            access(env, addr, r->element[LO_IDX ? index : (adjust - index)], \
+                   GETPC());                                                 \
+        }                                                                    \
     }
 #define I(x) (x)
 STVE(stvebx, cpu_stb_data_ra, I, u8)
@@ -442,60 +438,60 @@ STVE(stvewx, cpu_stl_data_ra, bswap32, u32)
 #ifdef TARGET_PPC64
 #define GET_NB(rb) ((rb >> 56) & 0xFF)
 
-#define VSX_LXVL(name, lj)                                              \
-void helper_##name(CPUPPCState *env, target_ulong addr,                 \
-                   ppc_vsr_t *xt, target_ulong rb)                      \
-{                                                                       \
-    ppc_vsr_t t;                                                        \
-    uint64_t nb = GET_NB(rb);                                           \
-    int i;                                                              \
-                                                                        \
-    t.s128 = int128_zero();                                             \
-    if (nb) {                                                           \
-        nb = (nb >= 16) ? 16 : nb;                                      \
-        if (FIELD_EX64(env->msr, MSR, LE) && !lj) {                     \
-            for (i = 16; i > 16 - nb; i--) {                            \
-                t.VsrB(i - 1) = cpu_ldub_data_ra(env, addr, GETPC());   \
-                addr = addr_add(env, addr, 1);                          \
-            }                                                           \
-        } else {                                                        \
-            for (i = 0; i < nb; i++) {                                  \
-                t.VsrB(i) = cpu_ldub_data_ra(env, addr, GETPC());       \
-                addr = addr_add(env, addr, 1);                          \
-            }                                                           \
-        }                                                               \
-    }                                                                   \
-    *xt = t;                                                            \
-}
+#define VSX_LXVL(name, lj)                                                 \
+    void helper_##name(CPUPPCState *env, target_ulong addr, ppc_vsr_t *xt, \
+                       target_ulong rb)                                    \
+    {                                                                      \
+        ppc_vsr_t t;                                                       \
+        uint64_t nb = GET_NB(rb);                                          \
+        int i;                                                             \
+                                                                           \
+        t.s128 = int128_zero();                                            \
+        if (nb) {                                                          \
+            nb = (nb >= 16) ? 16 : nb;                                     \
+            if (FIELD_EX64(env->msr, MSR, LE) && !lj) {                    \
+                for (i = 16; i > 16 - nb; i--) {                           \
+                    t.VsrB(i - 1) = cpu_ldub_data_ra(env, addr, GETPC());  \
+                    addr = addr_add(env, addr, 1);                         \
+                }                                                          \
+            } else {                                                       \
+                for (i = 0; i < nb; i++) {                                 \
+                    t.VsrB(i) = cpu_ldub_data_ra(env, addr, GETPC());      \
+                    addr = addr_add(env, addr, 1);                         \
+                }                                                          \
+            }                                                              \
+        }                                                                  \
+        *xt = t;                                                           \
+    }
 
 VSX_LXVL(lxvl, 0)
 VSX_LXVL(lxvll, 1)
 #undef VSX_LXVL
 
-#define VSX_STXVL(name, lj)                                       \
-void helper_##name(CPUPPCState *env, target_ulong addr,           \
-                   ppc_vsr_t *xt, target_ulong rb)                \
-{                                                                 \
-    target_ulong nb = GET_NB(rb);                                 \
-    int i;                                                        \
-                                                                  \
-    if (!nb) {                                                    \
-        return;                                                   \
-    }                                                             \
-                                                                  \
-    nb = (nb >= 16) ? 16 : nb;                                    \
-    if (FIELD_EX64(env->msr, MSR, LE) && !lj) {                   \
-        for (i = 16; i > 16 - nb; i--) {                          \
-            cpu_stb_data_ra(env, addr, xt->VsrB(i - 1), GETPC()); \
-            addr = addr_add(env, addr, 1);                        \
-        }                                                         \
-    } else {                                                      \
-        for (i = 0; i < nb; i++) {                                \
-            cpu_stb_data_ra(env, addr, xt->VsrB(i), GETPC());     \
-            addr = addr_add(env, addr, 1);                        \
-        }                                                         \
-    }                                                             \
-}
+#define VSX_STXVL(name, lj)                                                \
+    void helper_##name(CPUPPCState *env, target_ulong addr, ppc_vsr_t *xt, \
+                       target_ulong rb)                                    \
+    {                                                                      \
+        target_ulong nb = GET_NB(rb);                                      \
+        int i;                                                             \
+                                                                           \
+        if (!nb) {                                                         \
+            return;                                                        \
+        }                                                                  \
+                                                                           \
+        nb = (nb >= 16) ? 16 : nb;                                         \
+        if (FIELD_EX64(env->msr, MSR, LE) && !lj) {                        \
+            for (i = 16; i > 16 - nb; i--) {                               \
+                cpu_stb_data_ra(env, addr, xt->VsrB(i - 1), GETPC());      \
+                addr = addr_add(env, addr, 1);                             \
+            }                                                              \
+        } else {                                                           \
+            for (i = 0; i < nb; i++) {                                     \
+                cpu_stb_data_ra(env, addr, xt->VsrB(i), GETPC());          \
+                addr = addr_add(env, addr, 1);                             \
+            }                                                              \
+        }                                                                  \
+    }
 
 VSX_STXVL(stxvl, 0)
 VSX_STXVL(stxvll, 1)
@@ -522,8 +518,7 @@ void helper_tbegin(CPUPPCState *env)
         (1ULL << TEXASR_NESTING_OVERFLOW) |
         (FIELD_EX64_HV(env->msr) << TEXASR_PRIVILEGE_HV) |
         (FIELD_EX64(env->msr, MSR, PR) << TEXASR_PRIVILEGE_PR) |
-        (1ULL << TEXASR_FAILURE_SUMMARY) |
-        (1ULL << TEXASR_TFIAR_EXACT);
+        (1ULL << TEXASR_FAILURE_SUMMARY) | (1ULL << TEXASR_TFIAR_EXACT);
     env->spr[SPR_TFIAR] = env->nip | (FIELD_EX64_HV(env->msr) << 1) |
                           FIELD_EX64(env->msr, MSR, PR);
     env->spr[SPR_TFHAR] = env->nip + 4;

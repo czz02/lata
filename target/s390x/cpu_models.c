@@ -27,18 +27,13 @@
 #include "target/s390x/kvm/pv.h"
 #endif
 
-#define CPUDEF_INIT(_type, _gen, _ec_ga, _mha_pow, _hmfai, _name, _desc) \
-    {                                                                    \
-        .name = _name,                                                   \
-        .type = _type,                                                   \
-        .gen = _gen,                                                     \
-        .ec_ga = _ec_ga,                                                 \
-        .mha_pow = _mha_pow,                                             \
-        .hmfai = _hmfai,                                                 \
-        .desc = _desc,                                                   \
-        .base_init = { S390_FEAT_LIST_GEN ## _gen ## _GA ## _ec_ga ## _BASE },  \
-        .default_init = { S390_FEAT_LIST_GEN ## _gen ## _GA ## _ec_ga ## _DEFAULT },  \
-        .full_init = { S390_FEAT_LIST_GEN ## _gen ## _GA ## _ec_ga ## _FULL },  \
+#define CPUDEF_INIT(_type, _gen, _ec_ga, _mha_pow, _hmfai, _name, _desc)     \
+    {                                                                        \
+        .name = _name, .type = _type, .gen = _gen, .ec_ga = _ec_ga,          \
+        .mha_pow = _mha_pow, .hmfai = _hmfai, .desc = _desc,                 \
+        .base_init = { S390_FEAT_LIST_GEN##_gen##_GA##_ec_ga##_BASE },       \
+        .default_init = { S390_FEAT_LIST_GEN##_gen##_GA##_ec_ga##_DEFAULT }, \
+        .full_init = { S390_FEAT_LIST_GEN##_gen##_GA##_ec_ga##_FULL },       \
     }
 
 /*
@@ -60,27 +55,42 @@ static S390CPUDef s390_cpu_defs[] = {
     CPUDEF_INIT(0x2084, 8, 5, 38, 0x00000000U, "z990.5", "IBM zSeries 990 GA5"),
     CPUDEF_INIT(0x2086, 8, 5, 38, 0x00000000U, "z890.3", "IBM zSeries 880 GA3"),
     CPUDEF_INIT(0x2094, 9, 1, 40, 0x00000000U, "z9EC", "IBM System z9 EC GA1"),
-    CPUDEF_INIT(0x2094, 9, 2, 40, 0x00000000U, "z9EC.2", "IBM System z9 EC GA2"),
+    CPUDEF_INIT(0x2094, 9, 2, 40, 0x00000000U, "z9EC.2",
+                "IBM System z9 EC GA2"),
     CPUDEF_INIT(0x2096, 9, 2, 40, 0x00000000U, "z9BC", "IBM System z9 BC GA1"),
-    CPUDEF_INIT(0x2094, 9, 3, 40, 0x00000000U, "z9EC.3", "IBM System z9 EC GA3"),
-    CPUDEF_INIT(0x2096, 9, 3, 40, 0x00000000U, "z9BC.2", "IBM System z9 BC GA2"),
-    CPUDEF_INIT(0x2097, 10, 1, 43, 0x00000000U, "z10EC", "IBM System z10 EC GA1"),
-    CPUDEF_INIT(0x2097, 10, 2, 43, 0x00000000U, "z10EC.2", "IBM System z10 EC GA2"),
-    CPUDEF_INIT(0x2098, 10, 2, 43, 0x00000000U, "z10BC", "IBM System z10 BC GA1"),
-    CPUDEF_INIT(0x2097, 10, 3, 43, 0x00000000U, "z10EC.3", "IBM System z10 EC GA3"),
-    CPUDEF_INIT(0x2098, 10, 3, 43, 0x00000000U, "z10BC.2", "IBM System z10 BC GA2"),
-    CPUDEF_INIT(0x2817, 11, 1, 44, 0x08000000U, "z196", "IBM zEnterprise 196 GA1"),
-    CPUDEF_INIT(0x2817, 11, 2, 44, 0x08000000U, "z196.2", "IBM zEnterprise 196 GA2"),
-    CPUDEF_INIT(0x2818, 11, 2, 44, 0x08000000U, "z114", "IBM zEnterprise 114 GA1"),
-    CPUDEF_INIT(0x2827, 12, 1, 44, 0x08000000U, "zEC12", "IBM zEnterprise EC12 GA1"),
-    CPUDEF_INIT(0x2827, 12, 2, 44, 0x08000000U, "zEC12.2", "IBM zEnterprise EC12 GA2"),
-    CPUDEF_INIT(0x2828, 12, 2, 44, 0x08000000U, "zBC12", "IBM zEnterprise BC12 GA1"),
+    CPUDEF_INIT(0x2094, 9, 3, 40, 0x00000000U, "z9EC.3",
+                "IBM System z9 EC GA3"),
+    CPUDEF_INIT(0x2096, 9, 3, 40, 0x00000000U, "z9BC.2",
+                "IBM System z9 BC GA2"),
+    CPUDEF_INIT(0x2097, 10, 1, 43, 0x00000000U, "z10EC",
+                "IBM System z10 EC GA1"),
+    CPUDEF_INIT(0x2097, 10, 2, 43, 0x00000000U, "z10EC.2",
+                "IBM System z10 EC GA2"),
+    CPUDEF_INIT(0x2098, 10, 2, 43, 0x00000000U, "z10BC",
+                "IBM System z10 BC GA1"),
+    CPUDEF_INIT(0x2097, 10, 3, 43, 0x00000000U, "z10EC.3",
+                "IBM System z10 EC GA3"),
+    CPUDEF_INIT(0x2098, 10, 3, 43, 0x00000000U, "z10BC.2",
+                "IBM System z10 BC GA2"),
+    CPUDEF_INIT(0x2817, 11, 1, 44, 0x08000000U, "z196",
+                "IBM zEnterprise 196 GA1"),
+    CPUDEF_INIT(0x2817, 11, 2, 44, 0x08000000U, "z196.2",
+                "IBM zEnterprise 196 GA2"),
+    CPUDEF_INIT(0x2818, 11, 2, 44, 0x08000000U, "z114",
+                "IBM zEnterprise 114 GA1"),
+    CPUDEF_INIT(0x2827, 12, 1, 44, 0x08000000U, "zEC12",
+                "IBM zEnterprise EC12 GA1"),
+    CPUDEF_INIT(0x2827, 12, 2, 44, 0x08000000U, "zEC12.2",
+                "IBM zEnterprise EC12 GA2"),
+    CPUDEF_INIT(0x2828, 12, 2, 44, 0x08000000U, "zBC12",
+                "IBM zEnterprise BC12 GA1"),
     CPUDEF_INIT(0x2964, 13, 1, 47, 0x08000000U, "z13", "IBM z13 GA1"),
     CPUDEF_INIT(0x2964, 13, 2, 47, 0x08000000U, "z13.2", "IBM z13 GA2"),
     CPUDEF_INIT(0x2965, 13, 2, 47, 0x08000000U, "z13s", "IBM z13s GA1"),
     CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
     CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
-    CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
+    CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1",
+                "IBM z14 Model ZR1 GA1"),
     CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "gen15a", "IBM z15 T01 GA1"),
     CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "gen15b", "IBM z15 T02 GA1"),
     CPUDEF_INIT(0x3931, 16, 1, 47, 0x08000000U, "gen16a", "IBM 3931 GA1"),
@@ -191,7 +201,7 @@ uint32_t s390_get_ibc_val(void)
     if (!lowest_ibc || lowest_ibc > unblocked_ibc) {
         return 0;
     }
-    return ((uint32_t) lowest_ibc << 16) | unblocked_ibc;
+    return ((uint32_t)lowest_ibc << 16) | unblocked_ibc;
 }
 
 void s390_get_feat_block(S390FeatType type, uint8_t *data)
@@ -432,11 +442,11 @@ static void check_consistency(const S390CPUModel *model)
         { S390_FEAT_IDTE_SEGMENT, S390_FEAT_DAT_ENH },
         { S390_FEAT_IDTE_REGION, S390_FEAT_DAT_ENH },
         { S390_FEAT_IDTE_REGION, S390_FEAT_IDTE_SEGMENT },
-        { S390_FEAT_LOCAL_TLB_CLEARING, S390_FEAT_DAT_ENH},
+        { S390_FEAT_LOCAL_TLB_CLEARING, S390_FEAT_DAT_ENH },
         { S390_FEAT_LONG_DISPLACEMENT_FAST, S390_FEAT_LONG_DISPLACEMENT },
         { S390_FEAT_DFP_FAST, S390_FEAT_DFP },
         { S390_FEAT_TRANSACTIONAL_EXE, S390_FEAT_STFLE_49 },
-        { S390_FEAT_EDAT_2, S390_FEAT_EDAT},
+        { S390_FEAT_EDAT_2, S390_FEAT_EDAT },
         { S390_FEAT_MSA_EXT_5, S390_FEAT_KIMD_SHA_512 },
         { S390_FEAT_MSA_EXT_5, S390_FEAT_KLMD_SHA_512 },
         { S390_FEAT_MSA_EXT_4, S390_FEAT_MSA_EXT_3 },
@@ -448,8 +458,10 @@ static void check_consistency(const S390CPUModel *model)
         { S390_FEAT_MSA_EXT_9, S390_FEAT_MSA_EXT_4 },
         { S390_FEAT_MULTIPLE_EPOCH, S390_FEAT_TOD_CLOCK_STEERING },
         { S390_FEAT_VECTOR_PACKED_DECIMAL, S390_FEAT_VECTOR },
-        { S390_FEAT_VECTOR_PACKED_DECIMAL_ENH, S390_FEAT_VECTOR_PACKED_DECIMAL },
-        { S390_FEAT_VECTOR_PACKED_DECIMAL_ENH2, S390_FEAT_VECTOR_PACKED_DECIMAL_ENH },
+        { S390_FEAT_VECTOR_PACKED_DECIMAL_ENH,
+          S390_FEAT_VECTOR_PACKED_DECIMAL },
+        { S390_FEAT_VECTOR_PACKED_DECIMAL_ENH2,
+          S390_FEAT_VECTOR_PACKED_DECIMAL_ENH },
         { S390_FEAT_VECTOR_ENH, S390_FEAT_VECTOR },
         { S390_FEAT_INSTRUCTION_EXEC_PROT, S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2 },
         { S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2, S390_FEAT_ESOP },
@@ -498,7 +510,7 @@ static void check_consistency(const S390CPUModel *model)
 
 static void error_prepend_missing_feat(const char *name, void *opaque)
 {
-    error_prepend((Error **) opaque, "%s ", name);
+    error_prepend((Error **)opaque, "%s ", name);
 }
 
 static void check_compatibility(const S390CPUModel *max_model,
@@ -507,13 +519,15 @@ static void check_compatibility(const S390CPUModel *max_model,
     S390FeatBitmap missing;
 
     if (model->def->gen > max_model->def->gen) {
-        error_setg(errp, "Selected CPU generation is too new. Maximum "
+        error_setg(errp,
+                   "Selected CPU generation is too new. Maximum "
                    "supported model in the configuration: \'%s\'",
                    max_model->def->name);
         return;
     } else if (model->def->gen == max_model->def->gen &&
                model->def->ec_ga > max_model->def->ec_ga) {
-        error_setg(errp, "Selected CPU GA level is too new. Maximum "
+        error_setg(errp,
+                   "Selected CPU GA level is too new. Maximum "
                    "supported model in the configuration: \'%s\'",
                    max_model->def->name);
         return;
@@ -521,7 +535,8 @@ static void check_compatibility(const S390CPUModel *max_model,
 
 #ifndef CONFIG_USER_ONLY
     if (only_migratable && test_bit(S390_FEAT_UNPACK, model->features)) {
-        error_setg(errp, "The unpack facility is not compatible with "
+        error_setg(errp,
+                   "The unpack facility is not compatible with "
                    "the --only-migratable option. You must remove either "
                    "the 'unpack' facility or the --only-migratable option");
         return;
@@ -537,7 +552,7 @@ static void check_compatibility(const S390CPUModel *max_model,
     error_setg(errp, " ");
     s390_feat_bitmap_to_ascii(missing, errp, error_prepend_missing_feat);
     error_prepend(errp, "Some features requested in the CPU model are not "
-                  "available in the configuration: ");
+                        "available in the configuration: ");
 }
 
 S390CPUModel *get_max_cpu_model(Error **errp)
@@ -613,10 +628,10 @@ void s390_realize_cpu_model(CPUState *cs, Error **errp)
 #endif
 }
 
-static void get_feature(Object *obj, Visitor *v, const char *name,
-                        void *opaque, Error **errp)
+static void get_feature(Object *obj, Visitor *v, const char *name, void *opaque,
+                        Error **errp)
 {
-    S390Feat feat = (S390Feat) (uintptr_t) opaque;
+    S390Feat feat = (S390Feat)(uintptr_t)opaque;
     S390CPU *cpu = S390_CPU(obj);
     bool value;
 
@@ -630,17 +645,19 @@ static void get_feature(Object *obj, Visitor *v, const char *name,
     visit_type_bool(v, name, &value, errp);
 }
 
-static void set_feature(Object *obj, Visitor *v, const char *name,
-                        void *opaque, Error **errp)
+static void set_feature(Object *obj, Visitor *v, const char *name, void *opaque,
+                        Error **errp)
 {
-    S390Feat feat = (S390Feat) (uintptr_t) opaque;
+    S390Feat feat = (S390Feat)(uintptr_t)opaque;
     DeviceState *dev = DEVICE(obj);
     S390CPU *cpu = S390_CPU(obj);
     bool value;
 
     if (dev->realized) {
-        error_setg(errp, "Attempt to set property '%s' on '%s' after "
-                   "it was realized", name, object_get_typename(obj));
+        error_setg(errp,
+                   "Attempt to set property '%s' on '%s' after "
+                   "it was realized",
+                   name, object_get_typename(obj));
         return;
     } else if (!cpu->model) {
         error_setg(errp, "Details about the host CPU model are not available, "
@@ -653,7 +670,8 @@ static void set_feature(Object *obj, Visitor *v, const char *name,
     }
     if (value) {
         if (!test_bit(feat, cpu->model->def->full_feat)) {
-            error_setg(errp, "Feature '%s' is not available for CPU model '%s',"
+            error_setg(errp,
+                       "Feature '%s' is not available for CPU model '%s',"
                        " it was introduced with later models.",
                        name, cpu->model->def->name);
             return;
@@ -667,7 +685,7 @@ static void set_feature(Object *obj, Visitor *v, const char *name,
 static void get_feature_group(Object *obj, Visitor *v, const char *name,
                               void *opaque, Error **errp)
 {
-    S390FeatGroup group = (S390FeatGroup) (uintptr_t) opaque;
+    S390FeatGroup group = (S390FeatGroup)(uintptr_t)opaque;
     const S390FeatGroupDef *def = s390_feat_group_def(group);
     S390CPU *cpu = S390_CPU(obj);
     S390FeatBitmap tmp;
@@ -688,15 +706,17 @@ static void get_feature_group(Object *obj, Visitor *v, const char *name,
 static void set_feature_group(Object *obj, Visitor *v, const char *name,
                               void *opaque, Error **errp)
 {
-    S390FeatGroup group = (S390FeatGroup) (uintptr_t) opaque;
+    S390FeatGroup group = (S390FeatGroup)(uintptr_t)opaque;
     const S390FeatGroupDef *def = s390_feat_group_def(group);
     DeviceState *dev = DEVICE(obj);
     S390CPU *cpu = S390_CPU(obj);
     bool value;
 
     if (dev->realized) {
-        error_setg(errp, "Attempt to set property '%s' on '%s' after "
-                   "it was realized", name, object_get_typename(obj));
+        error_setg(errp,
+                   "Attempt to set property '%s' on '%s' after "
+                   "it was realized",
+                   name, object_get_typename(obj));
         return;
     } else if (!cpu->model) {
         error_setg(errp, "Details about the host CPU model are not available, "
@@ -711,7 +731,8 @@ static void set_feature_group(Object *obj, Visitor *v, const char *name,
         /* groups are added in one shot, so an intersect is sufficient */
         if (!bitmap_intersects(def->feat, cpu->model->def->full_feat,
                                S390_FEAT_MAX)) {
-            error_setg(errp, "Group '%s' is not available for CPU model '%s',"
+            error_setg(errp,
+                       "Group '%s' is not available for CPU model '%s',"
                        " it was introduced with later models.",
                        name, cpu->model->def->name);
             return;
@@ -738,8 +759,8 @@ static void s390_cpu_model_initfn(Object *obj)
                     S390_FEAT_MAX);
     } else {
         /* latest model - features can change */
-        bitmap_copy(cpu->model->features,
-                    cpu->model->def->default_feat, S390_FEAT_MAX);
+        bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
+                    S390_FEAT_MAX);
     }
 }
 
@@ -826,20 +847,19 @@ void s390_cpu_model_class_register_props(ObjectClass *oc)
 
     object_class_property_add_bool(oc, "migration-safe", get_is_migration_safe,
                                    NULL);
-    object_class_property_add_bool(oc, "static", get_is_static,
-                                   NULL);
+    object_class_property_add_bool(oc, "static", get_is_static, NULL);
     object_class_property_add_str(oc, "description", get_description, NULL);
 
     for (feat = 0; feat < S390_FEAT_MAX; feat++) {
         const S390FeatDef *def = s390_feat_def(feat);
         object_class_property_add(oc, def->name, "bool", get_feature,
-                                  set_feature, NULL, (void *) feat);
+                                  set_feature, NULL, (void *)feat);
         object_class_property_set_description(oc, def->name, def->desc);
     }
     for (group = 0; group < S390_FEAT_GROUP_MAX; group++) {
         const S390FeatGroupDef *def = s390_feat_group_def(group);
         object_class_property_add(oc, def->name, "bool", get_feature_group,
-                                  set_feature_group, NULL, (void *) group);
+                                  set_feature_group, NULL, (void *)group);
         object_class_property_set_description(oc, def->name, def->desc);
     }
 }
@@ -859,7 +879,7 @@ static void s390_base_cpu_model_class_init(ObjectClass *oc, void *data)
     S390CPUClass *xcc = S390_CPU_CLASS(oc);
 
     /* all base models are migration safe */
-    xcc->cpu_def = (const S390CPUDef *) data;
+    xcc->cpu_def = (const S390CPUDef *)data;
     xcc->is_migration_safe = true;
     xcc->is_static = true;
     xcc->desc = xcc->cpu_def->desc;
@@ -870,7 +890,7 @@ static void s390_cpu_model_class_init(ObjectClass *oc, void *data)
     S390CPUClass *xcc = S390_CPU_CLASS(oc);
 
     /* model that can change between QEMU versions */
-    xcc->cpu_def = (const S390CPUDef *) data;
+    xcc->cpu_def = (const S390CPUDef *)data;
     xcc->is_migration_safe = true;
     xcc->desc = xcc->cpu_def->desc;
 }
@@ -880,8 +900,8 @@ static void s390_qemu_cpu_model_class_init(ObjectClass *oc, void *data)
     S390CPUClass *xcc = S390_CPU_CLASS(oc);
 
     xcc->is_migration_safe = true;
-    xcc->desc = g_strdup_printf("QEMU Virtual CPU version %s",
-                                qemu_hw_version());
+    xcc->desc =
+        g_strdup_printf("QEMU Virtual CPU version %s", qemu_hw_version());
 }
 
 static void s390_max_cpu_model_class_init(ObjectClass *oc, void *data)
@@ -946,20 +966,20 @@ static const TypeInfo host_s390_cpu_type_info = {
 static void init_ignored_base_feat(void)
 {
     static const int feats[] = {
-         /* MSA subfunctions that could not be available on certain machines */
-         S390_FEAT_KMAC_DEA,
-         S390_FEAT_KMAC_TDEA_128,
-         S390_FEAT_KMAC_TDEA_192,
-         S390_FEAT_KMC_DEA,
-         S390_FEAT_KMC_TDEA_128,
-         S390_FEAT_KMC_TDEA_192,
-         S390_FEAT_KM_DEA,
-         S390_FEAT_KM_TDEA_128,
-         S390_FEAT_KM_TDEA_192,
-         S390_FEAT_KIMD_SHA_1,
-         S390_FEAT_KLMD_SHA_1,
-         /* CSSKE is deprecated on newer generations */
-         S390_FEAT_CONDITIONAL_SSKE,
+        /* MSA subfunctions that could not be available on certain machines */
+        S390_FEAT_KMAC_DEA,
+        S390_FEAT_KMAC_TDEA_128,
+        S390_FEAT_KMAC_TDEA_192,
+        S390_FEAT_KMC_DEA,
+        S390_FEAT_KMC_TDEA_128,
+        S390_FEAT_KMC_TDEA_192,
+        S390_FEAT_KM_DEA,
+        S390_FEAT_KM_TDEA_128,
+        S390_FEAT_KM_TDEA_192,
+        S390_FEAT_KIMD_SHA_1,
+        S390_FEAT_KLMD_SHA_1,
+        /* CSSKE is deprecated on newer generations */
+        S390_FEAT_CONDITIONAL_SSKE,
     };
     int i;
 
@@ -998,7 +1018,7 @@ static void register_types(void)
             .instance_init = s390_cpu_model_initfn,
             .instance_finalize = s390_cpu_model_finalize,
             .class_init = s390_base_cpu_model_class_init,
-            .class_data = (void *) &s390_cpu_defs[i],
+            .class_data = (void *)&s390_cpu_defs[i],
         };
         char *name = s390_cpu_type_name(s390_cpu_defs[i].name);
         TypeInfo ti = {
@@ -1007,7 +1027,7 @@ static void register_types(void)
             .instance_init = s390_cpu_model_initfn,
             .instance_finalize = s390_cpu_model_finalize,
             .class_init = s390_cpu_model_class_init,
-            .class_data = (void *) &s390_cpu_defs[i],
+            .class_data = (void *)&s390_cpu_defs[i],
         };
 
         type_register_static(&ti_base);

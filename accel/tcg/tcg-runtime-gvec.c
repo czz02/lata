@@ -490,7 +490,7 @@ void HELPER(gvec_andc)(void *d, void *a, void *b, uint32_t desc)
     intptr_t i;
 
     for (i = 0; i < oprsz; i += sizeof(uint64_t)) {
-        *(uint64_t *)(d + i) = *(uint64_t *)(a + i) &~ *(uint64_t *)(b + i);
+        *(uint64_t *)(d + i) = *(uint64_t *)(a + i) & ~*(uint64_t *)(b + i);
     }
     clear_high(d, oprsz, desc);
 }
@@ -501,7 +501,7 @@ void HELPER(gvec_orc)(void *d, void *a, void *b, uint32_t desc)
     intptr_t i;
 
     for (i = 0; i < oprsz; i += sizeof(uint64_t)) {
-        *(uint64_t *)(d + i) = *(uint64_t *)(a + i) |~ *(uint64_t *)(b + i);
+        *(uint64_t *)(d + i) = *(uint64_t *)(a + i) | ~*(uint64_t *)(b + i);
     }
     clear_high(d, oprsz, desc);
 }
@@ -1015,23 +1015,23 @@ void HELPER(gvec_rotr64v)(void *d, void *a, void *b, uint32_t desc)
     clear_high(d, oprsz, desc);
 }
 
-#define DO_CMP1(NAME, TYPE, OP)                                            \
-void HELPER(NAME)(void *d, void *a, void *b, uint32_t desc)                \
-{                                                                          \
-    intptr_t oprsz = simd_oprsz(desc);                                     \
-    intptr_t i;                                                            \
-    for (i = 0; i < oprsz; i += sizeof(TYPE)) {                            \
-        *(TYPE *)(d + i) = -(*(TYPE *)(a + i) OP *(TYPE *)(b + i));        \
-    }                                                                      \
-    clear_high(d, oprsz, desc);                                            \
-}
+#define DO_CMP1(NAME, TYPE, OP)                                          \
+    void HELPER(NAME)(void *d, void *a, void *b, uint32_t desc)          \
+    {                                                                    \
+        intptr_t oprsz = simd_oprsz(desc);                               \
+        intptr_t i;                                                      \
+        for (i = 0; i < oprsz; i += sizeof(TYPE)) {                      \
+            *(TYPE *)(d + i) = -(*(TYPE *)(a + i) OP * (TYPE *)(b + i)); \
+        }                                                                \
+        clear_high(d, oprsz, desc);                                      \
+    }
 
-#define DO_CMP2(SZ) \
-    DO_CMP1(gvec_eq##SZ, uint##SZ##_t, ==)    \
-    DO_CMP1(gvec_ne##SZ, uint##SZ##_t, !=)    \
-    DO_CMP1(gvec_lt##SZ, int##SZ##_t, <)      \
-    DO_CMP1(gvec_le##SZ, int##SZ##_t, <=)     \
-    DO_CMP1(gvec_ltu##SZ, uint##SZ##_t, <)    \
+#define DO_CMP2(SZ)                        \
+    DO_CMP1(gvec_eq##SZ, uint##SZ##_t, ==) \
+    DO_CMP1(gvec_ne##SZ, uint##SZ##_t, !=) \
+    DO_CMP1(gvec_lt##SZ, int##SZ##_t, <)   \
+    DO_CMP1(gvec_le##SZ, int##SZ##_t, <=)  \
+    DO_CMP1(gvec_ltu##SZ, uint##SZ##_t, <) \
     DO_CMP1(gvec_leu##SZ, uint##SZ##_t, <=)
 
 DO_CMP2(8)

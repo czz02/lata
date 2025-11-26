@@ -30,13 +30,13 @@
 target_ulong cpu_read_xer(const CPUPPCState *env)
 {
     if (is_isa300(env)) {
-        return env->xer | (env->so << XER_SO) |
-            (env->ov << XER_OV) | (env->ca << XER_CA) |
-            (env->ov32 << XER_OV32) | (env->ca32 << XER_CA32);
+        return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) |
+               (env->ca << XER_CA) | (env->ov32 << XER_OV32) |
+               (env->ca32 << XER_CA32);
     }
 
     return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) |
-        (env->ca << XER_CA);
+           (env->ca << XER_CA);
 }
 
 void cpu_write_xer(CPUPPCState *env, target_ulong xer)
@@ -47,8 +47,7 @@ void cpu_write_xer(CPUPPCState *env, target_ulong xer)
     /* write all the flags, while reading back check of isa300 */
     env->ov32 = (xer >> XER_OV32) & 1;
     env->ca32 = (xer >> XER_CA32) & 1;
-    env->xer = xer & ~((1ul << XER_SO) |
-                       (1ul << XER_OV) | (1ul << XER_CA) |
+    env->xer = xer & ~((1ul << XER_SO) | (1ul << XER_OV) | (1ul << XER_CA) |
                        (1ul << XER_OV32) | (1ul << XER_CA32));
 }
 
@@ -141,7 +140,7 @@ void ppc_store_fpscr(CPUPPCState *env, target_ulong val)
         val |= FP_FEX;
     }
     env->fpscr = val;
-    env->fp_status.rebias_overflow  = (FP_OE & env->fpscr) ? true : false;
+    env->fp_status.rebias_overflow = (FP_OE & env->fpscr) ? true : false;
     env->fp_status.rebias_underflow = (FP_UE & env->fpscr) ? true : false;
     if (tcg_enabled()) {
         fpscr_set_rounding_mode(env);

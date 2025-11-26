@@ -19,8 +19,7 @@
 #include "reg_fields.h"
 
 const RegField reg_field_info[NUM_REG_FIELDS] = {
-#define DEF_REG_FIELD(TAG, START, WIDTH)    \
-      { START, WIDTH },
+#define DEF_REG_FIELD(TAG, START, WIDTH) { START, WIDTH },
 #include "reg_fields_def.h.inc"
 #undef DEF_REG_FIELD
 };

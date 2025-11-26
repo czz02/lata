@@ -30,7 +30,7 @@ static bool trans_CPUCFG(DisasContext *ctx, arg_CPUCFG *a)
 
 #ifndef CONFIG_USER_ONLY
 static bool gen_rdcsr(DisasContext *ctx, arg_r *a,
-                        void (*func)(TCGv, TCGv_ptr, TCGv))
+                      void (*func)(TCGv, TCGv_ptr, TCGv))
 {
     TCGv dest = tcg_temp_new();
     TCGv src1 = tcg_temp_new();
@@ -44,7 +44,7 @@ static bool gen_rdcsr(DisasContext *ctx, arg_r *a,
 }
 
 static bool gen_wrcsr(DisasContext *ctx, arg_r *a,
-                        void (*func)(TCGv_ptr, TCGv, TCGv))
+                      void (*func)(TCGv_ptr, TCGv, TCGv))
 {
     TCGv val = tcg_temp_new();
     TCGv addr = tcg_temp_new();
@@ -62,11 +62,11 @@ TRANS(DRDCSR, gen_rdcsr, gen_helper_lcsr_drdcsr)
 TRANS(WRCSR, gen_wrcsr, gen_helper_lcsr_wrcsr)
 TRANS(DWRCSR, gen_wrcsr, gen_helper_lcsr_dwrcsr)
 #else
-#define GEN_FALSE_TRANS(name)   \
-static bool trans_##name(DisasContext *ctx, arg_##name * a)  \
-{   \
-    return false;   \
-}
+#define GEN_FALSE_TRANS(name)                                  \
+    static bool trans_##name(DisasContext *ctx, arg_##name *a) \
+    {                                                          \
+        return false;                                          \
+    }
 
 GEN_FALSE_TRANS(RDCSR)
 GEN_FALSE_TRANS(DRDCSR)

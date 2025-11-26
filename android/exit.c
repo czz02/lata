@@ -33,12 +33,12 @@ extern void __gcov_dump(void);
 void preexit_cleanup(CPUArchState *env, int code)
 {
 #ifdef CONFIG_GPROF
-        _mcleanup();
+    _mcleanup();
 #endif
 #ifdef CONFIG_GCOV
-        __gcov_dump();
+    __gcov_dump();
 #endif
-        // gdb_exit(code);
-        qemu_plugin_user_exit();
-        perf_exit();
+    // gdb_exit(code);
+    qemu_plugin_user_exit();
+    perf_exit();
 }

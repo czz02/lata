@@ -39,9 +39,11 @@
 /* #define DEBUG_SLB */
 
 #ifdef DEBUG_SLB
-#  define LOG_SLB(...) qemu_log_mask(CPU_LOG_MMU, __VA_ARGS__)
+#define LOG_SLB(...) qemu_log_mask(CPU_LOG_MMU, __VA_ARGS__)
 #else
-#  define LOG_SLB(...) do { } while (0)
+#define LOG_SLB(...) \
+    do {             \
+    } while (0)
 #endif
 
 /*
@@ -62,17 +64,17 @@ static ppc_slb_t *slb_lookup(PowerPCCPU *cpu, target_ulong eaddr)
     for (n = 0; n < cpu->hash64_opts->slb_size; n++) {
         ppc_slb_t *slb = &env->slb[n];
 
-        LOG_SLB("%s: slot %d %016" PRIx64 " %016"
-                    PRIx64 "\n", __func__, n, slb->esid, slb->vsid);
+        LOG_SLB("%s: slot %d %016" PRIx64 " %016" PRIx64 "\n", __func__, n,
+                slb->esid, slb->vsid);
         /*
          * We check for 1T matches on all MMUs here - if the MMU
          * doesn't have 1T segment support, we will have prevented 1T
          * entries from being inserted in the slbmte code.
          */
         if (((slb->esid == esid_256M) &&
-             ((slb->vsid & SLB_VSID_B) == SLB_VSID_B_256M))
-            || ((slb->esid == esid_1T) &&
-                ((slb->vsid & SLB_VSID_B) == SLB_VSID_B_1T))) {
+             ((slb->vsid & SLB_VSID_B) == SLB_VSID_B_256M)) ||
+            ((slb->esid == esid_1T) &&
+             ((slb->vsid & SLB_VSID_B) == SLB_VSID_B_1T))) {
             return slb;
         }
     }
@@ -95,8 +97,7 @@ void dump_slb(PowerPCCPU *cpu)
         if (slbe == 0 && slbv == 0) {
             continue;
         }
-        qemu_printf("%d\t0x%016" PRIx64 "\t0x%016" PRIx64 "\n",
-                    i, slbe, slbv);
+        qemu_printf("%d\t0x%016" PRIx64 "\t0x%016" PRIx64 "\n", i, slbe, slbv);
     }
 }
 
@@ -146,8 +147,8 @@ void helper_SLBIA(CPUPPCState *env, uint32_t ih)
 
         case 0x5:
             /* treat undefined values as ih==0, and warn */
-            qemu_log_mask(LOG_GUEST_ERROR,
-                          "slbia undefined IH field %u.\n", ih);
+            qemu_log_mask(LOG_GUEST_ERROR, "slbia undefined IH field %u.\n",
+                          ih);
             break;
 
         default:
@@ -235,8 +236,8 @@ void helper_SLBIEG(CPUPPCState *env, target_ulong addr)
 }
 #endif
 
-int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
-                  target_ulong esid, target_ulong vsid)
+int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot, target_ulong esid,
+                  target_ulong vsid)
 {
     CPUPPCState *env = &cpu->env;
     ppc_slb_t *slb = &env->slb[slot];
@@ -270,8 +271,8 @@ int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
     }
 
     if (!sps) {
-        error_report("Bad page size encoding in SLB store: slot "TARGET_FMT_lu
-                     " esid 0x"TARGET_FMT_lx" vsid 0x"TARGET_FMT_lx,
+        error_report("Bad page size encoding in SLB store: slot " TARGET_FMT_lu
+                     " esid 0x" TARGET_FMT_lx " vsid 0x" TARGET_FMT_lx,
                      slot, esid, vsid);
         return -1;
     }
@@ -281,15 +282,14 @@ int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
     slb->sps = sps;
 
     LOG_SLB("%s: " TARGET_FMT_lu " " TARGET_FMT_lx " - " TARGET_FMT_lx
-            " => %016" PRIx64 " %016" PRIx64 "\n", __func__, slot, esid, vsid,
-            slb->esid, slb->vsid);
+            " => %016" PRIx64 " %016" PRIx64 "\n",
+            __func__, slot, esid, vsid, slb->esid, slb->vsid);
 
     return 0;
 }
 
 #ifdef CONFIG_TCG
-static int ppc_load_slb_esid(PowerPCCPU *cpu, target_ulong rb,
-                             target_ulong *rt)
+static int ppc_load_slb_esid(PowerPCCPU *cpu, target_ulong rb, target_ulong *rt)
 {
     CPUPPCState *env = &cpu->env;
     int slot = rb & 0xfff;
@@ -303,8 +303,7 @@ static int ppc_load_slb_esid(PowerPCCPU *cpu, target_ulong rb,
     return 0;
 }
 
-static int ppc_load_slb_vsid(PowerPCCPU *cpu, target_ulong rb,
-                             target_ulong *rt)
+static int ppc_load_slb_vsid(PowerPCCPU *cpu, target_ulong rb, target_ulong *rt)
 {
     CPUPPCState *env = &cpu->env;
     int slot = rb & 0xfff;
@@ -318,8 +317,7 @@ static int ppc_load_slb_vsid(PowerPCCPU *cpu, target_ulong rb,
     return 0;
 }
 
-static int ppc_find_slb_vsid(PowerPCCPU *cpu, target_ulong rb,
-                             target_ulong *rt)
+static int ppc_find_slb_vsid(PowerPCCPU *cpu, target_ulong rb, target_ulong *rt)
 {
     CPUPPCState *env = &cpu->env;
     ppc_slb_t *slb;
@@ -341,8 +339,8 @@ void helper_SLBMTE(CPUPPCState *env, target_ulong rb, target_ulong rs)
     PowerPCCPU *cpu = env_archcpu(env);
 
     if (ppc_store_slb(cpu, rb & 0xfff, rb & ~0xfffULL, rs) < 0) {
-        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_INVAL, GETPC());
+        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM, POWERPC_EXCP_INVAL,
+                               GETPC());
     }
 }
 
@@ -352,8 +350,8 @@ target_ulong helper_SLBMFEE(CPUPPCState *env, target_ulong rb)
     target_ulong rt = 0;
 
     if (ppc_load_slb_esid(cpu, rb, &rt) < 0) {
-        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_INVAL, GETPC());
+        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM, POWERPC_EXCP_INVAL,
+                               GETPC());
     }
     return rt;
 }
@@ -364,8 +362,8 @@ target_ulong helper_SLBFEE(CPUPPCState *env, target_ulong rb)
     target_ulong rt = 0;
 
     if (ppc_find_slb_vsid(cpu, rb, &rt) < 0) {
-        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_INVAL, GETPC());
+        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM, POWERPC_EXCP_INVAL,
+                               GETPC());
     }
     return rt;
 }
@@ -376,8 +374,8 @@ target_ulong helper_SLBMFEV(CPUPPCState *env, target_ulong rb)
     target_ulong rt = 0;
 
     if (ppc_load_slb_vsid(cpu, rb, &rt) < 0) {
-        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_INVAL, GETPC());
+        raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM, POWERPC_EXCP_INVAL,
+                               GETPC());
     }
     return rt;
 }
@@ -389,12 +387,13 @@ static inline int ppc_hash64_pte_noexec_guard(PowerPCCPU *cpu,
 {
     /* Exec permissions CANNOT take away read or write permissions */
     return (pte.pte1 & HPTE64_R_N) || (pte.pte1 & HPTE64_R_G) ?
-            PAGE_READ | PAGE_WRITE : PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+               PAGE_READ | PAGE_WRITE :
+               PAGE_READ | PAGE_WRITE | PAGE_EXEC;
 }
 
 /* Check Basic Storage Protection */
-static int ppc_hash64_pte_prot(int mmu_idx,
-                               ppc_slb_t *slb, ppc_hash_pte64_t pte)
+static int ppc_hash64_pte_prot(int mmu_idx, ppc_slb_t *slb,
+                               ppc_hash_pte64_t pte)
 {
     unsigned pp, key;
     /*
@@ -403,8 +402,8 @@ static int ppc_hash64_pte_prot(int mmu_idx,
      */
     int prot = 0;
 
-    key = !!(mmuidx_pr(mmu_idx) ? (slb->vsid & SLB_VSID_KP)
-             : (slb->vsid & SLB_VSID_KS));
+    key = !!(mmuidx_pr(mmu_idx) ? (slb->vsid & SLB_VSID_KP) :
+                                  (slb->vsid & SLB_VSID_KS));
     pp = (pte.pte1 & HPTE64_R_PP) | ((pte.pte1 & HPTE64_R_PP0) >> 61);
 
     if (key == 0) {
@@ -507,8 +506,8 @@ static int ppc_hash64_amr_prot(PowerPCCPU *cpu, ppc_hash_pte64_t pte)
     return prot;
 }
 
-const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu,
-                                             hwaddr ptex, int n)
+const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu, hwaddr ptex,
+                                             int n)
 {
     hwaddr pte_offset = ptex * HASH_PTE_SIZE_64;
     hwaddr base;
@@ -589,8 +588,8 @@ static void ppc64_v3_new_to_old_hpte(target_ulong *pte0, target_ulong *pte1)
 {
     /* Insert B into pte0 */
     *pte0 = (*pte0 & HPTE64_V_COMMON_BITS) |
-            ((*pte1 & HPTE64_R_3_0_SSIZE_MASK) <<
-             (HPTE64_V_SSIZE_SHIFT - HPTE64_R_3_0_SSIZE_SHIFT));
+            ((*pte1 & HPTE64_R_3_0_SSIZE_MASK)
+             << (HPTE64_V_SSIZE_SHIFT - HPTE64_R_3_0_SSIZE_SHIFT));
 
     /* Remove B from pte1 */
     *pte1 = *pte1 & ~HPTE64_R_3_0_SSIZE_MASK;
@@ -599,8 +598,8 @@ static void ppc64_v3_new_to_old_hpte(target_ulong *pte0, target_ulong *pte1)
 
 static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
                                      const PPCHash64SegmentPageSizes *sps,
-                                     target_ulong ptem,
-                                     ppc_hash_pte64_t *pte, unsigned *pshift)
+                                     target_ulong ptem, ppc_hash_pte64_t *pte,
+                                     unsigned *pshift)
 {
     int i;
     const ppc_hash_pte64_t *pteg;
@@ -657,9 +656,9 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
     return -1;
 }
 
-static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
-                                     ppc_slb_t *slb, target_ulong eaddr,
-                                     ppc_hash_pte64_t *pte, unsigned *pshift)
+static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu, ppc_slb_t *slb,
+                                     target_ulong eaddr, ppc_hash_pte64_t *pte,
+                                     unsigned *pshift)
 {
     CPUPPCState *env = &cpu->env;
     hwaddr hash, ptex;
@@ -697,27 +696,27 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
 
     /* Page address translation */
     qemu_log_mask(CPU_LOG_MMU,
-            "htab_base " HWADDR_FMT_plx " htab_mask " HWADDR_FMT_plx
-            " hash " HWADDR_FMT_plx "\n",
-            ppc_hash64_hpt_base(cpu), ppc_hash64_hpt_mask(cpu), hash);
+                  "htab_base " HWADDR_FMT_plx " htab_mask " HWADDR_FMT_plx
+                  " hash " HWADDR_FMT_plx "\n",
+                  ppc_hash64_hpt_base(cpu), ppc_hash64_hpt_mask(cpu), hash);
 
     /* Primary PTEG lookup */
-    qemu_log_mask(CPU_LOG_MMU,
-            "0 htab=" HWADDR_FMT_plx "/" HWADDR_FMT_plx
-            " vsid=" TARGET_FMT_lx " ptem=" TARGET_FMT_lx
-            " hash=" HWADDR_FMT_plx "\n",
-            ppc_hash64_hpt_base(cpu), ppc_hash64_hpt_mask(cpu),
-            vsid, ptem,  hash);
+    qemu_log_mask(
+        CPU_LOG_MMU,
+        "0 htab=" HWADDR_FMT_plx "/" HWADDR_FMT_plx " vsid=" TARGET_FMT_lx
+        " ptem=" TARGET_FMT_lx " hash=" HWADDR_FMT_plx "\n",
+        ppc_hash64_hpt_base(cpu), ppc_hash64_hpt_mask(cpu), vsid, ptem, hash);
     ptex = ppc_hash64_pteg_search(cpu, hash, sps, ptem, pte, pshift);
 
     if (ptex == -1) {
         /* Secondary PTEG lookup */
         ptem |= HPTE64_V_SECONDARY;
         qemu_log_mask(CPU_LOG_MMU,
-                "1 htab=" HWADDR_FMT_plx "/" HWADDR_FMT_plx
-                " vsid=" TARGET_FMT_lx " api=" TARGET_FMT_lx
-                " hash=" HWADDR_FMT_plx "\n", ppc_hash64_hpt_base(cpu),
-                ppc_hash64_hpt_mask(cpu), vsid, ptem, ~hash);
+                      "1 htab=" HWADDR_FMT_plx "/" HWADDR_FMT_plx
+                      " vsid=" TARGET_FMT_lx " api=" TARGET_FMT_lx
+                      " hash=" HWADDR_FMT_plx "\n",
+                      ppc_hash64_hpt_base(cpu), ppc_hash64_hpt_mask(cpu), vsid,
+                      ptem, ~hash);
 
         ptex = ppc_hash64_pteg_search(cpu, ~hash, sps, ptem, pte, pshift);
     }
@@ -725,8 +724,8 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
     return ptex;
 }
 
-unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
-                                          uint64_t pte0, uint64_t pte1)
+unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu, uint64_t pte0,
+                                          uint64_t pte1)
 {
     int i;
 
@@ -810,7 +809,7 @@ static void ppc_hash64_set_dsi(CPUState *cs, int mmu_idx, uint64_t slb_vsid,
         cs->exception_index = POWERPC_EXCP_DSI;
         env->spr[SPR_DAR] = dar;
         env->spr[SPR_DSISR] = dsisr;
-   }
+    }
     env->error_code = 0;
 }
 
@@ -861,13 +860,8 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
      * to trigger an immediate DSI or ISI
      */
     static const target_ulong rma_sizes[16] = {
-        [0] = 256 * GiB,
-        [1] = 16 * GiB,
-        [2] = 1 * GiB,
-        [3] = 64 * MiB,
-        [4] = 256 * MiB,
-        [7] = 128 * MiB,
-        [8] = 32 * MiB,
+        [0] = 256 * GiB, [1] = 16 * GiB,  [2] = 1 * GiB,  [3] = 64 * MiB,
+        [4] = 256 * MiB, [7] = 128 * MiB, [8] = 32 * MiB,
     };
     target_ulong rmls = (env->spr[SPR_LPCR] & LPCR_RMLS) >> LPCR_RMLS_SHIFT;
 
@@ -1054,7 +1048,7 @@ bool ppc_hash64_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
         return false;
     }
 
- skip_slb_search:
+skip_slb_search:
 
     /* 3. Check for segment level no-execute violation */
     if (access_type == MMU_INST_FETCH && (slb->vsid & SLB_VSID_N)) {
@@ -1086,8 +1080,7 @@ bool ppc_hash64_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
         }
         return false;
     }
-    qemu_log_mask(CPU_LOG_MMU,
-                  "found PTE at index %08" HWADDR_PRIx "\n", ptex);
+    qemu_log_mask(CPU_LOG_MMU, "found PTE at index %08" HWADDR_PRIx "\n", ptex);
 
     /* 5. Check access permissions */
 
@@ -1239,5 +1232,3 @@ const PPCHash64Options ppc_hash64_opts_POWER7 = {
         },
     }
 };
-
-

@@ -116,7 +116,8 @@ static void mve_advance_vpt(CPUARMState *env)
 
     if ((env->condexec_bits & 0xf) == 0) {
         env->condexec_bits = (env->condexec_bits == (ECI_A0A1A2B0 << 4)) ?
-            (ECI_A0 << 4) : (ECI_NONE << 4);
+                                 (ECI_A0 << 4) :
+                                 (ECI_NONE << 4);
     }
 
     if (!(vpr & (R_V7M_VPR_MASK01_MASK | R_V7M_VPR_MASK23_MASK))) {
@@ -148,41 +149,43 @@ static void mve_advance_vpt(CPUARMState *env)
 }
 
 /* For loads, predicated lanes are zeroed instead of keeping their old values */
-#define DO_VLDR(OP, MSIZE, LDTYPE, ESIZE, TYPE)                         \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, uint32_t addr)    \
-    {                                                                   \
-        TYPE *d = vd;                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        unsigned b, e;                                                  \
-        /*                                                              \
-         * R_SXTM allows the dest reg to become UNKNOWN for abandoned   \
-         * beats so we don't care if we update part of the dest and     \
-         * then take an exception.                                      \
-         */                                                             \
-        for (b = 0, e = 0; b < 16; b += ESIZE, e++) {                   \
-            if (eci_mask & (1 << b)) {                                  \
-                d[H##ESIZE(e)] = (mask & (1 << b)) ?                    \
-                    cpu_##LDTYPE##_data_ra(env, addr, GETPC()) : 0;     \
-            }                                                           \
-            addr += MSIZE;                                              \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VLDR(OP, MSIZE, LDTYPE, ESIZE, TYPE)                       \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, uint32_t addr) \
+    {                                                                 \
+        TYPE *d = vd;                                                 \
+        uint16_t mask = mve_element_mask(env);                        \
+        uint16_t eci_mask = mve_eci_mask(env);                        \
+        unsigned b, e;                                                \
+        /*                                                            \
+         * R_SXTM allows the dest reg to become UNKNOWN for abandoned \
+         * beats so we don't care if we update part of the dest and   \
+         * then take an exception.                                    \
+         */                                                           \
+        for (b = 0, e = 0; b < 16; b += ESIZE, e++) {                 \
+            if (eci_mask & (1 << b)) {                                \
+                d[H##ESIZE(e)] =                                      \
+                    (mask & (1 << b)) ?                               \
+                        cpu_##LDTYPE##_data_ra(env, addr, GETPC()) :  \
+                        0;                                            \
+            }                                                         \
+            addr += MSIZE;                                            \
+        }                                                             \
+        mve_advance_vpt(env);                                         \
     }
 
-#define DO_VSTR(OP, MSIZE, STTYPE, ESIZE, TYPE)                         \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, uint32_t addr)    \
-    {                                                                   \
-        TYPE *d = vd;                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned b, e;                                                  \
-        for (b = 0, e = 0; b < 16; b += ESIZE, e++) {                   \
-            if (mask & (1 << b)) {                                      \
+#define DO_VSTR(OP, MSIZE, STTYPE, ESIZE, TYPE)                             \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, uint32_t addr)       \
+    {                                                                       \
+        TYPE *d = vd;                                                       \
+        uint16_t mask = mve_element_mask(env);                              \
+        unsigned b, e;                                                      \
+        for (b = 0, e = 0; b < 16; b += ESIZE, e++) {                       \
+            if (mask & (1 << b)) {                                          \
                 cpu_##STTYPE##_data_ra(env, addr, d[H##ESIZE(e)], GETPC()); \
-            }                                                           \
-            addr += MSIZE;                                              \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+            }                                                               \
+            addr += MSIZE;                                                  \
+        }                                                                   \
+        mve_advance_vpt(env);                                               \
     }
 
 DO_VLDR(vldrb, 1, ldub, 1, uint8_t)
@@ -214,54 +217,54 @@ DO_VSTR(vstrh_w, 2, stw, 4, int32_t)
  * For loads, predicated lanes are zeroed instead of retaining
  * their previous values.
  */
-#define DO_VLDR_SG(OP, LDTYPE, ESIZE, TYPE, OFFTYPE, ADDRFN, WB)        \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm,         \
-                          uint32_t base)                                \
-    {                                                                   \
-        TYPE *d = vd;                                                   \
-        OFFTYPE *m = vm;                                                \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        unsigned e;                                                     \
-        uint32_t addr;                                                  \
+#define DO_VLDR_SG(OP, LDTYPE, ESIZE, TYPE, OFFTYPE, ADDRFN, WB)               \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm,               \
+                          uint32_t base)                                       \
+    {                                                                          \
+        TYPE *d = vd;                                                          \
+        OFFTYPE *m = vm;                                                       \
+        uint16_t mask = mve_element_mask(env);                                 \
+        uint16_t eci_mask = mve_eci_mask(env);                                 \
+        unsigned e;                                                            \
+        uint32_t addr;                                                         \
         for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE, eci_mask >>= ESIZE) { \
-            if (!(eci_mask & 1)) {                                      \
-                continue;                                               \
-            }                                                           \
-            addr = ADDRFN(base, m[H##ESIZE(e)]);                        \
-            d[H##ESIZE(e)] = (mask & 1) ?                               \
-                cpu_##LDTYPE##_data_ra(env, addr, GETPC()) : 0;         \
-            if (WB) {                                                   \
-                m[H##ESIZE(e)] = addr;                                  \
-            }                                                           \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+            if (!(eci_mask & 1)) {                                             \
+                continue;                                                      \
+            }                                                                  \
+            addr = ADDRFN(base, m[H##ESIZE(e)]);                               \
+            d[H##ESIZE(e)] =                                                   \
+                (mask & 1) ? cpu_##LDTYPE##_data_ra(env, addr, GETPC()) : 0;   \
+            if (WB) {                                                          \
+                m[H##ESIZE(e)] = addr;                                         \
+            }                                                                  \
+        }                                                                      \
+        mve_advance_vpt(env);                                                  \
     }
 
 /* We know here TYPE is unsigned so always the same as the offset type */
-#define DO_VSTR_SG(OP, STTYPE, ESIZE, TYPE, ADDRFN, WB)                 \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm,         \
-                          uint32_t base)                                \
-    {                                                                   \
-        TYPE *d = vd;                                                   \
-        TYPE *m = vm;                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        unsigned e;                                                     \
-        uint32_t addr;                                                  \
+#define DO_VSTR_SG(OP, STTYPE, ESIZE, TYPE, ADDRFN, WB)                        \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm,               \
+                          uint32_t base)                                       \
+    {                                                                          \
+        TYPE *d = vd;                                                          \
+        TYPE *m = vm;                                                          \
+        uint16_t mask = mve_element_mask(env);                                 \
+        uint16_t eci_mask = mve_eci_mask(env);                                 \
+        unsigned e;                                                            \
+        uint32_t addr;                                                         \
         for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE, eci_mask >>= ESIZE) { \
-            if (!(eci_mask & 1)) {                                      \
-                continue;                                               \
-            }                                                           \
-            addr = ADDRFN(base, m[H##ESIZE(e)]);                        \
-            if (mask & 1) {                                             \
-                cpu_##STTYPE##_data_ra(env, addr, d[H##ESIZE(e)], GETPC()); \
-            }                                                           \
-            if (WB) {                                                   \
-                m[H##ESIZE(e)] = addr;                                  \
-            }                                                           \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+            if (!(eci_mask & 1)) {                                             \
+                continue;                                                      \
+            }                                                                  \
+            addr = ADDRFN(base, m[H##ESIZE(e)]);                               \
+            if (mask & 1) {                                                    \
+                cpu_##STTYPE##_data_ra(env, addr, d[H##ESIZE(e)], GETPC());    \
+            }                                                                  \
+            if (WB) {                                                          \
+                m[H##ESIZE(e)] = addr;                                         \
+            }                                                                  \
+        }                                                                      \
+        mve_advance_vpt(env);                                                  \
     }
 
 /*
@@ -272,54 +275,54 @@ DO_VSTR(vstrh_w, 2, stw, 4, int32_t)
  * Address writeback happens on the odd beats and updates the address
  * stored in the even-beat element.
  */
-#define DO_VLDR64_SG(OP, ADDRFN, WB)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm,         \
-                          uint32_t base)                                \
-    {                                                                   \
-        uint32_t *d = vd;                                               \
-        uint32_t *m = vm;                                               \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        unsigned e;                                                     \
-        uint32_t addr;                                                  \
-        for (e = 0; e < 16 / 4; e++, mask >>= 4, eci_mask >>= 4) {      \
-            if (!(eci_mask & 1)) {                                      \
-                continue;                                               \
-            }                                                           \
-            addr = ADDRFN(base, m[H4(e & ~1)]);                         \
-            addr += 4 * (e & 1);                                        \
+#define DO_VLDR64_SG(OP, ADDRFN, WB)                                         \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm,             \
+                          uint32_t base)                                     \
+    {                                                                        \
+        uint32_t *d = vd;                                                    \
+        uint32_t *m = vm;                                                    \
+        uint16_t mask = mve_element_mask(env);                               \
+        uint16_t eci_mask = mve_eci_mask(env);                               \
+        unsigned e;                                                          \
+        uint32_t addr;                                                       \
+        for (e = 0; e < 16 / 4; e++, mask >>= 4, eci_mask >>= 4) {           \
+            if (!(eci_mask & 1)) {                                           \
+                continue;                                                    \
+            }                                                                \
+            addr = ADDRFN(base, m[H4(e & ~1)]);                              \
+            addr += 4 * (e & 1);                                             \
             d[H4(e)] = (mask & 1) ? cpu_ldl_data_ra(env, addr, GETPC()) : 0; \
-            if (WB && (e & 1)) {                                        \
-                m[H4(e & ~1)] = addr - 4;                               \
-            }                                                           \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+            if (WB && (e & 1)) {                                             \
+                m[H4(e & ~1)] = addr - 4;                                    \
+            }                                                                \
+        }                                                                    \
+        mve_advance_vpt(env);                                                \
     }
 
-#define DO_VSTR64_SG(OP, ADDRFN, WB)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm,         \
-                          uint32_t base)                                \
-    {                                                                   \
-        uint32_t *d = vd;                                               \
-        uint32_t *m = vm;                                               \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        unsigned e;                                                     \
-        uint32_t addr;                                                  \
-        for (e = 0; e < 16 / 4; e++, mask >>= 4, eci_mask >>= 4) {      \
-            if (!(eci_mask & 1)) {                                      \
-                continue;                                               \
-            }                                                           \
-            addr = ADDRFN(base, m[H4(e & ~1)]);                         \
-            addr += 4 * (e & 1);                                        \
-            if (mask & 1) {                                             \
-                cpu_stl_data_ra(env, addr, d[H4(e)], GETPC());          \
-            }                                                           \
-            if (WB && (e & 1)) {                                        \
-                m[H4(e & ~1)] = addr - 4;                               \
-            }                                                           \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VSTR64_SG(OP, ADDRFN, WB)                               \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm,   \
+                          uint32_t base)                           \
+    {                                                              \
+        uint32_t *d = vd;                                          \
+        uint32_t *m = vm;                                          \
+        uint16_t mask = mve_element_mask(env);                     \
+        uint16_t eci_mask = mve_eci_mask(env);                     \
+        unsigned e;                                                \
+        uint32_t addr;                                             \
+        for (e = 0; e < 16 / 4; e++, mask >>= 4, eci_mask >>= 4) { \
+            if (!(eci_mask & 1)) {                                 \
+                continue;                                          \
+            }                                                      \
+            addr = ADDRFN(base, m[H4(e & ~1)]);                    \
+            addr += 4 * (e & 1);                                   \
+            if (mask & 1) {                                        \
+                cpu_stl_data_ra(env, addr, d[H4(e)], GETPC());     \
+            }                                                      \
+            if (WB && (e & 1)) {                                   \
+                m[H4(e & ~1)] = addr - 4;                          \
+            }                                                      \
+        }                                                          \
+        mve_advance_vpt(env);                                      \
     }
 
 #define ADDR_ADD(BASE, OFFSET) ((BASE) + (OFFSET))
@@ -379,74 +382,71 @@ DO_VSTR64_SG(vstrd_sg_wb_ud, ADDR_ADD, true)
  * of the element size, but rules R_VVVG and R_FXDM permit us to make
  * one 32-bit memory access per beat.
  */
-#define DO_VLD4B(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat, e;                                                    \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 4;                                \
-            data = cpu_ldl_le_data_ra(env, addr, GETPC());              \
-            for (e = 0; e < 4; e++, data >>= 8) {                       \
-                uint8_t *qd = (uint8_t *)aa32_vfp_qreg(env, qnidx + e); \
-                qd[H1(off[beat])] = data;                               \
-            }                                                           \
-        }                                                               \
+#define DO_VLD4B(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat, e;                                                        \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 4;                                    \
+            data = cpu_ldl_le_data_ra(env, addr, GETPC());                  \
+            for (e = 0; e < 4; e++, data >>= 8) {                           \
+                uint8_t *qd = (uint8_t *)aa32_vfp_qreg(env, qnidx + e);     \
+                qd[H1(off[beat])] = data;                                   \
+            }                                                               \
+        }                                                                   \
     }
 
-#define DO_VLD4H(OP, O1, O2)                                            \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat;                                                       \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O1, O2, O2 };               \
-        uint32_t addr, data;                                            \
-        int y; /* y counts 0 2 0 2 */                                   \
-        uint16_t *qd;                                                   \
-        for (beat = 0, y = 0; beat < 4; beat++, mask >>= 4, y ^= 2) {   \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 8 + (beat & 1) * 4;               \
-            data = cpu_ldl_le_data_ra(env, addr, GETPC());              \
-            qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + y);             \
-            qd[H2(off[beat])] = data;                                   \
-            data >>= 16;                                                \
-            qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + y + 1);         \
-            qd[H2(off[beat])] = data;                                   \
-        }                                                               \
+#define DO_VLD4H(OP, O1, O2)                                                \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat;                                                           \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O1, O2, O2 };                   \
+        uint32_t addr, data;                                                \
+        int y; /* y counts 0 2 0 2 */                                       \
+        uint16_t *qd;                                                       \
+        for (beat = 0, y = 0; beat < 4; beat++, mask >>= 4, y ^= 2) {       \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 8 + (beat & 1) * 4;                   \
+            data = cpu_ldl_le_data_ra(env, addr, GETPC());                  \
+            qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + y);                 \
+            qd[H2(off[beat])] = data;                                       \
+            data >>= 16;                                                    \
+            qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + y + 1);             \
+            qd[H2(off[beat])] = data;                                       \
+        }                                                                   \
     }
 
-#define DO_VLD4W(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat;                                                       \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        uint32_t *qd;                                                   \
-        int y;                                                          \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 4;                                \
-            data = cpu_ldl_le_data_ra(env, addr, GETPC());              \
-            y = (beat + (O1 & 2)) & 3;                                  \
-            qd = (uint32_t *)aa32_vfp_qreg(env, qnidx + y);             \
-            qd[H4(off[beat] >> 2)] = data;                              \
-        }                                                               \
+#define DO_VLD4W(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat;                                                           \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        uint32_t *qd;                                                       \
+        int y;                                                              \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 4;                                    \
+            data = cpu_ldl_le_data_ra(env, addr, GETPC());                  \
+            y = (beat + (O1 & 2)) & 3;                                      \
+            qd = (uint32_t *)aa32_vfp_qreg(env, qnidx + y);                 \
+            qd[H4(off[beat] >> 2)] = data;                                  \
+        }                                                                   \
     }
 
 DO_VLD4B(vld40b, 0, 1, 10, 11)
@@ -464,72 +464,69 @@ DO_VLD4W(vld41w, 2, 3, 12, 13)
 DO_VLD4W(vld42w, 4, 5, 14, 15)
 DO_VLD4W(vld43w, 6, 7, 8, 9)
 
-#define DO_VLD2B(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat, e;                                                    \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        uint8_t *qd;                                                    \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 2;                                \
-            data = cpu_ldl_le_data_ra(env, addr, GETPC());              \
-            for (e = 0; e < 4; e++, data >>= 8) {                       \
-                qd = (uint8_t *)aa32_vfp_qreg(env, qnidx + (e & 1));    \
-                qd[H1(off[beat] + (e >> 1))] = data;                    \
-            }                                                           \
-        }                                                               \
+#define DO_VLD2B(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat, e;                                                        \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        uint8_t *qd;                                                        \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 2;                                    \
+            data = cpu_ldl_le_data_ra(env, addr, GETPC());                  \
+            for (e = 0; e < 4; e++, data >>= 8) {                           \
+                qd = (uint8_t *)aa32_vfp_qreg(env, qnidx + (e & 1));        \
+                qd[H1(off[beat] + (e >> 1))] = data;                        \
+            }                                                               \
+        }                                                                   \
     }
 
-#define DO_VLD2H(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat;                                                       \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        int e;                                                          \
-        uint16_t *qd;                                                   \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 4;                                \
-            data = cpu_ldl_le_data_ra(env, addr, GETPC());              \
-            for (e = 0; e < 2; e++, data >>= 16) {                      \
-                qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + e);         \
-                qd[H2(off[beat])] = data;                               \
-            }                                                           \
-        }                                                               \
+#define DO_VLD2H(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat;                                                           \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        int e;                                                              \
+        uint16_t *qd;                                                       \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 4;                                    \
+            data = cpu_ldl_le_data_ra(env, addr, GETPC());                  \
+            for (e = 0; e < 2; e++, data >>= 16) {                          \
+                qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + e);             \
+                qd[H2(off[beat])] = data;                                   \
+            }                                                               \
+        }                                                                   \
     }
 
-#define DO_VLD2W(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat;                                                       \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        uint32_t *qd;                                                   \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat];                                    \
-            data = cpu_ldl_le_data_ra(env, addr, GETPC());              \
-            qd = (uint32_t *)aa32_vfp_qreg(env, qnidx + (beat & 1));    \
-            qd[H4(off[beat] >> 3)] = data;                              \
-        }                                                               \
+#define DO_VLD2W(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat;                                                           \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        uint32_t *qd;                                                       \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat];                                        \
+            data = cpu_ldl_le_data_ra(env, addr, GETPC());                  \
+            qd = (uint32_t *)aa32_vfp_qreg(env, qnidx + (beat & 1));        \
+            qd[H4(off[beat] >> 3)] = data;                                  \
+        }                                                                   \
     }
 
 DO_VLD2B(vld20b, 0, 2, 12, 14)
@@ -541,74 +538,71 @@ DO_VLD2H(vld21h, 2, 3, 4, 5)
 DO_VLD2W(vld20w, 0, 4, 24, 28)
 DO_VLD2W(vld21w, 8, 12, 16, 20)
 
-#define DO_VST4B(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat, e;                                                    \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 4;                                \
-            data = 0;                                                   \
-            for (e = 3; e >= 0; e--) {                                  \
-                uint8_t *qd = (uint8_t *)aa32_vfp_qreg(env, qnidx + e); \
-                data = (data << 8) | qd[H1(off[beat])];                 \
-            }                                                           \
-            cpu_stl_le_data_ra(env, addr, data, GETPC());               \
-        }                                                               \
+#define DO_VST4B(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat, e;                                                        \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 4;                                    \
+            data = 0;                                                       \
+            for (e = 3; e >= 0; e--) {                                      \
+                uint8_t *qd = (uint8_t *)aa32_vfp_qreg(env, qnidx + e);     \
+                data = (data << 8) | qd[H1(off[beat])];                     \
+            }                                                               \
+            cpu_stl_le_data_ra(env, addr, data, GETPC());                   \
+        }                                                                   \
     }
 
-#define DO_VST4H(OP, O1, O2)                                            \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat;                                                       \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O1, O2, O2 };               \
-        uint32_t addr, data;                                            \
-        int y; /* y counts 0 2 0 2 */                                   \
-        uint16_t *qd;                                                   \
-        for (beat = 0, y = 0; beat < 4; beat++, mask >>= 4, y ^= 2) {   \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 8 + (beat & 1) * 4;               \
-            qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + y);             \
-            data = qd[H2(off[beat])];                                   \
-            qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + y + 1);         \
-            data |= qd[H2(off[beat])] << 16;                            \
-            cpu_stl_le_data_ra(env, addr, data, GETPC());               \
-        }                                                               \
+#define DO_VST4H(OP, O1, O2)                                                \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat;                                                           \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O1, O2, O2 };                   \
+        uint32_t addr, data;                                                \
+        int y; /* y counts 0 2 0 2 */                                       \
+        uint16_t *qd;                                                       \
+        for (beat = 0, y = 0; beat < 4; beat++, mask >>= 4, y ^= 2) {       \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 8 + (beat & 1) * 4;                   \
+            qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + y);                 \
+            data = qd[H2(off[beat])];                                       \
+            qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + y + 1);             \
+            data |= qd[H2(off[beat])] << 16;                                \
+            cpu_stl_le_data_ra(env, addr, data, GETPC());                   \
+        }                                                                   \
     }
 
-#define DO_VST4W(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat;                                                       \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        uint32_t *qd;                                                   \
-        int y;                                                          \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 4;                                \
-            y = (beat + (O1 & 2)) & 3;                                  \
-            qd = (uint32_t *)aa32_vfp_qreg(env, qnidx + y);             \
-            data = qd[H4(off[beat] >> 2)];                              \
-            cpu_stl_le_data_ra(env, addr, data, GETPC());               \
-        }                                                               \
+#define DO_VST4W(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat;                                                           \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        uint32_t *qd;                                                       \
+        int y;                                                              \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 4;                                    \
+            y = (beat + (O1 & 2)) & 3;                                      \
+            qd = (uint32_t *)aa32_vfp_qreg(env, qnidx + y);                 \
+            data = qd[H4(off[beat] >> 2)];                                  \
+            cpu_stl_le_data_ra(env, addr, data, GETPC());                   \
+        }                                                                   \
     }
 
 DO_VST4B(vst40b, 0, 1, 10, 11)
@@ -626,74 +620,71 @@ DO_VST4W(vst41w, 2, 3, 12, 13)
 DO_VST4W(vst42w, 4, 5, 14, 15)
 DO_VST4W(vst43w, 6, 7, 8, 9)
 
-#define DO_VST2B(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat, e;                                                    \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        uint8_t *qd;                                                    \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 2;                                \
-            data = 0;                                                   \
-            for (e = 3; e >= 0; e--) {                                  \
-                qd = (uint8_t *)aa32_vfp_qreg(env, qnidx + (e & 1));    \
-                data = (data << 8) | qd[H1(off[beat] + (e >> 1))];      \
-            }                                                           \
-            cpu_stl_le_data_ra(env, addr, data, GETPC());               \
-        }                                                               \
+#define DO_VST2B(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat, e;                                                        \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        uint8_t *qd;                                                        \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 2;                                    \
+            data = 0;                                                       \
+            for (e = 3; e >= 0; e--) {                                      \
+                qd = (uint8_t *)aa32_vfp_qreg(env, qnidx + (e & 1));        \
+                data = (data << 8) | qd[H1(off[beat] + (e >> 1))];          \
+            }                                                               \
+            cpu_stl_le_data_ra(env, addr, data, GETPC());                   \
+        }                                                                   \
     }
 
-#define DO_VST2H(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat;                                                       \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        int e;                                                          \
-        uint16_t *qd;                                                   \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat] * 4;                                \
-            data = 0;                                                   \
-            for (e = 1; e >= 0; e--) {                                  \
-                qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + e);         \
-                data = (data << 16) | qd[H2(off[beat])];                \
-            }                                                           \
-            cpu_stl_le_data_ra(env, addr, data, GETPC());               \
-        }                                                               \
+#define DO_VST2H(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat;                                                           \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        int e;                                                              \
+        uint16_t *qd;                                                       \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat] * 4;                                    \
+            data = 0;                                                       \
+            for (e = 1; e >= 0; e--) {                                      \
+                qd = (uint16_t *)aa32_vfp_qreg(env, qnidx + e);             \
+                data = (data << 16) | qd[H2(off[beat])];                    \
+            }                                                               \
+            cpu_stl_le_data_ra(env, addr, data, GETPC());                   \
+        }                                                                   \
     }
 
-#define DO_VST2W(OP, O1, O2, O3, O4)                                    \
-    void HELPER(mve_##OP)(CPUARMState *env, uint32_t qnidx,             \
-                          uint32_t base)                                \
-    {                                                                   \
-        int beat;                                                       \
-        uint16_t mask = mve_eci_mask(env);                              \
-        static const uint8_t off[4] = { O1, O2, O3, O4 };               \
-        uint32_t addr, data;                                            \
-        uint32_t *qd;                                                   \
-        for (beat = 0; beat < 4; beat++, mask >>= 4) {                  \
-            if ((mask & 1) == 0) {                                      \
-                /* ECI says skip this beat */                           \
-                continue;                                               \
-            }                                                           \
-            addr = base + off[beat];                                    \
-            qd = (uint32_t *)aa32_vfp_qreg(env, qnidx + (beat & 1));    \
-            data = qd[H4(off[beat] >> 3)];                              \
-            cpu_stl_le_data_ra(env, addr, data, GETPC());               \
-        }                                                               \
+#define DO_VST2W(OP, O1, O2, O3, O4)                                        \
+    void HELPER(mve_##OP)(CPUARMState * env, uint32_t qnidx, uint32_t base) \
+    {                                                                       \
+        int beat;                                                           \
+        uint16_t mask = mve_eci_mask(env);                                  \
+        static const uint8_t off[4] = { O1, O2, O3, O4 };                   \
+        uint32_t addr, data;                                                \
+        uint32_t *qd;                                                       \
+        for (beat = 0; beat < 4; beat++, mask >>= 4) {                      \
+            if ((mask & 1) == 0) {                                          \
+                /* ECI says skip this beat */                               \
+                continue;                                                   \
+            }                                                               \
+            addr = base + off[beat];                                        \
+            qd = (uint32_t *)aa32_vfp_qreg(env, qnidx + (beat & 1));        \
+            data = qd[H4(off[beat] >> 3)];                                  \
+            cpu_stl_le_data_ra(env, addr, data, GETPC());                   \
+        }                                                                   \
     }
 
 DO_VST2B(vst20b, 0, 2, 12, 14)
@@ -757,16 +748,16 @@ static void mergemask_sq(int64_t *d, int64_t r, uint16_t mask)
     mergemask_uq((uint64_t *)d, r, mask);
 }
 
-#define mergemask(D, R, M)                      \
-    _Generic(D,                                 \
-             uint8_t *: mergemask_ub,           \
-             int8_t *:  mergemask_sb,           \
-             uint16_t *: mergemask_uh,          \
-             int16_t *:  mergemask_sh,          \
-             uint32_t *: mergemask_uw,          \
-             int32_t *:  mergemask_sw,          \
-             uint64_t *: mergemask_uq,          \
-             int64_t *:  mergemask_sq)(D, R, M)
+#define mergemask(D, R, M)        \
+    _Generic(D,                   \
+        uint8_t *: mergemask_ub,  \
+        int8_t *: mergemask_sb,   \
+        uint16_t *: mergemask_uh, \
+        int16_t *: mergemask_sh,  \
+        uint32_t *: mergemask_uw, \
+        int32_t *: mergemask_sw,  \
+        uint64_t *: mergemask_uq, \
+        int64_t *: mergemask_sq)(D, R, M)
 
 void HELPER(mve_vdup)(CPUARMState *env, void *vd, uint32_t val)
 {
@@ -784,27 +775,27 @@ void HELPER(mve_vdup)(CPUARMState *env, void *vd, uint32_t val)
     mve_advance_vpt(env);
 }
 
-#define DO_1OP(OP, ESIZE, TYPE, FN)                                     \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm)         \
-    {                                                                   \
-        TYPE *d = vd, *m = vm;                                          \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            mergemask(&d[H##ESIZE(e)], FN(m[H##ESIZE(e)]), mask);       \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_1OP(OP, ESIZE, TYPE, FN)                               \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm)  \
+    {                                                             \
+        TYPE *d = vd, *m = vm;                                    \
+        uint16_t mask = mve_element_mask(env);                    \
+        unsigned e;                                               \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {        \
+            mergemask(&d[H##ESIZE(e)], FN(m[H##ESIZE(e)]), mask); \
+        }                                                         \
+        mve_advance_vpt(env);                                     \
     }
 
-#define DO_CLS_B(N)   (clrsb32(N) - 24)
-#define DO_CLS_H(N)   (clrsb32(N) - 16)
+#define DO_CLS_B(N) (clrsb32(N) - 24)
+#define DO_CLS_H(N) (clrsb32(N) - 16)
 
 DO_1OP(vclsb, 1, int8_t, DO_CLS_B)
 DO_1OP(vclsh, 2, int16_t, DO_CLS_H)
 DO_1OP(vclsw, 4, int32_t, clrsb32)
 
-#define DO_CLZ_B(N)   (clz32(N) - 24)
-#define DO_CLZ_H(N)   (clz32(N) - 16)
+#define DO_CLZ_B(N) (clz32(N) - 24)
+#define DO_CLZ_H(N) (clz32(N) - 16)
 
 DO_1OP(vclzb, 1, uint8_t, DO_CLZ_B)
 DO_1OP(vclzh, 2, uint16_t, DO_CLZ_H)
@@ -822,8 +813,8 @@ DO_1OP(vrev64w, 8, uint64_t, wswap64)
 DO_1OP(vmvn, 8, uint64_t, DO_NOT)
 
 #define DO_ABS(N) ((N) < 0 ? -(N) : (N))
-#define DO_FABSH(N)  ((N) & dup_const(MO_16, 0x7fff))
-#define DO_FABSS(N)  ((N) & dup_const(MO_32, 0x7fffffff))
+#define DO_FABSH(N) ((N) & dup_const(MO_16, 0x7fff))
+#define DO_FABSS(N) ((N) & dup_const(MO_32, 0x7fffffff))
 
 DO_1OP(vabsb, 1, int8_t, DO_ABS)
 DO_1OP(vabsh, 2, int16_t, DO_ABS)
@@ -833,7 +824,7 @@ DO_1OP(vabsw, 4, int32_t, DO_ABS)
 DO_1OP(vfabsh, 8, uint64_t, DO_FABSH)
 DO_1OP(vfabss, 8, uint64_t, DO_FABSS)
 
-#define DO_NEG(N)    (-(N))
+#define DO_NEG(N) (-(N))
 #define DO_FNEGH(N) ((N) ^ dup_const(MO_16, 0x8000))
 #define DO_FNEGS(N) ((N) ^ dup_const(MO_32, 0x80000000))
 
@@ -849,16 +840,16 @@ DO_1OP(vfnegs, 8, uint64_t, DO_FNEGS)
  * 1 operand immediates: Vda is destination and possibly also one source.
  * All these insns work at 64-bit widths.
  */
-#define DO_1OP_IMM(OP, FN)                                              \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vda, uint64_t imm)    \
-    {                                                                   \
-        uint64_t *da = vda;                                             \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        for (e = 0; e < 16 / 8; e++, mask >>= 8) {                      \
-            mergemask(&da[H8(e)], FN(da[H8(e)], imm), mask);            \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_1OP_IMM(OP, FN)                                            \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vda, uint64_t imm) \
+    {                                                                 \
+        uint64_t *da = vda;                                           \
+        uint16_t mask = mve_element_mask(env);                        \
+        unsigned e;                                                   \
+        for (e = 0; e < 16 / 8; e++, mask >>= 8) {                    \
+            mergemask(&da[H8(e)], FN(da[H8(e)], imm), mask);          \
+        }                                                             \
+        mve_advance_vpt(env);                                         \
     }
 
 #define DO_MOVI(N, I) (I)
@@ -869,30 +860,30 @@ DO_1OP_IMM(vmovi, DO_MOVI)
 DO_1OP_IMM(vandi, DO_ANDI)
 DO_1OP_IMM(vorri, DO_ORRI)
 
-#define DO_2OP(OP, ESIZE, TYPE, FN)                                     \
-    void HELPER(glue(mve_, OP))(CPUARMState *env,                       \
-                                void *vd, void *vn, void *vm)           \
-    {                                                                   \
-        TYPE *d = vd, *n = vn, *m = vm;                                 \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            mergemask(&d[H##ESIZE(e)],                                  \
-                      FN(n[H##ESIZE(e)], m[H##ESIZE(e)]), mask);        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP(OP, ESIZE, TYPE, FN)                                        \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn,     \
+                                void *vm)                                  \
+    {                                                                      \
+        TYPE *d = vd, *n = vn, *m = vm;                                    \
+        uint16_t mask = mve_element_mask(env);                             \
+        unsigned e;                                                        \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                 \
+            mergemask(&d[H##ESIZE(e)], FN(n[H##ESIZE(e)], m[H##ESIZE(e)]), \
+                      mask);                                               \
+        }                                                                  \
+        mve_advance_vpt(env);                                              \
     }
 
 /* provide unsigned 2-op helpers for all sizes */
-#define DO_2OP_U(OP, FN)                        \
-    DO_2OP(OP##b, 1, uint8_t, FN)               \
-    DO_2OP(OP##h, 2, uint16_t, FN)              \
+#define DO_2OP_U(OP, FN)           \
+    DO_2OP(OP##b, 1, uint8_t, FN)  \
+    DO_2OP(OP##h, 2, uint16_t, FN) \
     DO_2OP(OP##w, 4, uint32_t, FN)
 
 /* provide signed 2-op helpers for all sizes */
-#define DO_2OP_S(OP, FN)                        \
-    DO_2OP(OP##b, 1, int8_t, FN)                \
-    DO_2OP(OP##h, 2, int16_t, FN)               \
+#define DO_2OP_S(OP, FN)          \
+    DO_2OP(OP##b, 1, int8_t, FN)  \
+    DO_2OP(OP##h, 2, int16_t, FN) \
     DO_2OP(OP##w, 4, int32_t, FN)
 
 /*
@@ -900,57 +891,59 @@ DO_1OP_IMM(vorri, DO_ORRI)
  * top or the bottom of the input vector) produce a double-width result.
  * Here ESIZE, TYPE are for the input, and LESIZE, LTYPE for the output.
  */
-#define DO_2OP_L(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN)               \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn, void *vm) \
-    {                                                                   \
-        LTYPE *d = vd;                                                  \
-        TYPE *n = vn, *m = vm;                                          \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned le;                                                    \
-        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {         \
-            LTYPE r = FN((LTYPE)n[H##ESIZE(le * 2 + TOP)],              \
-                         m[H##ESIZE(le * 2 + TOP)]);                    \
-            mergemask(&d[H##LESIZE(le)], r, mask);                      \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_L(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN)              \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                void *vm)                              \
+    {                                                                  \
+        LTYPE *d = vd;                                                 \
+        TYPE *n = vn, *m = vm;                                         \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned le;                                                   \
+        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {        \
+            LTYPE r = FN((LTYPE)n[H##ESIZE(le * 2 + TOP)],             \
+                         m[H##ESIZE(le * 2 + TOP)]);                   \
+            mergemask(&d[H##LESIZE(le)], r, mask);                     \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
-#define DO_2OP_SAT(OP, ESIZE, TYPE, FN)                                 \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn, void *vm) \
-    {                                                                   \
-        TYPE *d = vd, *n = vn, *m = vm;                                 \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        bool qc = false;                                                \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            bool sat = false;                                           \
-            TYPE r = FN(n[H##ESIZE(e)], m[H##ESIZE(e)], &sat);          \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-            qc |= sat & mask & 1;                                       \
-        }                                                               \
-        if (qc) {                                                       \
-            env->vfp.qc[0] = qc;                                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_SAT(OP, ESIZE, TYPE, FN)                                \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                void *vm)                              \
+    {                                                                  \
+        TYPE *d = vd, *n = vn, *m = vm;                                \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        bool qc = false;                                               \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            bool sat = false;                                          \
+            TYPE r = FN(n[H##ESIZE(e)], m[H##ESIZE(e)], &sat);         \
+            mergemask(&d[H##ESIZE(e)], r, mask);                       \
+            qc |= sat & mask & 1;                                      \
+        }                                                              \
+        if (qc) {                                                      \
+            env->vfp.qc[0] = qc;                                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 /* provide unsigned 2-op helpers for all sizes */
-#define DO_2OP_SAT_U(OP, FN)                    \
-    DO_2OP_SAT(OP##b, 1, uint8_t, FN)           \
-    DO_2OP_SAT(OP##h, 2, uint16_t, FN)          \
+#define DO_2OP_SAT_U(OP, FN)           \
+    DO_2OP_SAT(OP##b, 1, uint8_t, FN)  \
+    DO_2OP_SAT(OP##h, 2, uint16_t, FN) \
     DO_2OP_SAT(OP##w, 4, uint32_t, FN)
 
 /* provide signed 2-op helpers for all sizes */
-#define DO_2OP_SAT_S(OP, FN)                    \
-    DO_2OP_SAT(OP##b, 1, int8_t, FN)            \
-    DO_2OP_SAT(OP##h, 2, int16_t, FN)           \
+#define DO_2OP_SAT_S(OP, FN)          \
+    DO_2OP_SAT(OP##b, 1, int8_t, FN)  \
+    DO_2OP_SAT(OP##h, 2, int16_t, FN) \
     DO_2OP_SAT(OP##w, 4, int32_t, FN)
 
-#define DO_AND(N, M)  ((N) & (M))
-#define DO_BIC(N, M)  ((N) & ~(M))
-#define DO_ORR(N, M)  ((N) | (M))
-#define DO_ORN(N, M)  ((N) | ~(M))
-#define DO_EOR(N, M)  ((N) ^ (M))
+#define DO_AND(N, M) ((N) & (M))
+#define DO_BIC(N, M) ((N) & ~(M))
+#define DO_ORR(N, M) ((N) | (M))
+#define DO_ORN(N, M) ((N) | ~(M))
+#define DO_EOR(N, M) ((N) ^ (M))
 
 DO_2OP(vand, 8, uint64_t, DO_AND)
 DO_2OP(vbic, 8, uint64_t, DO_BIC)
@@ -1044,15 +1037,15 @@ DO_2OP(vrmulhub, 1, uint8_t, do_rmulh_b)
 DO_2OP(vrmulhuh, 2, uint16_t, do_rmulh_h)
 DO_2OP(vrmulhuw, 4, uint32_t, do_rmulh_w)
 
-#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
-#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
+#define DO_MAX(N, M) ((N) >= (M) ? (N) : (M))
+#define DO_MIN(N, M) ((N) >= (M) ? (M) : (N))
 
 DO_2OP_S(vmaxs, DO_MAX)
 DO_2OP_U(vmaxu, DO_MAX)
 DO_2OP_S(vmins, DO_MIN)
 DO_2OP_U(vminu, DO_MIN)
 
-#define DO_ABD(N, M)  ((N) >= (M) ? (N) - (M) : (M) - (N))
+#define DO_ABD(N, M) ((N) >= (M) ? (N) - (M) : (M) - (N))
 
 DO_2OP_S(vabds, DO_ABD)
 DO_2OP_U(vabdu, DO_ABD)
@@ -1150,30 +1143,31 @@ void HELPER(mve_vsbci)(CPUARMState *env, void *vd, void *vn, void *vm)
     do_vadc(env, vd, vn, vm, -1, 1, true);
 }
 
-#define DO_VCADD(OP, ESIZE, TYPE, FN0, FN1)                             \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn, void *vm) \
-    {                                                                   \
-        TYPE *d = vd, *n = vn, *m = vm;                                 \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        TYPE r[16 / ESIZE];                                             \
-        /* Calculate all results first to avoid overwriting inputs */   \
-        for (e = 0; e < 16 / ESIZE; e++) {                              \
-            if (!(e & 1)) {                                             \
-                r[e] = FN0(n[H##ESIZE(e)], m[H##ESIZE(e + 1)]);         \
-            } else {                                                    \
-                r[e] = FN1(n[H##ESIZE(e)], m[H##ESIZE(e - 1)]);         \
-            }                                                           \
-        }                                                               \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            mergemask(&d[H##ESIZE(e)], r[e], mask);                     \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VCADD(OP, ESIZE, TYPE, FN0, FN1)                            \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                void *vm)                              \
+    {                                                                  \
+        TYPE *d = vd, *n = vn, *m = vm;                                \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        TYPE r[16 / ESIZE];                                            \
+        /* Calculate all results first to avoid overwriting inputs */  \
+        for (e = 0; e < 16 / ESIZE; e++) {                             \
+            if (!(e & 1)) {                                            \
+                r[e] = FN0(n[H##ESIZE(e)], m[H##ESIZE(e + 1)]);        \
+            } else {                                                   \
+                r[e] = FN1(n[H##ESIZE(e)], m[H##ESIZE(e - 1)]);        \
+            }                                                          \
+        }                                                              \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            mergemask(&d[H##ESIZE(e)], r[e], mask);                    \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
-#define DO_VCADD_ALL(OP, FN0, FN1)              \
-    DO_VCADD(OP##b, 1, int8_t, FN0, FN1)        \
-    DO_VCADD(OP##h, 2, int16_t, FN0, FN1)       \
+#define DO_VCADD_ALL(OP, FN0, FN1)        \
+    DO_VCADD(OP##b, 1, int8_t, FN0, FN1)  \
+    DO_VCADD(OP##h, 2, int16_t, FN0, FN1) \
     DO_VCADD(OP##w, 4, int32_t, FN0, FN1)
 
 DO_VCADD_ALL(vcadd90, DO_SUB, DO_ADD)
@@ -1213,19 +1207,19 @@ static inline int32_t do_sat_bhw(int64_t val, int64_t min, int64_t max, bool *s)
  * For QDMULH and QRDMULH we simplify "double and shift by esize" into
  * "shift by esize-1", adjusting the QRDMULH rounding constant to match.
  */
-#define DO_QDMULH_B(n, m, s) do_sat_bhw(((int64_t)n * m) >> 7, \
-                                        INT8_MIN, INT8_MAX, s)
-#define DO_QDMULH_H(n, m, s) do_sat_bhw(((int64_t)n * m) >> 15, \
-                                        INT16_MIN, INT16_MAX, s)
-#define DO_QDMULH_W(n, m, s) do_sat_bhw(((int64_t)n * m) >> 31, \
-                                        INT32_MIN, INT32_MAX, s)
+#define DO_QDMULH_B(n, m, s) \
+    do_sat_bhw(((int64_t)n * m) >> 7, INT8_MIN, INT8_MAX, s)
+#define DO_QDMULH_H(n, m, s) \
+    do_sat_bhw(((int64_t)n * m) >> 15, INT16_MIN, INT16_MAX, s)
+#define DO_QDMULH_W(n, m, s) \
+    do_sat_bhw(((int64_t)n * m) >> 31, INT32_MIN, INT32_MAX, s)
 
-#define DO_QRDMULH_B(n, m, s) do_sat_bhw(((int64_t)n * m + (1 << 6)) >> 7, \
-                                         INT8_MIN, INT8_MAX, s)
-#define DO_QRDMULH_H(n, m, s) do_sat_bhw(((int64_t)n * m + (1 << 14)) >> 15, \
-                                         INT16_MIN, INT16_MAX, s)
-#define DO_QRDMULH_W(n, m, s) do_sat_bhw(((int64_t)n * m + (1 << 30)) >> 31, \
-                                         INT32_MIN, INT32_MAX, s)
+#define DO_QRDMULH_B(n, m, s) \
+    do_sat_bhw(((int64_t)n * m + (1 << 6)) >> 7, INT8_MIN, INT8_MAX, s)
+#define DO_QRDMULH_H(n, m, s) \
+    do_sat_bhw(((int64_t)n * m + (1 << 14)) >> 15, INT16_MIN, INT16_MAX, s)
+#define DO_QRDMULH_W(n, m, s) \
+    do_sat_bhw(((int64_t)n * m + (1 << 30)) >> 31, INT32_MIN, INT32_MAX, s)
 
 DO_2OP_SAT(vqdmulhb, 1, int8_t, DO_QDMULH_B)
 DO_2OP_SAT(vqdmulhh, 2, int16_t, DO_QDMULH_H)
@@ -1253,14 +1247,14 @@ DO_2OP_SAT(vqsubsw, 4, int32_t, DO_SQSUB_W)
  * This wrapper fixes up the impedance mismatch between do_sqrshl_bhs()
  * and friends wanting a uint32_t* sat and our needing a bool*.
  */
-#define WRAP_QRSHL_HELPER(FN, N, M, ROUND, satp)                        \
-    ({                                                                  \
-        uint32_t su32 = 0;                                              \
-        typeof(N) r = FN(N, (int8_t)(M), sizeof(N) * 8, ROUND, &su32);  \
-        if (su32) {                                                     \
-            *satp = true;                                               \
-        }                                                               \
-        r;                                                              \
+#define WRAP_QRSHL_HELPER(FN, N, M, ROUND, satp)                       \
+    ({                                                                 \
+        uint32_t su32 = 0;                                             \
+        typeof(N) r = FN(N, (int8_t)(M), sizeof(N) * 8, ROUND, &su32); \
+        if (su32) {                                                    \
+            *satp = true;                                              \
+        }                                                              \
+        r;                                                             \
     })
 
 #define DO_SQSHL_OP(N, M, satp) \
@@ -1287,34 +1281,32 @@ DO_2OP_SAT_U(vqrshlu, DO_UQRSHL_OP)
  * saturate to twice the input size and return the high half; or
  * (A * B - C * D) etc for VQDMLSDH.
  */
-#define DO_VQDMLADH_OP(OP, ESIZE, TYPE, XCHG, ROUND, FN)                \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn,   \
-                                void *vm)                               \
-    {                                                                   \
-        TYPE *d = vd, *n = vn, *m = vm;                                 \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        bool qc = false;                                                \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            bool sat = false;                                           \
-            if ((e & 1) == XCHG) {                                      \
-                TYPE r = FN(n[H##ESIZE(e)],                             \
-                            m[H##ESIZE(e - XCHG)],                      \
-                            n[H##ESIZE(e + (1 - 2 * XCHG))],            \
-                            m[H##ESIZE(e + (1 - XCHG))],                \
-                            ROUND, &sat);                               \
-                mergemask(&d[H##ESIZE(e)], r, mask);                    \
-                qc |= sat & mask & 1;                                   \
-            }                                                           \
-        }                                                               \
-        if (qc) {                                                       \
-            env->vfp.qc[0] = qc;                                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VQDMLADH_OP(OP, ESIZE, TYPE, XCHG, ROUND, FN)               \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                void *vm)                              \
+    {                                                                  \
+        TYPE *d = vd, *n = vn, *m = vm;                                \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        bool qc = false;                                               \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            bool sat = false;                                          \
+            if ((e & 1) == XCHG) {                                     \
+                TYPE r = FN(n[H##ESIZE(e)], m[H##ESIZE(e - XCHG)],     \
+                            n[H##ESIZE(e + (1 - 2 * XCHG))],           \
+                            m[H##ESIZE(e + (1 - XCHG))], ROUND, &sat); \
+                mergemask(&d[H##ESIZE(e)], r, mask);                   \
+                qc |= sat & mask & 1;                                  \
+            }                                                          \
+        }                                                              \
+        if (qc) {                                                      \
+            env->vfp.qc[0] = qc;                                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
-static int8_t do_vqdmladh_b(int8_t a, int8_t b, int8_t c, int8_t d,
-                            int round, bool *sat)
+static int8_t do_vqdmladh_b(int8_t a, int8_t b, int8_t c, int8_t d, int round,
+                            bool *sat)
 {
     int64_t r = ((int64_t)a * b + (int64_t)c * d) * 2 + (round << 7);
     return do_sat_bhw(r, INT16_MIN, INT16_MAX, sat) >> 8;
@@ -1345,8 +1337,7 @@ static int32_t do_vqdmladh_w(int32_t a, int32_t b, int32_t c, int32_t d,
      * So we add half the rounding constant before doubling rather
      * than adding the rounding constant after the doubling.
      */
-    if (sadd64_overflow(m1, m2, &r) ||
-        sadd64_overflow(r, (round << 30), &r) ||
+    if (sadd64_overflow(m1, m2, &r) || sadd64_overflow(r, (round << 30), &r) ||
         sadd64_overflow(r, r, &r)) {
         *sat = true;
         return r < 0 ? INT32_MAX : INT32_MIN;
@@ -1354,8 +1345,8 @@ static int32_t do_vqdmladh_w(int32_t a, int32_t b, int32_t c, int32_t d,
     return r >> 32;
 }
 
-static int8_t do_vqdmlsdh_b(int8_t a, int8_t b, int8_t c, int8_t d,
-                            int round, bool *sat)
+static int8_t do_vqdmlsdh_b(int8_t a, int8_t b, int8_t c, int8_t d, int round,
+                            bool *sat)
 {
     int64_t r = ((int64_t)a * b - (int64_t)c * d) * 2 + (round << 7);
     return do_sat_bhw(r, INT16_MIN, INT16_MAX, sat) >> 8;
@@ -1375,8 +1366,7 @@ static int32_t do_vqdmlsdh_w(int32_t a, int32_t b, int32_t c, int32_t d,
     int64_t m2 = (int64_t)c * d;
     int64_t r;
     /* The same ordering issue as in do_vqdmladh_w applies here too */
-    if (ssub64_overflow(m1, m2, &r) ||
-        sadd64_overflow(r, (round << 30), &r) ||
+    if (ssub64_overflow(m1, m2, &r) || sadd64_overflow(r, (round << 30), &r) ||
         sadd64_overflow(r, r, &r)) {
         *sat = true;
         return r < 0 ? INT32_MAX : INT32_MIN;
@@ -1412,92 +1402,90 @@ DO_VQDMLADH_OP(vqrdmlsdhxb, 1, int8_t, 1, 1, do_vqdmlsdh_b)
 DO_VQDMLADH_OP(vqrdmlsdhxh, 2, int16_t, 1, 1, do_vqdmlsdh_h)
 DO_VQDMLADH_OP(vqrdmlsdhxw, 4, int32_t, 1, 1, do_vqdmlsdh_w)
 
-#define DO_2OP_SCALAR(OP, ESIZE, TYPE, FN)                              \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn,   \
-                                uint32_t rm)                            \
-    {                                                                   \
-        TYPE *d = vd, *n = vn;                                          \
-        TYPE m = rm;                                                    \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            mergemask(&d[H##ESIZE(e)], FN(n[H##ESIZE(e)], m), mask);    \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_SCALAR(OP, ESIZE, TYPE, FN)                             \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                uint32_t rm)                           \
+    {                                                                  \
+        TYPE *d = vd, *n = vn;                                         \
+        TYPE m = rm;                                                   \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            mergemask(&d[H##ESIZE(e)], FN(n[H##ESIZE(e)], m), mask);   \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
-#define DO_2OP_SAT_SCALAR(OP, ESIZE, TYPE, FN)                          \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn,   \
-                                uint32_t rm)                            \
-    {                                                                   \
-        TYPE *d = vd, *n = vn;                                          \
-        TYPE m = rm;                                                    \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        bool qc = false;                                                \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            bool sat = false;                                           \
-            mergemask(&d[H##ESIZE(e)], FN(n[H##ESIZE(e)], m, &sat),     \
-                      mask);                                            \
-            qc |= sat & mask & 1;                                       \
-        }                                                               \
-        if (qc) {                                                       \
-            env->vfp.qc[0] = qc;                                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_SAT_SCALAR(OP, ESIZE, TYPE, FN)                             \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn,     \
+                                uint32_t rm)                               \
+    {                                                                      \
+        TYPE *d = vd, *n = vn;                                             \
+        TYPE m = rm;                                                       \
+        uint16_t mask = mve_element_mask(env);                             \
+        unsigned e;                                                        \
+        bool qc = false;                                                   \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                 \
+            bool sat = false;                                              \
+            mergemask(&d[H##ESIZE(e)], FN(n[H##ESIZE(e)], m, &sat), mask); \
+            qc |= sat & mask & 1;                                          \
+        }                                                                  \
+        if (qc) {                                                          \
+            env->vfp.qc[0] = qc;                                           \
+        }                                                                  \
+        mve_advance_vpt(env);                                              \
     }
 
 /* "accumulating" version where FN takes d as well as n and m */
-#define DO_2OP_ACC_SCALAR(OP, ESIZE, TYPE, FN)                          \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn,   \
-                                uint32_t rm)                            \
-    {                                                                   \
-        TYPE *d = vd, *n = vn;                                          \
-        TYPE m = rm;                                                    \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            mergemask(&d[H##ESIZE(e)],                                  \
-                      FN(d[H##ESIZE(e)], n[H##ESIZE(e)], m), mask);     \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_ACC_SCALAR(OP, ESIZE, TYPE, FN)                                \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn,        \
+                                uint32_t rm)                                  \
+    {                                                                         \
+        TYPE *d = vd, *n = vn;                                                \
+        TYPE m = rm;                                                          \
+        uint16_t mask = mve_element_mask(env);                                \
+        unsigned e;                                                           \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                    \
+            mergemask(&d[H##ESIZE(e)], FN(d[H##ESIZE(e)], n[H##ESIZE(e)], m), \
+                      mask);                                                  \
+        }                                                                     \
+        mve_advance_vpt(env);                                                 \
     }
 
-#define DO_2OP_SAT_ACC_SCALAR(OP, ESIZE, TYPE, FN)                      \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn,   \
-                                uint32_t rm)                            \
-    {                                                                   \
-        TYPE *d = vd, *n = vn;                                          \
-        TYPE m = rm;                                                    \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        bool qc = false;                                                \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            bool sat = false;                                           \
-            mergemask(&d[H##ESIZE(e)],                                  \
-                      FN(d[H##ESIZE(e)], n[H##ESIZE(e)], m, &sat),      \
-                      mask);                                            \
-            qc |= sat & mask & 1;                                       \
-        }                                                               \
-        if (qc) {                                                       \
-            env->vfp.qc[0] = qc;                                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_SAT_ACC_SCALAR(OP, ESIZE, TYPE, FN)                        \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn,    \
+                                uint32_t rm)                              \
+    {                                                                     \
+        TYPE *d = vd, *n = vn;                                            \
+        TYPE m = rm;                                                      \
+        uint16_t mask = mve_element_mask(env);                            \
+        unsigned e;                                                       \
+        bool qc = false;                                                  \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                \
+            bool sat = false;                                             \
+            mergemask(&d[H##ESIZE(e)],                                    \
+                      FN(d[H##ESIZE(e)], n[H##ESIZE(e)], m, &sat), mask); \
+            qc |= sat & mask & 1;                                         \
+        }                                                                 \
+        if (qc) {                                                         \
+            env->vfp.qc[0] = qc;                                          \
+        }                                                                 \
+        mve_advance_vpt(env);                                             \
     }
 
 /* provide unsigned 2-op scalar helpers for all sizes */
-#define DO_2OP_SCALAR_U(OP, FN)                 \
-    DO_2OP_SCALAR(OP##b, 1, uint8_t, FN)        \
-    DO_2OP_SCALAR(OP##h, 2, uint16_t, FN)       \
+#define DO_2OP_SCALAR_U(OP, FN)           \
+    DO_2OP_SCALAR(OP##b, 1, uint8_t, FN)  \
+    DO_2OP_SCALAR(OP##h, 2, uint16_t, FN) \
     DO_2OP_SCALAR(OP##w, 4, uint32_t, FN)
-#define DO_2OP_SCALAR_S(OP, FN)                 \
-    DO_2OP_SCALAR(OP##b, 1, int8_t, FN)         \
-    DO_2OP_SCALAR(OP##h, 2, int16_t, FN)        \
+#define DO_2OP_SCALAR_S(OP, FN)          \
+    DO_2OP_SCALAR(OP##b, 1, int8_t, FN)  \
+    DO_2OP_SCALAR(OP##h, 2, int16_t, FN) \
     DO_2OP_SCALAR(OP##w, 4, int32_t, FN)
 
-#define DO_2OP_ACC_SCALAR_U(OP, FN)             \
-    DO_2OP_ACC_SCALAR(OP##b, 1, uint8_t, FN)    \
-    DO_2OP_ACC_SCALAR(OP##h, 2, uint16_t, FN)   \
+#define DO_2OP_ACC_SCALAR_U(OP, FN)           \
+    DO_2OP_ACC_SCALAR(OP##b, 1, uint8_t, FN)  \
+    DO_2OP_ACC_SCALAR(OP##h, 2, uint16_t, FN) \
     DO_2OP_ACC_SCALAR(OP##w, 4, uint32_t, FN)
 
 DO_2OP_SCALAR_U(vadd_scalar, DO_ADD)
@@ -1535,15 +1523,15 @@ static int8_t do_vqdmlah_b(int8_t a, int8_t b, int8_t c, int round, bool *sat)
     return do_sat_bhw(r, INT16_MIN, INT16_MAX, sat) >> 8;
 }
 
-static int16_t do_vqdmlah_h(int16_t a, int16_t b, int16_t c,
-                           int round, bool *sat)
+static int16_t do_vqdmlah_h(int16_t a, int16_t b, int16_t c, int round,
+                            bool *sat)
 {
     int64_t r = (int64_t)a * b * 2 + ((int64_t)c << 16) + (round << 15);
     return do_sat_bhw(r, INT32_MIN, INT32_MAX, sat) >> 16;
 }
 
-static int32_t do_vqdmlah_w(int32_t a, int32_t b, int32_t c,
-                            int round, bool *sat)
+static int32_t do_vqdmlah_w(int32_t a, int32_t b, int32_t c, int round,
+                            bool *sat)
 {
     /*
      * Architecturally we should do the entire add, double, round
@@ -1561,8 +1549,7 @@ static int32_t do_vqdmlah_w(int32_t a, int32_t b, int32_t c,
     int64_t m1 = (int64_t)a * b;
     int64_t m2 = (int64_t)c << 31;
     int64_t r;
-    if (sadd64_overflow(m1, m2, &r) ||
-        sadd64_overflow(r, (round << 30), &r) ||
+    if (sadd64_overflow(m1, m2, &r) || sadd64_overflow(r, (round << 30), &r) ||
         sadd64_overflow(r, r, &r)) {
         *sat = true;
         return r < 0 ? INT32_MAX : INT32_MIN;
@@ -1622,25 +1609,25 @@ DO_2OP_ACC_SCALAR_U(vmlas, DO_VMLAS)
  * bit is set for either half.
  */
 #define DO_2OP_SAT_SCALAR_L(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN, SATMASK) \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn,   \
-                                uint32_t rm)                            \
-    {                                                                   \
-        LTYPE *d = vd;                                                  \
-        TYPE *n = vn;                                                   \
-        TYPE m = rm;                                                    \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned le;                                                    \
-        bool qc = false;                                                \
-        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {         \
-            bool sat = false;                                           \
-            LTYPE r = FN((LTYPE)n[H##ESIZE(le * 2 + TOP)], m, &sat);    \
-            mergemask(&d[H##LESIZE(le)], r, mask);                      \
-            qc |= sat && (mask & SATMASK);                              \
-        }                                                               \
-        if (qc) {                                                       \
-            env->vfp.qc[0] = qc;                                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn,        \
+                                uint32_t rm)                                  \
+    {                                                                         \
+        LTYPE *d = vd;                                                        \
+        TYPE *n = vn;                                                         \
+        TYPE m = rm;                                                          \
+        uint16_t mask = mve_element_mask(env);                                \
+        unsigned le;                                                          \
+        bool qc = false;                                                      \
+        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {               \
+            bool sat = false;                                                 \
+            LTYPE r = FN((LTYPE)n[H##ESIZE(le * 2 + TOP)], m, &sat);          \
+            mergemask(&d[H##LESIZE(le)], r, mask);                            \
+            qc |= sat && (mask & SATMASK);                                    \
+        }                                                                     \
+        if (qc) {                                                             \
+            env->vfp.qc[0] = qc;                                              \
+        }                                                                     \
+        mve_advance_vpt(env);                                                 \
     }
 
 static inline int32_t do_qdmullh(int16_t n, int16_t m, bool *sat)
@@ -1668,38 +1655,38 @@ static inline int64_t do_qdmullw(int32_t n, int32_t m, bool *sat)
 #define SATMASK16T (1 << 2)
 #define SATMASK32 ((1 << 4) | 1)
 
-DO_2OP_SAT_SCALAR_L(vqdmullb_scalarh, 0, 2, int16_t, 4, int32_t, \
-                    do_qdmullh, SATMASK16B)
-DO_2OP_SAT_SCALAR_L(vqdmullb_scalarw, 0, 4, int32_t, 8, int64_t, \
-                    do_qdmullw, SATMASK32)
-DO_2OP_SAT_SCALAR_L(vqdmullt_scalarh, 1, 2, int16_t, 4, int32_t, \
-                    do_qdmullh, SATMASK16T)
-DO_2OP_SAT_SCALAR_L(vqdmullt_scalarw, 1, 4, int32_t, 8, int64_t, \
-                    do_qdmullw, SATMASK32)
+DO_2OP_SAT_SCALAR_L(vqdmullb_scalarh, 0, 2, int16_t, 4, int32_t, do_qdmullh,
+                    SATMASK16B)
+DO_2OP_SAT_SCALAR_L(vqdmullb_scalarw, 0, 4, int32_t, 8, int64_t, do_qdmullw,
+                    SATMASK32)
+DO_2OP_SAT_SCALAR_L(vqdmullt_scalarh, 1, 2, int16_t, 4, int32_t, do_qdmullh,
+                    SATMASK16T)
+DO_2OP_SAT_SCALAR_L(vqdmullt_scalarw, 1, 4, int32_t, 8, int64_t, do_qdmullw,
+                    SATMASK32)
 
 /*
  * Long saturating ops
  */
-#define DO_2OP_SAT_L(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN, SATMASK)  \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vn,   \
-                                void *vm)                               \
-    {                                                                   \
-        LTYPE *d = vd;                                                  \
-        TYPE *n = vn, *m = vm;                                          \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned le;                                                    \
-        bool qc = false;                                                \
-        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {         \
-            bool sat = false;                                           \
-            LTYPE op1 = n[H##ESIZE(le * 2 + TOP)];                      \
-            LTYPE op2 = m[H##ESIZE(le * 2 + TOP)];                      \
-            mergemask(&d[H##LESIZE(le)], FN(op1, op2, &sat), mask);     \
-            qc |= sat && (mask & SATMASK);                              \
-        }                                                               \
-        if (qc) {                                                       \
-            env->vfp.qc[0] = qc;                                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_SAT_L(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN, SATMASK) \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                void *vm)                              \
+    {                                                                  \
+        LTYPE *d = vd;                                                 \
+        TYPE *n = vn, *m = vm;                                         \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned le;                                                   \
+        bool qc = false;                                               \
+        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {        \
+            bool sat = false;                                          \
+            LTYPE op1 = n[H##ESIZE(le * 2 + TOP)];                     \
+            LTYPE op2 = m[H##ESIZE(le * 2 + TOP)];                     \
+            mergemask(&d[H##LESIZE(le)], FN(op1, op2, &sat), mask);    \
+            qc |= sat && (mask & SATMASK);                             \
+        }                                                              \
+        if (qc) {                                                      \
+            env->vfp.qc[0] = qc;                                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 DO_2OP_SAT_L(vqdmullbh, 0, 2, int16_t, 4, int32_t, do_qdmullh, SATMASK16B)
@@ -1753,26 +1740,26 @@ DO_2OP_SCALAR(vbrsrw, 4, uint32_t, do_vbrsrw)
 /*
  * Multiply add long dual accumulate ops.
  */
-#define DO_LDAV(OP, ESIZE, TYPE, XCHG, EVENACC, ODDACC)                 \
-    uint64_t HELPER(glue(mve_, OP))(CPUARMState *env, void *vn,         \
-                                    void *vm, uint64_t a)               \
-    {                                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        TYPE *n = vn, *m = vm;                                          \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if (mask & 1) {                                             \
-                if (e & 1) {                                            \
-                    a ODDACC                                            \
-                        (int64_t)n[H##ESIZE(e - 1 * XCHG)] * m[H##ESIZE(e)]; \
-                } else {                                                \
-                    a EVENACC                                           \
-                        (int64_t)n[H##ESIZE(e + 1 * XCHG)] * m[H##ESIZE(e)]; \
-                }                                                       \
-            }                                                           \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
-        return a;                                                       \
+#define DO_LDAV(OP, ESIZE, TYPE, XCHG, EVENACC, ODDACC)                    \
+    uint64_t HELPER(glue(mve_, OP))(CPUARMState * env, void *vn, void *vm, \
+                                    uint64_t a)                            \
+    {                                                                      \
+        uint16_t mask = mve_element_mask(env);                             \
+        unsigned e;                                                        \
+        TYPE *n = vn, *m = vm;                                             \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                 \
+            if (mask & 1) {                                                \
+                if (e & 1) {                                               \
+                    a ODDACC(int64_t) n[H##ESIZE(e - 1 * XCHG)] *          \
+                        m[H##ESIZE(e)];                                    \
+                } else {                                                   \
+                    a EVENACC(int64_t) n[H##ESIZE(e + 1 * XCHG)] *         \
+                        m[H##ESIZE(e)];                                    \
+                }                                                          \
+            }                                                              \
+        }                                                                  \
+        mve_advance_vpt(env);                                              \
+        return a;                                                          \
     }
 
 DO_LDAV(vmlaldavsh, 2, int16_t, false, +=, +=)
@@ -1791,31 +1778,29 @@ DO_LDAV(vmlsldavxsw, 4, int32_t, true, +=, -=)
 /*
  * Multiply add dual accumulate ops
  */
-#define DO_DAV(OP, ESIZE, TYPE, XCHG, EVENACC, ODDACC) \
-    uint32_t HELPER(glue(mve_, OP))(CPUARMState *env, void *vn,         \
-                                    void *vm, uint32_t a)               \
-    {                                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        TYPE *n = vn, *m = vm;                                          \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if (mask & 1) {                                             \
-                if (e & 1) {                                            \
-                    a ODDACC                                            \
-                        n[H##ESIZE(e - 1 * XCHG)] * m[H##ESIZE(e)];     \
-                } else {                                                \
-                    a EVENACC                                           \
-                        n[H##ESIZE(e + 1 * XCHG)] * m[H##ESIZE(e)];     \
-                }                                                       \
-            }                                                           \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
-        return a;                                                       \
+#define DO_DAV(OP, ESIZE, TYPE, XCHG, EVENACC, ODDACC)                     \
+    uint32_t HELPER(glue(mve_, OP))(CPUARMState * env, void *vn, void *vm, \
+                                    uint32_t a)                            \
+    {                                                                      \
+        uint16_t mask = mve_element_mask(env);                             \
+        unsigned e;                                                        \
+        TYPE *n = vn, *m = vm;                                             \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                 \
+            if (mask & 1) {                                                \
+                if (e & 1) {                                               \
+                    a ODDACC n[H##ESIZE(e - 1 * XCHG)] * m[H##ESIZE(e)];   \
+                } else {                                                   \
+                    a EVENACC n[H##ESIZE(e + 1 * XCHG)] * m[H##ESIZE(e)];  \
+                }                                                          \
+            }                                                              \
+        }                                                                  \
+        mve_advance_vpt(env);                                              \
+        return a;                                                          \
     }
 
-#define DO_DAV_S(INSN, XCHG, EVENACC, ODDACC)           \
-    DO_DAV(INSN##b, 1, int8_t, XCHG, EVENACC, ODDACC)   \
-    DO_DAV(INSN##h, 2, int16_t, XCHG, EVENACC, ODDACC)  \
+#define DO_DAV_S(INSN, XCHG, EVENACC, ODDACC)          \
+    DO_DAV(INSN##b, 1, int8_t, XCHG, EVENACC, ODDACC)  \
+    DO_DAV(INSN##h, 2, int16_t, XCHG, EVENACC, ODDACC) \
     DO_DAV(INSN##w, 4, int32_t, XCHG, EVENACC, ODDACC)
 
 #define DO_DAV_U(INSN, XCHG, EVENACC, ODDACC)           \
@@ -1836,30 +1821,30 @@ DO_DAV_S(vmlsdavx, true, +=, -=)
  * use 128-bit arithmetic -- we can do this because the 74-bit accumulator
  * is squashed back into 64-bits after each beat.
  */
-#define DO_LDAVH(OP, TYPE, LTYPE, XCHG, SUB)                            \
-    uint64_t HELPER(glue(mve_, OP))(CPUARMState *env, void *vn,         \
-                                    void *vm, uint64_t a)               \
-    {                                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        TYPE *n = vn, *m = vm;                                          \
-        for (e = 0; e < 16 / 4; e++, mask >>= 4) {                      \
-            if (mask & 1) {                                             \
-                LTYPE mul;                                              \
-                if (e & 1) {                                            \
-                    mul = (LTYPE)n[H4(e - 1 * XCHG)] * m[H4(e)];        \
-                    if (SUB) {                                          \
-                        mul = -mul;                                     \
-                    }                                                   \
-                } else {                                                \
-                    mul = (LTYPE)n[H4(e + 1 * XCHG)] * m[H4(e)];        \
-                }                                                       \
-                mul = (mul >> 8) + ((mul >> 7) & 1);                    \
-                a += mul;                                               \
-            }                                                           \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
-        return a;                                                       \
+#define DO_LDAVH(OP, TYPE, LTYPE, XCHG, SUB)                               \
+    uint64_t HELPER(glue(mve_, OP))(CPUARMState * env, void *vn, void *vm, \
+                                    uint64_t a)                            \
+    {                                                                      \
+        uint16_t mask = mve_element_mask(env);                             \
+        unsigned e;                                                        \
+        TYPE *n = vn, *m = vm;                                             \
+        for (e = 0; e < 16 / 4; e++, mask >>= 4) {                         \
+            if (mask & 1) {                                                \
+                LTYPE mul;                                                 \
+                if (e & 1) {                                               \
+                    mul = (LTYPE)n[H4(e - 1 * XCHG)] * m[H4(e)];           \
+                    if (SUB) {                                             \
+                        mul = -mul;                                        \
+                    }                                                      \
+                } else {                                                   \
+                    mul = (LTYPE)n[H4(e + 1 * XCHG)] * m[H4(e)];           \
+                }                                                          \
+                mul = (mul >> 8) + ((mul >> 7) & 1);                       \
+                a += mul;                                                  \
+            }                                                              \
+        }                                                                  \
+        mve_advance_vpt(env);                                              \
+        return a;                                                          \
     }
 
 DO_LDAVH(vrmlaldavhsw, int32_t, int64_t, false, false)
@@ -1871,21 +1856,20 @@ DO_LDAVH(vrmlsldavhsw, int32_t, int64_t, false, true)
 DO_LDAVH(vrmlsldavhxsw, int32_t, int64_t, true, true)
 
 /* Vector add across vector */
-#define DO_VADDV(OP, ESIZE, TYPE)                               \
-    uint32_t HELPER(glue(mve_, OP))(CPUARMState *env, void *vm, \
-                                    uint32_t ra)                \
-    {                                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        TYPE *m = vm;                                           \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {      \
-            if (mask & 1) {                                     \
-                ra += m[H##ESIZE(e)];                           \
-            }                                                   \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
-        return ra;                                              \
-    }                                                           \
+#define DO_VADDV(OP, ESIZE, TYPE)                                             \
+    uint32_t HELPER(glue(mve_, OP))(CPUARMState * env, void *vm, uint32_t ra) \
+    {                                                                         \
+        uint16_t mask = mve_element_mask(env);                                \
+        unsigned e;                                                           \
+        TYPE *m = vm;                                                         \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                    \
+            if (mask & 1) {                                                   \
+                ra += m[H##ESIZE(e)];                                         \
+            }                                                                 \
+        }                                                                     \
+        mve_advance_vpt(env);                                                 \
+        return ra;                                                            \
+    }
 
 DO_VADDV(vaddvsb, 1, int8_t)
 DO_VADDV(vaddvsh, 2, int16_t)
@@ -1899,30 +1883,30 @@ DO_VADDV(vaddvuw, 4, uint32_t)
  * read ra as the element size, not its full width.
  * We work with int64_t internally for simplicity.
  */
-#define DO_VMAXMINV(OP, ESIZE, TYPE, RATYPE, FN)                \
-    uint32_t HELPER(glue(mve_, OP))(CPUARMState *env, void *vm, \
-                                    uint32_t ra_in)             \
-    {                                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        TYPE *m = vm;                                           \
-        int64_t ra = (RATYPE)ra_in;                             \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {      \
-            if (mask & 1) {                                     \
-                ra = FN(ra, m[H##ESIZE(e)]);                    \
-            }                                                   \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
-        return ra;                                              \
-    }                                                           \
+#define DO_VMAXMINV(OP, ESIZE, TYPE, RATYPE, FN)                 \
+    uint32_t HELPER(glue(mve_, OP))(CPUARMState * env, void *vm, \
+                                    uint32_t ra_in)              \
+    {                                                            \
+        uint16_t mask = mve_element_mask(env);                   \
+        unsigned e;                                              \
+        TYPE *m = vm;                                            \
+        int64_t ra = (RATYPE)ra_in;                              \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {       \
+            if (mask & 1) {                                      \
+                ra = FN(ra, m[H##ESIZE(e)]);                     \
+            }                                                    \
+        }                                                        \
+        mve_advance_vpt(env);                                    \
+        return ra;                                               \
+    }
 
-#define DO_VMAXMINV_U(INSN, FN)                         \
-    DO_VMAXMINV(INSN##b, 1, uint8_t, uint8_t, FN)       \
-    DO_VMAXMINV(INSN##h, 2, uint16_t, uint16_t, FN)     \
+#define DO_VMAXMINV_U(INSN, FN)                     \
+    DO_VMAXMINV(INSN##b, 1, uint8_t, uint8_t, FN)   \
+    DO_VMAXMINV(INSN##h, 2, uint16_t, uint16_t, FN) \
     DO_VMAXMINV(INSN##w, 4, uint32_t, uint32_t, FN)
-#define DO_VMAXMINV_S(INSN, FN)                         \
-    DO_VMAXMINV(INSN##b, 1, int8_t, int8_t, FN)         \
-    DO_VMAXMINV(INSN##h, 2, int16_t, int16_t, FN)       \
+#define DO_VMAXMINV_S(INSN, FN)                   \
+    DO_VMAXMINV(INSN##b, 1, int8_t, int8_t, FN)   \
+    DO_VMAXMINV(INSN##h, 2, int16_t, int16_t, FN) \
     DO_VMAXMINV(INSN##w, 4, int32_t, int32_t, FN)
 
 /*
@@ -1960,23 +1944,23 @@ DO_VMAXMINV(vminavb, 1, int8_t, uint8_t, do_mina)
 DO_VMAXMINV(vminavh, 2, int16_t, uint16_t, do_mina)
 DO_VMAXMINV(vminavw, 4, int32_t, uint32_t, do_mina)
 
-#define DO_VABAV(OP, ESIZE, TYPE)                               \
-    uint32_t HELPER(glue(mve_, OP))(CPUARMState *env, void *vn, \
-                                    void *vm, uint32_t ra)      \
-    {                                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        TYPE *m = vm, *n = vn;                                  \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {      \
-            if (mask & 1) {                                     \
-                int64_t n0 = n[H##ESIZE(e)];                    \
-                int64_t m0 = m[H##ESIZE(e)];                    \
-                uint32_t r = n0 >= m0 ? (n0 - m0) : (m0 - n0);  \
-                ra += r;                                        \
-            }                                                   \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
-        return ra;                                              \
+#define DO_VABAV(OP, ESIZE, TYPE)                                          \
+    uint32_t HELPER(glue(mve_, OP))(CPUARMState * env, void *vn, void *vm, \
+                                    uint32_t ra)                           \
+    {                                                                      \
+        uint16_t mask = mve_element_mask(env);                             \
+        unsigned e;                                                        \
+        TYPE *m = vm, *n = vn;                                             \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                 \
+            if (mask & 1) {                                                \
+                int64_t n0 = n[H##ESIZE(e)];                               \
+                int64_t m0 = m[H##ESIZE(e)];                               \
+                uint32_t r = n0 >= m0 ? (n0 - m0) : (m0 - n0);             \
+                ra += r;                                                   \
+            }                                                              \
+        }                                                                  \
+        mve_advance_vpt(env);                                              \
+        return ra;                                                         \
     }
 
 DO_VABAV(vabavsb, 1, int8_t)
@@ -1986,77 +1970,74 @@ DO_VABAV(vabavub, 1, uint8_t)
 DO_VABAV(vabavuh, 2, uint16_t)
 DO_VABAV(vabavuw, 4, uint32_t)
 
-#define DO_VADDLV(OP, TYPE, LTYPE)                              \
-    uint64_t HELPER(glue(mve_, OP))(CPUARMState *env, void *vm, \
-                                    uint64_t ra)                \
-    {                                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        TYPE *m = vm;                                           \
-        for (e = 0; e < 16 / 4; e++, mask >>= 4) {              \
-            if (mask & 1) {                                     \
-                ra += (LTYPE)m[H4(e)];                          \
-            }                                                   \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
-        return ra;                                              \
-    }                                                           \
+#define DO_VADDLV(OP, TYPE, LTYPE)                                            \
+    uint64_t HELPER(glue(mve_, OP))(CPUARMState * env, void *vm, uint64_t ra) \
+    {                                                                         \
+        uint16_t mask = mve_element_mask(env);                                \
+        unsigned e;                                                           \
+        TYPE *m = vm;                                                         \
+        for (e = 0; e < 16 / 4; e++, mask >>= 4) {                            \
+            if (mask & 1) {                                                   \
+                ra += (LTYPE)m[H4(e)];                                        \
+            }                                                                 \
+        }                                                                     \
+        mve_advance_vpt(env);                                                 \
+        return ra;                                                            \
+    }
 
 DO_VADDLV(vaddlv_s, int32_t, int64_t)
 DO_VADDLV(vaddlv_u, uint32_t, uint64_t)
 
 /* Shifts by immediate */
-#define DO_2SHIFT(OP, ESIZE, TYPE, FN)                          \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd,     \
-                                void *vm, uint32_t shift)       \
-    {                                                           \
-        TYPE *d = vd, *m = vm;                                  \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {      \
-            mergemask(&d[H##ESIZE(e)],                          \
-                      FN(m[H##ESIZE(e)], shift), mask);         \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
+#define DO_2SHIFT(OP, ESIZE, TYPE, FN)                                   \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm,   \
+                                uint32_t shift)                          \
+    {                                                                    \
+        TYPE *d = vd, *m = vm;                                           \
+        uint16_t mask = mve_element_mask(env);                           \
+        unsigned e;                                                      \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {               \
+            mergemask(&d[H##ESIZE(e)], FN(m[H##ESIZE(e)], shift), mask); \
+        }                                                                \
+        mve_advance_vpt(env);                                            \
     }
 
-#define DO_2SHIFT_SAT(OP, ESIZE, TYPE, FN)                      \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd,     \
-                                void *vm, uint32_t shift)       \
-    {                                                           \
-        TYPE *d = vd, *m = vm;                                  \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        bool qc = false;                                        \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {      \
-            bool sat = false;                                   \
-            mergemask(&d[H##ESIZE(e)],                          \
-                      FN(m[H##ESIZE(e)], shift, &sat), mask);   \
-            qc |= sat & mask & 1;                               \
-        }                                                       \
-        if (qc) {                                               \
-            env->vfp.qc[0] = qc;                                \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
+#define DO_2SHIFT_SAT(OP, ESIZE, TYPE, FN)                                     \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm,         \
+                                uint32_t shift)                                \
+    {                                                                          \
+        TYPE *d = vd, *m = vm;                                                 \
+        uint16_t mask = mve_element_mask(env);                                 \
+        unsigned e;                                                            \
+        bool qc = false;                                                       \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                     \
+            bool sat = false;                                                  \
+            mergemask(&d[H##ESIZE(e)], FN(m[H##ESIZE(e)], shift, &sat), mask); \
+            qc |= sat & mask & 1;                                              \
+        }                                                                      \
+        if (qc) {                                                              \
+            env->vfp.qc[0] = qc;                                               \
+        }                                                                      \
+        mve_advance_vpt(env);                                                  \
     }
 
 /* provide unsigned 2-op shift helpers for all sizes */
-#define DO_2SHIFT_U(OP, FN)                     \
-    DO_2SHIFT(OP##b, 1, uint8_t, FN)            \
-    DO_2SHIFT(OP##h, 2, uint16_t, FN)           \
+#define DO_2SHIFT_U(OP, FN)           \
+    DO_2SHIFT(OP##b, 1, uint8_t, FN)  \
+    DO_2SHIFT(OP##h, 2, uint16_t, FN) \
     DO_2SHIFT(OP##w, 4, uint32_t, FN)
-#define DO_2SHIFT_S(OP, FN)                     \
-    DO_2SHIFT(OP##b, 1, int8_t, FN)             \
-    DO_2SHIFT(OP##h, 2, int16_t, FN)            \
+#define DO_2SHIFT_S(OP, FN)          \
+    DO_2SHIFT(OP##b, 1, int8_t, FN)  \
+    DO_2SHIFT(OP##h, 2, int16_t, FN) \
     DO_2SHIFT(OP##w, 4, int32_t, FN)
 
-#define DO_2SHIFT_SAT_U(OP, FN)                 \
-    DO_2SHIFT_SAT(OP##b, 1, uint8_t, FN)        \
-    DO_2SHIFT_SAT(OP##h, 2, uint16_t, FN)       \
+#define DO_2SHIFT_SAT_U(OP, FN)           \
+    DO_2SHIFT_SAT(OP##b, 1, uint8_t, FN)  \
+    DO_2SHIFT_SAT(OP##h, 2, uint16_t, FN) \
     DO_2SHIFT_SAT(OP##w, 4, uint32_t, FN)
-#define DO_2SHIFT_SAT_S(OP, FN)                 \
-    DO_2SHIFT_SAT(OP##b, 1, int8_t, FN)         \
-    DO_2SHIFT_SAT(OP##h, 2, int16_t, FN)        \
+#define DO_2SHIFT_SAT_S(OP, FN)          \
+    DO_2SHIFT_SAT(OP##b, 1, int8_t, FN)  \
+    DO_2SHIFT_SAT(OP##h, 2, int16_t, FN) \
     DO_2SHIFT_SAT(OP##w, 4, int32_t, FN)
 
 DO_2SHIFT_U(vshli_u, DO_VSHLU)
@@ -2070,34 +2051,34 @@ DO_2SHIFT_SAT_U(vqrshli_u, DO_UQRSHL_OP)
 DO_2SHIFT_SAT_S(vqrshli_s, DO_SQRSHL_OP)
 
 /* Shift-and-insert; we always work with 64 bits at a time */
-#define DO_2SHIFT_INSERT(OP, ESIZE, SHIFTFN, MASKFN)                    \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd,             \
-                                void *vm, uint32_t shift)               \
-    {                                                                   \
-        uint64_t *d = vd, *m = vm;                                      \
-        uint16_t mask;                                                  \
-        uint64_t shiftmask;                                             \
-        unsigned e;                                                     \
-        if (shift == ESIZE * 8) {                                       \
-            /*                                                          \
-             * Only VSRI can shift by <dt>; it should mean "don't       \
-             * update the destination". The generic logic can't handle  \
-             * this because it would try to shift by an out-of-range    \
-             * amount, so special case it here.                         \
-             */                                                         \
-            goto done;                                                  \
-        }                                                               \
-        assert(shift < ESIZE * 8);                                      \
-        mask = mve_element_mask(env);                                   \
-        /* ESIZE / 2 gives the MO_* value if ESIZE is in [1,2,4] */     \
-        shiftmask = dup_const(ESIZE / 2, MASKFN(ESIZE * 8, shift));     \
-        for (e = 0; e < 16 / 8; e++, mask >>= 8) {                      \
-            uint64_t r = (SHIFTFN(m[H8(e)], shift) & shiftmask) |       \
-                (d[H8(e)] & ~shiftmask);                                \
-            mergemask(&d[H8(e)], r, mask);                              \
-        }                                                               \
-done:                                                                   \
-        mve_advance_vpt(env);                                           \
+#define DO_2SHIFT_INSERT(OP, ESIZE, SHIFTFN, MASKFN)                   \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm, \
+                                uint32_t shift)                        \
+    {                                                                  \
+        uint64_t *d = vd, *m = vm;                                     \
+        uint16_t mask;                                                 \
+        uint64_t shiftmask;                                            \
+        unsigned e;                                                    \
+        if (shift == ESIZE * 8) {                                      \
+            /*                                                         \
+             * Only VSRI can shift by <dt>; it should mean "don't      \
+             * update the destination". The generic logic can't handle \
+             * this because it would try to shift by an out-of-range   \
+             * amount, so special case it here.                        \
+             */                                                        \
+            goto done;                                                 \
+        }                                                              \
+        assert(shift < ESIZE * 8);                                     \
+        mask = mve_element_mask(env);                                  \
+        /* ESIZE / 2 gives the MO_* value if ESIZE is in [1,2,4] */    \
+        shiftmask = dup_const(ESIZE / 2, MASKFN(ESIZE * 8, shift));    \
+        for (e = 0; e < 16 / 8; e++, mask >>= 8) {                     \
+            uint64_t r = (SHIFTFN(m[H8(e)], shift) & shiftmask) |      \
+                         (d[H8(e)] & ~shiftmask);                      \
+            mergemask(&d[H8(e)], r, mask);                             \
+        }                                                              \
+    done:                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 #define DO_SHL(N, SHIFT) ((N) << (SHIFT))
@@ -2119,27 +2100,27 @@ DO_2SHIFT_INSERT(vsliw, 4, DO_SHL, SHL_MASK)
  * Unlike the normal shift helpers, we do not handle negative shift counts,
  * because the long shift is strictly left-only.
  */
-#define DO_VSHLL(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE)                   \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd,             \
-                                void *vm, uint32_t shift)               \
-    {                                                                   \
-        LTYPE *d = vd;                                                  \
-        TYPE *m = vm;                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned le;                                                    \
-        assert(shift <= 16);                                            \
-        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {         \
-            LTYPE r = (LTYPE)m[H##ESIZE(le * 2 + TOP)] << shift;        \
-            mergemask(&d[H##LESIZE(le)], r, mask);                      \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VSHLL(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE)                  \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm, \
+                                uint32_t shift)                        \
+    {                                                                  \
+        LTYPE *d = vd;                                                 \
+        TYPE *m = vm;                                                  \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned le;                                                   \
+        assert(shift <= 16);                                           \
+        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {        \
+            LTYPE r = (LTYPE)m[H##ESIZE(le * 2 + TOP)] << shift;       \
+            mergemask(&d[H##LESIZE(le)], r, mask);                     \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
-#define DO_VSHLL_ALL(OP, TOP)                                \
-    DO_VSHLL(OP##sb, TOP, 1, int8_t, 2, int16_t)             \
-    DO_VSHLL(OP##ub, TOP, 1, uint8_t, 2, uint16_t)           \
-    DO_VSHLL(OP##sh, TOP, 2, int16_t, 4, int32_t)            \
-    DO_VSHLL(OP##uh, TOP, 2, uint16_t, 4, uint32_t)          \
+#define DO_VSHLL_ALL(OP, TOP)                      \
+    DO_VSHLL(OP##sb, TOP, 1, int8_t, 2, int16_t)   \
+    DO_VSHLL(OP##ub, TOP, 1, uint8_t, 2, uint16_t) \
+    DO_VSHLL(OP##sh, TOP, 2, int16_t, 4, int32_t)  \
+    DO_VSHLL(OP##uh, TOP, 2, uint16_t, 4, uint32_t)
 
 DO_VSHLL_ALL(vshllb, false)
 DO_VSHLL_ALL(vshllt, true)
@@ -2149,26 +2130,26 @@ DO_VSHLL_ALL(vshllt, true)
  * and putting the result in either the top or bottom half of the output.
  * ESIZE, TYPE are the output, and LESIZE, LTYPE the input.
  */
-#define DO_VSHRN(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN)       \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd,     \
-                                void *vm, uint32_t shift)       \
-    {                                                           \
-        LTYPE *m = vm;                                          \
-        TYPE *d = vd;                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned le;                                            \
-        mask >>= ESIZE * TOP;                                   \
-        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) { \
-            TYPE r = FN(m[H##LESIZE(le)], shift);               \
-            mergemask(&d[H##ESIZE(le * 2 + TOP)], r, mask);     \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
+#define DO_VSHRN(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN)              \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm, \
+                                uint32_t shift)                        \
+    {                                                                  \
+        LTYPE *m = vm;                                                 \
+        TYPE *d = vd;                                                  \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned le;                                                   \
+        mask >>= ESIZE * TOP;                                          \
+        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {        \
+            TYPE r = FN(m[H##LESIZE(le)], shift);                      \
+            mergemask(&d[H##ESIZE(le * 2 + TOP)], r, mask);            \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
-#define DO_VSHRN_ALL(OP, FN)                                    \
-    DO_VSHRN(OP##bb, false, 1, uint8_t, 2, uint16_t, FN)        \
-    DO_VSHRN(OP##bh, false, 2, uint16_t, 4, uint32_t, FN)       \
-    DO_VSHRN(OP##tb, true, 1, uint8_t, 2, uint16_t, FN)         \
+#define DO_VSHRN_ALL(OP, FN)                              \
+    DO_VSHRN(OP##bb, false, 1, uint8_t, 2, uint16_t, FN)  \
+    DO_VSHRN(OP##bh, false, 2, uint16_t, 4, uint32_t, FN) \
+    DO_VSHRN(OP##tb, true, 1, uint8_t, 2, uint16_t, FN)   \
     DO_VSHRN(OP##th, true, 2, uint16_t, 4, uint32_t, FN)
 
 static inline uint64_t do_urshr(uint64_t x, unsigned sh)
@@ -2210,71 +2191,67 @@ static inline int32_t do_sat_bhs(int64_t val, int64_t min, int64_t max,
 }
 
 /* Saturating narrowing right shifts */
-#define DO_VSHRN_SAT(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN)   \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd,     \
-                                void *vm, uint32_t shift)       \
-    {                                                           \
-        LTYPE *m = vm;                                          \
-        TYPE *d = vd;                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        bool qc = false;                                        \
-        unsigned le;                                            \
-        mask >>= ESIZE * TOP;                                   \
-        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) { \
-            bool sat = false;                                   \
-            TYPE r = FN(m[H##LESIZE(le)], shift, &sat);         \
-            mergemask(&d[H##ESIZE(le * 2 + TOP)], r, mask);     \
-            qc |= sat & mask & 1;                               \
-        }                                                       \
-        if (qc) {                                               \
-            env->vfp.qc[0] = qc;                                \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
+#define DO_VSHRN_SAT(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN)          \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm, \
+                                uint32_t shift)                        \
+    {                                                                  \
+        LTYPE *m = vm;                                                 \
+        TYPE *d = vd;                                                  \
+        uint16_t mask = mve_element_mask(env);                         \
+        bool qc = false;                                               \
+        unsigned le;                                                   \
+        mask >>= ESIZE * TOP;                                          \
+        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {        \
+            bool sat = false;                                          \
+            TYPE r = FN(m[H##LESIZE(le)], shift, &sat);                \
+            mergemask(&d[H##ESIZE(le * 2 + TOP)], r, mask);            \
+            qc |= sat & mask & 1;                                      \
+        }                                                              \
+        if (qc) {                                                      \
+            env->vfp.qc[0] = qc;                                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
-#define DO_VSHRN_SAT_UB(BOP, TOP, FN)                           \
-    DO_VSHRN_SAT(BOP, false, 1, uint8_t, 2, uint16_t, FN)       \
+#define DO_VSHRN_SAT_UB(BOP, TOP, FN)                     \
+    DO_VSHRN_SAT(BOP, false, 1, uint8_t, 2, uint16_t, FN) \
     DO_VSHRN_SAT(TOP, true, 1, uint8_t, 2, uint16_t, FN)
 
-#define DO_VSHRN_SAT_UH(BOP, TOP, FN)                           \
-    DO_VSHRN_SAT(BOP, false, 2, uint16_t, 4, uint32_t, FN)      \
+#define DO_VSHRN_SAT_UH(BOP, TOP, FN)                      \
+    DO_VSHRN_SAT(BOP, false, 2, uint16_t, 4, uint32_t, FN) \
     DO_VSHRN_SAT(TOP, true, 2, uint16_t, 4, uint32_t, FN)
 
-#define DO_VSHRN_SAT_SB(BOP, TOP, FN)                           \
-    DO_VSHRN_SAT(BOP, false, 1, int8_t, 2, int16_t, FN)         \
+#define DO_VSHRN_SAT_SB(BOP, TOP, FN)                   \
+    DO_VSHRN_SAT(BOP, false, 1, int8_t, 2, int16_t, FN) \
     DO_VSHRN_SAT(TOP, true, 1, int8_t, 2, int16_t, FN)
 
-#define DO_VSHRN_SAT_SH(BOP, TOP, FN)                           \
-    DO_VSHRN_SAT(BOP, false, 2, int16_t, 4, int32_t, FN)        \
+#define DO_VSHRN_SAT_SH(BOP, TOP, FN)                    \
+    DO_VSHRN_SAT(BOP, false, 2, int16_t, 4, int32_t, FN) \
     DO_VSHRN_SAT(TOP, true, 2, int16_t, 4, int32_t, FN)
 
-#define DO_SHRN_SB(N, M, SATP)                                  \
+#define DO_SHRN_SB(N, M, SATP) \
     do_sat_bhs((int64_t)(N) >> (M), INT8_MIN, INT8_MAX, SATP)
-#define DO_SHRN_UB(N, M, SATP)                                  \
+#define DO_SHRN_UB(N, M, SATP) \
     do_sat_bhs((uint64_t)(N) >> (M), 0, UINT8_MAX, SATP)
-#define DO_SHRUN_B(N, M, SATP)                                  \
+#define DO_SHRUN_B(N, M, SATP) \
     do_sat_bhs((int64_t)(N) >> (M), 0, UINT8_MAX, SATP)
 
-#define DO_SHRN_SH(N, M, SATP)                                  \
+#define DO_SHRN_SH(N, M, SATP) \
     do_sat_bhs((int64_t)(N) >> (M), INT16_MIN, INT16_MAX, SATP)
-#define DO_SHRN_UH(N, M, SATP)                                  \
+#define DO_SHRN_UH(N, M, SATP) \
     do_sat_bhs((uint64_t)(N) >> (M), 0, UINT16_MAX, SATP)
-#define DO_SHRUN_H(N, M, SATP)                                  \
+#define DO_SHRUN_H(N, M, SATP) \
     do_sat_bhs((int64_t)(N) >> (M), 0, UINT16_MAX, SATP)
 
-#define DO_RSHRN_SB(N, M, SATP)                                 \
+#define DO_RSHRN_SB(N, M, SATP) \
     do_sat_bhs(do_srshr(N, M), INT8_MIN, INT8_MAX, SATP)
-#define DO_RSHRN_UB(N, M, SATP)                                 \
-    do_sat_bhs(do_urshr(N, M), 0, UINT8_MAX, SATP)
-#define DO_RSHRUN_B(N, M, SATP)                                 \
-    do_sat_bhs(do_srshr(N, M), 0, UINT8_MAX, SATP)
+#define DO_RSHRN_UB(N, M, SATP) do_sat_bhs(do_urshr(N, M), 0, UINT8_MAX, SATP)
+#define DO_RSHRUN_B(N, M, SATP) do_sat_bhs(do_srshr(N, M), 0, UINT8_MAX, SATP)
 
-#define DO_RSHRN_SH(N, M, SATP)                                 \
+#define DO_RSHRN_SH(N, M, SATP) \
     do_sat_bhs(do_srshr(N, M), INT16_MIN, INT16_MAX, SATP)
-#define DO_RSHRN_UH(N, M, SATP)                                 \
-    do_sat_bhs(do_urshr(N, M), 0, UINT16_MAX, SATP)
-#define DO_RSHRUN_H(N, M, SATP)                                 \
-    do_sat_bhs(do_srshr(N, M), 0, UINT16_MAX, SATP)
+#define DO_RSHRN_UH(N, M, SATP) do_sat_bhs(do_urshr(N, M), 0, UINT16_MAX, SATP)
+#define DO_RSHRUN_H(N, M, SATP) do_sat_bhs(do_srshr(N, M), 0, UINT16_MAX, SATP)
 
 DO_VSHRN_SAT_SB(vqshrnb_sb, vqshrnt_sb, DO_SHRN_SB)
 DO_VSHRN_SAT_SH(vqshrnb_sh, vqshrnt_sh, DO_SHRN_SH)
@@ -2290,19 +2267,18 @@ DO_VSHRN_SAT_UH(vqrshrnb_uh, vqrshrnt_uh, DO_RSHRN_UH)
 DO_VSHRN_SAT_SB(vqrshrunbb, vqrshruntb, DO_RSHRUN_B)
 DO_VSHRN_SAT_SH(vqrshrunbh, vqrshrunth, DO_RSHRUN_H)
 
-#define DO_VMOVN(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE)                   \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm)         \
-    {                                                                   \
-        LTYPE *m = vm;                                                  \
-        TYPE *d = vd;                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned le;                                                    \
-        mask >>= ESIZE * TOP;                                           \
-        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {         \
-            mergemask(&d[H##ESIZE(le * 2 + TOP)],                       \
-                      m[H##LESIZE(le)], mask);                          \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VMOVN(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE)                      \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm)           \
+    {                                                                      \
+        LTYPE *m = vm;                                                     \
+        TYPE *d = vd;                                                      \
+        uint16_t mask = mve_element_mask(env);                             \
+        unsigned le;                                                       \
+        mask >>= ESIZE * TOP;                                              \
+        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {            \
+            mergemask(&d[H##ESIZE(le * 2 + TOP)], m[H##LESIZE(le)], mask); \
+        }                                                                  \
+        mve_advance_vpt(env);                                              \
     }
 
 DO_VMOVN(vmovnbb, false, 1, uint8_t, 2, uint16_t)
@@ -2310,56 +2286,51 @@ DO_VMOVN(vmovnbh, false, 2, uint16_t, 4, uint32_t)
 DO_VMOVN(vmovntb, true, 1, uint8_t, 2, uint16_t)
 DO_VMOVN(vmovnth, true, 2, uint16_t, 4, uint32_t)
 
-#define DO_VMOVN_SAT(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN)           \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm)         \
-    {                                                                   \
-        LTYPE *m = vm;                                                  \
-        TYPE *d = vd;                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        bool qc = false;                                                \
-        unsigned le;                                                    \
-        mask >>= ESIZE * TOP;                                           \
-        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {         \
-            bool sat = false;                                           \
-            TYPE r = FN(m[H##LESIZE(le)], &sat);                        \
-            mergemask(&d[H##ESIZE(le * 2 + TOP)], r, mask);             \
-            qc |= sat & mask & 1;                                       \
-        }                                                               \
-        if (qc) {                                                       \
-            env->vfp.qc[0] = qc;                                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VMOVN_SAT(OP, TOP, ESIZE, TYPE, LESIZE, LTYPE, FN)    \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm) \
+    {                                                            \
+        LTYPE *m = vm;                                           \
+        TYPE *d = vd;                                            \
+        uint16_t mask = mve_element_mask(env);                   \
+        bool qc = false;                                         \
+        unsigned le;                                             \
+        mask >>= ESIZE * TOP;                                    \
+        for (le = 0; le < 16 / LESIZE; le++, mask >>= LESIZE) {  \
+            bool sat = false;                                    \
+            TYPE r = FN(m[H##LESIZE(le)], &sat);                 \
+            mergemask(&d[H##ESIZE(le * 2 + TOP)], r, mask);      \
+            qc |= sat & mask & 1;                                \
+        }                                                        \
+        if (qc) {                                                \
+            env->vfp.qc[0] = qc;                                 \
+        }                                                        \
+        mve_advance_vpt(env);                                    \
     }
 
-#define DO_VMOVN_SAT_UB(BOP, TOP, FN)                           \
-    DO_VMOVN_SAT(BOP, false, 1, uint8_t, 2, uint16_t, FN)       \
+#define DO_VMOVN_SAT_UB(BOP, TOP, FN)                     \
+    DO_VMOVN_SAT(BOP, false, 1, uint8_t, 2, uint16_t, FN) \
     DO_VMOVN_SAT(TOP, true, 1, uint8_t, 2, uint16_t, FN)
 
-#define DO_VMOVN_SAT_UH(BOP, TOP, FN)                           \
-    DO_VMOVN_SAT(BOP, false, 2, uint16_t, 4, uint32_t, FN)      \
+#define DO_VMOVN_SAT_UH(BOP, TOP, FN)                      \
+    DO_VMOVN_SAT(BOP, false, 2, uint16_t, 4, uint32_t, FN) \
     DO_VMOVN_SAT(TOP, true, 2, uint16_t, 4, uint32_t, FN)
 
-#define DO_VMOVN_SAT_SB(BOP, TOP, FN)                           \
-    DO_VMOVN_SAT(BOP, false, 1, int8_t, 2, int16_t, FN)         \
+#define DO_VMOVN_SAT_SB(BOP, TOP, FN)                   \
+    DO_VMOVN_SAT(BOP, false, 1, int8_t, 2, int16_t, FN) \
     DO_VMOVN_SAT(TOP, true, 1, int8_t, 2, int16_t, FN)
 
-#define DO_VMOVN_SAT_SH(BOP, TOP, FN)                           \
-    DO_VMOVN_SAT(BOP, false, 2, int16_t, 4, int32_t, FN)        \
+#define DO_VMOVN_SAT_SH(BOP, TOP, FN)                    \
+    DO_VMOVN_SAT(BOP, false, 2, int16_t, 4, int32_t, FN) \
     DO_VMOVN_SAT(TOP, true, 2, int16_t, 4, int32_t, FN)
 
-#define DO_VQMOVN_SB(N, SATP)                           \
-    do_sat_bhs((int64_t)(N), INT8_MIN, INT8_MAX, SATP)
-#define DO_VQMOVN_UB(N, SATP)                           \
-    do_sat_bhs((uint64_t)(N), 0, UINT8_MAX, SATP)
-#define DO_VQMOVUN_B(N, SATP)                           \
-    do_sat_bhs((int64_t)(N), 0, UINT8_MAX, SATP)
+#define DO_VQMOVN_SB(N, SATP) do_sat_bhs((int64_t)(N), INT8_MIN, INT8_MAX, SATP)
+#define DO_VQMOVN_UB(N, SATP) do_sat_bhs((uint64_t)(N), 0, UINT8_MAX, SATP)
+#define DO_VQMOVUN_B(N, SATP) do_sat_bhs((int64_t)(N), 0, UINT8_MAX, SATP)
 
-#define DO_VQMOVN_SH(N, SATP)                           \
+#define DO_VQMOVN_SH(N, SATP) \
     do_sat_bhs((int64_t)(N), INT16_MIN, INT16_MAX, SATP)
-#define DO_VQMOVN_UH(N, SATP)                           \
-    do_sat_bhs((uint64_t)(N), 0, UINT16_MAX, SATP)
-#define DO_VQMOVUN_H(N, SATP)                           \
-    do_sat_bhs((int64_t)(N), 0, UINT16_MAX, SATP)
+#define DO_VQMOVN_UH(N, SATP) do_sat_bhs((uint64_t)(N), 0, UINT16_MAX, SATP)
+#define DO_VQMOVUN_H(N, SATP) do_sat_bhs((int64_t)(N), 0, UINT16_MAX, SATP)
 
 DO_VMOVN_SAT_SB(vqmovnbsb, vqmovntsb, DO_VQMOVN_SB)
 DO_VMOVN_SAT_SH(vqmovnbsh, vqmovntsh, DO_VQMOVN_SH)
@@ -2437,8 +2408,8 @@ uint64_t HELPER(mve_uqrshll)(CPUARMState *env, uint64_t n, uint32_t shift)
 }
 
 /* Operate on 64-bit values, but saturate at 48 bits */
-static inline int64_t do_sqrshl48_d(int64_t src, int64_t shift,
-                                    bool round, uint32_t *sat)
+static inline int64_t do_sqrshl48_d(int64_t src, int64_t shift, bool round,
+                                    uint32_t *sat)
 {
     int64_t val, extval;
 
@@ -2473,8 +2444,8 @@ static inline int64_t do_sqrshl48_d(int64_t src, int64_t shift,
 }
 
 /* Operate on 64-bit values, but saturate at 48 bits */
-static inline uint64_t do_uqrshl48_d(uint64_t src, int64_t shift,
-                                     bool round, uint32_t *sat)
+static inline uint64_t do_uqrshl48_d(uint64_t src, int64_t shift, bool round,
+                                     uint32_t *sat)
 {
     uint64_t val, extval;
 
@@ -2534,45 +2505,44 @@ uint32_t HELPER(mve_sqrshr)(CPUARMState *env, uint32_t n, uint32_t shift)
     return do_sqrshl_bhs(n, -(int8_t)shift, 32, true, &env->QF);
 }
 
-#define DO_VIDUP(OP, ESIZE, TYPE, FN)                           \
-    uint32_t HELPER(mve_##OP)(CPUARMState *env, void *vd,       \
-                           uint32_t offset, uint32_t imm)       \
-    {                                                           \
-        TYPE *d = vd;                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {      \
-            mergemask(&d[H##ESIZE(e)], offset, mask);           \
-            offset = FN(offset, imm);                           \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
-        return offset;                                          \
+#define DO_VIDUP(OP, ESIZE, TYPE, FN)                                       \
+    uint32_t HELPER(mve_##OP)(CPUARMState * env, void *vd, uint32_t offset, \
+                              uint32_t imm)                                 \
+    {                                                                       \
+        TYPE *d = vd;                                                       \
+        uint16_t mask = mve_element_mask(env);                              \
+        unsigned e;                                                         \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                  \
+            mergemask(&d[H##ESIZE(e)], offset, mask);                       \
+            offset = FN(offset, imm);                                       \
+        }                                                                   \
+        mve_advance_vpt(env);                                               \
+        return offset;                                                      \
     }
 
-#define DO_VIWDUP(OP, ESIZE, TYPE, FN)                          \
-    uint32_t HELPER(mve_##OP)(CPUARMState *env, void *vd,       \
-                              uint32_t offset, uint32_t wrap,   \
-                              uint32_t imm)                     \
-    {                                                           \
-        TYPE *d = vd;                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {      \
-            mergemask(&d[H##ESIZE(e)], offset, mask);           \
-            offset = FN(offset, wrap, imm);                     \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
-        return offset;                                          \
+#define DO_VIWDUP(OP, ESIZE, TYPE, FN)                                      \
+    uint32_t HELPER(mve_##OP)(CPUARMState * env, void *vd, uint32_t offset, \
+                              uint32_t wrap, uint32_t imm)                  \
+    {                                                                       \
+        TYPE *d = vd;                                                       \
+        uint16_t mask = mve_element_mask(env);                              \
+        unsigned e;                                                         \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                  \
+            mergemask(&d[H##ESIZE(e)], offset, mask);                       \
+            offset = FN(offset, wrap, imm);                                 \
+        }                                                                   \
+        mve_advance_vpt(env);                                               \
+        return offset;                                                      \
     }
 
-#define DO_VIDUP_ALL(OP, FN)                    \
-    DO_VIDUP(OP##b, 1, int8_t, FN)              \
-    DO_VIDUP(OP##h, 2, int16_t, FN)             \
+#define DO_VIDUP_ALL(OP, FN)        \
+    DO_VIDUP(OP##b, 1, int8_t, FN)  \
+    DO_VIDUP(OP##h, 2, int16_t, FN) \
     DO_VIDUP(OP##w, 4, int32_t, FN)
 
-#define DO_VIWDUP_ALL(OP, FN)                   \
-    DO_VIWDUP(OP##b, 1, int8_t, FN)             \
-    DO_VIWDUP(OP##h, 2, int16_t, FN)            \
+#define DO_VIWDUP_ALL(OP, FN)        \
+    DO_VIWDUP(OP##b, 1, int8_t, FN)  \
+    DO_VIWDUP(OP##h, 2, int16_t, FN) \
     DO_VIWDUP(OP##w, 4, int32_t, FN)
 
 static uint32_t do_add_wrap(uint32_t offset, uint32_t wrap, uint32_t imm)
@@ -2604,63 +2574,62 @@ DO_VIWDUP_ALL(vdwdup, do_sub_wrap)
  * P0 bits otherwise are updated with the results of the comparisons.
  * We must also keep unchanged the MASK fields at the top of v7m.vpr.
  */
-#define DO_VCMP(OP, ESIZE, TYPE, FN)                                    \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vn, void *vm)   \
-    {                                                                   \
-        TYPE *n = vn, *m = vm;                                          \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        uint16_t beatpred = 0;                                          \
-        uint16_t emask = MAKE_64BIT_MASK(0, ESIZE);                     \
-        unsigned e;                                                     \
-        for (e = 0; e < 16 / ESIZE; e++) {                              \
-            bool r = FN(n[H##ESIZE(e)], m[H##ESIZE(e)]);                \
-            /* Comparison sets 0/1 bits for each byte in the element */ \
-            beatpred |= r * emask;                                      \
-            emask <<= ESIZE;                                            \
-        }                                                               \
-        beatpred &= mask;                                               \
-        env->v7m.vpr = (env->v7m.vpr & ~(uint32_t)eci_mask) |           \
-            (beatpred & eci_mask);                                      \
-        mve_advance_vpt(env);                                           \
+#define DO_VCMP(OP, ESIZE, TYPE, FN)                                      \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vn, void *vm)    \
+    {                                                                     \
+        TYPE *n = vn, *m = vm;                                            \
+        uint16_t mask = mve_element_mask(env);                            \
+        uint16_t eci_mask = mve_eci_mask(env);                            \
+        uint16_t beatpred = 0;                                            \
+        uint16_t emask = MAKE_64BIT_MASK(0, ESIZE);                       \
+        unsigned e;                                                       \
+        for (e = 0; e < 16 / ESIZE; e++) {                                \
+            bool r = FN(n[H##ESIZE(e)], m[H##ESIZE(e)]);                  \
+            /* Comparison sets 0/1 bits for each byte in the element */   \
+            beatpred |= r * emask;                                        \
+            emask <<= ESIZE;                                              \
+        }                                                                 \
+        beatpred &= mask;                                                 \
+        env->v7m.vpr =                                                    \
+            (env->v7m.vpr & ~(uint32_t)eci_mask) | (beatpred & eci_mask); \
+        mve_advance_vpt(env);                                             \
     }
 
-#define DO_VCMP_SCALAR(OP, ESIZE, TYPE, FN)                             \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vn,             \
-                                uint32_t rm)                            \
-    {                                                                   \
-        TYPE *n = vn;                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        uint16_t beatpred = 0;                                          \
-        uint16_t emask = MAKE_64BIT_MASK(0, ESIZE);                     \
-        unsigned e;                                                     \
-        for (e = 0; e < 16 / ESIZE; e++) {                              \
-            bool r = FN(n[H##ESIZE(e)], (TYPE)rm);                      \
-            /* Comparison sets 0/1 bits for each byte in the element */ \
-            beatpred |= r * emask;                                      \
-            emask <<= ESIZE;                                            \
-        }                                                               \
-        beatpred &= mask;                                               \
-        env->v7m.vpr = (env->v7m.vpr & ~(uint32_t)eci_mask) |           \
-            (beatpred & eci_mask);                                      \
-        mve_advance_vpt(env);                                           \
+#define DO_VCMP_SCALAR(OP, ESIZE, TYPE, FN)                               \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vn, uint32_t rm) \
+    {                                                                     \
+        TYPE *n = vn;                                                     \
+        uint16_t mask = mve_element_mask(env);                            \
+        uint16_t eci_mask = mve_eci_mask(env);                            \
+        uint16_t beatpred = 0;                                            \
+        uint16_t emask = MAKE_64BIT_MASK(0, ESIZE);                       \
+        unsigned e;                                                       \
+        for (e = 0; e < 16 / ESIZE; e++) {                                \
+            bool r = FN(n[H##ESIZE(e)], (TYPE)rm);                        \
+            /* Comparison sets 0/1 bits for each byte in the element */   \
+            beatpred |= r * emask;                                        \
+            emask <<= ESIZE;                                              \
+        }                                                                 \
+        beatpred &= mask;                                                 \
+        env->v7m.vpr =                                                    \
+            (env->v7m.vpr & ~(uint32_t)eci_mask) | (beatpred & eci_mask); \
+        mve_advance_vpt(env);                                             \
     }
 
-#define DO_VCMP_S(OP, FN)                               \
-    DO_VCMP(OP##b, 1, int8_t, FN)                       \
-    DO_VCMP(OP##h, 2, int16_t, FN)                      \
-    DO_VCMP(OP##w, 4, int32_t, FN)                      \
-    DO_VCMP_SCALAR(OP##_scalarb, 1, int8_t, FN)         \
-    DO_VCMP_SCALAR(OP##_scalarh, 2, int16_t, FN)        \
+#define DO_VCMP_S(OP, FN)                        \
+    DO_VCMP(OP##b, 1, int8_t, FN)                \
+    DO_VCMP(OP##h, 2, int16_t, FN)               \
+    DO_VCMP(OP##w, 4, int32_t, FN)               \
+    DO_VCMP_SCALAR(OP##_scalarb, 1, int8_t, FN)  \
+    DO_VCMP_SCALAR(OP##_scalarh, 2, int16_t, FN) \
     DO_VCMP_SCALAR(OP##_scalarw, 4, int32_t, FN)
 
-#define DO_VCMP_U(OP, FN)                               \
-    DO_VCMP(OP##b, 1, uint8_t, FN)                      \
-    DO_VCMP(OP##h, 2, uint16_t, FN)                     \
-    DO_VCMP(OP##w, 4, uint32_t, FN)                     \
-    DO_VCMP_SCALAR(OP##_scalarb, 1, uint8_t, FN)        \
-    DO_VCMP_SCALAR(OP##_scalarh, 2, uint16_t, FN)       \
+#define DO_VCMP_U(OP, FN)                         \
+    DO_VCMP(OP##b, 1, uint8_t, FN)                \
+    DO_VCMP(OP##h, 2, uint16_t, FN)               \
+    DO_VCMP(OP##w, 4, uint32_t, FN)               \
+    DO_VCMP_SCALAR(OP##_scalarb, 1, uint8_t, FN)  \
+    DO_VCMP_SCALAR(OP##_scalarh, 2, uint16_t, FN) \
     DO_VCMP_SCALAR(OP##_scalarw, 4, uint32_t, FN)
 
 #define DO_EQ(N, M) ((N) == (M))
@@ -2738,7 +2707,7 @@ void HELPER(mve_vctp)(CPUARMState *env, uint32_t masklen)
 }
 
 #define DO_1OP_SAT(OP, ESIZE, TYPE, FN)                                 \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm)         \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm)        \
     {                                                                   \
         TYPE *d = vd, *m = vm;                                          \
         uint16_t mask = mve_element_mask(env);                          \
@@ -2778,19 +2747,19 @@ DO_1OP_SAT(vqnegw, 4, int32_t, DO_VQNEG_W)
  * VMAXA, VMINA: vd is unsigned; vm is signed, and we take its
  * absolute value; we then do an unsigned comparison.
  */
-#define DO_VMAXMINA(OP, ESIZE, STYPE, UTYPE, FN)                        \
-    void HELPER(mve_##OP)(CPUARMState *env, void *vd, void *vm)         \
-    {                                                                   \
-        UTYPE *d = vd;                                                  \
-        STYPE *m = vm;                                                  \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            UTYPE r = DO_ABS(m[H##ESIZE(e)]);                           \
-            r = FN(d[H##ESIZE(e)], r);                                  \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VMAXMINA(OP, ESIZE, STYPE, UTYPE, FN)                 \
+    void HELPER(mve_##OP)(CPUARMState * env, void *vd, void *vm) \
+    {                                                            \
+        UTYPE *d = vd;                                           \
+        STYPE *m = vm;                                           \
+        uint16_t mask = mve_element_mask(env);                   \
+        unsigned e;                                              \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {       \
+            UTYPE r = DO_ABS(m[H##ESIZE(e)]);                    \
+            r = FN(d[H##ESIZE(e)], r);                           \
+            mergemask(&d[H##ESIZE(e)], r, mask);                 \
+        }                                                        \
+        mve_advance_vpt(env);                                    \
     }
 
 DO_VMAXMINA(vmaxab, 1, int8_t, uint8_t, DO_MAX)
@@ -2806,31 +2775,31 @@ DO_VMAXMINA(vminaw, 4, int32_t, uint32_t, DO_MIN)
  * bytes, but we must be careful to avoid updating the FP exception
  * state unless byte 0 of the element was unpredicated.
  */
-#define DO_2OP_FP(OP, ESIZE, TYPE, FN)                                  \
-    void HELPER(glue(mve_, OP))(CPUARMState *env,                       \
-                                void *vd, void *vn, void *vm)           \
-    {                                                                   \
-        TYPE *d = vd, *n = vn, *m = vm;                                 \
-        TYPE r;                                                         \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {              \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(mask & 1)) {                                          \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = FN(n[H##ESIZE(e)], m[H##ESIZE(e)], fpst);               \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_FP(OP, ESIZE, TYPE, FN)                                 \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                void *vm)                              \
+    {                                                                  \
+        TYPE *d = vd, *n = vn, *m = vm;                                \
+        TYPE r;                                                        \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        float_status *fpst;                                            \
+        float_status scratch_fpst;                                     \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {             \
+                continue;                                              \
+            }                                                          \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :   \
+                                  &env->vfp.standard_fp_status;        \
+            if (!(mask & 1)) {                                         \
+                /* We need the result but without updating flags */    \
+                scratch_fpst = *fpst;                                  \
+                fpst = &scratch_fpst;                                  \
+            }                                                          \
+            r = FN(n[H##ESIZE(e)], m[H##ESIZE(e)], fpst);              \
+            mergemask(&d[H##ESIZE(e)], r, mask);                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 #define DO_2OP_FP_ALL(OP, FN)                  \
@@ -2878,39 +2847,39 @@ static inline float32 float32_minnuma(float32 a, float32 b, float_status *s)
 DO_2OP_FP_ALL(vmaxnma, maxnuma)
 DO_2OP_FP_ALL(vminnma, minnuma)
 
-#define DO_VCADD_FP(OP, ESIZE, TYPE, FN0, FN1)                          \
-    void HELPER(glue(mve_, OP))(CPUARMState *env,                       \
-                                void *vd, void *vn, void *vm)           \
-    {                                                                   \
-        TYPE *d = vd, *n = vn, *m = vm;                                 \
-        TYPE r[16 / ESIZE];                                             \
-        uint16_t tm, mask = mve_element_mask(env);                      \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        /* Calculate all results first to avoid overwriting inputs */   \
-        for (e = 0, tm = mask; e < 16 / ESIZE; e++, tm >>= ESIZE) {     \
-            if ((tm & MAKE_64BIT_MASK(0, ESIZE)) == 0) {                \
-                r[e] = 0;                                               \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(tm & 1)) {                                            \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            if (!(e & 1)) {                                             \
-                r[e] = FN0(n[H##ESIZE(e)], m[H##ESIZE(e + 1)], fpst);   \
-            } else {                                                    \
-                r[e] = FN1(n[H##ESIZE(e)], m[H##ESIZE(e - 1)], fpst);   \
-            }                                                           \
-        }                                                               \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            mergemask(&d[H##ESIZE(e)], r[e], mask);                     \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VCADD_FP(OP, ESIZE, TYPE, FN0, FN1)                         \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                void *vm)                              \
+    {                                                                  \
+        TYPE *d = vd, *n = vn, *m = vm;                                \
+        TYPE r[16 / ESIZE];                                            \
+        uint16_t tm, mask = mve_element_mask(env);                     \
+        unsigned e;                                                    \
+        float_status *fpst;                                            \
+        float_status scratch_fpst;                                     \
+        /* Calculate all results first to avoid overwriting inputs */  \
+        for (e = 0, tm = mask; e < 16 / ESIZE; e++, tm >>= ESIZE) {    \
+            if ((tm & MAKE_64BIT_MASK(0, ESIZE)) == 0) {               \
+                r[e] = 0;                                              \
+                continue;                                              \
+            }                                                          \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :   \
+                                  &env->vfp.standard_fp_status;        \
+            if (!(tm & 1)) {                                           \
+                /* We need the result but without updating flags */    \
+                scratch_fpst = *fpst;                                  \
+                fpst = &scratch_fpst;                                  \
+            }                                                          \
+            if (!(e & 1)) {                                            \
+                r[e] = FN0(n[H##ESIZE(e)], m[H##ESIZE(e + 1)], fpst);  \
+            } else {                                                   \
+                r[e] = FN1(n[H##ESIZE(e)], m[H##ESIZE(e - 1)], fpst);  \
+            }                                                          \
+        }                                                              \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            mergemask(&d[H##ESIZE(e)], r[e], mask);                    \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 DO_VCADD_FP(vfcadd90h, 2, float16, float16_sub, float16_add)
@@ -2918,36 +2887,35 @@ DO_VCADD_FP(vfcadd90s, 4, float32, float32_sub, float32_add)
 DO_VCADD_FP(vfcadd270h, 2, float16, float16_add, float16_sub)
 DO_VCADD_FP(vfcadd270s, 4, float32, float32_add, float32_sub)
 
-#define DO_VFMA(OP, ESIZE, TYPE, CHS)                                   \
-    void HELPER(glue(mve_, OP))(CPUARMState *env,                       \
-                                void *vd, void *vn, void *vm)           \
-    {                                                                   \
-        TYPE *d = vd, *n = vn, *m = vm;                                 \
-        TYPE r;                                                         \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {              \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(mask & 1)) {                                          \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = n[H##ESIZE(e)];                                         \
-            if (CHS) {                                                  \
-                r = TYPE##_chs(r);                                      \
-            }                                                           \
-            r = TYPE##_muladd(r, m[H##ESIZE(e)], d[H##ESIZE(e)],        \
-                              0, fpst);                                 \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VFMA(OP, ESIZE, TYPE, CHS)                                      \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn,     \
+                                void *vm)                                  \
+    {                                                                      \
+        TYPE *d = vd, *n = vn, *m = vm;                                    \
+        TYPE r;                                                            \
+        uint16_t mask = mve_element_mask(env);                             \
+        unsigned e;                                                        \
+        float_status *fpst;                                                \
+        float_status scratch_fpst;                                         \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                 \
+            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {                 \
+                continue;                                                  \
+            }                                                              \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :       \
+                                  &env->vfp.standard_fp_status;            \
+            if (!(mask & 1)) {                                             \
+                /* We need the result but without updating flags */        \
+                scratch_fpst = *fpst;                                      \
+                fpst = &scratch_fpst;                                      \
+            }                                                              \
+            r = n[H##ESIZE(e)];                                            \
+            if (CHS) {                                                     \
+                r = TYPE##_chs(r);                                         \
+            }                                                              \
+            r = TYPE##_muladd(r, m[H##ESIZE(e)], d[H##ESIZE(e)], 0, fpst); \
+            mergemask(&d[H##ESIZE(e)], r, mask);                           \
+        }                                                                  \
+        mve_advance_vpt(env);                                              \
     }
 
 DO_VFMA(vfmah, 2, float16, false)
@@ -2955,66 +2923,66 @@ DO_VFMA(vfmas, 4, float32, false)
 DO_VFMA(vfmsh, 2, float16, true)
 DO_VFMA(vfmss, 4, float32, true)
 
-#define DO_VCMLA(OP, ESIZE, TYPE, ROT, FN)                              \
-    void HELPER(glue(mve_, OP))(CPUARMState *env,                       \
-                                void *vd, void *vn, void *vm)           \
-    {                                                                   \
-        TYPE *d = vd, *n = vn, *m = vm;                                 \
-        TYPE r0, r1, e1, e2, e3, e4;                                    \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        float_status *fpst0, *fpst1;                                    \
-        float_status scratch_fpst;                                      \
-        /* We loop through pairs of elements at a time */               \
-        for (e = 0; e < 16 / ESIZE; e += 2, mask >>= ESIZE * 2) {       \
-            if ((mask & MAKE_64BIT_MASK(0, ESIZE * 2)) == 0) {          \
-                continue;                                               \
-            }                                                           \
-            fpst0 = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :   \
-                &env->vfp.standard_fp_status;                           \
-            fpst1 = fpst0;                                              \
-            if (!(mask & 1)) {                                          \
-                scratch_fpst = *fpst0;                                  \
-                fpst0 = &scratch_fpst;                                  \
-            }                                                           \
-            if (!(mask & (1 << ESIZE))) {                               \
-                scratch_fpst = *fpst1;                                  \
-                fpst1 = &scratch_fpst;                                  \
-            }                                                           \
-            switch (ROT) {                                              \
-            case 0:                                                     \
-                e1 = m[H##ESIZE(e)];                                    \
-                e2 = n[H##ESIZE(e)];                                    \
-                e3 = m[H##ESIZE(e + 1)];                                \
-                e4 = n[H##ESIZE(e)];                                    \
-                break;                                                  \
-            case 1:                                                     \
-                e1 = TYPE##_chs(m[H##ESIZE(e + 1)]);                    \
-                e2 = n[H##ESIZE(e + 1)];                                \
-                e3 = m[H##ESIZE(e)];                                    \
-                e4 = n[H##ESIZE(e + 1)];                                \
-                break;                                                  \
-            case 2:                                                     \
-                e1 = TYPE##_chs(m[H##ESIZE(e)]);                        \
-                e2 = n[H##ESIZE(e)];                                    \
-                e3 = TYPE##_chs(m[H##ESIZE(e + 1)]);                    \
-                e4 = n[H##ESIZE(e)];                                    \
-                break;                                                  \
-            case 3:                                                     \
-                e1 = m[H##ESIZE(e + 1)];                                \
-                e2 = n[H##ESIZE(e + 1)];                                \
-                e3 = TYPE##_chs(m[H##ESIZE(e)]);                        \
-                e4 = n[H##ESIZE(e + 1)];                                \
-                break;                                                  \
-            default:                                                    \
-                g_assert_not_reached();                                 \
-            }                                                           \
-            r0 = FN(e2, e1, d[H##ESIZE(e)], fpst0);                     \
-            r1 = FN(e4, e3, d[H##ESIZE(e + 1)], fpst1);                 \
-            mergemask(&d[H##ESIZE(e)], r0, mask);                       \
-            mergemask(&d[H##ESIZE(e + 1)], r1, mask >> ESIZE);          \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VCMLA(OP, ESIZE, TYPE, ROT, FN)                             \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                void *vm)                              \
+    {                                                                  \
+        TYPE *d = vd, *n = vn, *m = vm;                                \
+        TYPE r0, r1, e1, e2, e3, e4;                                   \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        float_status *fpst0, *fpst1;                                   \
+        float_status scratch_fpst;                                     \
+        /* We loop through pairs of elements at a time */              \
+        for (e = 0; e < 16 / ESIZE; e += 2, mask >>= ESIZE * 2) {      \
+            if ((mask & MAKE_64BIT_MASK(0, ESIZE * 2)) == 0) {         \
+                continue;                                              \
+            }                                                          \
+            fpst0 = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :  \
+                                   &env->vfp.standard_fp_status;       \
+            fpst1 = fpst0;                                             \
+            if (!(mask & 1)) {                                         \
+                scratch_fpst = *fpst0;                                 \
+                fpst0 = &scratch_fpst;                                 \
+            }                                                          \
+            if (!(mask & (1 << ESIZE))) {                              \
+                scratch_fpst = *fpst1;                                 \
+                fpst1 = &scratch_fpst;                                 \
+            }                                                          \
+            switch (ROT) {                                             \
+            case 0:                                                    \
+                e1 = m[H##ESIZE(e)];                                   \
+                e2 = n[H##ESIZE(e)];                                   \
+                e3 = m[H##ESIZE(e + 1)];                               \
+                e4 = n[H##ESIZE(e)];                                   \
+                break;                                                 \
+            case 1:                                                    \
+                e1 = TYPE##_chs(m[H##ESIZE(e + 1)]);                   \
+                e2 = n[H##ESIZE(e + 1)];                               \
+                e3 = m[H##ESIZE(e)];                                   \
+                e4 = n[H##ESIZE(e + 1)];                               \
+                break;                                                 \
+            case 2:                                                    \
+                e1 = TYPE##_chs(m[H##ESIZE(e)]);                       \
+                e2 = n[H##ESIZE(e)];                                   \
+                e3 = TYPE##_chs(m[H##ESIZE(e + 1)]);                   \
+                e4 = n[H##ESIZE(e)];                                   \
+                break;                                                 \
+            case 3:                                                    \
+                e1 = m[H##ESIZE(e + 1)];                               \
+                e2 = n[H##ESIZE(e + 1)];                               \
+                e3 = TYPE##_chs(m[H##ESIZE(e)]);                       \
+                e4 = n[H##ESIZE(e + 1)];                               \
+                break;                                                 \
+            default:                                                   \
+                g_assert_not_reached();                                \
+            }                                                          \
+            r0 = FN(e2, e1, d[H##ESIZE(e)], fpst0);                    \
+            r1 = FN(e4, e3, d[H##ESIZE(e + 1)], fpst1);                \
+            mergemask(&d[H##ESIZE(e)], r0, mask);                      \
+            mergemask(&d[H##ESIZE(e + 1)], r1, mask >> ESIZE);         \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 #define DO_VCMULH(N, M, D, S) float16_mul(N, M, S)
@@ -3041,66 +3009,66 @@ DO_VCMLA(vcmla180s, 4, float32, 2, DO_VCMLAS)
 DO_VCMLA(vcmla270h, 2, float16, 3, DO_VCMLAH)
 DO_VCMLA(vcmla270s, 4, float32, 3, DO_VCMLAS)
 
-#define DO_2OP_FP_SCALAR(OP, ESIZE, TYPE, FN)                           \
-    void HELPER(glue(mve_, OP))(CPUARMState *env,                       \
-                                void *vd, void *vn, uint32_t rm)        \
-    {                                                                   \
-        TYPE *d = vd, *n = vn;                                          \
-        TYPE r, m = rm;                                                 \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {              \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(mask & 1)) {                                          \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = FN(n[H##ESIZE(e)], m, fpst);                            \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_FP_SCALAR(OP, ESIZE, TYPE, FN)                          \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                uint32_t rm)                           \
+    {                                                                  \
+        TYPE *d = vd, *n = vn;                                         \
+        TYPE r, m = rm;                                                \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        float_status *fpst;                                            \
+        float_status scratch_fpst;                                     \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {             \
+                continue;                                              \
+            }                                                          \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :   \
+                                  &env->vfp.standard_fp_status;        \
+            if (!(mask & 1)) {                                         \
+                /* We need the result but without updating flags */    \
+                scratch_fpst = *fpst;                                  \
+                fpst = &scratch_fpst;                                  \
+            }                                                          \
+            r = FN(n[H##ESIZE(e)], m, fpst);                           \
+            mergemask(&d[H##ESIZE(e)], r, mask);                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
-#define DO_2OP_FP_SCALAR_ALL(OP, FN)                    \
-    DO_2OP_FP_SCALAR(OP##h, 2, float16, float16_##FN)   \
+#define DO_2OP_FP_SCALAR_ALL(OP, FN)                  \
+    DO_2OP_FP_SCALAR(OP##h, 2, float16, float16_##FN) \
     DO_2OP_FP_SCALAR(OP##s, 4, float32, float32_##FN)
 
 DO_2OP_FP_SCALAR_ALL(vfadd_scalar, add)
 DO_2OP_FP_SCALAR_ALL(vfsub_scalar, sub)
 DO_2OP_FP_SCALAR_ALL(vfmul_scalar, mul)
 
-#define DO_2OP_FP_ACC_SCALAR(OP, ESIZE, TYPE, FN)                       \
-    void HELPER(glue(mve_, OP))(CPUARMState *env,                       \
-                                void *vd, void *vn, uint32_t rm)        \
-    {                                                                   \
-        TYPE *d = vd, *n = vn;                                          \
-        TYPE r, m = rm;                                                 \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {              \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(mask & 1)) {                                          \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = FN(n[H##ESIZE(e)], m, d[H##ESIZE(e)], 0, fpst);         \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_2OP_FP_ACC_SCALAR(OP, ESIZE, TYPE, FN)                      \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vn, \
+                                uint32_t rm)                           \
+    {                                                                  \
+        TYPE *d = vd, *n = vn;                                         \
+        TYPE r, m = rm;                                                \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        float_status *fpst;                                            \
+        float_status scratch_fpst;                                     \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {             \
+                continue;                                              \
+            }                                                          \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :   \
+                                  &env->vfp.standard_fp_status;        \
+            if (!(mask & 1)) {                                         \
+                /* We need the result but without updating flags */    \
+                scratch_fpst = *fpst;                                  \
+                fpst = &scratch_fpst;                                  \
+            }                                                          \
+            r = FN(n[H##ESIZE(e)], m, d[H##ESIZE(e)], 0, fpst);        \
+            mergemask(&d[H##ESIZE(e)], r, mask);                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 /* VFMAS is vector * vector + scalar, so swap op2 and op3 */
@@ -3114,37 +3082,36 @@ DO_2OP_FP_ACC_SCALAR(vfmas_scalarh, 2, float16, DO_VFMAS_SCALARH)
 DO_2OP_FP_ACC_SCALAR(vfmas_scalars, 4, float32, DO_VFMAS_SCALARS)
 
 /* Floating point max/min across vector. */
-#define DO_FP_VMAXMINV(OP, ESIZE, TYPE, ABS, FN)                \
-    uint32_t HELPER(glue(mve_, OP))(CPUARMState *env, void *vm, \
-                                    uint32_t ra_in)             \
-    {                                                           \
-        uint16_t mask = mve_element_mask(env);                  \
-        unsigned e;                                             \
-        TYPE *m = vm;                                           \
-        TYPE ra = (TYPE)ra_in;                                  \
-        float_status *fpst = (ESIZE == 2) ?                     \
-            &env->vfp.standard_fp_status_f16 :                  \
-            &env->vfp.standard_fp_status;                       \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {      \
-            if (mask & 1) {                                     \
-                TYPE v = m[H##ESIZE(e)];                        \
-                if (TYPE##_is_signaling_nan(ra, fpst)) {        \
-                    ra = TYPE##_silence_nan(ra, fpst);          \
-                    float_raise(float_flag_invalid, fpst);      \
-                }                                               \
-                if (TYPE##_is_signaling_nan(v, fpst)) {         \
-                    v = TYPE##_silence_nan(v, fpst);            \
-                    float_raise(float_flag_invalid, fpst);      \
-                }                                               \
-                if (ABS) {                                      \
-                    v = TYPE##_abs(v);                          \
-                }                                               \
-                ra = FN(ra, v, fpst);                           \
-            }                                                   \
-        }                                                       \
-        mve_advance_vpt(env);                                   \
-        return ra;                                              \
-    }                                                           \
+#define DO_FP_VMAXMINV(OP, ESIZE, TYPE, ABS, FN)                               \
+    uint32_t HELPER(glue(mve_, OP))(CPUARMState * env, void *vm,               \
+                                    uint32_t ra_in)                            \
+    {                                                                          \
+        uint16_t mask = mve_element_mask(env);                                 \
+        unsigned e;                                                            \
+        TYPE *m = vm;                                                          \
+        TYPE ra = (TYPE)ra_in;                                                 \
+        float_status *fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 : \
+                                            &env->vfp.standard_fp_status;      \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {                     \
+            if (mask & 1) {                                                    \
+                TYPE v = m[H##ESIZE(e)];                                       \
+                if (TYPE##_is_signaling_nan(ra, fpst)) {                       \
+                    ra = TYPE##_silence_nan(ra, fpst);                         \
+                    float_raise(float_flag_invalid, fpst);                     \
+                }                                                              \
+                if (TYPE##_is_signaling_nan(v, fpst)) {                        \
+                    v = TYPE##_silence_nan(v, fpst);                           \
+                    float_raise(float_flag_invalid, fpst);                     \
+                }                                                              \
+                if (ABS) {                                                     \
+                    v = TYPE##_abs(v);                                         \
+                }                                                              \
+                ra = FN(ra, v, fpst);                                          \
+            }                                                                  \
+        }                                                                      \
+        mve_advance_vpt(env);                                                  \
+        return ra;                                                             \
+    }
 
 #define NOP(X) (X)
 
@@ -3158,75 +3125,74 @@ DO_FP_VMAXMINV(vminnmavh, 2, float16, true, float16_minnum)
 DO_FP_VMAXMINV(vminnmavs, 4, float32, true, float32_minnum)
 
 /* FP compares; note that all comparisons signal InvalidOp for QNaNs */
-#define DO_VCMP_FP(OP, ESIZE, TYPE, FN)                                 \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vn, void *vm)   \
-    {                                                                   \
-        TYPE *n = vn, *m = vm;                                          \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        uint16_t beatpred = 0;                                          \
-        uint16_t emask = MAKE_64BIT_MASK(0, ESIZE);                     \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        bool r;                                                         \
-        for (e = 0; e < 16 / ESIZE; e++, emask <<= ESIZE) {             \
-            if ((mask & emask) == 0) {                                  \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(mask & (1 << (e * ESIZE)))) {                         \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = FN(n[H##ESIZE(e)], m[H##ESIZE(e)], fpst);               \
-            /* Comparison sets 0/1 bits for each byte in the element */ \
-            beatpred |= r * emask;                                      \
-        }                                                               \
-        beatpred &= mask;                                               \
-        env->v7m.vpr = (env->v7m.vpr & ~(uint32_t)eci_mask) |           \
-            (beatpred & eci_mask);                                      \
-        mve_advance_vpt(env);                                           \
+#define DO_VCMP_FP(OP, ESIZE, TYPE, FN)                                   \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vn, void *vm)    \
+    {                                                                     \
+        TYPE *n = vn, *m = vm;                                            \
+        uint16_t mask = mve_element_mask(env);                            \
+        uint16_t eci_mask = mve_eci_mask(env);                            \
+        uint16_t beatpred = 0;                                            \
+        uint16_t emask = MAKE_64BIT_MASK(0, ESIZE);                       \
+        unsigned e;                                                       \
+        float_status *fpst;                                               \
+        float_status scratch_fpst;                                        \
+        bool r;                                                           \
+        for (e = 0; e < 16 / ESIZE; e++, emask <<= ESIZE) {               \
+            if ((mask & emask) == 0) {                                    \
+                continue;                                                 \
+            }                                                             \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :      \
+                                  &env->vfp.standard_fp_status;           \
+            if (!(mask & (1 << (e * ESIZE)))) {                           \
+                /* We need the result but without updating flags */       \
+                scratch_fpst = *fpst;                                     \
+                fpst = &scratch_fpst;                                     \
+            }                                                             \
+            r = FN(n[H##ESIZE(e)], m[H##ESIZE(e)], fpst);                 \
+            /* Comparison sets 0/1 bits for each byte in the element */   \
+            beatpred |= r * emask;                                        \
+        }                                                                 \
+        beatpred &= mask;                                                 \
+        env->v7m.vpr =                                                    \
+            (env->v7m.vpr & ~(uint32_t)eci_mask) | (beatpred & eci_mask); \
+        mve_advance_vpt(env);                                             \
     }
 
-#define DO_VCMP_FP_SCALAR(OP, ESIZE, TYPE, FN)                          \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vn,             \
-                                uint32_t rm)                            \
-    {                                                                   \
-        TYPE *n = vn;                                                   \
-        uint16_t mask = mve_element_mask(env);                          \
-        uint16_t eci_mask = mve_eci_mask(env);                          \
-        uint16_t beatpred = 0;                                          \
-        uint16_t emask = MAKE_64BIT_MASK(0, ESIZE);                     \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        bool r;                                                         \
-        for (e = 0; e < 16 / ESIZE; e++, emask <<= ESIZE) {             \
-            if ((mask & emask) == 0) {                                  \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(mask & (1 << (e * ESIZE)))) {                         \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = FN(n[H##ESIZE(e)], (TYPE)rm, fpst);                     \
-            /* Comparison sets 0/1 bits for each byte in the element */ \
-            beatpred |= r * emask;                                      \
-        }                                                               \
-        beatpred &= mask;                                               \
-        env->v7m.vpr = (env->v7m.vpr & ~(uint32_t)eci_mask) |           \
-            (beatpred & eci_mask);                                      \
-        mve_advance_vpt(env);                                           \
+#define DO_VCMP_FP_SCALAR(OP, ESIZE, TYPE, FN)                            \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vn, uint32_t rm) \
+    {                                                                     \
+        TYPE *n = vn;                                                     \
+        uint16_t mask = mve_element_mask(env);                            \
+        uint16_t eci_mask = mve_eci_mask(env);                            \
+        uint16_t beatpred = 0;                                            \
+        uint16_t emask = MAKE_64BIT_MASK(0, ESIZE);                       \
+        unsigned e;                                                       \
+        float_status *fpst;                                               \
+        float_status scratch_fpst;                                        \
+        bool r;                                                           \
+        for (e = 0; e < 16 / ESIZE; e++, emask <<= ESIZE) {               \
+            if ((mask & emask) == 0) {                                    \
+                continue;                                                 \
+            }                                                             \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :      \
+                                  &env->vfp.standard_fp_status;           \
+            if (!(mask & (1 << (e * ESIZE)))) {                           \
+                /* We need the result but without updating flags */       \
+                scratch_fpst = *fpst;                                     \
+                fpst = &scratch_fpst;                                     \
+            }                                                             \
+            r = FN(n[H##ESIZE(e)], (TYPE)rm, fpst);                       \
+            /* Comparison sets 0/1 bits for each byte in the element */   \
+            beatpred |= r * emask;                                        \
+        }                                                                 \
+        beatpred &= mask;                                                 \
+        env->v7m.vpr =                                                    \
+            (env->v7m.vpr & ~(uint32_t)eci_mask) | (beatpred & eci_mask); \
+        mve_advance_vpt(env);                                             \
     }
 
-#define DO_VCMP_FP_BOTH(VOP, SOP, ESIZE, TYPE, FN)      \
-    DO_VCMP_FP(VOP, ESIZE, TYPE, FN)                    \
+#define DO_VCMP_FP_BOTH(VOP, SOP, ESIZE, TYPE, FN) \
+    DO_VCMP_FP(VOP, ESIZE, TYPE, FN)               \
     DO_VCMP_FP_SCALAR(SOP, ESIZE, TYPE, FN)
 
 /*
@@ -3259,31 +3225,31 @@ DO_VCMP_FP_BOTH(vfcmpgts, vfcmpgt_scalars, 4, float32, DO_GT32)
 DO_VCMP_FP_BOTH(vfcmpleh, vfcmple_scalarh, 2, float16, !DO_GT16)
 DO_VCMP_FP_BOTH(vfcmples, vfcmple_scalars, 4, float32, !DO_GT32)
 
-#define DO_VCVT_FIXED(OP, ESIZE, TYPE, FN)                              \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vm,   \
-                                uint32_t shift)                         \
-    {                                                                   \
-        TYPE *d = vd, *m = vm;                                          \
-        TYPE r;                                                         \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {              \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(mask & 1)) {                                          \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = FN(m[H##ESIZE(e)], shift, fpst);                        \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_VCVT_FIXED(OP, ESIZE, TYPE, FN)                             \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm, \
+                                uint32_t shift)                        \
+    {                                                                  \
+        TYPE *d = vd, *m = vm;                                         \
+        TYPE r;                                                        \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        float_status *fpst;                                            \
+        float_status scratch_fpst;                                     \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {             \
+                continue;                                              \
+            }                                                          \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :   \
+                                  &env->vfp.standard_fp_status;        \
+            if (!(mask & 1)) {                                         \
+                /* We need the result but without updating flags */    \
+                scratch_fpst = *fpst;                                  \
+                fpst = &scratch_fpst;                                  \
+            }                                                          \
+            r = FN(m[H##ESIZE(e)], shift, fpst);                       \
+            mergemask(&d[H##ESIZE(e)], r, mask);                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 DO_VCVT_FIXED(vcvt_sh, 2, int16_t, helper_vfp_shtoh)
@@ -3296,36 +3262,36 @@ DO_VCVT_FIXED(vcvt_fs, 4, int32_t, helper_vfp_tosls_round_to_zero)
 DO_VCVT_FIXED(vcvt_fu, 4, uint32_t, helper_vfp_touls_round_to_zero)
 
 /* VCVT with specified rmode */
-#define DO_VCVT_RMODE(OP, ESIZE, TYPE, FN)                              \
-    void HELPER(glue(mve_, OP))(CPUARMState *env,                       \
-                                void *vd, void *vm, uint32_t rmode)     \
-    {                                                                   \
-        TYPE *d = vd, *m = vm;                                          \
-        TYPE r;                                                         \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        float_status *base_fpst = (ESIZE == 2) ?                        \
-            &env->vfp.standard_fp_status_f16 :                          \
-            &env->vfp.standard_fp_status;                               \
-        uint32_t prev_rmode = get_float_rounding_mode(base_fpst);       \
-        set_float_rounding_mode(rmode, base_fpst);                      \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {              \
-                continue;                                               \
-            }                                                           \
-            fpst = base_fpst;                                           \
-            if (!(mask & 1)) {                                          \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = FN(m[H##ESIZE(e)], 0, fpst);                            \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-        }                                                               \
-        set_float_rounding_mode(prev_rmode, base_fpst);                 \
-        mve_advance_vpt(env);                                           \
+#define DO_VCVT_RMODE(OP, ESIZE, TYPE, FN)                               \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm,   \
+                                uint32_t rmode)                          \
+    {                                                                    \
+        TYPE *d = vd, *m = vm;                                           \
+        TYPE r;                                                          \
+        uint16_t mask = mve_element_mask(env);                           \
+        unsigned e;                                                      \
+        float_status *fpst;                                              \
+        float_status scratch_fpst;                                       \
+        float_status *base_fpst = (ESIZE == 2) ?                         \
+                                      &env->vfp.standard_fp_status_f16 : \
+                                      &env->vfp.standard_fp_status;      \
+        uint32_t prev_rmode = get_float_rounding_mode(base_fpst);        \
+        set_float_rounding_mode(rmode, base_fpst);                       \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {               \
+            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {               \
+                continue;                                                \
+            }                                                            \
+            fpst = base_fpst;                                            \
+            if (!(mask & 1)) {                                           \
+                /* We need the result but without updating flags */      \
+                scratch_fpst = *fpst;                                    \
+                fpst = &scratch_fpst;                                    \
+            }                                                            \
+            r = FN(m[H##ESIZE(e)], 0, fpst);                             \
+            mergemask(&d[H##ESIZE(e)], r, mask);                         \
+        }                                                                \
+        set_float_rounding_mode(prev_rmode, base_fpst);                  \
+        mve_advance_vpt(env);                                            \
     }
 
 DO_VCVT_RMODE(vcvt_rm_sh, 2, uint16_t, helper_vfp_toshh)
@@ -3420,30 +3386,30 @@ void HELPER(mve_vcvtt_hs)(CPUARMState *env, void *vd, void *vm)
     do_vcvt_hs(env, vd, vm, 1);
 }
 
-#define DO_1OP_FP(OP, ESIZE, TYPE, FN)                                  \
-    void HELPER(glue(mve_, OP))(CPUARMState *env, void *vd, void *vm)   \
-    {                                                                   \
-        TYPE *d = vd, *m = vm;                                          \
-        TYPE r;                                                         \
-        uint16_t mask = mve_element_mask(env);                          \
-        unsigned e;                                                     \
-        float_status *fpst;                                             \
-        float_status scratch_fpst;                                      \
-        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {              \
-            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {              \
-                continue;                                               \
-            }                                                           \
-            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :    \
-                &env->vfp.standard_fp_status;                           \
-            if (!(mask & 1)) {                                          \
-                /* We need the result but without updating flags */     \
-                scratch_fpst = *fpst;                                   \
-                fpst = &scratch_fpst;                                   \
-            }                                                           \
-            r = FN(m[H##ESIZE(e)], fpst);                               \
-            mergemask(&d[H##ESIZE(e)], r, mask);                        \
-        }                                                               \
-        mve_advance_vpt(env);                                           \
+#define DO_1OP_FP(OP, ESIZE, TYPE, FN)                                 \
+    void HELPER(glue(mve_, OP))(CPUARMState * env, void *vd, void *vm) \
+    {                                                                  \
+        TYPE *d = vd, *m = vm;                                         \
+        TYPE r;                                                        \
+        uint16_t mask = mve_element_mask(env);                         \
+        unsigned e;                                                    \
+        float_status *fpst;                                            \
+        float_status scratch_fpst;                                     \
+        for (e = 0; e < 16 / ESIZE; e++, mask >>= ESIZE) {             \
+            if ((mask & MAKE_64BIT_MASK(0, ESIZE)) == 0) {             \
+                continue;                                              \
+            }                                                          \
+            fpst = (ESIZE == 2) ? &env->vfp.standard_fp_status_f16 :   \
+                                  &env->vfp.standard_fp_status;        \
+            if (!(mask & 1)) {                                         \
+                /* We need the result but without updating flags */    \
+                scratch_fpst = *fpst;                                  \
+                fpst = &scratch_fpst;                                  \
+            }                                                          \
+            r = FN(m[H##ESIZE(e)], fpst);                              \
+            mergemask(&d[H##ESIZE(e)], r, mask);                       \
+        }                                                              \
+        mve_advance_vpt(env);                                          \
     }
 
 DO_1OP_FP(vrintx_h, 2, float16, float16_round_to_int)

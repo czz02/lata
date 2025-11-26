@@ -38,8 +38,8 @@
 #include "sysemu/reset.h"
 #endif
 
-#define CR0_RESET       0xE0UL
-#define CR14_RESET      0xC2000000UL;
+#define CR0_RESET 0xE0UL
+#define CR14_RESET 0xC2000000UL;
 
 #ifndef CONFIG_USER_ONLY
 static bool is_early_exception_psw(uint64_t mask, uint64_t addr)
@@ -98,8 +98,8 @@ uint64_t s390_cpu_get_psw_mask(CPUS390XState *env)
     uint64_t r = env->psw.mask;
 
     if (tcg_enabled()) {
-        uint64_t cc = calc_cc(env, env->cc_op, env->cc_src,
-                              env->cc_dst, env->cc_vr);
+        uint64_t cc =
+            calc_cc(env, env->cc_op, env->cc_src, env->cc_dst, env->cc_vr);
 
         assert(cc <= 3);
         r &= ~PSW_MASK_CC;
@@ -167,7 +167,7 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
         /* initial reset does not clear everything! */
         memset(&env->start_initial_reset_fields, 0,
                offsetof(CPUS390XState, start_normal_reset_fields) -
-               offsetof(CPUS390XState, start_initial_reset_fields));
+                   offsetof(CPUS390XState, start_initial_reset_fields));
 
         /* architectured initial value for Breaking-Event-Address register */
         env->gbea = 1;
@@ -187,12 +187,12 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
         /* tininess for underflow is detected before rounding */
         set_float_detect_tininess(float_tininess_before_rounding,
                                   &env->fpu_status);
-       /* fall through */
+        /* fall through */
     case S390_CPU_RESET_NORMAL:
         env->psw.mask &= ~PSW_MASK_RI;
         memset(&env->start_normal_reset_fields, 0,
                offsetof(CPUS390XState, end_reset_fields) -
-               offsetof(CPUS390XState, start_normal_reset_fields));
+                   offsetof(CPUS390XState, start_normal_reset_fields));
 
         env->pfault_token = -1UL;
         env->bpbc = false;

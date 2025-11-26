@@ -33,14 +33,12 @@ static VMStateField vmstate_env_fields[] = {
        jumping.  We want OFFSET=0 so that we effectively pass ENV
        to the helper functions, and we need to fill in the name by
        hand since there's no field of that name.  */
-    {
-        .name = "fpcr",
-        .version_id = 0,
-        .size = sizeof(uint64_t),
-        .info = &vmstate_fpcr,
-        .flags = VMS_SINGLE,
-        .offset = 0
-    },
+    { .name = "fpcr",
+      .version_id = 0,
+      .size = sizeof(uint64_t),
+      .info = &vmstate_fpcr,
+      .flags = VMS_SINGLE,
+      .offset = 0 },
     VMSTATE_UINTTL(pc, CPUAlphaState),
     VMSTATE_UINTTL(unique, CPUAlphaState),
     VMSTATE_UINTTL(lock_addr, CPUAlphaState),
@@ -74,8 +72,7 @@ static const VMStateDescription vmstate_env = {
 };
 
 static VMStateField vmstate_cpu_fields[] = {
-    VMSTATE_CPU(),
-    VMSTATE_STRUCT(env, AlphaCPU, 1, vmstate_env, CPUAlphaState),
+    VMSTATE_CPU(), VMSTATE_STRUCT(env, AlphaCPU, 1, vmstate_env, CPUAlphaState),
     VMSTATE_END_OF_LIST()
 };
 

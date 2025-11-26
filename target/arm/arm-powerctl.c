@@ -21,11 +21,11 @@
 #define DEBUG_ARM_POWERCTL 0
 #endif
 
-#define DPRINTF(fmt, args...) \
-    do { \
-        if (DEBUG_ARM_POWERCTL) { \
-            fprintf(stderr, "[ARM]%s: " fmt , __func__, ##args); \
-        } \
+#define DPRINTF(fmt, args...)                                   \
+    do {                                                        \
+        if (DEBUG_ARM_POWERCTL) {                               \
+            fprintf(stderr, "[ARM]%s: " fmt, __func__, ##args); \
+        }                                                       \
     } while (0)
 
 CPUState *arm_get_cpu_by_id(uint64_t id)
@@ -34,7 +34,7 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
 
     DPRINTF("cpu %" PRId64 "\n", id);
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         ARMCPU *armcpu = ARM_CPU(cpu);
 
         if (armcpu->mp_affinity == id) {
@@ -43,8 +43,8 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
     }
 
     qemu_log_mask(LOG_GUEST_ERROR,
-                  "[ARM]%s: Requesting unknown CPU %" PRId64 "\n",
-                  __func__, id);
+                  "[ARM]%s: Requesting unknown CPU %" PRId64 "\n", __func__,
+                  id);
 
     return NULL;
 }
@@ -61,15 +61,15 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
                                       run_on_cpu_data data)
 {
     ARMCPU *target_cpu = ARM_CPU(target_cpu_state);
-    struct CpuOnInfo *info = (struct CpuOnInfo *) data.host_ptr;
+    struct CpuOnInfo *info = (struct CpuOnInfo *)data.host_ptr;
 
     /* Initialize the cpu we are turning on */
     cpu_reset(target_cpu_state);
     target_cpu_state->halted = 0;
 
     if (info->target_aa64) {
-        if ((info->target_el < 3) && arm_feature(&target_cpu->env,
-                                                 ARM_FEATURE_EL3)) {
+        if ((info->target_el < 3) &&
+            arm_feature(&target_cpu->env, ARM_FEATURE_EL3)) {
             /*
              * As target mode is AArch64, we need to set lower
              * exception level (the requested level 2) to AArch64
@@ -77,8 +77,8 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
             target_cpu->env.cp15.scr_el3 |= SCR_RW;
         }
 
-        if ((info->target_el < 2) && arm_feature(&target_cpu->env,
-                                                 ARM_FEATURE_EL2)) {
+        if ((info->target_el < 2) &&
+            arm_feature(&target_cpu->env, ARM_FEATURE_EL2)) {
             /*
              * As target mode is AArch64, we need to set lower
              * exception level (the requested level 1) to AArch64
@@ -89,8 +89,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
         target_cpu->env.pstate = aarch64_pstate_mode(info->target_el, true);
     } else {
         /* We are requested to boot in AArch32 mode */
-        static const uint32_t mode_for_el[] = { 0,
-                                                ARM_CPU_MODE_SVC,
+        static const uint32_t mode_for_el[] = { 0, ARM_CPU_MODE_SVC,
                                                 ARM_CPU_MODE_HYP,
                                                 ARM_CPU_MODE_SVC };
 
@@ -113,8 +112,8 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
          * to make sure a CPU targeting EL2 comes out of reset with a
          * functional HVC insn.
          */
-        if (arm_feature(&target_cpu->env, ARM_FEATURE_EL3)
-            && info->target_el == 2) {
+        if (arm_feature(&target_cpu->env, ARM_FEATURE_EL3) &&
+            info->target_el == 2) {
             target_cpu->env.cp15.scr_el3 |= SCR_HCE;
         }
     }
@@ -153,7 +152,8 @@ int arm_set_cpu_on(uint64_t cpuid, uint64_t entry, uint64_t context_id,
     assert(qemu_mutex_iothread_locked());
 
     DPRINTF("cpu %" PRId64 " (EL %d, %s) @ 0x%" PRIx64 " with R0 = 0x%" PRIx64
-            "\n", cpuid, target_el, target_aa64 ? "aarch64" : "aarch32", entry,
+            "\n",
+            cpuid, target_el, target_aa64 ? "aarch64" : "aarch32", entry,
             context_id);
 
     /* requested EL level need to be in the 1 to 3 range */
@@ -177,8 +177,8 @@ int arm_set_cpu_on(uint64_t cpuid, uint64_t entry, uint64_t context_id,
     target_cpu = ARM_CPU(target_cpu_state);
     if (target_cpu->power_state == PSCI_ON) {
         qemu_log_mask(LOG_GUEST_ERROR,
-                      "[ARM]%s: CPU %" PRId64 " is already on\n",
-                      __func__, cpuid);
+                      "[ARM]%s: CPU %" PRId64 " is already on\n", __func__,
+                      cpuid);
         return QEMU_ARM_POWERCTL_ALREADY_ON;
     }
 
@@ -268,8 +268,8 @@ int arm_set_cpu_on_and_reset(uint64_t cpuid)
     target_cpu = ARM_CPU(target_cpu_state);
     if (target_cpu->power_state == PSCI_ON) {
         qemu_log_mask(LOG_GUEST_ERROR,
-                      "[ARM]%s: CPU %" PRId64 " is already on\n",
-                      __func__, cpuid);
+                      "[ARM]%s: CPU %" PRId64 " is already on\n", __func__,
+                      cpuid);
         return QEMU_ARM_POWERCTL_ALREADY_ON;
     }
 
@@ -321,8 +321,8 @@ int arm_set_cpu_off(uint64_t cpuid)
     target_cpu = ARM_CPU(target_cpu_state);
     if (target_cpu->power_state == PSCI_OFF) {
         qemu_log_mask(LOG_GUEST_ERROR,
-                      "[ARM]%s: CPU %" PRId64 " is already off\n",
-                      __func__, cpuid);
+                      "[ARM]%s: CPU %" PRId64 " is already off\n", __func__,
+                      cpuid);
         return QEMU_ARM_POWERCTL_IS_OFF;
     }
 
@@ -357,8 +357,7 @@ int arm_reset_cpu(uint64_t cpuid)
     target_cpu = ARM_CPU(target_cpu_state);
 
     if (target_cpu->power_state == PSCI_OFF) {
-        qemu_log_mask(LOG_GUEST_ERROR,
-                      "[ARM]%s: CPU %" PRId64 " is off\n",
+        qemu_log_mask(LOG_GUEST_ERROR, "[ARM]%s: CPU %" PRId64 " is off\n",
                       __func__, cpuid);
         return QEMU_ARM_POWERCTL_IS_OFF;
     }

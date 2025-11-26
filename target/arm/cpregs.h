@@ -29,79 +29,79 @@ enum {
      * Register must be handled specially during translation.
      * The method is one of the values below:
      */
-    ARM_CP_SPECIAL_MASK          = 0x000f,
+    ARM_CP_SPECIAL_MASK = 0x000f,
     /* Special: no change to PE state: writes ignored, reads ignored. */
-    ARM_CP_NOP                   = 0x0001,
+    ARM_CP_NOP = 0x0001,
     /* Special: sysreg is WFI, for v5 and v6. */
-    ARM_CP_WFI                   = 0x0002,
+    ARM_CP_WFI = 0x0002,
     /* Special: sysreg is NZCV. */
-    ARM_CP_NZCV                  = 0x0003,
+    ARM_CP_NZCV = 0x0003,
     /* Special: sysreg is CURRENTEL. */
-    ARM_CP_CURRENTEL             = 0x0004,
+    ARM_CP_CURRENTEL = 0x0004,
     /* Special: sysreg is DC ZVA or similar. */
-    ARM_CP_DC_ZVA                = 0x0005,
-    ARM_CP_DC_GVA                = 0x0006,
-    ARM_CP_DC_GZVA               = 0x0007,
+    ARM_CP_DC_ZVA = 0x0005,
+    ARM_CP_DC_GVA = 0x0006,
+    ARM_CP_DC_GZVA = 0x0007,
 
     /* Flag: reads produce resetvalue; writes ignored. */
-    ARM_CP_CONST                 = 1 << 4,
+    ARM_CP_CONST = 1 << 4,
     /* Flag: For ARM_CP_STATE_AA32, sysreg is 64-bit. */
-    ARM_CP_64BIT                 = 1 << 5,
+    ARM_CP_64BIT = 1 << 5,
     /*
      * Flag: TB should not be ended after a write to this register
      * (the default is that the TB ends after cp writes).
      */
-    ARM_CP_SUPPRESS_TB_END       = 1 << 6,
+    ARM_CP_SUPPRESS_TB_END = 1 << 6,
     /*
      * Flag: Permit a register definition to override a previous definition
      * for the same (cp, is64, crn, crm, opc1, opc2) tuple: either the new
      * or the old must have the ARM_CP_OVERRIDE bit set.
      */
-    ARM_CP_OVERRIDE              = 1 << 7,
+    ARM_CP_OVERRIDE = 1 << 7,
     /*
      * Flag: Register is an alias view of some underlying state which is also
      * visible via another register, and that the other register is handling
      * migration and reset; registers marked ARM_CP_ALIAS will not be migrated
      * but may have their state set by syncing of register state from KVM.
      */
-    ARM_CP_ALIAS                 = 1 << 8,
+    ARM_CP_ALIAS = 1 << 8,
     /*
      * Flag: Register does I/O and therefore its accesses need to be marked
      * with translator_io_start() and also end the TB. In particular,
      * registers which implement clocks or timers require this.
      */
-    ARM_CP_IO                    = 1 << 9,
+    ARM_CP_IO = 1 << 9,
     /*
      * Flag: Register has no underlying state and does not support raw access
      * for state saving/loading; it will not be used for either migration or
      * KVM state synchronization. Typically this is for "registers" which are
      * actually used as instructions for cache maintenance and so on.
      */
-    ARM_CP_NO_RAW                = 1 << 10,
+    ARM_CP_NO_RAW = 1 << 10,
     /*
      * Flag: The read or write hook might raise an exception; the generated
      * code will synchronize the CPU state before calling the hook so that it
      * is safe for the hook to call raise_exception().
      */
-    ARM_CP_RAISES_EXC            = 1 << 11,
+    ARM_CP_RAISES_EXC = 1 << 11,
     /*
      * Flag: Writes to the sysreg might change the exception level - typically
      * on older ARM chips. For those cases we need to re-read the new el when
      * recomputing the translation flags.
      */
-    ARM_CP_NEWEL                 = 1 << 12,
+    ARM_CP_NEWEL = 1 << 12,
     /*
      * Flag: Access check for this sysreg is identical to accessing FPU state
      * from an instruction: use translation fp_access_check().
      */
-    ARM_CP_FPU                   = 1 << 13,
+    ARM_CP_FPU = 1 << 13,
     /*
      * Flag: Access check for this sysreg is identical to accessing SVE state
      * from an instruction: use translation sve_access_check().
      */
-    ARM_CP_SVE                   = 1 << 14,
+    ARM_CP_SVE = 1 << 14,
     /* Flag: Do not expose in gdb sysreg xml. */
-    ARM_CP_NO_GDB                = 1 << 15,
+    ARM_CP_NO_GDB = 1 << 15,
     /*
      * Flags: If EL3 but not EL2...
      *   - UNDEF: discard the cpreg,
@@ -110,14 +110,14 @@ enum {
      *   -  else: set const on the cpreg, zero resetvalue, aka RES0.
      * See rule RJFFP in section D1.1.3 of DDI0487H.a.
      */
-    ARM_CP_EL3_NO_EL2_UNDEF      = 1 << 16,
-    ARM_CP_EL3_NO_EL2_KEEP       = 1 << 17,
-    ARM_CP_EL3_NO_EL2_C_NZ       = 1 << 18,
+    ARM_CP_EL3_NO_EL2_UNDEF = 1 << 16,
+    ARM_CP_EL3_NO_EL2_KEEP = 1 << 17,
+    ARM_CP_EL3_NO_EL2_C_NZ = 1 << 18,
     /*
      * Flag: Access check for this sysreg is constrained by the
      * ARM pseudocode function CheckSMEAccess().
      */
-    ARM_CP_SME                   = 1 << 19,
+    ARM_CP_SME = 1 << 19,
 };
 
 /*
@@ -160,17 +160,16 @@ enum {
 #define CP_REG_NS_SHIFT 29
 #define CP_REG_NS_MASK (1 << CP_REG_NS_SHIFT)
 
-#define ENCODE_CP_REG(cp, is64, ns, crn, crm, opc1, opc2)   \
-    ((ns) << CP_REG_NS_SHIFT | ((cp) << 16) | ((is64) << 15) |   \
-     ((crn) << 11) | ((crm) << 7) | ((opc1) << 3) | (opc2))
+#define ENCODE_CP_REG(cp, is64, ns, crn, crm, opc1, opc2)                      \
+    ((ns) << CP_REG_NS_SHIFT | ((cp) << 16) | ((is64) << 15) | ((crn) << 11) | \
+     ((crm) << 7) | ((opc1) << 3) | (opc2))
 
-#define ENCODE_AA64_CP_REG(cp, crn, crm, op0, op1, op2) \
-    (CP_REG_AA64_MASK |                                 \
-     ((cp) << CP_REG_ARM_COPROC_SHIFT) |                \
-     ((op0) << CP_REG_ARM64_SYSREG_OP0_SHIFT) |         \
-     ((op1) << CP_REG_ARM64_SYSREG_OP1_SHIFT) |         \
-     ((crn) << CP_REG_ARM64_SYSREG_CRN_SHIFT) |         \
-     ((crm) << CP_REG_ARM64_SYSREG_CRM_SHIFT) |         \
+#define ENCODE_AA64_CP_REG(cp, crn, crm, op0, op1, op2)     \
+    (CP_REG_AA64_MASK | ((cp) << CP_REG_ARM_COPROC_SHIFT) | \
+     ((op0) << CP_REG_ARM64_SYSREG_OP0_SHIFT) |             \
+     ((op1) << CP_REG_ARM64_SYSREG_OP1_SHIFT) |             \
+     ((crn) << CP_REG_ARM64_SYSREG_CRN_SHIFT) |             \
+     ((crm) << CP_REG_ARM64_SYSREG_CRM_SHIFT) |             \
      ((op2) << CP_REG_ARM64_SYSREG_OP2_SHIFT))
 
 /*
@@ -191,7 +190,7 @@ static inline uint32_t kvm_to_cpreg_id(uint64_t kvmid)
          * KVM is always non-secure so add the NS flag on AArch32 register
          * entries.
          */
-         cpregid |= 1 << CP_REG_NS_SHIFT;
+        cpregid |= 1 << CP_REG_NS_SHIFT;
     }
     return cpregid;
 }
@@ -246,9 +245,9 @@ typedef enum {
  * or non-secure.
  */
 typedef enum {
-    ARM_CP_SECSTATE_BOTH = 0,       /* define one cpreg for each secstate */
-    ARM_CP_SECSTATE_S =   (1 << 0), /* bit[0]: Secure state register */
-    ARM_CP_SECSTATE_NS =  (1 << 1), /* bit[1]: Non-secure state register */
+    ARM_CP_SECSTATE_BOTH = 0, /* define one cpreg for each secstate */
+    ARM_CP_SECSTATE_S = (1 << 0), /* bit[0]: Secure state register */
+    ARM_CP_SECSTATE_NS = (1 << 1), /* bit[1]: Non-secure state register */
 } CPSecureState;
 
 /*
@@ -279,12 +278,12 @@ typedef enum {
     PL0_R = 0x02 | PL1_R,
     PL0_W = 0x01 | PL1_W,
 
-    /*
-     * For user-mode some registers are accessible to EL0 via a kernel
-     * trap-and-emulate ABI. In this case we define the read permissions
-     * as actually being PL0_R. However some bits of any given register
-     * may still be masked.
-     */
+/*
+ * For user-mode some registers are accessible to EL0 via a kernel
+ * trap-and-emulate ABI. In this case we define the read permissions
+ * as actually being PL0_R. However some bits of any given register
+ * may still be masked.
+ */
 #ifdef CONFIG_USER_ONLY
     PL0U_R = PL0_R,
 #else
@@ -624,11 +623,11 @@ FIELD(FGT, BITPOS, 0, 6) /* Bit position within the uint64_t */
  * fields. We assume for brevity's sake that there are no duplicated
  * bit names across the various FGT registers.
  */
-#define DO_BIT(REG, BITNAME)                                    \
+#define DO_BIT(REG, BITNAME) \
     FGT_##BITNAME = FGT_##REG | R_##REG##_EL2_##BITNAME##_SHIFT
 
 /* Some bits have reversed sense, so 0 means trap and 1 means not */
-#define DO_REV_BIT(REG, BITNAME)                                        \
+#define DO_REV_BIT(REG, BITNAME) \
     FGT_##BITNAME = FGT_##REG | FGT_REV | R_##REG##_EL2_##BITNAME##_SHIFT
 
 typedef enum FGTBit {
@@ -813,8 +812,7 @@ typedef uint64_t CPReadFn(CPUARMState *env, const ARMCPRegInfo *opaque);
 typedef void CPWriteFn(CPUARMState *env, const ARMCPRegInfo *opaque,
                        uint64_t value);
 /* Access permission check functions for coprocessor registers. */
-typedef CPAccessResult CPAccessFn(CPUARMState *env,
-                                  const ARMCPRegInfo *opaque,
+typedef CPAccessResult CPAccessFn(CPUARMState *env, const ARMCPRegInfo *opaque,
                                   bool isread);
 /* Hook function for register reset */
 typedef void CPResetFn(CPUARMState *env, const ARMCPRegInfo *opaque);
@@ -970,11 +968,11 @@ static inline void define_one_arm_cp_reg(ARMCPU *cpu, const ARMCPRegInfo *regs)
 void define_arm_cp_regs_with_opaque_len(ARMCPU *cpu, const ARMCPRegInfo *regs,
                                         void *opaque, size_t len);
 
-#define define_arm_cp_regs_with_opaque(CPU, REGS, OPAQUE)               \
-    do {                                                                \
-        QEMU_BUILD_BUG_ON(ARRAY_SIZE(REGS) == 0);                       \
-        define_arm_cp_regs_with_opaque_len(CPU, REGS, OPAQUE,           \
-                                           ARRAY_SIZE(REGS));           \
+#define define_arm_cp_regs_with_opaque(CPU, REGS, OPAQUE)     \
+    do {                                                      \
+        QEMU_BUILD_BUG_ON(ARRAY_SIZE(REGS) == 0);             \
+        define_arm_cp_regs_with_opaque_len(CPU, REGS, OPAQUE, \
+                                           ARRAY_SIZE(REGS)); \
     } while (0)
 
 #define define_arm_cp_regs(CPU, REGS) \
@@ -1006,12 +1004,12 @@ void modify_arm_cp_regs_with_len(ARMCPRegInfo *regs, size_t regs_len,
                                  const ARMCPRegUserSpaceInfo *mods,
                                  size_t mods_len);
 
-#define modify_arm_cp_regs(REGS, MODS)                                  \
-    do {                                                                \
-        QEMU_BUILD_BUG_ON(ARRAY_SIZE(REGS) == 0);                       \
-        QEMU_BUILD_BUG_ON(ARRAY_SIZE(MODS) == 0);                       \
-        modify_arm_cp_regs_with_len(REGS, ARRAY_SIZE(REGS),             \
-                                    MODS, ARRAY_SIZE(MODS));            \
+#define modify_arm_cp_regs(REGS, MODS)                            \
+    do {                                                          \
+        QEMU_BUILD_BUG_ON(ARRAY_SIZE(REGS) == 0);                 \
+        QEMU_BUILD_BUG_ON(ARRAY_SIZE(MODS) == 0);                 \
+        modify_arm_cp_regs_with_len(REGS, ARRAY_SIZE(REGS), MODS, \
+                                    ARRAY_SIZE(MODS));            \
     } while (0)
 
 /* CPWriteFn that can be used to implement writes-ignored behaviour */
@@ -1038,8 +1036,8 @@ static inline bool cpreg_field_is_64bit(const ARMCPRegInfo *ri)
     return (ri->state == ARM_CP_STATE_AA64) || (ri->type & ARM_CP_64BIT);
 }
 
-static inline bool cp_access_ok(int current_el,
-                                const ARMCPRegInfo *ri, int isread)
+static inline bool cp_access_ok(int current_el, const ARMCPRegInfo *ri,
+                                int isread)
 {
     return (ri->access >> ((current_el * 2) + isread)) & 1;
 }
@@ -1053,11 +1051,11 @@ uint64_t read_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri);
  * as EC_SYSTEMREGISTERTRAP rather than EC_UNCATEGORIZED).
  */
 static inline bool arm_cpreg_encoding_in_idspace(uint8_t opc0, uint8_t opc1,
-                                                 uint8_t opc2,
-                                                 uint8_t crn, uint8_t crm)
+                                                 uint8_t opc2, uint8_t crn,
+                                                 uint8_t crm)
 {
-    return opc0 == 3 && (opc1 == 0 || opc1 == 1 || opc1 == 3) &&
-        crn == 0 && crm < 8;
+    return opc0 == 3 && (opc1 == 0 || opc1 == 1 || opc1 == 3) && crn == 0 &&
+           crm < 8;
 }
 
 /*
@@ -1067,12 +1065,14 @@ static inline bool arm_cpreg_encoding_in_idspace(uint8_t opc0, uint8_t opc1,
 static inline bool arm_cpreg_in_idspace(const ARMCPRegInfo *ri)
 {
     return ri->state == ARM_CP_STATE_AA64 &&
-        arm_cpreg_encoding_in_idspace(ri->opc0, ri->opc1, ri->opc2,
-                                      ri->crn, ri->crm);
+           arm_cpreg_encoding_in_idspace(ri->opc0, ri->opc1, ri->opc2, ri->crn,
+                                         ri->crm);
 }
 
 #ifdef CONFIG_USER_ONLY
-static inline void define_cortex_a72_a57_a53_cp_reginfo(ARMCPU *cpu) { }
+static inline void define_cortex_a72_a57_a53_cp_reginfo(ARMCPU *cpu)
+{
+}
 #else
 void define_cortex_a72_a57_a53_cp_reginfo(ARMCPU *cpu);
 #endif

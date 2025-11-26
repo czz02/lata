@@ -23,7 +23,8 @@
 #include "exec/exec-all.h"
 #include "exec/cpu_ldst.h"
 
-static void do_unaligned_access(CPUAlphaState *env, vaddr addr, uintptr_t retaddr)
+static void do_unaligned_access(CPUAlphaState *env, vaddr addr,
+                                uintptr_t retaddr)
 {
     uint64_t pc;
     uint32_t insn;
@@ -34,8 +35,8 @@ static void do_unaligned_access(CPUAlphaState *env, vaddr addr, uintptr_t retadd
     insn = cpu_ldl_code(env, pc);
 
     env->trap_arg0 = addr;
-    env->trap_arg1 = insn >> 26;                /* opcode */
-    env->trap_arg2 = (insn >> 21) & 31;         /* dest regno */
+    env->trap_arg1 = insn >> 26; /* opcode */
+    env->trap_arg2 = (insn >> 21) & 31; /* dest regno */
 }
 
 #ifdef CONFIG_USER_ONLY
@@ -49,8 +50,8 @@ void alpha_cpu_record_sigbus(CPUState *cs, vaddr addr,
 }
 #else
 void alpha_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                   MMUAccessType access_type,
-                                   int mmu_idx, uintptr_t retaddr)
+                                   MMUAccessType access_type, int mmu_idx,
+                                   uintptr_t retaddr)
 {
     AlphaCPU *cpu = ALPHA_CPU(cs);
     CPUAlphaState *env = &cpu->env;
@@ -61,9 +62,8 @@ void alpha_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
     cpu_loop_exit(cs);
 }
 
-void alpha_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                     vaddr addr, unsigned size,
-                                     MMUAccessType access_type,
+void alpha_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                     unsigned size, MMUAccessType access_type,
                                      int mmu_idx, MemTxAttrs attrs,
                                      MemTxResult response, uintptr_t retaddr)
 {

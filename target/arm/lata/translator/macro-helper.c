@@ -1,12 +1,12 @@
 #include "lata.h"
 
 /**
-* @brief imm_helper - The base interface that load immediate to gpr
-*
-* @param opnd2 - the dest opnd
-* @param hi32
-* @param lo32
-*/
+ * @brief imm_helper - The base interface that load immediate to gpr
+ *
+ * @param opnd2 - the dest opnd
+ * @param hi32
+ * @param lo32
+ */
 static void imm_helper(IR2_OPND opnd2, uint32_t hi32, uint32_t lo32)
 {
     /*
@@ -30,15 +30,13 @@ static void imm_helper(IR2_OPND opnd2, uint32_t hi32, uint32_t lo32)
      * | imm[63:52] | bit3   | part3 |
      *
      */
-    sign_bitmap = (((hi32 & 0x80000000) != 0) << 3) |
-                  (((hi32 & 0x00080000) != 0) << 2) |
-                  (((lo32 & 0x80000000) != 0) << 1) |
-                  ((lo32 & 0x00000800) != 0);
+    sign_bitmap =
+        (((hi32 & 0x80000000) != 0) << 3) | (((hi32 & 0x00080000) != 0) << 2) |
+        (((lo32 & 0x80000000) != 0) << 1) | ((lo32 & 0x00000800) != 0);
     /* 1 means that this part equals 0 */
-    all0_bitmap = (((hi32 & 0xfff00000) == 0) << 3) |
-                  (((hi32 & 0x000fffff) == 0) << 2) |
-                  (((lo32 & 0xfffff000) == 0) << 1) |
-                  ((lo32 & 0x00000fff) == 0);
+    all0_bitmap =
+        (((hi32 & 0xfff00000) == 0) << 3) | (((hi32 & 0x000fffff) == 0) << 2) |
+        (((lo32 & 0xfffff000) == 0) << 1) | ((lo32 & 0x00000fff) == 0);
     /* 1 means that this part equals -1 */
     allf_bitmap = (((hi32 & 0xfff00000) == 0xfff00000) << 3) |
                   (((hi32 & 0x000fffff) == 0x000fffff) << 2) |
@@ -51,8 +49,8 @@ static void imm_helper(IR2_OPND opnd2, uint32_t hi32, uint32_t lo32)
      *
      * bit0 equals 1 means part0 equals 0.
      */
-    sign_extension_by_previous = (all0_bitmap ^ allf_bitmap) &
-                                 (all0_bitmap ^ (sign_bitmap << 1));
+    sign_extension_by_previous =
+        (all0_bitmap ^ allf_bitmap) & (all0_bitmap ^ (sign_bitmap << 1));
     extension_by_previous_lo = sign_extension_by_previous & 0x3;
     extension_by_previous_hi = sign_extension_by_previous >> 2;
 
@@ -144,11 +142,11 @@ static void imm_helper(IR2_OPND opnd2, uint32_t hi32, uint32_t lo32)
 }
 
 /**
-* @brief li_d - macro instruction, semantic equivalent to li.d rd, {s,u}64
-*
-* @param opnd2 - the dest opnd
-* @param value
-*/
+ * @brief li_d - macro instruction, semantic equivalent to li.d rd, {s,u}64
+ *
+ * @param opnd2 - the dest opnd
+ * @param value
+ */
 void li_d(IR2_OPND opnd2, int64_t value)
 {
     uint32_t hi32, lo32;
@@ -159,11 +157,11 @@ void li_d(IR2_OPND opnd2, int64_t value)
 }
 
 /**
-* @brief li_w - macro instruction, semantic equivalent to li.d rd, s32
-*
-* @param opnd2 - the dest opnd
-* @param lo32
-*/
+ * @brief li_w - macro instruction, semantic equivalent to li.d rd, s32
+ *
+ * @param opnd2 - the dest opnd
+ * @param lo32
+ */
 void li_w(IR2_OPND opnd2, uint32_t lo32)
 {
     uint32_t hi32;
@@ -173,24 +171,24 @@ void li_w(IR2_OPND opnd2, uint32_t lo32)
 }
 
 /**
-* @brief li_wu - macro instruction, semantic equivalent to li.d rd, u32
-*
-* @param opnd2 - the dest opnd
-* @param lo32
-*/
+ * @brief li_wu - macro instruction, semantic equivalent to li.d rd, u32
+ *
+ * @param opnd2 - the dest opnd
+ * @param lo32
+ */
 void li_wu(IR2_OPND opnd2, uint32_t lo32)
 {
     imm_helper(opnd2, 0, lo32);
 }
 
 /**
-* @brief la_ld_by_op_size - load by opnd size
-*
-* @param rd
-* @param rj
-* @param imm_si12
-* @param op_size
-*/
+ * @brief la_ld_by_op_size - load by opnd size
+ *
+ * @param rd
+ * @param rj
+ * @param imm_si12
+ * @param op_size
+ */
 void la_ld_by_op_size(IR2_OPND rd, IR2_OPND rj, int imm_si12, int op_size)
 {
     switch (op_size) {
@@ -213,13 +211,13 @@ void la_ld_by_op_size(IR2_OPND rd, IR2_OPND rj, int imm_si12, int op_size)
 }
 
 /**
-* @brief la_st_by_op_size - store by opnd size
-*
-* @param rd
-* @param rj
-* @param imm_si12
-* @param op_size
-*/
+ * @brief la_st_by_op_size - store by opnd size
+ *
+ * @param rd
+ * @param rj
+ * @param imm_si12
+ * @param op_size
+ */
 void la_st_by_op_size(IR2_OPND rd, IR2_OPND rj, int imm_si12, int op_size)
 {
     switch (op_size) {

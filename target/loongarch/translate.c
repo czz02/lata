@@ -25,15 +25,15 @@ static TCGv cpu_lladdr, cpu_llval;
 
 #define HELPER_H "helper.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
-#define DISAS_STOP        DISAS_TARGET_0
-#define DISAS_EXIT        DISAS_TARGET_1
+#define DISAS_STOP DISAS_TARGET_0
+#define DISAS_EXIT DISAS_TARGET_1
 #define DISAS_EXIT_UPDATE DISAS_TARGET_2
 
 static inline int vec_full_offset(int regno)
 {
-    return  offsetof(CPULoongArchState, fpr[regno]);
+    return offsetof(CPULoongArchState, fpr[regno]);
 }
 
 static inline void get_vreg64(TCGv_i64 dest, int regno, int index)
@@ -196,7 +196,7 @@ static TCGv get_fpr(DisasContext *ctx, int reg_num)
     TCGv t = tcg_temp_new();
     tcg_gen_ld_i64(t, cpu_env,
                    offsetof(CPULoongArchState, fpr[reg_num].vreg.D(0)));
-    return  t;
+    return t;
 }
 
 static void set_fpr(int reg_num, TCGv val)
@@ -229,8 +229,8 @@ static void loongarch_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
     ctx->opcode = translator_ldl(env, &ctx->base, ctx->base.pc_next);
 
     if (!decode(ctx, ctx->opcode)) {
-        qemu_log_mask(LOG_UNIMP, "Error: unknown opcode. "
-                      TARGET_FMT_lx ": 0x%x\n",
+        qemu_log_mask(LOG_UNIMP,
+                      "Error: unknown opcode. " TARGET_FMT_lx ": 0x%x\n",
                       ctx->base.pc_next, ctx->opcode);
         generate_exception(ctx, EXCCODE_INE);
     }
@@ -272,11 +272,11 @@ static void loongarch_tr_disas_log(const DisasContextBase *dcbase,
 
 static const TranslatorOps loongarch_tr_ops = {
     .init_disas_context = loongarch_tr_init_disas_context,
-    .tb_start           = loongarch_tr_tb_start,
-    .insn_start         = loongarch_tr_insn_start,
-    .translate_insn     = loongarch_tr_translate_insn,
-    .tb_stop            = loongarch_tr_tb_stop,
-    .disas_log          = loongarch_tr_disas_log,
+    .tb_start = loongarch_tr_tb_start,
+    .insn_start = loongarch_tr_insn_start,
+    .translate_insn = loongarch_tr_translate_insn,
+    .tb_stop = loongarch_tr_tb_stop,
+    .disas_log = loongarch_tr_disas_log,
 };
 
 void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
@@ -284,8 +284,8 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
 {
     DisasContext ctx;
 
-    translator_loop(cs, tb, max_insns, pc, host_pc,
-                    &loongarch_tr_ops, &ctx.base);
+    translator_loop(cs, tb, max_insns, pc, host_pc, &loongarch_tr_ops,
+                    &ctx.base);
 }
 
 void loongarch_translate_init(void)
@@ -294,14 +294,13 @@ void loongarch_translate_init(void)
 
     cpu_gpr[0] = NULL;
     for (i = 1; i < 32; i++) {
-        cpu_gpr[i] = tcg_global_mem_new(cpu_env,
-                                        offsetof(CPULoongArchState, gpr[i]),
-                                        regnames[i]);
+        cpu_gpr[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPULoongArchState, gpr[i]), regnames[i]);
     }
 
     cpu_pc = tcg_global_mem_new(cpu_env, offsetof(CPULoongArchState, pc), "pc");
-    cpu_lladdr = tcg_global_mem_new(cpu_env,
-                    offsetof(CPULoongArchState, lladdr), "lladdr");
-    cpu_llval = tcg_global_mem_new(cpu_env,
-                    offsetof(CPULoongArchState, llval), "llval");
+    cpu_lladdr = tcg_global_mem_new(
+        cpu_env, offsetof(CPULoongArchState, lladdr), "lladdr");
+    cpu_llval = tcg_global_mem_new(cpu_env, offsetof(CPULoongArchState, llval),
+                                   "llval");
 }

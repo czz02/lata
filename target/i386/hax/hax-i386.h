@@ -65,8 +65,7 @@ int hax_vcpu_run(AccelCPUState *vcpu);
 int hax_vcpu_create(int id);
 void hax_kick_vcpu_thread(CPUState *cpu);
 
-int hax_sync_vcpu_state(CPUArchState *env, struct vcpu_state_t *state,
-                        int set);
+int hax_sync_vcpu_state(CPUArchState *env, struct vcpu_state_t *state, int set);
 int hax_sync_msr(CPUArchState *env, struct hax_msr_data *msrs, int set);
 int hax_sync_fpu(CPUArchState *env, struct fx_layout *fl, int set);
 

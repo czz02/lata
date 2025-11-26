@@ -60,20 +60,19 @@ uint64_t vfp_expand_imm(int size, uint8_t imm8)
     switch (size) {
     case MO_64:
         imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
-            (extract32(imm8, 6, 1) ? 0x3fc0 : 0x4000) |
-            extract32(imm8, 0, 6);
+              (extract32(imm8, 6, 1) ? 0x3fc0 : 0x4000) | extract32(imm8, 0, 6);
         imm <<= 48;
         break;
     case MO_32:
         imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
-            (extract32(imm8, 6, 1) ? 0x3e00 : 0x4000) |
-            (extract32(imm8, 0, 6) << 3);
+              (extract32(imm8, 6, 1) ? 0x3e00 : 0x4000) |
+              (extract32(imm8, 0, 6) << 3);
         imm <<= 16;
         break;
     case MO_16:
         imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
-            (extract32(imm8, 6, 1) ? 0x3000 : 0x4000) |
-            (extract32(imm8, 0, 6) << 6);
+              (extract32(imm8, 6, 1) ? 0x3000 : 0x4000) |
+              (extract32(imm8, 0, 6) << 6);
         break;
     default:
         g_assert_not_reached();
@@ -234,9 +233,9 @@ static bool vfp_access_check_a(DisasContext *s, bool ignore_vfp_enabled)
      * appear to be any insns which touch VFP which are allowed.
      */
     if (s->sme_trap_nonstreaming) {
-        gen_exception_insn(s, 0, EXCP_UDEF,
-                           syn_smetrap(SME_ET_Streaming,
-                                       curr_insn_len(s) == 2));
+        gen_exception_insn(
+            s, 0, EXCP_UDEF,
+            syn_smetrap(SME_ET_Streaming, curr_insn_len(s) == 2));
         return false;
     }
 
@@ -266,8 +265,8 @@ bool vfp_access_check_m(DisasContext *s, bool skip_context_update)
          * the encoding space handled by the patterns in m-nocp.decode,
          * and for them we may need to raise NOCP here.
          */
-        gen_exception_insn_el(s, 0, EXCP_NOCP,
-                              syn_uncategorized(), s->fp_excp_el);
+        gen_exception_insn_el(s, 0, EXCP_NOCP, syn_uncategorized(),
+                              s->fp_excp_el);
         return false;
     }
 
@@ -620,9 +619,8 @@ static bool trans_VMOV_to_gp(DisasContext *s, arg_VMOV_to_gp *a)
      * all sizes, whether the CPU has fp or not.
      */
     if (!dc_isar_feature(aa32_mve, s)) {
-        if (a->size == MO_32
-            ? !dc_isar_feature(aa32_fpsp_v2, s)
-            : !arm_dc_feature(s, ARM_FEATURE_NEON)) {
+        if (a->size == MO_32 ? !dc_isar_feature(aa32_fpsp_v2, s) :
+                               !arm_dc_feature(s, ARM_FEATURE_NEON)) {
             return false;
         }
     }
@@ -665,9 +663,8 @@ static bool trans_VMOV_from_gp(DisasContext *s, arg_VMOV_from_gp *a)
      * all sizes, whether the CPU has fp or not.
      */
     if (!dc_isar_feature(aa32_mve, s)) {
-        if (a->size == MO_32
-            ? !dc_isar_feature(aa32_fpsp_v2, s)
-            : !arm_dc_feature(s, ARM_FEATURE_NEON)) {
+        if (a->size == MO_32 ? !dc_isar_feature(aa32_fpsp_v2, s) :
+                               !arm_dc_feature(s, ARM_FEATURE_NEON)) {
             return false;
         }
     }
@@ -735,8 +732,8 @@ static bool trans_VDUP(DisasContext *s, arg_VDUP *a)
     }
 
     tmp = load_reg(s, a->rt);
-    tcg_gen_gvec_dup_i32(size, neon_full_reg_offset(a->vn),
-                         vec_size, vec_size, tmp);
+    tcg_gen_gvec_dup_i32(size, neon_full_reg_offset(a->vn), vec_size, vec_size,
+                         tmp);
     return true;
 }
 
@@ -815,8 +812,7 @@ static bool trans_VMSR_VMRS(DisasContext *s, arg_VMSR_VMRS *a)
             if (s->current_el == 1) {
                 gen_set_condexec(s);
                 gen_update_pc(s, 0);
-                gen_helper_check_hcr_el2_trap(cpu_env,
-                                              tcg_constant_i32(a->rt),
+                gen_helper_check_hcr_el2_trap(cpu_env, tcg_constant_i32(a->rt),
                                               tcg_constant_i32(a->reg));
             }
             /* fall through */
@@ -1296,10 +1292,10 @@ static bool trans_VLDM_VSTM_dp(DisasContext *s, arg_VLDM_VSTM_dp *a)
  * will contain the old value of the relevant VFP register;
  * otherwise it must be written to only.
  */
-typedef void VFPGen3OpSPFn(TCGv_i32 vd,
-                           TCGv_i32 vn, TCGv_i32 vm, TCGv_ptr fpst);
-typedef void VFPGen3OpDPFn(TCGv_i64 vd,
-                           TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst);
+typedef void VFPGen3OpSPFn(TCGv_i32 vd, TCGv_i32 vn, TCGv_i32 vm,
+                           TCGv_ptr fpst);
+typedef void VFPGen3OpDPFn(TCGv_i64 vd, TCGv_i64 vn, TCGv_i64 vm,
+                           TCGv_ptr fpst);
 
 /*
  * Types for callbacks for do_vfp_2op_sp() and do_vfp_2op_dp().
@@ -1350,8 +1346,8 @@ static inline int vfp_advance_dreg(int reg, int delta)
  * callback to do the actual operation; this function deals with the
  * code to handle looping around for VFP vector processing.
  */
-static bool do_vfp_3op_sp(DisasContext *s, VFPGen3OpSPFn *fn,
-                          int vd, int vn, int vm, bool reads_vd)
+static bool do_vfp_3op_sp(DisasContext *s, VFPGen3OpSPFn *fn, int vd, int vn,
+                          int vm, bool reads_vd)
 {
     uint32_t delta_m = 0;
     uint32_t delta_d = 0;
@@ -1422,8 +1418,8 @@ static bool do_vfp_3op_sp(DisasContext *s, VFPGen3OpSPFn *fn,
     return true;
 }
 
-static bool do_vfp_3op_hp(DisasContext *s, VFPGen3OpSPFn *fn,
-                          int vd, int vn, int vm, bool reads_vd)
+static bool do_vfp_3op_hp(DisasContext *s, VFPGen3OpSPFn *fn, int vd, int vn,
+                          int vm, bool reads_vd)
 {
     /*
      * Do a half-precision operation. Functionally this is
@@ -1464,8 +1460,8 @@ static bool do_vfp_3op_hp(DisasContext *s, VFPGen3OpSPFn *fn,
     return true;
 }
 
-static bool do_vfp_3op_dp(DisasContext *s, VFPGen3OpDPFn *fn,
-                          int vd, int vn, int vm, bool reads_vd)
+static bool do_vfp_3op_dp(DisasContext *s, VFPGen3OpDPFn *fn, int vd, int vn,
+                          int vm, bool reads_vd)
 {
     uint32_t delta_m = 0;
     uint32_t delta_d = 0;
@@ -2017,8 +2013,7 @@ static bool trans_VMINNM_hp(DisasContext *s, arg_VMINNM_sp *a)
     if (!dc_isar_feature(aa32_vminmaxnm, s)) {
         return false;
     }
-    return do_vfp_3op_hp(s, gen_helper_vfp_minnumh,
-                         a->vd, a->vn, a->vm, false);
+    return do_vfp_3op_hp(s, gen_helper_vfp_minnumh, a->vd, a->vn, a->vm, false);
 }
 
 static bool trans_VMAXNM_hp(DisasContext *s, arg_VMAXNM_sp *a)
@@ -2026,8 +2021,7 @@ static bool trans_VMAXNM_hp(DisasContext *s, arg_VMAXNM_sp *a)
     if (!dc_isar_feature(aa32_vminmaxnm, s)) {
         return false;
     }
-    return do_vfp_3op_hp(s, gen_helper_vfp_maxnumh,
-                         a->vd, a->vn, a->vm, false);
+    return do_vfp_3op_hp(s, gen_helper_vfp_maxnumh, a->vd, a->vn, a->vm, false);
 }
 
 static bool trans_VMINNM_sp(DisasContext *s, arg_VMINNM_sp *a)
@@ -2035,8 +2029,7 @@ static bool trans_VMINNM_sp(DisasContext *s, arg_VMINNM_sp *a)
     if (!dc_isar_feature(aa32_vminmaxnm, s)) {
         return false;
     }
-    return do_vfp_3op_sp(s, gen_helper_vfp_minnums,
-                         a->vd, a->vn, a->vm, false);
+    return do_vfp_3op_sp(s, gen_helper_vfp_minnums, a->vd, a->vn, a->vm, false);
 }
 
 static bool trans_VMAXNM_sp(DisasContext *s, arg_VMAXNM_sp *a)
@@ -2044,8 +2037,7 @@ static bool trans_VMAXNM_sp(DisasContext *s, arg_VMAXNM_sp *a)
     if (!dc_isar_feature(aa32_vminmaxnm, s)) {
         return false;
     }
-    return do_vfp_3op_sp(s, gen_helper_vfp_maxnums,
-                         a->vd, a->vn, a->vm, false);
+    return do_vfp_3op_sp(s, gen_helper_vfp_maxnums, a->vd, a->vn, a->vm, false);
 }
 
 static bool trans_VMINNM_dp(DisasContext *s, arg_VMINNM_dp *a)
@@ -2053,8 +2045,7 @@ static bool trans_VMINNM_dp(DisasContext *s, arg_VMINNM_dp *a)
     if (!dc_isar_feature(aa32_vminmaxnm, s)) {
         return false;
     }
-    return do_vfp_3op_dp(s, gen_helper_vfp_minnumd,
-                         a->vd, a->vn, a->vm, false);
+    return do_vfp_3op_dp(s, gen_helper_vfp_minnumd, a->vd, a->vn, a->vm, false);
 }
 
 static bool trans_VMAXNM_dp(DisasContext *s, arg_VMAXNM_dp *a)
@@ -2062,8 +2053,7 @@ static bool trans_VMAXNM_dp(DisasContext *s, arg_VMAXNM_dp *a)
     if (!dc_isar_feature(aa32_vminmaxnm, s)) {
         return false;
     }
-    return do_vfp_3op_dp(s, gen_helper_vfp_maxnumd,
-                         a->vd, a->vn, a->vm, false);
+    return do_vfp_3op_dp(s, gen_helper_vfp_maxnumd, a->vd, a->vn, a->vm, false);
 }
 
 static bool do_vfm_hp(DisasContext *s, arg_VFMA_sp *a, bool neg_n, bool neg_d)
@@ -2247,16 +2237,15 @@ static bool do_vfm_dp(DisasContext *s, arg_VFMA_dp *a, bool neg_n, bool neg_d)
     return true;
 }
 
-#define MAKE_ONE_VFM_TRANS_FN(INSN, PREC, NEGN, NEGD)                   \
-    static bool trans_##INSN##_##PREC(DisasContext *s,                  \
-                                      arg_##INSN##_##PREC *a)           \
-    {                                                                   \
-        return do_vfm_##PREC(s, a, NEGN, NEGD);                         \
+#define MAKE_ONE_VFM_TRANS_FN(INSN, PREC, NEGN, NEGD)                          \
+    static bool trans_##INSN##_##PREC(DisasContext *s, arg_##INSN##_##PREC *a) \
+    {                                                                          \
+        return do_vfm_##PREC(s, a, NEGN, NEGD);                                \
     }
 
-#define MAKE_VFM_TRANS_FNS(PREC) \
+#define MAKE_VFM_TRANS_FNS(PREC)                    \
     MAKE_ONE_VFM_TRANS_FN(VFMA, PREC, false, false) \
-    MAKE_ONE_VFM_TRANS_FN(VFMS, PREC, true, false) \
+    MAKE_ONE_VFM_TRANS_FN(VFMS, PREC, true, false)  \
     MAKE_ONE_VFM_TRANS_FN(VFNMA, PREC, false, true) \
     MAKE_ONE_VFM_TRANS_FN(VFNMS, PREC, true, true)
 
@@ -2385,25 +2374,23 @@ static bool trans_VMOV_imm_dp(DisasContext *s, arg_VMOV_imm_dp *a)
     return true;
 }
 
-#define DO_VFP_2OP(INSN, PREC, FN, CHECK)                       \
-    static bool trans_##INSN##_##PREC(DisasContext *s,          \
-                                      arg_##INSN##_##PREC *a)   \
-    {                                                           \
-        if (!dc_isar_feature(CHECK, s)) {                       \
-            return false;                                       \
-        }                                                       \
-        return do_vfp_2op_##PREC(s, FN, a->vd, a->vm);          \
+#define DO_VFP_2OP(INSN, PREC, FN, CHECK)                                      \
+    static bool trans_##INSN##_##PREC(DisasContext *s, arg_##INSN##_##PREC *a) \
+    {                                                                          \
+        if (!dc_isar_feature(CHECK, s)) {                                      \
+            return false;                                                      \
+        }                                                                      \
+        return do_vfp_2op_##PREC(s, FN, a->vd, a->vm);                         \
     }
 
-#define DO_VFP_VMOV(INSN, PREC, FN)                             \
-    static bool trans_##INSN##_##PREC(DisasContext *s,          \
-                                      arg_##INSN##_##PREC *a)   \
-    {                                                           \
-        if (!dc_isar_feature(aa32_fp##PREC##_v2, s) &&          \
-            !dc_isar_feature(aa32_mve, s)) {                    \
-            return false;                                       \
-        }                                                       \
-        return do_vfp_2op_##PREC(s, FN, a->vd, a->vm);          \
+#define DO_VFP_VMOV(INSN, PREC, FN)                                            \
+    static bool trans_##INSN##_##PREC(DisasContext *s, arg_##INSN##_##PREC *a) \
+    {                                                                          \
+        if (!dc_isar_feature(aa32_fp##PREC##_v2, s) &&                         \
+            !dc_isar_feature(aa32_mve, s)) {                                   \
+            return false;                                                      \
+        }                                                                      \
+        return do_vfp_2op_##PREC(s, FN, a->vd, a->vm);                         \
     }
 
 DO_VFP_VMOV(VMOV_reg, sp, tcg_gen_mov_i32)
@@ -2586,7 +2573,7 @@ static bool trans_VCVT_f64_f16(DisasContext *s, arg_VCVT_f64_f16 *a)
     }
 
     /* UNDEF accesses to D16-D31 if they don't exist. */
-    if (!dc_isar_feature(aa32_simd_r32, s) && (a->vd  & 0x10)) {
+    if (!dc_isar_feature(aa32_simd_r32, s) && (a->vd & 0x10)) {
         return false;
     }
 
@@ -2667,7 +2654,7 @@ static bool trans_VCVT_f16_f64(DisasContext *s, arg_VCVT_f16_f64 *a)
     }
 
     /* UNDEF accesses to D16-D31 if they don't exist. */
-    if (!dc_isar_feature(aa32_simd_r32, s) && (a->vm  & 0x10)) {
+    if (!dc_isar_feature(aa32_simd_r32, s) && (a->vm & 0x10)) {
         return false;
     }
 

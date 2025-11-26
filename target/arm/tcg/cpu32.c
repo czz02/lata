@@ -29,65 +29,65 @@ void aa32_max_features(ARMCPU *cpu)
 
     /* Add additional features supported by QEMU */
     t = cpu->isar.id_isar5;
-    t = FIELD_DP32(t, ID_ISAR5, AES, 2);          /* FEAT_PMULL */
-    t = FIELD_DP32(t, ID_ISAR5, SHA1, 1);         /* FEAT_SHA1 */
-    t = FIELD_DP32(t, ID_ISAR5, SHA2, 1);         /* FEAT_SHA256 */
+    t = FIELD_DP32(t, ID_ISAR5, AES, 2); /* FEAT_PMULL */
+    t = FIELD_DP32(t, ID_ISAR5, SHA1, 1); /* FEAT_SHA1 */
+    t = FIELD_DP32(t, ID_ISAR5, SHA2, 1); /* FEAT_SHA256 */
     t = FIELD_DP32(t, ID_ISAR5, CRC32, 1);
-    t = FIELD_DP32(t, ID_ISAR5, RDM, 1);          /* FEAT_RDM */
-    t = FIELD_DP32(t, ID_ISAR5, VCMA, 1);         /* FEAT_FCMA */
+    t = FIELD_DP32(t, ID_ISAR5, RDM, 1); /* FEAT_RDM */
+    t = FIELD_DP32(t, ID_ISAR5, VCMA, 1); /* FEAT_FCMA */
     cpu->isar.id_isar5 = t;
 
     t = cpu->isar.id_isar6;
-    t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);        /* FEAT_JSCVT */
-    t = FIELD_DP32(t, ID_ISAR6, DP, 1);           /* Feat_DotProd */
-    t = FIELD_DP32(t, ID_ISAR6, FHM, 1);          /* FEAT_FHM */
-    t = FIELD_DP32(t, ID_ISAR6, SB, 1);           /* FEAT_SB */
-    t = FIELD_DP32(t, ID_ISAR6, SPECRES, 1);      /* FEAT_SPECRES */
-    t = FIELD_DP32(t, ID_ISAR6, BF16, 1);         /* FEAT_AA32BF16 */
-    t = FIELD_DP32(t, ID_ISAR6, I8MM, 1);         /* FEAT_AA32I8MM */
+    t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1); /* FEAT_JSCVT */
+    t = FIELD_DP32(t, ID_ISAR6, DP, 1); /* Feat_DotProd */
+    t = FIELD_DP32(t, ID_ISAR6, FHM, 1); /* FEAT_FHM */
+    t = FIELD_DP32(t, ID_ISAR6, SB, 1); /* FEAT_SB */
+    t = FIELD_DP32(t, ID_ISAR6, SPECRES, 1); /* FEAT_SPECRES */
+    t = FIELD_DP32(t, ID_ISAR6, BF16, 1); /* FEAT_AA32BF16 */
+    t = FIELD_DP32(t, ID_ISAR6, I8MM, 1); /* FEAT_AA32I8MM */
     cpu->isar.id_isar6 = t;
 
     t = cpu->isar.mvfr1;
-    t = FIELD_DP32(t, MVFR1, FPHP, 3);            /* FEAT_FP16 */
-    t = FIELD_DP32(t, MVFR1, SIMDHP, 2);          /* FEAT_FP16 */
+    t = FIELD_DP32(t, MVFR1, FPHP, 3); /* FEAT_FP16 */
+    t = FIELD_DP32(t, MVFR1, SIMDHP, 2); /* FEAT_FP16 */
     cpu->isar.mvfr1 = t;
 
     t = cpu->isar.mvfr2;
-    t = FIELD_DP32(t, MVFR2, SIMDMISC, 3);        /* SIMD MaxNum */
-    t = FIELD_DP32(t, MVFR2, FPMISC, 4);          /* FP MaxNum */
+    t = FIELD_DP32(t, MVFR2, SIMDMISC, 3); /* SIMD MaxNum */
+    t = FIELD_DP32(t, MVFR2, FPMISC, 4); /* FP MaxNum */
     cpu->isar.mvfr2 = t;
 
     t = cpu->isar.id_mmfr3;
-    t = FIELD_DP32(t, ID_MMFR3, PAN, 2);          /* FEAT_PAN2 */
+    t = FIELD_DP32(t, ID_MMFR3, PAN, 2); /* FEAT_PAN2 */
     cpu->isar.id_mmfr3 = t;
 
     t = cpu->isar.id_mmfr4;
-    t = FIELD_DP32(t, ID_MMFR4, HPDS, 1);         /* FEAT_AA32HPD */
-    t = FIELD_DP32(t, ID_MMFR4, AC2, 1);          /* ACTLR2, HACTLR2 */
-    t = FIELD_DP32(t, ID_MMFR4, CNP, 1);          /* FEAT_TTCNP */
-    t = FIELD_DP32(t, ID_MMFR4, XNX, 1);          /* FEAT_XNX */
-    t = FIELD_DP32(t, ID_MMFR4, EVT, 2);          /* FEAT_EVT */
+    t = FIELD_DP32(t, ID_MMFR4, HPDS, 1); /* FEAT_AA32HPD */
+    t = FIELD_DP32(t, ID_MMFR4, AC2, 1); /* ACTLR2, HACTLR2 */
+    t = FIELD_DP32(t, ID_MMFR4, CNP, 1); /* FEAT_TTCNP */
+    t = FIELD_DP32(t, ID_MMFR4, XNX, 1); /* FEAT_XNX */
+    t = FIELD_DP32(t, ID_MMFR4, EVT, 2); /* FEAT_EVT */
     cpu->isar.id_mmfr4 = t;
 
     t = cpu->isar.id_mmfr5;
-    t = FIELD_DP32(t, ID_MMFR5, ETS, 1);          /* FEAT_ETS */
+    t = FIELD_DP32(t, ID_MMFR5, ETS, 1); /* FEAT_ETS */
     cpu->isar.id_mmfr5 = t;
 
     t = cpu->isar.id_pfr0;
-    t = FIELD_DP32(t, ID_PFR0, CSV2, 2);          /* FEAT_CVS2 */
-    t = FIELD_DP32(t, ID_PFR0, DIT, 1);           /* FEAT_DIT */
-    t = FIELD_DP32(t, ID_PFR0, RAS, 1);           /* FEAT_RAS */
+    t = FIELD_DP32(t, ID_PFR0, CSV2, 2); /* FEAT_CVS2 */
+    t = FIELD_DP32(t, ID_PFR0, DIT, 1); /* FEAT_DIT */
+    t = FIELD_DP32(t, ID_PFR0, RAS, 1); /* FEAT_RAS */
     cpu->isar.id_pfr0 = t;
 
     t = cpu->isar.id_pfr2;
-    t = FIELD_DP32(t, ID_PFR2, CSV3, 1);          /* FEAT_CSV3 */
-    t = FIELD_DP32(t, ID_PFR2, SSBS, 1);          /* FEAT_SSBS */
+    t = FIELD_DP32(t, ID_PFR2, CSV3, 1); /* FEAT_CSV3 */
+    t = FIELD_DP32(t, ID_PFR2, SSBS, 1); /* FEAT_SSBS */
     cpu->isar.id_pfr2 = t;
 
     t = cpu->isar.id_dfr0;
-    t = FIELD_DP32(t, ID_DFR0, COPDBG, 9);        /* FEAT_Debugv8p4 */
-    t = FIELD_DP32(t, ID_DFR0, COPSDBG, 9);       /* FEAT_Debugv8p4 */
-    t = FIELD_DP32(t, ID_DFR0, PERFMON, 6);       /* FEAT_PMUv3p5 */
+    t = FIELD_DP32(t, ID_DFR0, COPDBG, 9); /* FEAT_Debugv8p4 */
+    t = FIELD_DP32(t, ID_DFR0, COPSDBG, 9); /* FEAT_Debugv8p4 */
+    t = FIELD_DP32(t, ID_DFR0, PERFMON, 6); /* FEAT_PMUv3p5 */
     cpu->isar.id_dfr0 = t;
 }
 
@@ -110,8 +110,8 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
      * (which depends on state like BASEPRI, FAULTMASK and the
      * currently active exception).
      */
-    if (interrupt_request & CPU_INTERRUPT_HARD
-        && (armv7m_nvic_can_take_pending_exception(env->nvic))) {
+    if (interrupt_request & CPU_INTERRUPT_HARD &&
+        (armv7m_nvic_can_take_pending_exception(env->nvic))) {
         cs->exception_index = EXCP_IRQ;
         cc->tcg_ops->do_interrupt(cs);
         ret = true;
@@ -190,12 +190,16 @@ static void arm1026_initfn(Object *obj)
 
     {
         /* The 1026 had an IFAR at c6,c0,0,1 rather than the ARMv6 c6,c0,0,2 */
-        ARMCPRegInfo ifar = {
-            .name = "IFAR", .cp = 15, .crn = 6, .crm = 0, .opc1 = 0, .opc2 = 1,
-            .access = PL1_RW,
-            .fieldoffset = offsetof(CPUARMState, cp15.ifar_ns),
-            .resetvalue = 0
-        };
+        ARMCPRegInfo ifar = { .name = "IFAR",
+                              .cp = 15,
+                              .crn = 6,
+                              .crm = 0,
+                              .opc1 = 0,
+                              .opc2 = 1,
+                              .access = PL1_RW,
+                              .fieldoffset =
+                                  offsetof(CPUARMState, cp15.ifar_ns),
+                              .resetvalue = 0 };
         define_one_arm_cp_reg(cpu, &ifar);
     }
 }
@@ -331,10 +335,24 @@ static void arm11mpcore_initfn(Object *obj)
 }
 
 static const ARMCPRegInfo cortexa8_cp_reginfo[] = {
-    { .name = "L2LOCKDOWN", .cp = 15, .crn = 9, .crm = 0, .opc1 = 1, .opc2 = 0,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-    { .name = "L2AUXCR", .cp = 15, .crn = 9, .crm = 0, .opc1 = 1, .opc2 = 2,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
+    { .name = "L2LOCKDOWN",
+      .cp = 15,
+      .crn = 9,
+      .crm = 0,
+      .opc1 = 1,
+      .opc2 = 0,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
+    { .name = "L2AUXCR",
+      .cp = 15,
+      .crn = 9,
+      .crm = 0,
+      .opc1 = 1,
+      .opc2 = 2,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
 };
 
 static void cortex_a8_initfn(Object *obj)
@@ -381,28 +399,88 @@ static const ARMCPRegInfo cortexa9_cp_reginfo[] = {
      * power_control should be set to maximum latency. Again,
      * default to 0 and set by private hook
      */
-    { .name = "A9_PWRCTL", .cp = 15, .crn = 15, .crm = 0, .opc1 = 0, .opc2 = 0,
-      .access = PL1_RW, .resetvalue = 0,
+    { .name = "A9_PWRCTL",
+      .cp = 15,
+      .crn = 15,
+      .crm = 0,
+      .opc1 = 0,
+      .opc2 = 0,
+      .access = PL1_RW,
+      .resetvalue = 0,
       .fieldoffset = offsetof(CPUARMState, cp15.c15_power_control) },
-    { .name = "A9_DIAG", .cp = 15, .crn = 15, .crm = 0, .opc1 = 0, .opc2 = 1,
-      .access = PL1_RW, .resetvalue = 0,
+    { .name = "A9_DIAG",
+      .cp = 15,
+      .crn = 15,
+      .crm = 0,
+      .opc1 = 0,
+      .opc2 = 1,
+      .access = PL1_RW,
+      .resetvalue = 0,
       .fieldoffset = offsetof(CPUARMState, cp15.c15_diagnostic) },
-    { .name = "A9_PWRDIAG", .cp = 15, .crn = 15, .crm = 0, .opc1 = 0, .opc2 = 2,
-      .access = PL1_RW, .resetvalue = 0,
+    { .name = "A9_PWRDIAG",
+      .cp = 15,
+      .crn = 15,
+      .crm = 0,
+      .opc1 = 0,
+      .opc2 = 2,
+      .access = PL1_RW,
+      .resetvalue = 0,
       .fieldoffset = offsetof(CPUARMState, cp15.c15_power_diagnostic) },
-    { .name = "NEONBUSY", .cp = 15, .crn = 15, .crm = 1, .opc1 = 0, .opc2 = 0,
-      .access = PL1_RW, .resetvalue = 0, .type = ARM_CP_CONST },
+    { .name = "NEONBUSY",
+      .cp = 15,
+      .crn = 15,
+      .crm = 1,
+      .opc1 = 0,
+      .opc2 = 0,
+      .access = PL1_RW,
+      .resetvalue = 0,
+      .type = ARM_CP_CONST },
     /* TLB lockdown control */
-    { .name = "TLB_LOCKR", .cp = 15, .crn = 15, .crm = 4, .opc1 = 5, .opc2 = 2,
-      .access = PL1_W, .resetvalue = 0, .type = ARM_CP_NOP },
-    { .name = "TLB_LOCKW", .cp = 15, .crn = 15, .crm = 4, .opc1 = 5, .opc2 = 4,
-      .access = PL1_W, .resetvalue = 0, .type = ARM_CP_NOP },
-    { .name = "TLB_VA", .cp = 15, .crn = 15, .crm = 5, .opc1 = 5, .opc2 = 2,
-      .access = PL1_RW, .resetvalue = 0, .type = ARM_CP_CONST },
-    { .name = "TLB_PA", .cp = 15, .crn = 15, .crm = 6, .opc1 = 5, .opc2 = 2,
-      .access = PL1_RW, .resetvalue = 0, .type = ARM_CP_CONST },
-    { .name = "TLB_ATTR", .cp = 15, .crn = 15, .crm = 7, .opc1 = 5, .opc2 = 2,
-      .access = PL1_RW, .resetvalue = 0, .type = ARM_CP_CONST },
+    { .name = "TLB_LOCKR",
+      .cp = 15,
+      .crn = 15,
+      .crm = 4,
+      .opc1 = 5,
+      .opc2 = 2,
+      .access = PL1_W,
+      .resetvalue = 0,
+      .type = ARM_CP_NOP },
+    { .name = "TLB_LOCKW",
+      .cp = 15,
+      .crn = 15,
+      .crm = 4,
+      .opc1 = 5,
+      .opc2 = 4,
+      .access = PL1_W,
+      .resetvalue = 0,
+      .type = ARM_CP_NOP },
+    { .name = "TLB_VA",
+      .cp = 15,
+      .crn = 15,
+      .crm = 5,
+      .opc1 = 5,
+      .opc2 = 2,
+      .access = PL1_RW,
+      .resetvalue = 0,
+      .type = ARM_CP_CONST },
+    { .name = "TLB_PA",
+      .cp = 15,
+      .crn = 15,
+      .crm = 6,
+      .opc1 = 5,
+      .opc2 = 2,
+      .access = PL1_RW,
+      .resetvalue = 0,
+      .type = ARM_CP_CONST },
+    { .name = "TLB_ATTR",
+      .cp = 15,
+      .crn = 15,
+      .crm = 7,
+      .opc1 = 5,
+      .opc2 = 2,
+      .access = PL1_RW,
+      .resetvalue = 0,
+      .type = ARM_CP_CONST },
 };
 
 static void cortex_a9_initfn(Object *obj)
@@ -463,12 +541,28 @@ static uint64_t a15_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
 
 static const ARMCPRegInfo cortexa15_cp_reginfo[] = {
 #ifndef CONFIG_USER_ONLY
-    { .name = "L2CTLR", .cp = 15, .crn = 9, .crm = 0, .opc1 = 1, .opc2 = 2,
-      .access = PL1_RW, .resetvalue = 0, .readfn = a15_l2ctlr_read,
-      .writefn = arm_cp_write_ignore, },
+    {
+        .name = "L2CTLR",
+        .cp = 15,
+        .crn = 9,
+        .crm = 0,
+        .opc1 = 1,
+        .opc2 = 2,
+        .access = PL1_RW,
+        .resetvalue = 0,
+        .readfn = a15_l2ctlr_read,
+        .writefn = arm_cp_write_ignore,
+    },
 #endif
-    { .name = "L2ECTLR", .cp = 15, .crn = 9, .crm = 0, .opc1 = 1, .opc2 = 3,
-      .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
+    { .name = "L2ECTLR",
+      .cp = 15,
+      .crn = 9,
+      .crm = 0,
+      .opc1 = 1,
+      .opc2 = 3,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST,
+      .resetvalue = 0 },
 };
 
 static void cortex_a7_initfn(Object *obj)
@@ -756,12 +850,30 @@ static void cortex_m55_initfn(Object *obj)
 
 static const ARMCPRegInfo cortexr5_cp_reginfo[] = {
     /* Dummy the TCM region regs for the moment */
-    { .name = "ATCM", .cp = 15, .opc1 = 0, .crn = 9, .crm = 1, .opc2 = 0,
-      .access = PL1_RW, .type = ARM_CP_CONST },
-    { .name = "BTCM", .cp = 15, .opc1 = 0, .crn = 9, .crm = 1, .opc2 = 1,
-      .access = PL1_RW, .type = ARM_CP_CONST },
-    { .name = "DCACHE_INVAL", .cp = 15, .opc1 = 0, .crn = 15, .crm = 5,
-      .opc2 = 0, .access = PL1_W, .type = ARM_CP_NOP },
+    { .name = "ATCM",
+      .cp = 15,
+      .opc1 = 0,
+      .crn = 9,
+      .crm = 1,
+      .opc2 = 0,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST },
+    { .name = "BTCM",
+      .cp = 15,
+      .opc1 = 0,
+      .crn = 9,
+      .crm = 1,
+      .opc2 = 1,
+      .access = PL1_RW,
+      .type = ARM_CP_CONST },
+    { .name = "DCACHE_INVAL",
+      .cp = 15,
+      .opc1 = 0,
+      .crn = 15,
+      .crm = 5,
+      .opc2 = 0,
+      .access = PL1_W,
+      .type = ARM_CP_NOP },
 };
 
 static void cortex_r5_initfn(Object *obj)
@@ -1109,58 +1221,64 @@ static void arm_max_initfn(Object *obj)
 #endif /* !TARGET_AARCH64 */
 
 static const ARMCPUInfo arm_tcg_cpus[] = {
-    { .name = "arm926",      .initfn = arm926_initfn },
-    { .name = "arm946",      .initfn = arm946_initfn },
-    { .name = "arm1026",     .initfn = arm1026_initfn },
+    { .name = "arm926", .initfn = arm926_initfn },
+    { .name = "arm946", .initfn = arm946_initfn },
+    { .name = "arm1026", .initfn = arm1026_initfn },
     /*
      * What QEMU calls "arm1136-r2" is actually the 1136 r0p2, i.e. an
      * older core than plain "arm1136". In particular this does not
      * have the v6K features.
      */
-    { .name = "arm1136-r2",  .initfn = arm1136_r2_initfn },
-    { .name = "arm1136",     .initfn = arm1136_initfn },
-    { .name = "arm1176",     .initfn = arm1176_initfn },
+    { .name = "arm1136-r2", .initfn = arm1136_r2_initfn },
+    { .name = "arm1136", .initfn = arm1136_initfn },
+    { .name = "arm1176", .initfn = arm1176_initfn },
     { .name = "arm11mpcore", .initfn = arm11mpcore_initfn },
-    { .name = "cortex-a7",   .initfn = cortex_a7_initfn },
-    { .name = "cortex-a8",   .initfn = cortex_a8_initfn },
-    { .name = "cortex-a9",   .initfn = cortex_a9_initfn },
-    { .name = "cortex-a15",  .initfn = cortex_a15_initfn },
-    { .name = "cortex-m0",   .initfn = cortex_m0_initfn,
-                             .class_init = arm_v7m_class_init },
-    { .name = "cortex-m3",   .initfn = cortex_m3_initfn,
-                             .class_init = arm_v7m_class_init },
-    { .name = "cortex-m4",   .initfn = cortex_m4_initfn,
-                             .class_init = arm_v7m_class_init },
-    { .name = "cortex-m7",   .initfn = cortex_m7_initfn,
-                             .class_init = arm_v7m_class_init },
-    { .name = "cortex-m33",  .initfn = cortex_m33_initfn,
-                             .class_init = arm_v7m_class_init },
-    { .name = "cortex-m55",  .initfn = cortex_m55_initfn,
-                             .class_init = arm_v7m_class_init },
-    { .name = "cortex-r5",   .initfn = cortex_r5_initfn },
-    { .name = "cortex-r5f",  .initfn = cortex_r5f_initfn },
-    { .name = "cortex-r52",  .initfn = cortex_r52_initfn },
-    { .name = "ti925t",      .initfn = ti925t_initfn },
-    { .name = "sa1100",      .initfn = sa1100_initfn },
-    { .name = "sa1110",      .initfn = sa1110_initfn },
-    { .name = "pxa250",      .initfn = pxa250_initfn },
-    { .name = "pxa255",      .initfn = pxa255_initfn },
-    { .name = "pxa260",      .initfn = pxa260_initfn },
-    { .name = "pxa261",      .initfn = pxa261_initfn },
-    { .name = "pxa262",      .initfn = pxa262_initfn },
+    { .name = "cortex-a7", .initfn = cortex_a7_initfn },
+    { .name = "cortex-a8", .initfn = cortex_a8_initfn },
+    { .name = "cortex-a9", .initfn = cortex_a9_initfn },
+    { .name = "cortex-a15", .initfn = cortex_a15_initfn },
+    { .name = "cortex-m0",
+      .initfn = cortex_m0_initfn,
+      .class_init = arm_v7m_class_init },
+    { .name = "cortex-m3",
+      .initfn = cortex_m3_initfn,
+      .class_init = arm_v7m_class_init },
+    { .name = "cortex-m4",
+      .initfn = cortex_m4_initfn,
+      .class_init = arm_v7m_class_init },
+    { .name = "cortex-m7",
+      .initfn = cortex_m7_initfn,
+      .class_init = arm_v7m_class_init },
+    { .name = "cortex-m33",
+      .initfn = cortex_m33_initfn,
+      .class_init = arm_v7m_class_init },
+    { .name = "cortex-m55",
+      .initfn = cortex_m55_initfn,
+      .class_init = arm_v7m_class_init },
+    { .name = "cortex-r5", .initfn = cortex_r5_initfn },
+    { .name = "cortex-r5f", .initfn = cortex_r5f_initfn },
+    { .name = "cortex-r52", .initfn = cortex_r52_initfn },
+    { .name = "ti925t", .initfn = ti925t_initfn },
+    { .name = "sa1100", .initfn = sa1100_initfn },
+    { .name = "sa1110", .initfn = sa1110_initfn },
+    { .name = "pxa250", .initfn = pxa250_initfn },
+    { .name = "pxa255", .initfn = pxa255_initfn },
+    { .name = "pxa260", .initfn = pxa260_initfn },
+    { .name = "pxa261", .initfn = pxa261_initfn },
+    { .name = "pxa262", .initfn = pxa262_initfn },
     /* "pxa270" is an alias for "pxa270-a0" */
-    { .name = "pxa270",      .initfn = pxa270a0_initfn },
-    { .name = "pxa270-a0",   .initfn = pxa270a0_initfn },
-    { .name = "pxa270-a1",   .initfn = pxa270a1_initfn },
-    { .name = "pxa270-b0",   .initfn = pxa270b0_initfn },
-    { .name = "pxa270-b1",   .initfn = pxa270b1_initfn },
-    { .name = "pxa270-c0",   .initfn = pxa270c0_initfn },
-    { .name = "pxa270-c5",   .initfn = pxa270c5_initfn },
+    { .name = "pxa270", .initfn = pxa270a0_initfn },
+    { .name = "pxa270-a0", .initfn = pxa270a0_initfn },
+    { .name = "pxa270-a1", .initfn = pxa270a1_initfn },
+    { .name = "pxa270-b0", .initfn = pxa270b0_initfn },
+    { .name = "pxa270-b1", .initfn = pxa270b1_initfn },
+    { .name = "pxa270-c0", .initfn = pxa270c0_initfn },
+    { .name = "pxa270-c5", .initfn = pxa270c5_initfn },
 #ifndef TARGET_AARCH64
-    { .name = "max",         .initfn = arm_max_initfn },
+    { .name = "max", .initfn = arm_max_initfn },
 #endif
 #ifdef CONFIG_USER_ONLY
-    { .name = "any",         .initfn = arm_max_initfn },
+    { .name = "any", .initfn = arm_max_initfn },
 #endif
 };
 

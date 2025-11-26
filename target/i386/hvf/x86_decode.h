@@ -23,27 +23,27 @@
 
 typedef enum x86_prefix {
     /* group 1 */
-    PREFIX_LOCK =                  0xf0,
-    PREFIX_REPN =                  0xf2,
-    PREFIX_REP =                   0xf3,
+    PREFIX_LOCK = 0xf0,
+    PREFIX_REPN = 0xf2,
+    PREFIX_REP = 0xf3,
     /* group 2 */
-    PREFIX_CS_SEG_OVERRIDE =       0x2e,
-    PREFIX_SS_SEG_OVERRIDE =       0x36,
-    PREFIX_DS_SEG_OVERRIDE =       0x3e,
-    PREFIX_ES_SEG_OVERRIDE =       0x26,
-    PREFIX_FS_SEG_OVERRIDE =       0x64,
-    PREFIX_GS_SEG_OVERRIDE =       0x65,
+    PREFIX_CS_SEG_OVERRIDE = 0x2e,
+    PREFIX_SS_SEG_OVERRIDE = 0x36,
+    PREFIX_DS_SEG_OVERRIDE = 0x3e,
+    PREFIX_ES_SEG_OVERRIDE = 0x26,
+    PREFIX_FS_SEG_OVERRIDE = 0x64,
+    PREFIX_GS_SEG_OVERRIDE = 0x65,
     /* group 3 */
-    PREFIX_OP_SIZE_OVERRIDE =      0x66,
+    PREFIX_OP_SIZE_OVERRIDE = 0x66,
     /* group 4 */
-    PREFIX_ADDR_SIZE_OVERRIDE =    0x67,
+    PREFIX_ADDR_SIZE_OVERRIDE = 0x67,
 
-    PREFIX_REX                   = 0x40,
+    PREFIX_REX = 0x40,
 } x86_prefix;
 
 enum x86_decode_cmd {
     X86_DECODE_CMD_INVL = 0,
-    
+
     X86_DECODE_CMD_PUSH,
     X86_DECODE_CMD_PUSH_SEG,
     X86_DECODE_CMD_POP,
@@ -174,7 +174,7 @@ enum x86_decode_cmd {
     X86_DECODE_CMD_CMPXCHG8B,
     X86_DECODE_CMD_CMPXCHG,
     X86_DECODE_CMD_POPCNT,
-    
+
     X86_DECODE_CMD_FNINIT,
     X86_DECODE_CMD_FLD,
     X86_DECODE_CMD_FLDxx,
@@ -215,36 +215,36 @@ typedef struct x86_modrm {
     union {
         uint8_t modrm;
         struct {
-            uint8_t rm:3;
-            uint8_t reg:3;
-            uint8_t mod:2;
+            uint8_t rm : 3;
+            uint8_t reg : 3;
+            uint8_t mod : 2;
         };
     };
-} __attribute__ ((__packed__)) x86_modrm;
+} __attribute__((__packed__)) x86_modrm;
 
 typedef struct x86_sib {
     union {
         uint8_t sib;
         struct {
-            uint8_t base:3;
-            uint8_t index:3;
-            uint8_t scale:2;
+            uint8_t base : 3;
+            uint8_t index : 3;
+            uint8_t scale : 2;
         };
     };
-} __attribute__ ((__packed__)) x86_sib;
+} __attribute__((__packed__)) x86_sib;
 
 typedef struct x86_rex {
     union {
         uint8_t rex;
         struct {
-            uint8_t b:1;
-            uint8_t x:1;
-            uint8_t r:1;
-            uint8_t w:1;
-            uint8_t unused:4;
+            uint8_t b : 1;
+            uint8_t x : 1;
+            uint8_t r : 1;
+            uint8_t w : 1;
+            uint8_t unused : 4;
         };
     };
-} __attribute__ ((__packed__)) x86_rex;
+} __attribute__((__packed__)) x86_rex;
 
 typedef enum x86_var_type {
     X86_VAR_IMMEDIATE,
@@ -310,7 +310,7 @@ target_ulong get_reg_val(CPUX86State *env, int reg, int rex_present,
 void calc_modrm_operand(CPUX86State *env, struct x86_decode *decode,
                         struct x86_decode_op *op);
 target_ulong decode_linear_addr(CPUX86State *env, struct x86_decode *decode,
-                               target_ulong addr, enum X86Seg seg);
+                                target_ulong addr, enum X86Seg seg);
 
 void init_decoder(void);
 void calc_modrm_operand16(CPUX86State *env, struct x86_decode *decode,

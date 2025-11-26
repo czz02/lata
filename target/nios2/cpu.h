@@ -53,8 +53,8 @@ struct Nios2CPUClass {
 #define TARGET_HAS_ICE 1
 
 /* Configuration options for Nios II */
-#define RESET_ADDRESS         0x00000000
-#define EXCEPTION_ADDRESS     0x00000004
+#define RESET_ADDRESS 0x00000000
+#define EXCEPTION_ADDRESS 0x00000004
 #define FAST_TLB_MISS_ADDRESS 0x00000008
 
 #define NUM_GP_REGS 32
@@ -67,42 +67,42 @@ struct Nios2CPUClass {
 
 /* General purpose register aliases */
 enum {
-    R_ZERO   = 0,
-    R_AT     = 1,
-    R_RET0   = 2,
-    R_RET1   = 3,
-    R_ARG0   = 4,
-    R_ARG1   = 5,
-    R_ARG2   = 6,
-    R_ARG3   = 7,
-    R_ET     = 24,
-    R_BT     = 25,
-    R_GP     = 26,
-    R_SP     = 27,
-    R_FP     = 28,
-    R_EA     = 29,
-    R_BA     = 30,
+    R_ZERO = 0,
+    R_AT = 1,
+    R_RET0 = 2,
+    R_RET1 = 3,
+    R_ARG0 = 4,
+    R_ARG1 = 5,
+    R_ARG2 = 6,
+    R_ARG3 = 7,
+    R_ET = 24,
+    R_BT = 25,
+    R_GP = 26,
+    R_SP = 27,
+    R_FP = 28,
+    R_EA = 29,
+    R_BA = 30,
     R_SSTATUS = 30,
-    R_RA     = 31,
+    R_RA = 31,
 };
 
 /* Control register aliases */
 enum {
-    CR_STATUS        = 0,
-    CR_ESTATUS       = 1,
-    CR_BSTATUS       = 2,
-    CR_IENABLE       = 3,
-    CR_IPENDING      = 4,
-    CR_CPUID         = 5,
-    CR_EXCEPTION     = 7,
-    CR_PTEADDR       = 8,
-    CR_TLBACC        = 9,
-    CR_TLBMISC       = 10,
-    CR_ENCINJ        = 11,
-    CR_BADADDR       = 12,
-    CR_CONFIG        = 13,
-    CR_MPUBASE       = 14,
-    CR_MPUACC        = 15,
+    CR_STATUS = 0,
+    CR_ESTATUS = 1,
+    CR_BSTATUS = 2,
+    CR_IENABLE = 3,
+    CR_IPENDING = 4,
+    CR_CPUID = 5,
+    CR_EXCEPTION = 7,
+    CR_PTEADDR = 8,
+    CR_TLBACC = 9,
+    CR_TLBMISC = 10,
+    CR_ENCINJ = 11,
+    CR_BADADDR = 12,
+    CR_CONFIG = 13,
+    CR_MPUBASE = 14,
+    CR_MPUACC = 15,
 };
 
 FIELD(CR_STATUS, PIE, 0, 1)
@@ -114,15 +114,15 @@ FIELD(CR_STATUS, CRS, 10, 6)
 FIELD(CR_STATUS, PRS, 16, 6)
 FIELD(CR_STATUS, NMI, 22, 1)
 FIELD(CR_STATUS, RSIE, 23, 1)
-FIELD(CR_STATUS, SRS, 31, 1)  /* only in sstatus */
+FIELD(CR_STATUS, SRS, 31, 1) /* only in sstatus */
 
-#define CR_STATUS_PIE    R_CR_STATUS_PIE_MASK
-#define CR_STATUS_U      R_CR_STATUS_U_MASK
-#define CR_STATUS_EH     R_CR_STATUS_EH_MASK
-#define CR_STATUS_IH     R_CR_STATUS_IH_MASK
-#define CR_STATUS_NMI    R_CR_STATUS_NMI_MASK
-#define CR_STATUS_RSIE   R_CR_STATUS_RSIE_MASK
-#define CR_STATUS_SRS    R_CR_STATUS_SRS_MASK
+#define CR_STATUS_PIE R_CR_STATUS_PIE_MASK
+#define CR_STATUS_U R_CR_STATUS_U_MASK
+#define CR_STATUS_EH R_CR_STATUS_EH_MASK
+#define CR_STATUS_IH R_CR_STATUS_IH_MASK
+#define CR_STATUS_NMI R_CR_STATUS_NMI_MASK
+#define CR_STATUS_RSIE R_CR_STATUS_RSIE_MASK
+#define CR_STATUS_SRS R_CR_STATUS_SRS_MASK
 
 FIELD(CR_EXCEPTION, CAUSE, 2, 5)
 FIELD(CR_EXCEPTION, ECCFTL, 31, 1)
@@ -138,11 +138,11 @@ FIELD(CR_TLBACC, R, 23, 1)
 FIELD(CR_TLBACC, C, 24, 1)
 FIELD(CR_TLBACC, IG, 25, 7)
 
-#define CR_TLBACC_C      R_CR_TLBACC_C_MASK
-#define CR_TLBACC_R      R_CR_TLBACC_R_MASK
-#define CR_TLBACC_W      R_CR_TLBACC_W_MASK
-#define CR_TLBACC_X      R_CR_TLBACC_X_MASK
-#define CR_TLBACC_G      R_CR_TLBACC_G_MASK
+#define CR_TLBACC_C R_CR_TLBACC_C_MASK
+#define CR_TLBACC_R R_CR_TLBACC_R_MASK
+#define CR_TLBACC_W R_CR_TLBACC_W_MASK
+#define CR_TLBACC_X R_CR_TLBACC_X_MASK
+#define CR_TLBACC_G R_CR_TLBACC_G_MASK
 
 FIELD(CR_TLBMISC, D, 0, 1)
 FIELD(CR_TLBMISC, PERM, 1, 1)
@@ -154,36 +154,36 @@ FIELD(CR_TLBMISC, RD, 19, 1)
 FIELD(CR_TLBMISC, WAY, 20, 4)
 FIELD(CR_TLBMISC, EE, 24, 1)
 
-#define CR_TLBMISC_EE    R_CR_TLBMISC_EE_MASK
-#define CR_TLBMISC_RD    R_CR_TLBMISC_RD_MASK
-#define CR_TLBMISC_WE    R_CR_TLBMISC_WE_MASK
-#define CR_TLBMISC_DBL   R_CR_TLBMISC_DBL_MASK
-#define CR_TLBMISC_BAD   R_CR_TLBMISC_BAD_MASK
-#define CR_TLBMISC_PERM  R_CR_TLBMISC_PERM_MASK
-#define CR_TLBMISC_D     R_CR_TLBMISC_D_MASK
+#define CR_TLBMISC_EE R_CR_TLBMISC_EE_MASK
+#define CR_TLBMISC_RD R_CR_TLBMISC_RD_MASK
+#define CR_TLBMISC_WE R_CR_TLBMISC_WE_MASK
+#define CR_TLBMISC_DBL R_CR_TLBMISC_DBL_MASK
+#define CR_TLBMISC_BAD R_CR_TLBMISC_BAD_MASK
+#define CR_TLBMISC_PERM R_CR_TLBMISC_PERM_MASK
+#define CR_TLBMISC_D R_CR_TLBMISC_D_MASK
 
 /* Exceptions */
-#define EXCP_BREAK    0x1000
+#define EXCP_BREAK 0x1000
 #define EXCP_SEMIHOST 0x1001
-#define EXCP_RESET    0
-#define EXCP_PRESET   1
-#define EXCP_IRQ      2
-#define EXCP_TRAP     3
-#define EXCP_UNIMPL   4
-#define EXCP_ILLEGAL  5
-#define EXCP_UNALIGN  6
+#define EXCP_RESET 0
+#define EXCP_PRESET 1
+#define EXCP_IRQ 2
+#define EXCP_TRAP 3
+#define EXCP_UNIMPL 4
+#define EXCP_ILLEGAL 5
+#define EXCP_UNALIGN 6
 #define EXCP_UNALIGND 7
-#define EXCP_DIV      8
+#define EXCP_DIV 8
 #define EXCP_SUPERA_X 9
-#define EXCP_SUPERI   10
+#define EXCP_SUPERI 10
 #define EXCP_SUPERA_D 11
-#define EXCP_TLB_X    12
-#define EXCP_TLB_D    (0x1000 | EXCP_TLB_X)
-#define EXCP_PERM_X   13
-#define EXCP_PERM_R   14
-#define EXCP_PERM_W   15
-#define EXCP_MPUI     16
-#define EXCP_MPUD     17
+#define EXCP_TLB_X 12
+#define EXCP_TLB_D (0x1000 | EXCP_TLB_X)
+#define EXCP_PERM_X 13
+#define EXCP_PERM_R 14
+#define EXCP_PERM_W 15
+#define EXCP_MPUI 16
+#define EXCP_MPUD 17
 
 struct CPUArchState {
 #ifdef CONFIG_USER_ONLY
@@ -241,7 +241,7 @@ struct ArchCPU {
     uint32_t rha; /* Requested handler address */
     uint32_t ril; /* Requested interrupt level */
     uint32_t rrs; /* Requested register set */
-    bool rnmi;    /* Requested nonmaskable interrupt */
+    bool rnmi; /* Requested nonmaskable interrupt */
 };
 
 
@@ -263,8 +263,8 @@ void nios2_cpu_do_interrupt(CPUState *cs);
 void dump_mmu(CPUNios2State *env);
 void nios2_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
 G_NORETURN void nios2_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
-                                              MMUAccessType access_type, int mmu_idx,
-                                              uintptr_t retaddr);
+                                              MMUAccessType access_type,
+                                              int mmu_idx, uintptr_t retaddr);
 G_NORETURN void nios2_cpu_loop_exit_advance(CPUNios2State *env,
                                             uintptr_t retaddr);
 
@@ -277,8 +277,8 @@ void do_nios2_semihosting(CPUNios2State *env);
 #define CPU_SAVE_VERSION 1
 
 /* MMU modes definitions */
-#define MMU_SUPERVISOR_IDX  0
-#define MMU_USER_IDX        1
+#define MMU_SUPERVISOR_IDX 0
+#define MMU_USER_IDX 1
 
 static inline int cpu_mmu_index(CPUNios2State *env, bool ifetch)
 {
@@ -289,8 +289,8 @@ static inline int cpu_mmu_index(CPUNios2State *env, bool ifetch)
 #ifndef CONFIG_USER_ONLY
 hwaddr nios2_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
 bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                        MMUAccessType access_type, int mmu_idx,
-                        bool probe, uintptr_t retaddr);
+                        MMUAccessType access_type, int mmu_idx, bool probe,
+                        uintptr_t retaddr);
 #endif
 
 typedef CPUNios2State CPUArchState;
@@ -298,9 +298,9 @@ typedef Nios2CPU ArchCPU;
 
 #include "exec/cpu-all.h"
 
-FIELD(TBFLAGS, CRS0, 0, 1)  /* Set if CRS == 0. */
-FIELD(TBFLAGS, U, 1, 1)     /* Overlaps CR_STATUS_U */
-FIELD(TBFLAGS, R0_0, 2, 1)  /* Set if R0 == 0. */
+FIELD(TBFLAGS, CRS0, 0, 1) /* Set if CRS == 0. */
+FIELD(TBFLAGS, U, 1, 1) /* Overlaps CR_STATUS_U */
+FIELD(TBFLAGS, R0_0, 2, 1) /* Set if R0 == 0. */
 
 static inline void cpu_get_tb_cpu_state(CPUNios2State *env, vaddr *pc,
                                         uint64_t *cs_base, uint32_t *flags)
@@ -309,9 +309,9 @@ static inline void cpu_get_tb_cpu_state(CPUNios2State *env, vaddr *pc,
 
     *pc = env->pc;
     *cs_base = 0;
-    *flags = (env->ctrl[CR_STATUS] & CR_STATUS_U)
-           | (crs ? 0 : R_TBFLAGS_CRS0_MASK)
-           | (env->regs[0] ? 0 : R_TBFLAGS_R0_0_MASK);
+    *flags = (env->ctrl[CR_STATUS] & CR_STATUS_U) |
+             (crs ? 0 : R_TBFLAGS_CRS0_MASK) |
+             (env->regs[0] ? 0 : R_TBFLAGS_R0_0_MASK);
 }
 
 #endif /* NIOS2_CPU_H */

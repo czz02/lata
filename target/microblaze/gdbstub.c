@@ -30,15 +30,15 @@
  */
 
 enum {
-    GDB_PC    = 32 + 0,
-    GDB_MSR   = 32 + 1,
-    GDB_EAR   = 32 + 2,
-    GDB_ESR   = 32 + 3,
-    GDB_FSR   = 32 + 4,
-    GDB_BTR   = 32 + 5,
-    GDB_PVR0  = 32 + 6,
+    GDB_PC = 32 + 0,
+    GDB_MSR = 32 + 1,
+    GDB_EAR = 32 + 2,
+    GDB_ESR = 32 + 3,
+    GDB_FSR = 32 + 4,
+    GDB_BTR = 32 + 5,
+    GDB_PVR0 = 32 + 6,
     GDB_PVR11 = 32 + 17,
-    GDB_EDR   = 32 + 18,
+    GDB_EDR = 32 + 18,
 };
 
 enum {

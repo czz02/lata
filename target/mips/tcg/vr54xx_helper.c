@@ -47,71 +47,79 @@ static inline target_ulong set_HI_LOT0(CPUMIPSState *env, uint64_t HILO)
 target_ulong helper_muls(CPUMIPSState *env, target_ulong arg1,
                          target_ulong arg2)
 {
-    return set_HI_LOT0(env, 0 - ((int64_t)(int32_t)arg1 *
-                                 (int64_t)(int32_t)arg2));
+    return set_HI_LOT0(env,
+                       0 - ((int64_t)(int32_t)arg1 * (int64_t)(int32_t)arg2));
 }
 
 target_ulong helper_mulsu(CPUMIPSState *env, target_ulong arg1,
                           target_ulong arg2)
 {
-    return set_HI_LOT0(env, 0 - (uint64_t)(uint32_t)arg1 *
-                                (uint64_t)(uint32_t)arg2);
+    return set_HI_LOT0(env,
+                       0 - (uint64_t)(uint32_t)arg1 * (uint64_t)(uint32_t)arg2);
 }
 
 target_ulong helper_macc(CPUMIPSState *env, target_ulong arg1,
                          target_ulong arg2)
 {
-    return set_HI_LOT0(env, (int64_t)get_HILO(env) + (int64_t)(int32_t)arg1 *
-                                                     (int64_t)(int32_t)arg2);
+    return set_HI_LOT0(env,
+                       (int64_t)get_HILO(env) +
+                           (int64_t)(int32_t)arg1 * (int64_t)(int32_t)arg2);
 }
 
 target_ulong helper_macchi(CPUMIPSState *env, target_ulong arg1,
                            target_ulong arg2)
 {
-    return set_HIT0_LO(env, (int64_t)get_HILO(env) + (int64_t)(int32_t)arg1 *
-                       (int64_t)(int32_t)arg2);
+    return set_HIT0_LO(env,
+                       (int64_t)get_HILO(env) +
+                           (int64_t)(int32_t)arg1 * (int64_t)(int32_t)arg2);
 }
 
 target_ulong helper_maccu(CPUMIPSState *env, target_ulong arg1,
                           target_ulong arg2)
 {
-    return set_HI_LOT0(env, (uint64_t)get_HILO(env) + (uint64_t)(uint32_t)arg1 *
-                                                      (uint64_t)(uint32_t)arg2);
+    return set_HI_LOT0(env,
+                       (uint64_t)get_HILO(env) +
+                           (uint64_t)(uint32_t)arg1 * (uint64_t)(uint32_t)arg2);
 }
 
 target_ulong helper_macchiu(CPUMIPSState *env, target_ulong arg1,
                             target_ulong arg2)
 {
-    return set_HIT0_LO(env, (uint64_t)get_HILO(env) + (uint64_t)(uint32_t)arg1 *
-                                                      (uint64_t)(uint32_t)arg2);
+    return set_HIT0_LO(env,
+                       (uint64_t)get_HILO(env) +
+                           (uint64_t)(uint32_t)arg1 * (uint64_t)(uint32_t)arg2);
 }
 
 target_ulong helper_msac(CPUMIPSState *env, target_ulong arg1,
                          target_ulong arg2)
 {
-    return set_HI_LOT0(env, (int64_t)get_HILO(env) - (int64_t)(int32_t)arg1 *
-                                                     (int64_t)(int32_t)arg2);
+    return set_HI_LOT0(env,
+                       (int64_t)get_HILO(env) -
+                           (int64_t)(int32_t)arg1 * (int64_t)(int32_t)arg2);
 }
 
 target_ulong helper_msachi(CPUMIPSState *env, target_ulong arg1,
                            target_ulong arg2)
 {
-    return set_HIT0_LO(env, (int64_t)get_HILO(env) - (int64_t)(int32_t)arg1 *
-                                                     (int64_t)(int32_t)arg2);
+    return set_HIT0_LO(env,
+                       (int64_t)get_HILO(env) -
+                           (int64_t)(int32_t)arg1 * (int64_t)(int32_t)arg2);
 }
 
 target_ulong helper_msacu(CPUMIPSState *env, target_ulong arg1,
                           target_ulong arg2)
 {
-    return set_HI_LOT0(env, (uint64_t)get_HILO(env) - (uint64_t)(uint32_t)arg1 *
-                                                      (uint64_t)(uint32_t)arg2);
+    return set_HI_LOT0(env,
+                       (uint64_t)get_HILO(env) -
+                           (uint64_t)(uint32_t)arg1 * (uint64_t)(uint32_t)arg2);
 }
 
 target_ulong helper_msachiu(CPUMIPSState *env, target_ulong arg1,
                             target_ulong arg2)
 {
-    return set_HIT0_LO(env, (uint64_t)get_HILO(env) - (uint64_t)(uint32_t)arg1 *
-                                                      (uint64_t)(uint32_t)arg2);
+    return set_HIT0_LO(env,
+                       (uint64_t)get_HILO(env) -
+                           (uint64_t)(uint32_t)arg1 * (uint64_t)(uint32_t)arg2);
 }
 
 target_ulong helper_mulhi(CPUMIPSState *env, target_ulong arg1,
@@ -123,20 +131,20 @@ target_ulong helper_mulhi(CPUMIPSState *env, target_ulong arg1,
 target_ulong helper_mulhiu(CPUMIPSState *env, target_ulong arg1,
                            target_ulong arg2)
 {
-    return set_HIT0_LO(env, (uint64_t)(uint32_t)arg1 *
-                            (uint64_t)(uint32_t)arg2);
+    return set_HIT0_LO(env,
+                       (uint64_t)(uint32_t)arg1 * (uint64_t)(uint32_t)arg2);
 }
 
 target_ulong helper_mulshi(CPUMIPSState *env, target_ulong arg1,
                            target_ulong arg2)
 {
-    return set_HIT0_LO(env, 0 - (int64_t)(int32_t)arg1 *
-                                (int64_t)(int32_t)arg2);
+    return set_HIT0_LO(env,
+                       0 - (int64_t)(int32_t)arg1 * (int64_t)(int32_t)arg2);
 }
 
 target_ulong helper_mulshiu(CPUMIPSState *env, target_ulong arg1,
                             target_ulong arg2)
 {
-    return set_HIT0_LO(env, 0 - (uint64_t)(uint32_t)arg1 *
-                                (uint64_t)(uint32_t)arg2);
+    return set_HIT0_LO(env,
+                       0 - (uint64_t)(uint32_t)arg1 * (uint64_t)(uint32_t)arg2);
 }

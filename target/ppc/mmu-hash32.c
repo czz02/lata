@@ -31,15 +31,17 @@
 /* #define DEBUG_BATS */
 
 #ifdef DEBUG_BATS
-#  define LOG_BATS(...) qemu_log_mask(CPU_LOG_MMU, __VA_ARGS__)
+#define LOG_BATS(...) qemu_log_mask(CPU_LOG_MMU, __VA_ARGS__)
 #else
-#  define LOG_BATS(...) do { } while (0)
+#define LOG_BATS(...) \
+    do {              \
+    } while (0)
 #endif
 
 struct mmu_ctx_hash32 {
-    hwaddr raddr;      /* Real address              */
-    int prot;                      /* Protection bits           */
-    int key;                       /* Access key                */
+    hwaddr raddr; /* Real address              */
+    int prot; /* Protection bits           */
+    int key; /* Access key                */
 };
 
 static int ppc_hash32_pp_prot(int key, int pp, int nx)
@@ -87,8 +89,8 @@ static int ppc_hash32_pp_prot(int key, int pp, int nx)
     return prot;
 }
 
-static int ppc_hash32_pte_prot(int mmu_idx,
-                               target_ulong sr, ppc_hash_pte32_t pte)
+static int ppc_hash32_pte_prot(int mmu_idx, target_ulong sr,
+                               ppc_hash_pte32_t pte)
 {
     unsigned pp, key;
 
@@ -98,19 +100,19 @@ static int ppc_hash32_pte_prot(int mmu_idx,
     return ppc_hash32_pp_prot(key, pp, !!(sr & SR32_NX));
 }
 
-static target_ulong hash32_bat_size(int mmu_idx,
-                                    target_ulong batu, target_ulong batl)
+static target_ulong hash32_bat_size(int mmu_idx, target_ulong batu,
+                                    target_ulong batl)
 {
-    if ((mmuidx_pr(mmu_idx) && !(batu & BATU32_VP))
-        || (!mmuidx_pr(mmu_idx) && !(batu & BATU32_VS))) {
+    if ((mmuidx_pr(mmu_idx) && !(batu & BATU32_VP)) ||
+        (!mmuidx_pr(mmu_idx) && !(batu & BATU32_VS))) {
         return 0;
     }
 
     return BATU32_BEPI & ~((batu & BATU32_BL) << 15);
 }
 
-static int hash32_bat_prot(PowerPCCPU *cpu,
-                           target_ulong batu, target_ulong batl)
+static int hash32_bat_prot(PowerPCCPU *cpu, target_ulong batu,
+                           target_ulong batl)
 {
     int pp, prot;
 
@@ -134,8 +136,8 @@ static hwaddr ppc_hash32_bat_lookup(PowerPCCPU *cpu, target_ulong ea,
     bool ifetch = access_type == MMU_INST_FETCH;
     int i;
 
-    LOG_BATS("%s: %cBAT v " TARGET_FMT_lx "\n", __func__,
-             ifetch ? 'I' : 'D', ea);
+    LOG_BATS("%s: %cBAT v " TARGET_FMT_lx "\n", __func__, ifetch ? 'I' : 'D',
+             ea);
     if (ifetch) {
         BATlt = env->IBAT[1];
         BATut = env->IBAT[0];
@@ -150,8 +152,8 @@ static hwaddr ppc_hash32_bat_lookup(PowerPCCPU *cpu, target_ulong ea,
 
         mask = hash32_bat_size(mmu_idx, batu, batl);
         LOG_BATS("%s: %cBAT%d v " TARGET_FMT_lx " BATu " TARGET_FMT_lx
-                 " BATl " TARGET_FMT_lx "\n", __func__,
-                 ifetch ? 'I' : 'D', i, ea, batu, batl);
+                 " BATl " TARGET_FMT_lx "\n",
+                 __func__, ifetch ? 'I' : 'D', i, ea, batu, batl);
 
         if (mask && ((ea & mask) == (batu & BATU32_BEPI))) {
             hwaddr raddr = (batl & mask) | (ea & ~mask);
@@ -176,10 +178,10 @@ static hwaddr ppc_hash32_bat_lookup(PowerPCCPU *cpu, target_ulong ea,
             BEPIl = *BATu & BATU32_BEPIL;
             bl = (*BATu & 0x00001FFC) << 15;
             LOG_BATS("%s: %cBAT%d v " TARGET_FMT_lx " BATu " TARGET_FMT_lx
-                     " BATl " TARGET_FMT_lx "\n\t" TARGET_FMT_lx " "
-                     TARGET_FMT_lx " " TARGET_FMT_lx "\n",
-                     __func__, ifetch ? 'I' : 'D', i, ea,
-                     *BATu, *BATl, BEPIu, BEPIl, bl);
+                     " BATl " TARGET_FMT_lx "\n\t" TARGET_FMT_lx
+                     " " TARGET_FMT_lx " " TARGET_FMT_lx "\n",
+                     __func__, ifetch ? 'I' : 'D', i, ea, *BATu, *BATl, BEPIu,
+                     BEPIl, bl);
         }
     }
 #endif
@@ -189,9 +191,8 @@ static hwaddr ppc_hash32_bat_lookup(PowerPCCPU *cpu, target_ulong ea,
 
 static bool ppc_hash32_direct_store(PowerPCCPU *cpu, target_ulong sr,
                                     target_ulong eaddr,
-                                    MMUAccessType access_type,
-                                    hwaddr *raddr, int *prot, int mmu_idx,
-                                    bool guest_visible)
+                                    MMUAccessType access_type, hwaddr *raddr,
+                                    int *prot, int mmu_idx, bool guest_visible)
 {
     CPUState *cs = CPU(cpu);
     CPUPPCState *env = &cpu->env;
@@ -300,9 +301,9 @@ static hwaddr ppc_hash32_pteg_search(PowerPCCPU *cpu, hwaddr pteg_off,
         smp_rmb();
         pte1 = ppc_hash32_load_hpte1(cpu, pte_offset);
 
-        if ((pte0 & HPTE32_V_VALID)
-            && (secondary == !!(pte0 & HPTE32_V_SECONDARY))
-            && HPTE32_V_COMPARE(pte0, ptem)) {
+        if ((pte0 & HPTE32_V_VALID) &&
+            (secondary == !!(pte0 & HPTE32_V_SECONDARY)) &&
+            HPTE32_V_COMPARE(pte0, ptem)) {
             pte->pte0 = pte0;
             pte->pte1 = pte1;
             return pte_offset;
@@ -332,9 +333,8 @@ static void ppc_hash32_set_c(PowerPCCPU *cpu, hwaddr pte_offset, uint64_t pte1)
     stb_phys(CPU(cpu)->as, base + offset, (pte1 & 0xff) | 0x80);
 }
 
-static hwaddr ppc_hash32_htab_lookup(PowerPCCPU *cpu,
-                                     target_ulong sr, target_ulong eaddr,
-                                     ppc_hash_pte32_t *pte)
+static hwaddr ppc_hash32_htab_lookup(PowerPCCPU *cpu, target_ulong sr,
+                                     target_ulong eaddr, ppc_hash_pte32_t *pte)
 {
     hwaddr pteg_off, pte_offset;
     hwaddr hash;
@@ -346,25 +346,27 @@ static hwaddr ppc_hash32_htab_lookup(PowerPCCPU *cpu,
     ptem = (vsid << 7) | (pgidx >> 10);
 
     /* Page address translation */
-    qemu_log_mask(CPU_LOG_MMU, "htab_base " HWADDR_FMT_plx
-            " htab_mask " HWADDR_FMT_plx
-            " hash " HWADDR_FMT_plx "\n",
-            ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu), hash);
+    qemu_log_mask(CPU_LOG_MMU,
+                  "htab_base " HWADDR_FMT_plx " htab_mask " HWADDR_FMT_plx
+                  " hash " HWADDR_FMT_plx "\n",
+                  ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu), hash);
 
     /* Primary PTEG lookup */
-    qemu_log_mask(CPU_LOG_MMU, "0 htab=" HWADDR_FMT_plx "/" HWADDR_FMT_plx
-            " vsid=%" PRIx32 " ptem=%" PRIx32
-            " hash=" HWADDR_FMT_plx "\n",
-            ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu),
-            vsid, ptem, hash);
+    qemu_log_mask(CPU_LOG_MMU,
+                  "0 htab=" HWADDR_FMT_plx "/" HWADDR_FMT_plx " vsid=%" PRIx32
+                  " ptem=%" PRIx32 " hash=" HWADDR_FMT_plx "\n",
+                  ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu), vsid,
+                  ptem, hash);
     pteg_off = get_pteg_offset32(cpu, hash);
     pte_offset = ppc_hash32_pteg_search(cpu, pteg_off, 0, ptem, pte);
     if (pte_offset == -1) {
         /* Secondary PTEG lookup */
-        qemu_log_mask(CPU_LOG_MMU, "1 htab=" HWADDR_FMT_plx "/" HWADDR_FMT_plx
-                " vsid=%" PRIx32 " api=%" PRIx32
-                " hash=" HWADDR_FMT_plx "\n", ppc_hash32_hpt_base(cpu),
-                ppc_hash32_hpt_mask(cpu), vsid, ptem, ~hash);
+        qemu_log_mask(CPU_LOG_MMU,
+                      "1 htab=" HWADDR_FMT_plx "/" HWADDR_FMT_plx
+                      " vsid=%" PRIx32 " api=%" PRIx32 " hash=" HWADDR_FMT_plx
+                      "\n",
+                      ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu), vsid,
+                      ptem, ~hash);
         pteg_off = get_pteg_offset32(cpu, ~hash);
         pte_offset = ppc_hash32_pteg_search(cpu, pteg_off, 1, ptem, pte);
     }
@@ -439,8 +441,8 @@ bool ppc_hash32_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
 
     /* 4. Handle direct store segments */
     if (sr & SR32_T) {
-        return ppc_hash32_direct_store(cpu, sr, eaddr, access_type,
-                                       raddrp, protp, mmu_idx, guest_visible);
+        return ppc_hash32_direct_store(cpu, sr, eaddr, access_type, raddrp,
+                                       protp, mmu_idx, guest_visible);
     }
 
     /* 5. Check for segment level no-execute violation */
@@ -472,8 +474,8 @@ bool ppc_hash32_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
         }
         return false;
     }
-    qemu_log_mask(CPU_LOG_MMU,
-                "found PTE at offset %08" HWADDR_PRIx "\n", pte_offset);
+    qemu_log_mask(CPU_LOG_MMU, "found PTE at offset %08" HWADDR_PRIx "\n",
+                  pte_offset);
 
     /* 7. Check access permissions */
 
@@ -517,7 +519,7 @@ bool ppc_hash32_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
              */
             prot &= ~PAGE_WRITE;
         }
-     }
+    }
 
     /* 9. Determine the real address from the PTE */
 

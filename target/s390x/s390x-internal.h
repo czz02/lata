@@ -16,82 +16,82 @@
 #ifndef CONFIG_USER_ONLY
 typedef struct LowCore {
     /* prefix area: defined by architecture */
-    uint32_t        ccw1[2];                  /* 0x000 */
-    uint32_t        ccw2[4];                  /* 0x008 */
-    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
-    uint32_t        ext_params;               /* 0x080 */
-    uint16_t        cpu_addr;                 /* 0x084 */
-    uint16_t        ext_int_code;             /* 0x086 */
-    uint16_t        svc_ilen;                 /* 0x088 */
-    uint16_t        svc_code;                 /* 0x08a */
-    uint16_t        pgm_ilen;                 /* 0x08c */
-    uint16_t        pgm_code;                 /* 0x08e */
-    uint32_t        data_exc_code;            /* 0x090 */
-    uint16_t        mon_class_num;            /* 0x094 */
-    uint16_t        per_perc_atmid;           /* 0x096 */
-    uint64_t        per_address;              /* 0x098 */
-    uint8_t         exc_access_id;            /* 0x0a0 */
-    uint8_t         per_access_id;            /* 0x0a1 */
-    uint8_t         op_access_id;             /* 0x0a2 */
-    uint8_t         ar_access_id;             /* 0x0a3 */
-    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
-    uint64_t        trans_exc_code;           /* 0x0a8 */
-    uint64_t        monitor_code;             /* 0x0b0 */
-    uint16_t        subchannel_id;            /* 0x0b8 */
-    uint16_t        subchannel_nr;            /* 0x0ba */
-    uint32_t        io_int_parm;              /* 0x0bc */
-    uint32_t        io_int_word;              /* 0x0c0 */
-    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
-    uint32_t        stfl_fac_list;            /* 0x0c8 */
-    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
-    uint64_t        mcic;                     /* 0x0e8 */
-    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
-    uint32_t        external_damage_code;     /* 0x0f4 */
-    uint64_t        failing_storage_address;  /* 0x0f8 */
-    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
-    uint64_t        per_breaking_event_addr;  /* 0x110 */
-    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
-    PSW             restart_old_psw;          /* 0x120 */
-    PSW             external_old_psw;         /* 0x130 */
-    PSW             svc_old_psw;              /* 0x140 */
-    PSW             program_old_psw;          /* 0x150 */
-    PSW             mcck_old_psw;             /* 0x160 */
-    PSW             io_old_psw;               /* 0x170 */
-    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
-    PSW             restart_new_psw;          /* 0x1a0 */
-    PSW             external_new_psw;         /* 0x1b0 */
-    PSW             svc_new_psw;              /* 0x1c0 */
-    PSW             program_new_psw;          /* 0x1d0 */
-    PSW             mcck_new_psw;             /* 0x1e0 */
-    PSW             io_new_psw;               /* 0x1f0 */
-    uint8_t         pad13[0x11b0 - 0x200];    /* 0x200 */
+    uint32_t ccw1[2]; /* 0x000 */
+    uint32_t ccw2[4]; /* 0x008 */
+    uint8_t pad1[0x80 - 0x18]; /* 0x018 */
+    uint32_t ext_params; /* 0x080 */
+    uint16_t cpu_addr; /* 0x084 */
+    uint16_t ext_int_code; /* 0x086 */
+    uint16_t svc_ilen; /* 0x088 */
+    uint16_t svc_code; /* 0x08a */
+    uint16_t pgm_ilen; /* 0x08c */
+    uint16_t pgm_code; /* 0x08e */
+    uint32_t data_exc_code; /* 0x090 */
+    uint16_t mon_class_num; /* 0x094 */
+    uint16_t per_perc_atmid; /* 0x096 */
+    uint64_t per_address; /* 0x098 */
+    uint8_t exc_access_id; /* 0x0a0 */
+    uint8_t per_access_id; /* 0x0a1 */
+    uint8_t op_access_id; /* 0x0a2 */
+    uint8_t ar_access_id; /* 0x0a3 */
+    uint8_t pad2[0xA8 - 0xA4]; /* 0x0a4 */
+    uint64_t trans_exc_code; /* 0x0a8 */
+    uint64_t monitor_code; /* 0x0b0 */
+    uint16_t subchannel_id; /* 0x0b8 */
+    uint16_t subchannel_nr; /* 0x0ba */
+    uint32_t io_int_parm; /* 0x0bc */
+    uint32_t io_int_word; /* 0x0c0 */
+    uint8_t pad3[0xc8 - 0xc4]; /* 0x0c4 */
+    uint32_t stfl_fac_list; /* 0x0c8 */
+    uint8_t pad4[0xe8 - 0xcc]; /* 0x0cc */
+    uint64_t mcic; /* 0x0e8 */
+    uint8_t pad5[0xf4 - 0xf0]; /* 0x0f0 */
+    uint32_t external_damage_code; /* 0x0f4 */
+    uint64_t failing_storage_address; /* 0x0f8 */
+    uint8_t pad6[0x110 - 0x100]; /* 0x100 */
+    uint64_t per_breaking_event_addr; /* 0x110 */
+    uint8_t pad7[0x120 - 0x118]; /* 0x118 */
+    PSW restart_old_psw; /* 0x120 */
+    PSW external_old_psw; /* 0x130 */
+    PSW svc_old_psw; /* 0x140 */
+    PSW program_old_psw; /* 0x150 */
+    PSW mcck_old_psw; /* 0x160 */
+    PSW io_old_psw; /* 0x170 */
+    uint8_t pad8[0x1a0 - 0x180]; /* 0x180 */
+    PSW restart_new_psw; /* 0x1a0 */
+    PSW external_new_psw; /* 0x1b0 */
+    PSW svc_new_psw; /* 0x1c0 */
+    PSW program_new_psw; /* 0x1d0 */
+    PSW mcck_new_psw; /* 0x1e0 */
+    PSW io_new_psw; /* 0x1f0 */
+    uint8_t pad13[0x11b0 - 0x200]; /* 0x200 */
 
-    uint64_t        mcesad;                    /* 0x11B0 */
+    uint64_t mcesad; /* 0x11B0 */
 
     /* 64 bit extparam used for pfault, diag 250 etc  */
-    uint64_t        ext_params2;               /* 0x11B8 */
+    uint64_t ext_params2; /* 0x11B8 */
 
-    uint8_t         pad14[0x1200 - 0x11C0];    /* 0x11C0 */
+    uint8_t pad14[0x1200 - 0x11C0]; /* 0x11C0 */
 
     /* System info area */
 
-    uint64_t        floating_pt_save_area[16]; /* 0x1200 */
-    uint64_t        gpregs_save_area[16];      /* 0x1280 */
-    uint32_t        st_status_fixed_logout[4]; /* 0x1300 */
-    uint8_t         pad15[0x1318 - 0x1310];    /* 0x1310 */
-    uint32_t        prefixreg_save_area;       /* 0x1318 */
-    uint32_t        fpt_creg_save_area;        /* 0x131c */
-    uint8_t         pad16[0x1324 - 0x1320];    /* 0x1320 */
-    uint32_t        tod_progreg_save_area;     /* 0x1324 */
-    uint64_t        cpu_timer_save_area;       /* 0x1328 */
-    uint64_t        clock_comp_save_area;      /* 0x1330 */
-    uint8_t         pad17[0x1340 - 0x1338];    /* 0x1338 */
-    uint32_t        access_regs_save_area[16]; /* 0x1340 */
-    uint64_t        cregs_save_area[16];       /* 0x1380 */
+    uint64_t floating_pt_save_area[16]; /* 0x1200 */
+    uint64_t gpregs_save_area[16]; /* 0x1280 */
+    uint32_t st_status_fixed_logout[4]; /* 0x1300 */
+    uint8_t pad15[0x1318 - 0x1310]; /* 0x1310 */
+    uint32_t prefixreg_save_area; /* 0x1318 */
+    uint32_t fpt_creg_save_area; /* 0x131c */
+    uint8_t pad16[0x1324 - 0x1320]; /* 0x1320 */
+    uint32_t tod_progreg_save_area; /* 0x1324 */
+    uint64_t cpu_timer_save_area; /* 0x1328 */
+    uint64_t clock_comp_save_area; /* 0x1330 */
+    uint8_t pad17[0x1340 - 0x1338]; /* 0x1338 */
+    uint32_t access_regs_save_area[16]; /* 0x1340 */
+    uint64_t cregs_save_area[16]; /* 0x1380 */
 
     /* align to the top of the prefix area */
 
-    uint8_t         pad18[0x2000 - 0x1400];    /* 0x1400 */
+    uint8_t pad18[0x2000 - 0x1400]; /* 0x1400 */
 } QEMU_PACKED LowCore;
 QEMU_BUILD_BUG_ON(sizeof(LowCore) != 8192);
 #endif /* CONFIG_USER_ONLY */
@@ -120,12 +120,11 @@ static inline int get_ilen(uint8_t opc)
    entry when a PER exception is triggered.  */
 static inline uint8_t get_per_atmid(CPUS390XState *env)
 {
-    return ((env->psw.mask & PSW_MASK_64) ?       (1 << 7) : 0) |
-                                                  (1 << 6)      |
-           ((env->psw.mask & PSW_MASK_32) ?       (1 << 5) : 0) |
-           ((env->psw.mask & PSW_MASK_DAT) ?      (1 << 4) : 0) |
+    return ((env->psw.mask & PSW_MASK_64) ? (1 << 7) : 0) | (1 << 6) |
+           ((env->psw.mask & PSW_MASK_32) ? (1 << 5) : 0) |
+           ((env->psw.mask & PSW_MASK_DAT) ? (1 << 4) : 0) |
            ((env->psw.mask & PSW_ASC_SECONDARY) ? (1 << 3) : 0) |
-           ((env->psw.mask & PSW_ASC_ACCREG) ?    (1 << 2) : 0);
+           ((env->psw.mask & PSW_ASC_ACCREG) ? (1 << 2) : 0);
 }
 
 static inline uint64_t wrap_address(CPUS390XState *env, uint64_t a)
@@ -152,52 +151,52 @@ static inline uint64_t wrap_address(CPUS390XState *env, uint64_t a)
  * if they are only needed for conditional branches.
  */
 enum cc_op {
-    CC_OP_CONST0 = 0,           /* CC is 0 */
-    CC_OP_CONST1,               /* CC is 1 */
-    CC_OP_CONST2,               /* CC is 2 */
-    CC_OP_CONST3,               /* CC is 3 */
+    CC_OP_CONST0 = 0, /* CC is 0 */
+    CC_OP_CONST1, /* CC is 1 */
+    CC_OP_CONST2, /* CC is 2 */
+    CC_OP_CONST3, /* CC is 3 */
 
-    CC_OP_DYNAMIC,              /* CC calculation defined by env->cc_op */
-    CC_OP_STATIC,               /* CC value is env->cc_op */
+    CC_OP_DYNAMIC, /* CC calculation defined by env->cc_op */
+    CC_OP_STATIC, /* CC value is env->cc_op */
 
-    CC_OP_NZ,                   /* env->cc_dst != 0 */
-    CC_OP_ADDU,                 /* dst != 0, src = carry out (0,1) */
-    CC_OP_SUBU,                 /* dst != 0, src = borrow out (0,-1) */
+    CC_OP_NZ, /* env->cc_dst != 0 */
+    CC_OP_ADDU, /* dst != 0, src = carry out (0,1) */
+    CC_OP_SUBU, /* dst != 0, src = borrow out (0,-1) */
 
-    CC_OP_LTGT_32,              /* signed less/greater than (32bit) */
-    CC_OP_LTGT_64,              /* signed less/greater than (64bit) */
-    CC_OP_LTUGTU_32,            /* unsigned less/greater than (32bit) */
-    CC_OP_LTUGTU_64,            /* unsigned less/greater than (64bit) */
-    CC_OP_LTGT0_32,             /* signed less/greater than 0 (32bit) */
-    CC_OP_LTGT0_64,             /* signed less/greater than 0 (64bit) */
+    CC_OP_LTGT_32, /* signed less/greater than (32bit) */
+    CC_OP_LTGT_64, /* signed less/greater than (64bit) */
+    CC_OP_LTUGTU_32, /* unsigned less/greater than (32bit) */
+    CC_OP_LTUGTU_64, /* unsigned less/greater than (64bit) */
+    CC_OP_LTGT0_32, /* signed less/greater than 0 (32bit) */
+    CC_OP_LTGT0_64, /* signed less/greater than 0 (64bit) */
 
-    CC_OP_ADD_64,               /* overflow on add (64bit) */
-    CC_OP_SUB_64,               /* overflow on subtraction (64bit) */
-    CC_OP_ABS_64,               /* sign eval on abs (64bit) */
-    CC_OP_NABS_64,              /* sign eval on nabs (64bit) */
-    CC_OP_MULS_64,              /* overflow on signed multiply (64bit) */
+    CC_OP_ADD_64, /* overflow on add (64bit) */
+    CC_OP_SUB_64, /* overflow on subtraction (64bit) */
+    CC_OP_ABS_64, /* sign eval on abs (64bit) */
+    CC_OP_NABS_64, /* sign eval on nabs (64bit) */
+    CC_OP_MULS_64, /* overflow on signed multiply (64bit) */
 
-    CC_OP_ADD_32,               /* overflow on add (32bit) */
-    CC_OP_SUB_32,               /* overflow on subtraction (32bit) */
-    CC_OP_ABS_32,               /* sign eval on abs (64bit) */
-    CC_OP_NABS_32,              /* sign eval on nabs (64bit) */
-    CC_OP_MULS_32,              /* overflow on signed multiply (32bit) */
+    CC_OP_ADD_32, /* overflow on add (32bit) */
+    CC_OP_SUB_32, /* overflow on subtraction (32bit) */
+    CC_OP_ABS_32, /* sign eval on abs (64bit) */
+    CC_OP_NABS_32, /* sign eval on nabs (64bit) */
+    CC_OP_MULS_32, /* overflow on signed multiply (32bit) */
 
-    CC_OP_COMP_32,              /* complement */
-    CC_OP_COMP_64,              /* complement */
+    CC_OP_COMP_32, /* complement */
+    CC_OP_COMP_64, /* complement */
 
-    CC_OP_TM_32,                /* test under mask (32bit) */
-    CC_OP_TM_64,                /* test under mask (64bit) */
+    CC_OP_TM_32, /* test under mask (32bit) */
+    CC_OP_TM_64, /* test under mask (64bit) */
 
-    CC_OP_NZ_F32,               /* FP dst != 0 (32bit) */
-    CC_OP_NZ_F64,               /* FP dst != 0 (64bit) */
-    CC_OP_NZ_F128,              /* FP dst != 0 (128bit) */
+    CC_OP_NZ_F32, /* FP dst != 0 (32bit) */
+    CC_OP_NZ_F64, /* FP dst != 0 (64bit) */
+    CC_OP_NZ_F128, /* FP dst != 0 (128bit) */
 
-    CC_OP_ICM,                  /* insert characters under mask */
-    CC_OP_SLA,                  /* Calculate shift left signed */
-    CC_OP_FLOGR,                /* find leftmost one */
-    CC_OP_LCBB,                 /* load count to block boundary */
-    CC_OP_VC,                   /* vector compare result */
+    CC_OP_ICM, /* insert characters under mask */
+    CC_OP_SLA, /* Calculate shift left signed */
+    CC_OP_FLOGR, /* find leftmost one */
+    CC_OP_LCBB, /* load count to block boundary */
+    CC_OP_VC, /* vector compare result */
     CC_OP_MAX
 };
 
@@ -227,8 +226,8 @@ static inline hwaddr decode_basedisp_s(CPUS390XState *env, uint32_t ipb,
 #endif /* CONFIG_USER_ONLY */
 
 /* arch_dump.c */
-int s390_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                              int cpuid, DumpState *s);
+int s390_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs, int cpuid,
+                              DumpState *s);
 
 
 /* cc_helper.c */
@@ -273,17 +272,17 @@ bool s390_cpu_exec_interrupt(CPUState *cpu, int int_req);
 
 #ifdef CONFIG_USER_ONLY
 void s390_cpu_record_sigsegv(CPUState *cs, vaddr address,
-                             MMUAccessType access_type,
-                             bool maperr, uintptr_t retaddr);
+                             MMUAccessType access_type, bool maperr,
+                             uintptr_t retaddr);
 void s390_cpu_record_sigbus(CPUState *cs, vaddr address,
                             MMUAccessType access_type, uintptr_t retaddr);
 #else
 bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                       MMUAccessType access_type, int mmu_idx,
-                       bool probe, uintptr_t retaddr);
+                       MMUAccessType access_type, int mmu_idx, bool probe,
+                       uintptr_t retaddr);
 G_NORETURN void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                              MMUAccessType access_type, int mmu_idx,
-                                              uintptr_t retaddr);
+                                              MMUAccessType access_type,
+                                              int mmu_idx, uintptr_t retaddr);
 #endif
 
 
@@ -291,25 +290,25 @@ G_NORETURN void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
 uint32_t set_cc_nz_f32(float32 v);
 uint32_t set_cc_nz_f64(float64 v);
 uint32_t set_cc_nz_f128(float128 v);
-#define S390_IEEE_MASK_INVALID   0x80
+#define S390_IEEE_MASK_INVALID 0x80
 #define S390_IEEE_MASK_DIVBYZERO 0x40
-#define S390_IEEE_MASK_OVERFLOW  0x20
+#define S390_IEEE_MASK_OVERFLOW 0x20
 #define S390_IEEE_MASK_UNDERFLOW 0x10
-#define S390_IEEE_MASK_INEXACT   0x08
-#define S390_IEEE_MASK_QUANTUM   0x04
+#define S390_IEEE_MASK_INEXACT 0x08
+#define S390_IEEE_MASK_QUANTUM 0x04
 uint8_t s390_softfloat_exc_to_ieee(unsigned int exc);
 int s390_swap_bfp_rounding_mode(CPUS390XState *env, int m3);
 void s390_restore_bfp_rounding_mode(CPUS390XState *env, int old_mode);
 int float_comp_to_cc(CPUS390XState *env, FloatRelation float_compare);
 
-#define DCMASK_ZERO             0x0c00
-#define DCMASK_NORMAL           0x0300
-#define DCMASK_SUBNORMAL        0x00c0
-#define DCMASK_INFINITY         0x0030
-#define DCMASK_QUIET_NAN        0x000c
-#define DCMASK_SIGNALING_NAN    0x0003
-#define DCMASK_NAN              0x000f
-#define DCMASK_NEGATIVE         0x0555
+#define DCMASK_ZERO 0x0c00
+#define DCMASK_NORMAL 0x0300
+#define DCMASK_SUBNORMAL 0x00c0
+#define DCMASK_INFINITY 0x0030
+#define DCMASK_QUIET_NAN 0x000c
+#define DCMASK_SIGNALING_NAN 0x0003
+#define DCMASK_NAN 0x000f
+#define DCMASK_NEGATIVE 0x0555
 uint16_t float32_dcmask(CPUS390XState *env, float32 f1);
 uint16_t float64_dcmask(CPUS390XState *env, float64 f1);
 uint16_t float128_dcmask(CPUS390XState *env, float128 f1);
@@ -384,7 +383,7 @@ void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
 /* mmu_helper.c */
 bool mmu_absolute_addr_valid(target_ulong addr, bool is_write);
 /* Special access mode only valid for mmu_translate() */
-#define MMU_S390_LRA        -1
+#define MMU_S390_LRA -1
 int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
                   target_ulong *raddr, int *flags, uint64_t *tec);
 int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
@@ -399,8 +398,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3,
 
 /* translate.c */
 void s390x_translate_init(void);
-void s390x_restore_state_to_opc(CPUState *cs,
-                                const TranslationBlock *tb,
+void s390x_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                 const uint64_t *data);
 
 /* sigp.c */

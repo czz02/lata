@@ -39,11 +39,10 @@ int mips_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
             return gdb_get_regl(mem_buf, (int32_t)env->active_fpu.fcr0);
         default:
             if (env->CP0_Status & (1 << CP0St_FR)) {
-                return gdb_get_regl(mem_buf,
-                    env->active_fpu.fpr[n - 38].d);
+                return gdb_get_regl(mem_buf, env->active_fpu.fpr[n - 38].d);
             } else {
-                return gdb_get_regl(mem_buf,
-                    env->active_fpu.fpr[n - 38].w[FP_ENDIAN_IDX]);
+                return gdb_get_regl(
+                    mem_buf, env->active_fpu.fpr[n - 38].w[FP_ENDIAN_IDX]);
             }
         }
     }
@@ -60,7 +59,7 @@ int mips_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
         return gdb_get_regl(mem_buf, (int32_t)env->CP0_Cause);
     case 37:
         return gdb_get_regl(mem_buf, env->active_tc.PC |
-                                     !!(env->hflags & MIPS_HFLAG_M16));
+                                         !!(env->hflags & MIPS_HFLAG_M16));
     case 72:
         return gdb_get_regl(mem_buf, 0); /* fp */
     case 89:
@@ -91,8 +90,9 @@ int mips_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
     if (env->CP0_Config1 & (1 << CP0C1_FP) && n >= 38 && n < 72) {
         switch (n) {
         case 70:
-            env->active_fpu.fcr31 = (tmp & env->active_fpu.fcr31_rw_bitmask) |
-                  (env->active_fpu.fcr31 & ~(env->active_fpu.fcr31_rw_bitmask));
+            env->active_fpu.fcr31 =
+                (tmp & env->active_fpu.fcr31_rw_bitmask) |
+                (env->active_fpu.fcr31 & ~(env->active_fpu.fcr31_rw_bitmask));
             restore_fp_status(env);
             break;
         case 71:

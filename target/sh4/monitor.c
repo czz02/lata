@@ -29,14 +29,13 @@
 
 static void print_tlb(Monitor *mon, int idx, tlb_t *tlb)
 {
-    monitor_printf(mon, " tlb%i:\t"
+    monitor_printf(mon,
+                   " tlb%i:\t"
                    "asid=%hhu vpn=%x\tppn=%x\tsz=%hhu size=%u\t"
                    "v=%hhu shared=%hhu cached=%hhu prot=%hhu "
                    "dirty=%hhu writethrough=%hhu\n",
-                   idx,
-                   tlb->asid, tlb->vpn, tlb->ppn, tlb->sz, tlb->size,
-                   tlb->v, tlb->sh, tlb->c, tlb->pr,
-                   tlb->d, tlb->wt);
+                   idx, tlb->asid, tlb->vpn, tlb->ppn, tlb->sz, tlb->size,
+                   tlb->v, tlb->sh, tlb->c, tlb->pr, tlb->d, tlb->wt);
 }
 
 void hmp_info_tlb(Monitor *mon, const QDict *qdict)
@@ -49,10 +48,10 @@ void hmp_info_tlb(Monitor *mon, const QDict *qdict)
         return;
     }
 
-    monitor_printf (mon, "ITLB:\n");
-    for (i = 0 ; i < ITLB_SIZE ; i++)
-        print_tlb (mon, i, &env->itlb[i]);
-    monitor_printf (mon, "UTLB:\n");
-    for (i = 0 ; i < UTLB_SIZE ; i++)
-        print_tlb (mon, i, &env->utlb[i]);
+    monitor_printf(mon, "ITLB:\n");
+    for (i = 0; i < ITLB_SIZE; i++)
+        print_tlb(mon, i, &env->itlb[i]);
+    monitor_printf(mon, "UTLB:\n");
+    for (i = 0; i < UTLB_SIZE; i++)
+        print_tlb(mon, i, &env->utlb[i]);
 }

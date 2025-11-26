@@ -42,7 +42,7 @@ void rr_kick_vcpu_thread(CPUState *unused)
 {
     CPUState *cpu;
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         cpu_exit(cpu);
     };
 }
@@ -90,8 +90,8 @@ static void rr_kick_thread(void *opaque)
 static void rr_start_kick_timer(void)
 {
     if (!rr_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
-        rr_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                           rr_kick_thread, NULL);
+        rr_kick_vcpu_timer =
+            timer_new_ns(QEMU_CLOCK_VIRTUAL, rr_kick_thread, NULL);
     }
     if (rr_kick_vcpu_timer && !timer_pending(rr_kick_vcpu_timer)) {
         timer_mod(rr_kick_vcpu_timer, rr_next_kick_time());
@@ -116,7 +116,7 @@ static void rr_wait_io_event(void)
 
     rr_start_kick_timer();
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         qemu_wait_io_event_common(cpu);
     }
 }
@@ -129,7 +129,7 @@ static void rr_deal_with_unplugged_cpus(void)
 {
     CPUState *cpu;
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         if (cpu->unplug && !cpu_can_run(cpu)) {
             tcg_cpus_destroy(cpu);
             break;
@@ -160,7 +160,7 @@ static int rr_cpu_count(void)
 
     if (cpu_list_generation_id_get() != last_gen_id) {
         cpu_count = 0;
-        CPU_FOREACH(cpu) {
+        CPU_FOREACH (cpu) {
             ++cpu_count;
         }
         last_gen_id = cpu_list_generation_id_get();
@@ -201,7 +201,7 @@ static void *rr_cpu_thread_fn(void *arg)
         qemu_cond_wait_iothread(first_cpu->halt_cond);
 
         /* process any pending work */
-        CPU_FOREACH(cpu) {
+        CPU_FOREACH (cpu) {
             current_cpu = cpu;
             qemu_wait_io_event_common(cpu);
         }
@@ -323,9 +323,8 @@ void rr_start_vcpu_thread(CPUState *cpu)
 
         /* share a single thread for all cpus with TCG */
         snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
-        qemu_thread_create(cpu->thread, thread_name,
-                           rr_cpu_thread_fn,
-                           cpu, QEMU_THREAD_JOINABLE);
+        qemu_thread_create(cpu->thread, thread_name, rr_cpu_thread_fn, cpu,
+                           QEMU_THREAD_JOINABLE);
 
         single_tcg_halt_cond = cpu->halt_cond;
         single_tcg_cpu_thread = cpu->thread;

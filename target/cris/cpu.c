@@ -42,8 +42,7 @@ static vaddr cris_cpu_get_pc(CPUState *cs)
     return cpu->env.pc;
 }
 
-static void cris_restore_state_to_opc(CPUState *cs,
-                                      const TranslationBlock *tb,
+static void cris_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                       const uint64_t *data)
 {
     CRISCPU *cpu = CRIS_CPU(cs);
@@ -333,12 +332,11 @@ static void cris_cpu_class_init(ObjectClass *oc, void *data)
     cc->disas_set_info = cris_disas_set_info;
 }
 
-#define DEFINE_CRIS_CPU_TYPE(cpu_model, initfn) \
-     {                                          \
-         .parent = TYPE_CRIS_CPU,               \
-         .class_init = initfn,                  \
-         .name = CRIS_CPU_TYPE_NAME(cpu_model), \
-     }
+#define DEFINE_CRIS_CPU_TYPE(cpu_model, initfn)        \
+    {                                                  \
+        .parent = TYPE_CRIS_CPU, .class_init = initfn, \
+        .name = CRIS_CPU_TYPE_NAME(cpu_model),         \
+    }
 
 static const TypeInfo cris_cpu_model_type_infos[] = {
     {

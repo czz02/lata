@@ -30,7 +30,7 @@
 #include <sys/param.h>
 #if __FreeBSD_version >= 700104
 #define HAVE_KINFO_GETVMMAP
-#define sigqueue sigqueue_freebsd  /* avoid redefinition */
+#define sigqueue sigqueue_freebsd /* avoid redefinition */
 #include <sys/proc.h>
 #include <machine/profile.h>
 #define _KERNEL
@@ -85,8 +85,8 @@ static uint8_t *encode_sleb128(uint8_t *p, int64_t val)
     do {
         byte = val & 0x7f;
         val >>= 7;
-        more = !((val == 0 && (byte & 0x40) == 0)
-                 || (val == -1 && (byte & 0x40) != 0));
+        more = !((val == 0 && (byte & 0x40) == 0) ||
+                 (val == -1 && (byte & 0x40) != 0));
         if (more) {
             byte |= 0x80;
         }
@@ -292,7 +292,8 @@ int tr_translate_tb(struct TranslationBlock *tb)
 #ifdef CONFIG_ANDROID
 #include "android.h"
 
-static inline int tr_translate_wrap(struct TranslationBlock *tb, uint64_t host_pc, uint64_t callee)
+static inline int tr_translate_wrap(struct TranslationBlock *tb,
+                                    uint64_t host_pc, uint64_t callee)
 {
     tr_init(tb);
     tcg_insn_unit *gen_code_buf;
@@ -312,7 +313,8 @@ static inline int gen_func_wrap(TranslationBlock *tb, vaddr pc)
     uint64_t berberis_pc =
         (uint64_t)g_hash_table_lookup(berberis_guest_host, (gpointer)pc);
 
-    if(!berberis_pc) return 0;
+    if (!berberis_pc)
+        return 0;
 
     uint64_t callee =
         (uint64_t)g_hash_table_lookup(berberis_guest_callee, (gpointer)pc);
@@ -326,9 +328,8 @@ static inline int gen_func_wrap(TranslationBlock *tb, vaddr pc)
  * Isolate the portion of code gen which can setjmp/longjmp.
  * Return the size of the generated code, or negative on error.
  */
-static int setjmp_gen_code(CPUArchState *env, TranslationBlock *tb,
-                           vaddr pc, void *host_pc,
-                           int *max_insns, int64_t *ti)
+static int setjmp_gen_code(CPUArchState *env, TranslationBlock *tb, vaddr pc,
+                           void *host_pc, int *max_insns, int64_t *ti)
 {
     int ret = sigsetjmp(tcg_ctx->jmp_trans, 0);
     if (unlikely(ret != 0)) {
@@ -338,7 +339,8 @@ static int setjmp_gen_code(CPUArchState *env, TranslationBlock *tb,
     tcg_func_start(tcg_ctx);
 
     tcg_ctx->cpu = env_cpu(env);
-    tcg_ctx->gen_insn_data = tcg_malloc(sizeof(uint64_t) * (*max_insns) * tcg_ctx->insn_start_words);
+    tcg_ctx->gen_insn_data =
+        tcg_malloc(sizeof(uint64_t) * (*max_insns) * tcg_ctx->insn_start_words);
 
 #ifdef CONFIG_LATA
     target_disasm(tb, max_insns, env_cpu(env));
@@ -358,8 +360,7 @@ static int setjmp_gen_code(CPUArchState *env, TranslationBlock *tb,
 #endif
 
 /* Called with mmap_lock held for user mode emulation.  */
-TranslationBlock *tb_gen_code(CPUState *cpu,
-                              vaddr pc, uint64_t cs_base,
+TranslationBlock *tb_gen_code(CPUState *cpu, vaddr pc, uint64_t cs_base,
                               uint32_t flags, int cflags)
 {
     CPUArchState *env = cpu->env_ptr;
@@ -386,7 +387,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
     }
     QEMU_BUILD_BUG_ON(CF_COUNT_MASK + 1 != TCG_MAX_INSNS);
 
- buffer_overflow:
+buffer_overflow:
     assert_no_pages_locked();
     tb = tcg_tb_alloc(tcg_ctx);
     if (unlikely(!tb)) {
@@ -436,11 +437,11 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
 #ifdef CONFIG_LATA_INSTS_PATTERN
     tb->nzcv_save[0] = TB_JMP_OFFSET_INVALID;
     tb->nzcv_save[1] = TB_JMP_OFFSET_INVALID;
-    tb->nzcv_use = true ;
+    tb->nzcv_use = true;
 #endif
 #endif
 
-// push_queue(&q4pc, pc);
+    // push_queue(&q4pc, pc);
 
 #ifdef CONFIG_ANDROID
     gen_code_size = gen_func_wrap(tb, pc);
@@ -465,7 +466,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
     }
 #endif
 
- restart_translate:
+restart_translate:
     trace_translate_block(tb, pc, tb->tc.ptr);
 
     gen_code_size = setjmp_gen_code(env, tb, pc, host_pc, &max_insns, &ti);
@@ -534,7 +535,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
     }
     tcg_ctx->gen_tb = NULL;
 
-    
+
 #ifdef CONFIG_SPLIT_TB
     search_size = encode_search(tb, (void *)(tcg_ctx->tb_gen_tail));
 #else
@@ -552,8 +553,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
      */
     perf_report_code(pc, tb, tcg_splitwx_to_rx(gen_code_buf));
 
-    if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM) &&
-        qemu_log_in_addr_range(pc)) {
+    if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM) && qemu_log_in_addr_range(pc)) {
         FILE *logfile = qemu_log_trylock();
         if (logfile) {
             int code_size, data_size;
@@ -573,9 +573,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
 
             /* Dump header and the first instruction */
             fprintf(logfile, "OUT: [size=%d]\n", gen_code_size);
-            fprintf(logfile,
-                    "  -- guest addr 0x%016" PRIx64 " + tb prologue\n",
-                    (uint64_t)tcg_ctx->gen_insn_data[insn * TARGET_INSN_START_WORDS]);
+            fprintf(logfile, "  -- guest addr 0x%016" PRIx64 " + tb prologue\n",
+                    (uint64_t)
+                        tcg_ctx->gen_insn_data[insn * TARGET_INSN_START_WORDS]);
             chunk_start = tcg_ctx->gen_insn_end_off[insn];
             disas(logfile, tb->tc.ptr, chunk_start);
 
@@ -587,8 +587,10 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
             while (insn < tb->icount) {
                 size_t chunk_end = tcg_ctx->gen_insn_end_off[insn];
                 if (chunk_end > chunk_start) {
-                    fprintf(logfile, "  -- guest addr 0x%016" PRIx64 "\n",
-                            (uint64_t)tcg_ctx->gen_insn_data[insn * TARGET_INSN_START_WORDS]);
+                    fprintf(
+                        logfile, "  -- guest addr 0x%016" PRIx64 "\n",
+                        (uint64_t)tcg_ctx
+                            ->gen_insn_data[insn * TARGET_INSN_START_WORDS]);
                     disas(logfile, tb->tc.ptr + chunk_start,
                           chunk_end - chunk_start);
                     chunk_start = chunk_end;
@@ -608,13 +610,15 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
                 fprintf(logfile, "  data: [size=%d]\n", data_size);
                 for (i = 0; i < data_size / sizeof(tcg_target_ulong); i++) {
                     if (sizeof(tcg_target_ulong) == 8) {
-                        fprintf(logfile,
-                                "0x%08" PRIxPTR ":  .quad  0x%016" TCG_PRIlx "\n",
-                                (uintptr_t)&rx_data_gen_ptr[i], rx_data_gen_ptr[i]);
+                        fprintf(
+                            logfile,
+                            "0x%08" PRIxPTR ":  .quad  0x%016" TCG_PRIlx "\n",
+                            (uintptr_t)&rx_data_gen_ptr[i], rx_data_gen_ptr[i]);
                     } else if (sizeof(tcg_target_ulong) == 4) {
-                        fprintf(logfile,
-                                "0x%08" PRIxPTR ":  .long  0x%08" TCG_PRIlx "\n",
-                                (uintptr_t)&rx_data_gen_ptr[i], rx_data_gen_ptr[i]);
+                        fprintf(
+                            logfile,
+                            "0x%08" PRIxPTR ":  .long  0x%08" TCG_PRIlx "\n",
+                            (uintptr_t)&rx_data_gen_ptr[i], rx_data_gen_ptr[i]);
                     } else {
                         qemu_build_not_reached();
                     }
@@ -627,11 +631,14 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
 
     /*code cache space apply*/
 #ifdef CONFIG_SPLIT_TB
-    qatomic_set(&tcg_ctx->code_gen_ptr, (void *)ROUND_UP(((uintptr_t)gen_code_buf + gen_code_size), CODE_GEN_ALIGN));
+    qatomic_set(&tcg_ctx->code_gen_ptr,
+                (void *)ROUND_UP(((uintptr_t)gen_code_buf + gen_code_size),
+                                 CODE_GEN_ALIGN));
 #else
-    qatomic_set(&tcg_ctx->code_gen_ptr, (void *)
-        ROUND_UP((uintptr_t)gen_code_buf + gen_code_size + search_size,
-                 CODE_GEN_ALIGN));
+    qatomic_set(
+        &tcg_ctx->code_gen_ptr,
+        (void *)ROUND_UP((uintptr_t)gen_code_buf + gen_code_size + search_size,
+                         CODE_GEN_ALIGN));
 #endif
     /* init jump list */
     qemu_spin_init(&tb->jmp_lock);
@@ -759,8 +766,10 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
     if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
         vaddr pc = log_pc(cpu, tb);
         if (qemu_log_in_addr_range(pc)) {
-            qemu_log("cpu_io_recompile: rewound execution of TB to %016"
-                     VADDR_PRIx "\n", pc);
+            qemu_log(
+                "cpu_io_recompile: rewound execution of TB to %016" VADDR_PRIx
+                "\n",
+                pc);
         }
     }
 
@@ -776,19 +785,21 @@ static void print_qht_statistics(struct qht_stats hst, GString *buf)
     if (!hst.head_buckets) {
         return;
     }
-    g_string_append_printf(buf, "TB hash buckets     %zu/%zu "
+    g_string_append_printf(buf,
+                           "TB hash buckets     %zu/%zu "
                            "(%0.2f%% head buckets used)\n",
                            hst.used_head_buckets, hst.head_buckets,
-                           (double)hst.used_head_buckets /
-                           hst.head_buckets * 100);
+                           (double)hst.used_head_buckets / hst.head_buckets *
+                               100);
 
-    hgram_opts =  QDIST_PR_BORDER | QDIST_PR_LABELS;
-    hgram_opts |= QDIST_PR_100X   | QDIST_PR_PERCENT;
+    hgram_opts = QDIST_PR_BORDER | QDIST_PR_LABELS;
+    hgram_opts |= QDIST_PR_100X | QDIST_PR_PERCENT;
     if (qdist_xmax(&hst.occupancy) - qdist_xmin(&hst.occupancy) == 1) {
         hgram_opts |= QDIST_PR_NODECIMAL;
     }
     hgram = qdist_pr(&hst.occupancy, 10, hgram_opts);
-    g_string_append_printf(buf, "TB hash occupancy   %0.2f%% avg chain occ. "
+    g_string_append_printf(buf,
+                           "TB hash occupancy   %0.2f%% avg chain occ. "
                            "Histogram: %s\n",
                            qdist_avg(&hst.occupancy) * 100, hgram);
     g_free(hgram);
@@ -802,7 +813,8 @@ static void print_qht_statistics(struct qht_stats hst, GString *buf)
         hgram_opts |= QDIST_PR_NODECIMAL | QDIST_PR_NOBINRANGE;
     }
     hgram = qdist_pr(&hst.chain, hgram_bins, hgram_opts);
-    g_string_append_printf(buf, "TB hash avg chain   %0.3f buckets. "
+    g_string_append_printf(buf,
+                           "TB hash avg chain   %0.3f buckets. "
                            "Histogram: %s\n",
                            qdist_avg(&hst.chain), hgram);
     g_free(hgram);
@@ -862,15 +874,17 @@ void dump_exec_info(GString *buf)
     g_string_append_printf(buf, "TB avg target size  %zu max=%zu bytes\n",
                            nb_tbs ? tst.target_size / nb_tbs : 0,
                            tst.max_target_size);
-    g_string_append_printf(buf, "TB avg host size    %zu bytes "
-                           "(expansion ratio: %0.1f)\n",
-                           nb_tbs ? tst.host_size / nb_tbs : 0,
-                           tst.target_size ?
-                           (double)tst.host_size / tst.target_size : 0);
+    g_string_append_printf(
+        buf,
+        "TB avg host size    %zu bytes "
+        "(expansion ratio: %0.1f)\n",
+        nb_tbs ? tst.host_size / nb_tbs : 0,
+        tst.target_size ? (double)tst.host_size / tst.target_size : 0);
     g_string_append_printf(buf, "cross page TB count %zu (%zu%%)\n",
                            tst.cross_page,
                            nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
-    g_string_append_printf(buf, "direct jump count   %zu (%zu%%) "
+    g_string_append_printf(buf,
+                           "direct jump count   %zu (%zu%%) "
                            "(2 jumps=%zu %zu%%)\n",
                            tst.direct_jmp_count,
                            nb_tbs ? (tst.direct_jmp_count * 100) / nb_tbs : 0,

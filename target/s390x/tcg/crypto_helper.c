@@ -1,8 +1,8 @@
 /*
  *  s390x crypto helpers
  *
- *  Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
- *  Copyright (c) 2017 Red Hat Inc
+ *  Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights
+ * Reserved. Copyright (c) 2017 Red Hat Inc
  *
  *  Authors:
  *   David Hildenbrand <david@redhat.com>
@@ -121,8 +121,8 @@ static void sha512_bda_be64(uint64_t a[8], uint64_t w[16])
     sha512_bda(a, t);
 }
 
-static void sha512_read_icv(CPUS390XState *env, uint64_t addr,
-                            uint64_t a[8], uintptr_t ra)
+static void sha512_read_icv(CPUS390XState *env, uint64_t addr, uint64_t a[8],
+                            uintptr_t ra)
 {
     int i;
 
@@ -132,8 +132,8 @@ static void sha512_read_icv(CPUS390XState *env, uint64_t addr,
     }
 }
 
-static void sha512_write_ocv(CPUS390XState *env, uint64_t addr,
-                             uint64_t a[8], uintptr_t ra)
+static void sha512_write_ocv(CPUS390XState *env, uint64_t addr, uint64_t a[8],
+                             uintptr_t ra)
 {
     int i;
 
@@ -143,8 +143,8 @@ static void sha512_write_ocv(CPUS390XState *env, uint64_t addr,
     }
 }
 
-static void sha512_read_block(CPUS390XState *env, uint64_t addr,
-                              uint64_t a[16], uintptr_t ra)
+static void sha512_read_block(CPUS390XState *env, uint64_t addr, uint64_t a[16],
+                              uintptr_t ra)
 {
     int i;
 
@@ -166,7 +166,7 @@ static void sha512_read_mbl_be64(CPUS390XState *env, uint64_t addr,
 }
 
 static int cpacf_sha512(CPUS390XState *env, uintptr_t ra, uint64_t param_addr,
-                      uint64_t *message_reg, uint64_t *len_reg, uint32_t type)
+                        uint64_t *message_reg, uint64_t *len_reg, uint32_t type)
 {
     enum { MAX_BLOCKS_PER_RUN = 64 }; /* Arbitrary: keep interactivity. */
     uint64_t len = *len_reg, a[8], processed = 0;
@@ -239,14 +239,14 @@ static int cpacf_sha512(CPUS390XState *env, uintptr_t ra, uint64_t param_addr,
      * boundaries), we're in trouble. We'd need something like access_prepare().
      */
     sha512_write_ocv(env, param_addr, a, ra);
-    *message_reg = deposit64(*message_reg, 0, message_reg_len,
-                             *message_reg + processed);
+    *message_reg =
+        deposit64(*message_reg, 0, message_reg_len, *message_reg + processed);
     *len_reg -= processed;
     return !len ? 0 : 3;
 }
 
-static void fill_buf_random(CPUS390XState *env, uintptr_t ra,
-                            uint64_t *buf_reg, uint64_t *len_reg)
+static void fill_buf_random(CPUS390XState *env, uintptr_t ra, uint64_t *buf_reg,
+                            uint64_t *len_reg)
 {
     uint8_t tmp[256];
     uint64_t len = *len_reg;

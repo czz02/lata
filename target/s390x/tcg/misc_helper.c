@@ -277,7 +277,7 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0, uint64_t r0, uint64_t r1)
     const MachineState *ms = MACHINE(qdev_get_machine());
     uint16_t total_cpus = 0, conf_cpus = 0, reserved_cpus = 0;
     S390CPU *cpu = env_archcpu(env);
-    SysIB sysib = { };
+    SysIB sysib = {};
     int i, cc = 0;
 
     if ((r0 & STSI_R0_FC_MASK) > STSI_R0_FC_LEVEL_3) {
@@ -386,12 +386,12 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0, uint64_t r0, uint64_t r1)
             if (qemu_name) {
                 memset(sysib.sysib_322.vm[0].name, 0x40,
                        sizeof(sysib.sysib_322.vm[0].name));
-                ebcdic_put(sysib.sysib_322.vm[0].name, qemu_name,
-                           MIN(sizeof(sysib.sysib_322.vm[0].name),
-                               strlen(qemu_name)));
+                ebcdic_put(
+                    sysib.sysib_322.vm[0].name, qemu_name,
+                    MIN(sizeof(sysib.sysib_322.vm[0].name), strlen(qemu_name)));
                 strpadcpy((char *)sysib.sysib_322.ext_names[0],
-                          sizeof(sysib.sysib_322.ext_names[0]),
-                          qemu_name, '\0');
+                          sizeof(sysib.sysib_322.ext_names[0]), qemu_name,
+                          '\0');
 
             } else {
                 ebcdic_put(sysib.sysib_322.vm[0].name, "TCGguest", 8);
@@ -614,8 +614,8 @@ static inline bool get_per_in_range(CPUS390XState *env, uint64_t addr)
 void HELPER(per_branch)(CPUS390XState *env, uint64_t from, uint64_t to)
 {
     if ((env->cregs[9] & PER_CR9_EVENT_BRANCH)) {
-        if (!(env->cregs[9] & PER_CR9_CONTROL_BRANCH_ADDRESS)
-            || get_per_in_range(env, to)) {
+        if (!(env->cregs[9] & PER_CR9_CONTROL_BRANCH_ADDRESS) ||
+            get_per_in_range(env, to)) {
             env->per_address = from;
             env->per_perc_atmid = PER_CODE_EVENT_BRANCH | get_per_atmid(env);
         }
@@ -792,8 +792,7 @@ void HELPER(pcistb)(CPUS390XState *env, uint32_t r1, uint32_t r3,
     qemu_mutex_unlock_iothread();
 }
 
-void HELPER(mpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
-                    uint32_t ar)
+void HELPER(mpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba, uint32_t ar)
 {
     S390CPU *cpu = env_archcpu(env);
 

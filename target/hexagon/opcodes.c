@@ -29,15 +29,15 @@
 #define VEC_DESCR(A, B, C) DESCR(A, B, C)
 #define DONAME(X) #X
 
-const char * const opcode_names[] = {
+const char *const opcode_names[] = {
 #define OPCODE(IID) DONAME(IID)
 #include "opcodes_def_generated.h.inc"
     NULL
 #undef OPCODE
 };
 
-const char * const opcode_reginfo[] = {
-#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2)    /* nothing */
+const char *const opcode_reginfo[] = {
+#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2) /* nothing */
 #define REGINFO(TAG, REGINFO, RREGS, WREGS) REGINFO,
 #include "op_regs_generated.h.inc"
     NULL
@@ -46,8 +46,8 @@ const char * const opcode_reginfo[] = {
 };
 
 
-const char * const opcode_rregs[] = {
-#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2)    /* nothing */
+const char *const opcode_rregs[] = {
+#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2) /* nothing */
 #define REGINFO(TAG, REGINFO, RREGS, WREGS) RREGS,
 #include "op_regs_generated.h.inc"
     NULL
@@ -56,8 +56,8 @@ const char * const opcode_rregs[] = {
 };
 
 
-const char * const opcode_wregs[] = {
-#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2)    /* nothing */
+const char *const opcode_wregs[] = {
+#define IMMINFO(TAG, SIGN, SIZE, SHAMT, SIGN2, SIZE2, SHAMT2) /* nothing */
 #define REGINFO(TAG, REGINFO, RREGS, WREGS) WREGS,
 #include "op_regs_generated.h.inc"
     NULL
@@ -65,8 +65,8 @@ const char * const opcode_wregs[] = {
 #undef IMMINFO
 };
 
-const char * const opcode_short_semantics[] = {
-#define DEF_SHORTCODE(TAG, SHORTCODE)              [TAG] = #SHORTCODE,
+const char *const opcode_short_semantics[] = {
+#define DEF_SHORTCODE(TAG, SHORTCODE) [TAG] = #SHORTCODE,
 #include "shortcode_generated.h.inc"
 #undef DEF_SHORTCODE
     NULL
@@ -86,8 +86,7 @@ static void init_attribs(int tag, ...)
 }
 
 const OpcodeEncoding opcode_encodings[] = {
-#define DEF_ENC32(OPCODE, ENCSTR) \
-    [OPCODE] = { .encoding = ENCSTR },
+#define DEF_ENC32(OPCODE, ENCSTR) [OPCODE] = { .encoding = ENCSTR },
 
 #define DEF_ENC_SUBINSN(OPCODE, CLASS, ENCSTR) \
     [OPCODE] = { .encoding = ENCSTR, .enc_class = CLASS },
@@ -106,7 +105,7 @@ void opcode_init(void)
 {
     init_attribs(0, 0);
 
-#define ATTRIBS(...) , ## __VA_ARGS__, 0
+#define ATTRIBS(...) , ##__VA_ARGS__, 0
 #define OP_ATTRIB(TAG, ARGS) init_attribs(TAG ARGS);
 #include "op_attribs_generated.h.inc"
 #undef OP_ATTRIB

@@ -40,8 +40,7 @@ static vaddr rx_cpu_get_pc(CPUState *cs)
     return cpu->env.pc;
 }
 
-static void rx_cpu_synchronize_from_tb(CPUState *cs,
-                                       const TranslationBlock *tb)
+static void rx_cpu_synchronize_from_tb(CPUState *cs, const TranslationBlock *tb)
 {
     RXCPU *cpu = RX_CPU(cs);
 
@@ -49,8 +48,7 @@ static void rx_cpu_synchronize_from_tb(CPUState *cs,
     cpu->env.pc = tb->pc;
 }
 
-static void rx_restore_state_to_opc(CPUState *cs,
-                                    const TranslationBlock *tb,
+static void rx_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                     const uint64_t *data)
 {
     RXCPU *cpu = RX_CPU(cs);
@@ -60,8 +58,7 @@ static void rx_restore_state_to_opc(CPUState *cs,
 
 static bool rx_cpu_has_work(CPUState *cs)
 {
-    return cs->interrupt_request &
-        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
+    return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
 }
 
 static void rx_cpu_reset_hold(Object *obj)
@@ -169,8 +166,8 @@ static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
 }
 
 static bool rx_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-                            MMUAccessType access_type, int mmu_idx,
-                            bool probe, uintptr_t retaddr)
+                            MMUAccessType access_type, int mmu_idx, bool probe,
+                            uintptr_t retaddr)
 {
     uint32_t address, physical, prot;
 
@@ -221,8 +218,7 @@ static void rx_cpu_class_init(ObjectClass *klass, void *data)
     RXCPUClass *rcc = RX_CPU_CLASS(klass);
     ResettableClass *rc = RESETTABLE_CLASS(klass);
 
-    device_class_set_parent_realize(dc, rx_cpu_realize,
-                                    &rcc->parent_realize);
+    device_class_set_parent_realize(dc, rx_cpu_realize, &rcc->parent_realize);
     resettable_class_set_parent_phases(rc, NULL, rx_cpu_reset_hold, NULL,
                                        &rcc->parent_phases);
 

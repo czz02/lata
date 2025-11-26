@@ -168,8 +168,8 @@ target_ulong helper_load_dcr(CPUPPCState *env, target_ulong dcrn)
     if (unlikely(env->dcr_env == NULL)) {
         qemu_log_mask(LOG_GUEST_ERROR, "No DCR environment\n");
         raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_INVAL |
-                               POWERPC_EXCP_INVAL_INVAL, GETPC());
+                               POWERPC_EXCP_INVAL | POWERPC_EXCP_INVAL_INVAL,
+                               GETPC());
     } else {
         int ret;
 
@@ -179,9 +179,9 @@ target_ulong helper_load_dcr(CPUPPCState *env, target_ulong dcrn)
         if (unlikely(ret != 0)) {
             qemu_log_mask(LOG_GUEST_ERROR, "DCR read error %d %03x\n",
                           (uint32_t)dcrn, (uint32_t)dcrn);
-            raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                                   POWERPC_EXCP_INVAL |
-                                   POWERPC_EXCP_INVAL_INVAL, GETPC());
+            raise_exception_err_ra(
+                env, POWERPC_EXCP_PROGRAM,
+                POWERPC_EXCP_INVAL | POWERPC_EXCP_INVAL_INVAL, GETPC());
         }
     }
     return val;
@@ -192,8 +192,8 @@ void helper_store_dcr(CPUPPCState *env, target_ulong dcrn, target_ulong val)
     if (unlikely(env->dcr_env == NULL)) {
         qemu_log_mask(LOG_GUEST_ERROR, "No DCR environment\n");
         raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                               POWERPC_EXCP_INVAL |
-                               POWERPC_EXCP_INVAL_INVAL, GETPC());
+                               POWERPC_EXCP_INVAL | POWERPC_EXCP_INVAL_INVAL,
+                               GETPC());
     } else {
         int ret;
         qemu_mutex_lock_iothread();
@@ -202,9 +202,9 @@ void helper_store_dcr(CPUPPCState *env, target_ulong dcrn, target_ulong val)
         if (unlikely(ret != 0)) {
             qemu_log_mask(LOG_GUEST_ERROR, "DCR write error %d %03x\n",
                           (uint32_t)dcrn, (uint32_t)dcrn);
-            raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-                                   POWERPC_EXCP_INVAL |
-                                   POWERPC_EXCP_INVAL_INVAL, GETPC());
+            raise_exception_err_ra(
+                env, POWERPC_EXCP_PROGRAM,
+                POWERPC_EXCP_INVAL | POWERPC_EXCP_INVAL_INVAL, GETPC());
         }
     }
 }

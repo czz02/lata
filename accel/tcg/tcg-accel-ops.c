@@ -104,8 +104,8 @@ static bool tcg_supports_guest_debug(void)
 static inline int xlat_gdb_type(CPUState *cpu, int gdbtype)
 {
     static const int xlat[] = {
-        [GDB_WATCHPOINT_WRITE]  = BP_GDB | BP_MEM_WRITE,
-        [GDB_WATCHPOINT_READ]   = BP_GDB | BP_MEM_READ,
+        [GDB_WATCHPOINT_WRITE] = BP_GDB | BP_MEM_WRITE,
+        [GDB_WATCHPOINT_READ] = BP_GDB | BP_MEM_READ,
         [GDB_WATCHPOINT_ACCESS] = BP_GDB | BP_MEM_ACCESS,
     };
 
@@ -126,7 +126,7 @@ static int tcg_insert_breakpoint(CPUState *cs, int type, vaddr addr, vaddr len)
     switch (type) {
     case GDB_BREAKPOINT_SW:
     case GDB_BREAKPOINT_HW:
-        CPU_FOREACH(cpu) {
+        CPU_FOREACH (cpu) {
             err = cpu_breakpoint_insert(cpu, addr, BP_GDB, NULL);
             if (err) {
                 break;
@@ -136,7 +136,7 @@ static int tcg_insert_breakpoint(CPUState *cs, int type, vaddr addr, vaddr len)
     case GDB_WATCHPOINT_WRITE:
     case GDB_WATCHPOINT_READ:
     case GDB_WATCHPOINT_ACCESS:
-        CPU_FOREACH(cpu) {
+        CPU_FOREACH (cpu) {
             err = cpu_watchpoint_insert(cpu, addr, len,
                                         xlat_gdb_type(cpu, type), NULL);
             if (err) {
@@ -157,7 +157,7 @@ static int tcg_remove_breakpoint(CPUState *cs, int type, vaddr addr, vaddr len)
     switch (type) {
     case GDB_BREAKPOINT_SW:
     case GDB_BREAKPOINT_HW:
-        CPU_FOREACH(cpu) {
+        CPU_FOREACH (cpu) {
             err = cpu_breakpoint_remove(cpu, addr, BP_GDB);
             if (err) {
                 break;
@@ -167,9 +167,9 @@ static int tcg_remove_breakpoint(CPUState *cs, int type, vaddr addr, vaddr len)
     case GDB_WATCHPOINT_WRITE:
     case GDB_WATCHPOINT_READ:
     case GDB_WATCHPOINT_ACCESS:
-        CPU_FOREACH(cpu) {
-            err = cpu_watchpoint_remove(cpu, addr, len,
-                                        xlat_gdb_type(cpu, type));
+        CPU_FOREACH (cpu) {
+            err =
+                cpu_watchpoint_remove(cpu, addr, len, xlat_gdb_type(cpu, type));
             if (err) {
                 break;
             }

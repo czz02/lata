@@ -26,8 +26,8 @@
 #include "exec/helper-proto.h"
 
 /* Exceptions processing helpers */
-G_NORETURN void riscv_raise_exception(CPURISCVState *env,
-                                      uint32_t exception, uintptr_t pc)
+G_NORETURN void riscv_raise_exception(CPURISCVState *env, uint32_t exception,
+                                      uintptr_t pc)
 {
     CPUState *cs = env_cpu(env);
     cs->exception_index = exception;
@@ -69,8 +69,8 @@ void helper_csrw(CPURISCVState *env, int csr, target_ulong src)
     }
 }
 
-target_ulong helper_csrrw(CPURISCVState *env, int csr,
-                          target_ulong src, target_ulong write_mask)
+target_ulong helper_csrrw(CPURISCVState *env, int csr, target_ulong src,
+                          target_ulong write_mask)
 {
     target_ulong val = 0;
     RISCVException ret = riscv_csrrw(env, csr, &val, src, write_mask);
@@ -84,9 +84,8 @@ target_ulong helper_csrrw(CPURISCVState *env, int csr,
 target_ulong helper_csrr_i128(CPURISCVState *env, int csr)
 {
     Int128 rv = int128_zero();
-    RISCVException ret = riscv_csrrw_i128(env, csr, &rv,
-                                          int128_zero(),
-                                          int128_zero());
+    RISCVException ret =
+        riscv_csrrw_i128(env, csr, &rv, int128_zero(), int128_zero());
 
     if (ret != RISCV_EXCP_NONE) {
         riscv_raise_exception(env, ret, GETPC());
@@ -96,26 +95,25 @@ target_ulong helper_csrr_i128(CPURISCVState *env, int csr)
     return int128_getlo(rv);
 }
 
-void helper_csrw_i128(CPURISCVState *env, int csr,
-                      target_ulong srcl, target_ulong srch)
+void helper_csrw_i128(CPURISCVState *env, int csr, target_ulong srcl,
+                      target_ulong srch)
 {
-    RISCVException ret = riscv_csrrw_i128(env, csr, NULL,
-                                          int128_make128(srcl, srch),
-                                          UINT128_MAX);
+    RISCVException ret = riscv_csrrw_i128(
+        env, csr, NULL, int128_make128(srcl, srch), UINT128_MAX);
 
     if (ret != RISCV_EXCP_NONE) {
         riscv_raise_exception(env, ret, GETPC());
     }
 }
 
-target_ulong helper_csrrw_i128(CPURISCVState *env, int csr,
-                       target_ulong srcl, target_ulong srch,
-                       target_ulong maskl, target_ulong maskh)
+target_ulong helper_csrrw_i128(CPURISCVState *env, int csr, target_ulong srcl,
+                               target_ulong srch, target_ulong maskl,
+                               target_ulong maskh)
 {
     Int128 rv = int128_zero();
-    RISCVException ret = riscv_csrrw_i128(env, csr, &rv,
-                                          int128_make128(srcl, srch),
-                                          int128_make128(maskl, maskh));
+    RISCVException ret =
+        riscv_csrrw_i128(env, csr, &rv, int128_make128(srcl, srch),
+                         int128_make128(maskl, maskh));
 
     if (ret != RISCV_EXCP_NONE) {
         riscv_raise_exception(env, ret, GETPC());
@@ -134,7 +132,7 @@ target_ulong helper_csrrw_i128(CPURISCVState *env, int csr,
  * specified in section 2.5.1 of the CMO specification.
  */
 static void check_zicbo_envcfg(CPURISCVState *env, target_ulong envbits,
-                                uintptr_t ra)
+                               uintptr_t ra)
 {
 #ifndef CONFIG_USER_ONLY
     if ((env->priv < PRV_M) && !get_field(env->menvcfg, envbits)) {
@@ -200,8 +198,7 @@ void helper_cbo_zero(CPURISCVState *env, target_ulong address)
  * either store page-fault (non-virtualized) or store guest-page
  * fault (virtualized).
  */
-static void check_zicbom_access(CPURISCVState *env,
-                                target_ulong address,
+static void check_zicbom_access(CPURISCVState *env, target_ulong address,
                                 uintptr_t ra)
 {
     RISCVCPU *cpu = env_archcpu(env);
@@ -225,8 +222,8 @@ static void check_zicbom_access(CPURISCVState *env,
      * addresses, whether a cache-block management instruction is
      * permitted to access the cache block is UNSPECIFIED."
      */
-    ret = probe_access_flags(env, address, cbomlen, MMU_DATA_LOAD,
-                             mmu_idx, true, &phost, ra);
+    ret = probe_access_flags(env, address, cbomlen, MMU_DATA_LOAD, mmu_idx,
+                             true, &phost, ra);
     if (ret != TLB_INVALID_MASK) {
         /* Success: readable */
         return;
@@ -285,8 +282,7 @@ target_ulong helper_sret(CPURISCVState *env)
 
     mstatus = env->mstatus;
     prev_priv = get_field(mstatus, MSTATUS_SPP);
-    mstatus = set_field(mstatus, MSTATUS_SIE,
-                        get_field(mstatus, MSTATUS_SPIE));
+    mstatus = set_field(mstatus, MSTATUS_SIE, get_field(mstatus, MSTATUS_SPIE));
     mstatus = set_field(mstatus, MSTATUS_SPIE, 1);
     mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
     if (env->priv_ver >= PRIV_VERSION_1_12_0) {
@@ -330,15 +326,14 @@ target_ulong helper_mret(CPURISCVState *env)
     uint64_t mstatus = env->mstatus;
     target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
 
-    if (riscv_cpu_cfg(env)->pmp &&
-        !pmp_get_num_rules(env) && (prev_priv != PRV_M)) {
+    if (riscv_cpu_cfg(env)->pmp && !pmp_get_num_rules(env) &&
+        (prev_priv != PRV_M)) {
         riscv_raise_exception(env, RISCV_EXCP_INST_ACCESS_FAULT, GETPC());
     }
 
-    target_ulong prev_virt = get_field(env->mstatus, MSTATUS_MPV) &&
-                             (prev_priv != PRV_M);
-    mstatus = set_field(mstatus, MSTATUS_MIE,
-                        get_field(mstatus, MSTATUS_MPIE));
+    target_ulong prev_virt =
+        get_field(env->mstatus, MSTATUS_MPV) && (prev_priv != PRV_M);
+    mstatus = set_field(mstatus, MSTATUS_MIE, get_field(mstatus, MSTATUS_MPIE));
     mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
     mstatus = set_field(mstatus, MSTATUS_MPP,
                         riscv_has_ext(env, RVU) ? PRV_U : PRV_M);
@@ -409,8 +404,7 @@ void helper_hyp_tlb_flush(CPURISCVState *env)
         riscv_raise_exception(env, RISCV_EXCP_VIRT_INSTRUCTION_FAULT, GETPC());
     }
 
-    if (env->priv == PRV_M ||
-        (env->priv == PRV_S && !env->virt_enabled)) {
+    if (env->priv == PRV_M || (env->priv == PRV_S && !env->virt_enabled)) {
         tlb_flush(cs);
         return;
     }

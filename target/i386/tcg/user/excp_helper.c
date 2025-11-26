@@ -22,8 +22,7 @@
 #include "exec/exec-all.h"
 #include "tcg/helper-tcg.h"
 
-void x86_cpu_record_sigsegv(CPUState *cs, vaddr addr,
-                            MMUAccessType access_type,
+void x86_cpu_record_sigsegv(CPUState *cs, vaddr addr, MMUAccessType access_type,
                             bool maperr, uintptr_t ra)
 {
     X86CPU *cpu = X86_CPU(cs);
@@ -37,9 +36,8 @@ void x86_cpu_record_sigsegv(CPUState *cs, vaddr addr,
      * signal and set exception_index to EXCP_INTERRUPT.
      */
     env->cr[2] = addr;
-    env->error_code = ((access_type == MMU_DATA_STORE) << PG_ERROR_W_BIT)
-                    | (maperr ? 0 : PG_ERROR_P_MASK)
-                    | PG_ERROR_U_MASK;
+    env->error_code = ((access_type == MMU_DATA_STORE) << PG_ERROR_W_BIT) |
+                      (maperr ? 0 : PG_ERROR_P_MASK) | PG_ERROR_U_MASK;
     cs->exception_index = EXCP0E_PAGE;
 
     /* Disable do_interrupt_user. */
@@ -49,8 +47,8 @@ void x86_cpu_record_sigsegv(CPUState *cs, vaddr addr,
     cpu_loop_exit_restore(cs, ra);
 }
 
-void x86_cpu_record_sigbus(CPUState *cs, vaddr addr,
-                           MMUAccessType access_type, uintptr_t ra)
+void x86_cpu_record_sigbus(CPUState *cs, vaddr addr, MMUAccessType access_type,
+                           uintptr_t ra)
 {
     X86CPU *cpu = X86_CPU(cs);
     handle_unaligned_access(&cpu->env, addr, access_type, ra);

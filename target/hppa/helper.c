@@ -64,8 +64,8 @@ void cpu_hppa_put_psw(CPUHPPAState *env, target_ureg psw)
     cb |= ((psw >> 12) & 1) << 20;
     cb |= ((psw >> 11) & 1) << 16;
     cb |= ((psw >> 10) & 1) << 12;
-    cb |= ((psw >>  9) & 1) <<  8;
-    cb |= ((psw >>  8) & 1) <<  4;
+    cb |= ((psw >> 9) & 1) << 8;
+    cb |= ((psw >> 8) & 1) << 4;
     env->psw_cb = cb;
 
     /* If PSW_P changes, it affects how we translate addresses.  */
@@ -85,22 +85,22 @@ void hppa_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     char psw_c[20];
     int i;
 
-    qemu_fprintf(f, "IA_F " TARGET_FMT_lx " IA_B " TARGET_FMT_lx
-                 " IIR " TREG_FMT_lx  "\n",
-                 hppa_form_gva_psw(psw, env->iasq_f, env->iaoq_f),
-                 hppa_form_gva_psw(psw, env->iasq_b, env->iaoq_b),
-                 env->cr[CR_IIR]);
+    qemu_fprintf(
+        f,
+        "IA_F " TARGET_FMT_lx " IA_B " TARGET_FMT_lx " IIR " TREG_FMT_lx "\n",
+        hppa_form_gva_psw(psw, env->iasq_f, env->iaoq_f),
+        hppa_form_gva_psw(psw, env->iasq_b, env->iaoq_b), env->cr[CR_IIR]);
 
-    psw_c[0]  = (psw & PSW_W ? 'W' : '-');
-    psw_c[1]  = (psw & PSW_E ? 'E' : '-');
-    psw_c[2]  = (psw & PSW_S ? 'S' : '-');
-    psw_c[3]  = (psw & PSW_T ? 'T' : '-');
-    psw_c[4]  = (psw & PSW_H ? 'H' : '-');
-    psw_c[5]  = (psw & PSW_L ? 'L' : '-');
-    psw_c[6]  = (psw & PSW_N ? 'N' : '-');
-    psw_c[7]  = (psw & PSW_X ? 'X' : '-');
-    psw_c[8]  = (psw & PSW_B ? 'B' : '-');
-    psw_c[9]  = (psw & PSW_C ? 'C' : '-');
+    psw_c[0] = (psw & PSW_W ? 'W' : '-');
+    psw_c[1] = (psw & PSW_E ? 'E' : '-');
+    psw_c[2] = (psw & PSW_S ? 'S' : '-');
+    psw_c[3] = (psw & PSW_T ? 'T' : '-');
+    psw_c[4] = (psw & PSW_H ? 'H' : '-');
+    psw_c[5] = (psw & PSW_L ? 'L' : '-');
+    psw_c[6] = (psw & PSW_N ? 'N' : '-');
+    psw_c[7] = (psw & PSW_X ? 'X' : '-');
+    psw_c[8] = (psw & PSW_B ? 'B' : '-');
+    psw_c[9] = (psw & PSW_C ? 'C' : '-');
     psw_c[10] = (psw & PSW_V ? 'V' : '-');
     psw_c[11] = (psw & PSW_M ? 'M' : '-');
     psw_c[12] = (psw & PSW_F ? 'F' : '-');
@@ -112,8 +112,8 @@ void hppa_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     psw_c[18] = '\0';
     psw_cb = ((env->psw_cb >> 4) & 0x01111111) | (env->psw_cb_msb << 28);
 
-    qemu_fprintf(f, "PSW  " TREG_FMT_lx " CB   " TREG_FMT_lx " %s\n",
-                 psw, psw_cb, psw_c);
+    qemu_fprintf(f, "PSW  " TREG_FMT_lx " CB   " TREG_FMT_lx " %s\n", psw,
+                 psw_cb, psw_c);
 
     for (i = 0; i < 32; i++) {
         qemu_fprintf(f, "GR%02d " TREG_FMT_lx "%c", i, env->gr[i],
@@ -125,7 +125,7 @@ void hppa_cpu_dump_state(CPUState *cs, FILE *f, int flags)
                      (i & 3) == 3 ? '\n' : ' ');
     }
 #endif
-     qemu_fprintf(f, "\n");
+    qemu_fprintf(f, "\n");
 
     /* ??? FR */
 }

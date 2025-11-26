@@ -23,8 +23,7 @@
 #include "mmvec/mmvec.h"
 #include "mmvec/decode_ext_mmvec.h"
 
-static void
-check_new_value(Packet *pkt)
+static void check_new_value(Packet *pkt)
 {
     /* .new value for a MMVector store */
     int i, j;
@@ -38,10 +37,9 @@ check_new_value(Packet *pkt)
     for (i = 1; i < pkt->num_insns; i++) {
         uint16_t use_opcode = pkt->insn[i].opcode;
         if (GET_ATTRIB(use_opcode, A_DOTNEWVALUE) &&
-            GET_ATTRIB(use_opcode, A_CVI) &&
-            GET_ATTRIB(use_opcode, A_STORE)) {
+            GET_ATTRIB(use_opcode, A_CVI) && GET_ATTRIB(use_opcode, A_STORE)) {
             int use_regidx = strchr(opcode_reginfo[use_opcode], 's') -
-                opcode_reginfo[use_opcode];
+                             opcode_reginfo[use_opcode];
             /*
              * What's encoded at the N-field is the offset to who's producing
              * the value.
@@ -77,7 +75,7 @@ check_new_value(Packet *pkt)
                     break;
                 }
             }
-            if ((dststr == NULL)  && GET_ATTRIB(def_opcode, A_CVI_GATHER)) {
+            if ((dststr == NULL) && GET_ATTRIB(def_opcode, A_CVI_GATHER)) {
                 def_regnum = 0;
                 pkt->insn[i].regno[use_regidx] = def_oreg;
                 pkt->insn[i].new_value_producer_slot = pkt->insn[def_idx].slot;
@@ -113,8 +111,7 @@ check_new_value(Packet *pkt)
  * So we may need to move that even later.
  */
 
-static void
-decode_mmvec_move_cvi_to_end(Packet *pkt, int max)
+static void decode_mmvec_move_cvi_to_end(Packet *pkt, int max)
 {
     int i;
     for (i = 0; i < max; i++) {
@@ -126,21 +123,19 @@ decode_mmvec_move_cvi_to_end(Packet *pkt, int max)
              * If the last instruction is an endloop, move to the one before it
              * Keep endloop as the last thing always
              */
-            if ((last_opcode == J2_endloop0) ||
-                (last_opcode == J2_endloop1) ||
+            if ((last_opcode == J2_endloop0) || (last_opcode == J2_endloop1) ||
                 (last_opcode == J2_endloop01)) {
                 last_inst--;
             }
 
             decode_send_insn_to(pkt, i, last_inst);
             max--;
-            i--;    /* Retry this index now that packet has rotated */
+            i--; /* Retry this index now that packet has rotated */
         }
     }
 }
 
-static void
-decode_shuffle_for_execution_vops(Packet *pkt)
+static void decode_shuffle_for_execution_vops(Packet *pkt)
 {
     /*
      * Sort for .new
@@ -148,8 +143,7 @@ decode_shuffle_for_execution_vops(Packet *pkt)
     int i;
     for (i = 0; i < pkt->num_insns; i++) {
         uint16_t opcode = pkt->insn[i].opcode;
-        if ((GET_ATTRIB(opcode, A_LOAD) &&
-             GET_ATTRIB(opcode, A_CVI_NEW)) ||
+        if ((GET_ATTRIB(opcode, A_LOAD) && GET_ATTRIB(opcode, A_CVI_NEW)) ||
             GET_ATTRIB(opcode, A_CVI_TMP)) {
             /*
              * Find prior consuming vector instructions
@@ -163,8 +157,7 @@ decode_shuffle_for_execution_vops(Packet *pkt)
     /* Move HVX new value stores to the end of the packet */
     for (i = 0; i < pkt->num_insns - 1; i++) {
         uint16_t opcode = pkt->insn[i].opcode;
-        if (GET_ATTRIB(opcode, A_STORE) &&
-            GET_ATTRIB(opcode, A_CVI_NEW) &&
+        if (GET_ATTRIB(opcode, A_STORE) && GET_ATTRIB(opcode, A_CVI_NEW) &&
             !GET_ATTRIB(opcode, A_CVI_SCATTER_RELEASE)) {
             int last_inst = pkt->num_insns - 1;
             uint16_t last_opcode = pkt->insn[last_inst].opcode;
@@ -173,8 +166,7 @@ decode_shuffle_for_execution_vops(Packet *pkt)
              * If the last instruction is an endloop, move to the one before it
              * Keep endloop as the last thing always
              */
-            if ((last_opcode == J2_endloop0) ||
-                (last_opcode == J2_endloop1) ||
+            if ((last_opcode == J2_endloop0) || (last_opcode == J2_endloop1) ||
                 (last_opcode == J2_endloop01)) {
                 last_inst--;
             }
@@ -185,16 +177,15 @@ decode_shuffle_for_execution_vops(Packet *pkt)
     }
 }
 
-static void
-check_for_vhist(Packet *pkt)
+static void check_for_vhist(Packet *pkt)
 {
     pkt->vhist_insn = NULL;
     for (int i = 0; i < pkt->num_insns; i++) {
         Insn *insn = &pkt->insn[i];
         int opcode = insn->opcode;
         if (GET_ATTRIB(opcode, A_CVI) && GET_ATTRIB(opcode, A_CVI_4SLOT)) {
-                pkt->vhist_insn = insn;
-                return;
+            pkt->vhist_insn = insn;
+            return;
         }
     }
 }

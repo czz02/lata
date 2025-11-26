@@ -25,13 +25,15 @@
 #include "monitor/hmp-target.h"
 
 #ifdef TARGET_RISCV64
-#define PTE_HEADER_FIELDS       "vaddr            paddr            "\
-                                "size             attr\n"
-#define PTE_HEADER_DELIMITER    "---------------- ---------------- "\
-                                "---------------- -------\n"
+#define PTE_HEADER_FIELDS                \
+    "vaddr            paddr            " \
+    "size             attr\n"
+#define PTE_HEADER_DELIMITER             \
+    "---------------- ---------------- " \
+    "---------------- -------\n"
 #else
-#define PTE_HEADER_FIELDS       "vaddr    paddr            size     attr\n"
-#define PTE_HEADER_DELIMITER    "-------- ---------------- -------- -------\n"
+#define PTE_HEADER_FIELDS "vaddr    paddr            size     attr\n"
+#define PTE_HEADER_DELIMITER "-------- ---------------- -------- -------\n"
 #endif
 
 /* Perform linear address sign extension */
@@ -39,7 +41,7 @@ static target_ulong addr_canonical(int va_bits, target_ulong addr)
 {
 #ifdef TARGET_RISCV64
     if (addr & (1UL << (va_bits - 1))) {
-        addr |= (hwaddr)-(1L << va_bits);
+        addr |= (hwaddr) - (1L << va_bits);
     }
 #endif
 
@@ -64,21 +66,17 @@ static void print_pte(Monitor *mon, int va_bits, target_ulong vaddr,
         return;
     }
 
-    monitor_printf(mon, TARGET_FMT_lx " " HWADDR_FMT_plx " " TARGET_FMT_lx
-                   " %c%c%c%c%c%c%c\n",
-                   addr_canonical(va_bits, vaddr),
-                   paddr, size,
-                   attr & PTE_R ? 'r' : '-',
-                   attr & PTE_W ? 'w' : '-',
-                   attr & PTE_X ? 'x' : '-',
-                   attr & PTE_U ? 'u' : '-',
-                   attr & PTE_G ? 'g' : '-',
-                   attr & PTE_A ? 'a' : '-',
-                   attr & PTE_D ? 'd' : '-');
+    monitor_printf(
+        mon,
+        TARGET_FMT_lx " " HWADDR_FMT_plx " " TARGET_FMT_lx " %c%c%c%c%c%c%c\n",
+        addr_canonical(va_bits, vaddr), paddr, size, attr & PTE_R ? 'r' : '-',
+        attr & PTE_W ? 'w' : '-', attr & PTE_X ? 'x' : '-',
+        attr & PTE_U ? 'u' : '-', attr & PTE_G ? 'g' : '-',
+        attr & PTE_A ? 'a' : '-', attr & PTE_D ? 'd' : '-');
 }
 
-static void walk_pte(Monitor *mon, hwaddr base, target_ulong start,
-                     int level, int ptidxbits, int ptesize, int va_bits,
+static void walk_pte(Monitor *mon, hwaddr base, target_ulong start, int level,
+                     int ptidxbits, int ptesize, int va_bits,
                      target_ulong *vbase, hwaddr *pbase, hwaddr *last_paddr,
                      target_ulong *last_size, int *last_attr)
 {
@@ -133,14 +131,13 @@ static void walk_pte(Monitor *mon, hwaddr base, target_ulong start,
             } else {
                 /* pointer to the next level of the page table */
                 walk_pte(mon, paddr, start, level - 1, ptidxbits, ptesize,
-                         va_bits, vbase, pbase, last_paddr,
-                         last_size, last_attr);
+                         va_bits, vbase, pbase, last_paddr, last_size,
+                         last_attr);
             }
         }
 
         start += pgsize;
     }
-
 }
 
 static void mem_info_svxx(Monitor *mon, CPUArchState *env)
@@ -200,12 +197,12 @@ static void mem_info_svxx(Monitor *mon, CPUArchState *env)
     last_attr = 0;
 
     /* walk page tables, starting from address 0 */
-    walk_pte(mon, base, 0, levels - 1, ptidxbits, ptesize, va_bits,
-             &vbase, &pbase, &last_paddr, &last_size, &last_attr);
+    walk_pte(mon, base, 0, levels - 1, ptidxbits, ptesize, va_bits, &vbase,
+             &pbase, &last_paddr, &last_size, &last_attr);
 
     /* don't forget the last one */
-    print_pte(mon, va_bits, vbase, pbase,
-              last_paddr + last_size - pbase, last_attr);
+    print_pte(mon, va_bits, vbase, pbase, last_paddr + last_size - pbase,
+              last_attr);
 }
 
 void hmp_info_mem(Monitor *mon, const QDict *qdict)

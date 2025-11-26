@@ -53,7 +53,8 @@ uint8_t s390_softfloat_exc_to_ieee(unsigned int exc)
     s390_exc |= (exc & float_flag_overflow) ? S390_IEEE_MASK_OVERFLOW : 0;
     s390_exc |= (exc & float_flag_underflow) ? S390_IEEE_MASK_UNDERFLOW : 0;
     s390_exc |= (exc & (float_flag_inexact | float_flag_invalid_cvti)) ?
-                S390_IEEE_MASK_INEXACT : 0;
+                    S390_IEEE_MASK_INEXACT :
+                    0;
 
     return s390_exc;
 }
@@ -408,8 +409,8 @@ uint32_t HELPER(cdb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
 /* 128-bit FP compare */
 uint32_t HELPER(cxb)(CPUS390XState *env, Int128 a, Int128 b)
 {
-    FloatRelation cmp = float128_compare_quiet(ARG128(a), ARG128(b),
-                                               &env->fpu_status);
+    FloatRelation cmp =
+        float128_compare_quiet(ARG128(a), ARG128(b), &env->fpu_status);
     handle_exceptions(env, false, GETPC());
     return float_comp_to_cc(env, cmp);
 }
@@ -771,15 +772,14 @@ uint32_t HELPER(kdb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
 /* 128-bit FP compare and signal */
 uint32_t HELPER(kxb)(CPUS390XState *env, Int128 a, Int128 b)
 {
-    FloatRelation cmp = float128_compare(ARG128(a), ARG128(b),
-                                         &env->fpu_status);
+    FloatRelation cmp =
+        float128_compare(ARG128(a), ARG128(b), &env->fpu_status);
     handle_exceptions(env, false, GETPC());
     return float_comp_to_cc(env, cmp);
 }
 
 /* 32-bit FP multiply and add */
-uint64_t HELPER(maeb)(CPUS390XState *env, uint64_t f1,
-                      uint64_t f2, uint64_t f3)
+uint64_t HELPER(maeb)(CPUS390XState *env, uint64_t f1, uint64_t f2, uint64_t f3)
 {
     float32 ret = float32_muladd(f2, f3, f1, 0, &env->fpu_status);
     handle_exceptions(env, false, GETPC());
@@ -787,8 +787,7 @@ uint64_t HELPER(maeb)(CPUS390XState *env, uint64_t f1,
 }
 
 /* 64-bit FP multiply and add */
-uint64_t HELPER(madb)(CPUS390XState *env, uint64_t f1,
-                      uint64_t f2, uint64_t f3)
+uint64_t HELPER(madb)(CPUS390XState *env, uint64_t f1, uint64_t f2, uint64_t f3)
 {
     float64 ret = float64_muladd(f2, f3, f1, 0, &env->fpu_status);
     handle_exceptions(env, false, GETPC());
@@ -796,21 +795,19 @@ uint64_t HELPER(madb)(CPUS390XState *env, uint64_t f1,
 }
 
 /* 32-bit FP multiply and subtract */
-uint64_t HELPER(mseb)(CPUS390XState *env, uint64_t f1,
-                      uint64_t f2, uint64_t f3)
+uint64_t HELPER(mseb)(CPUS390XState *env, uint64_t f1, uint64_t f2, uint64_t f3)
 {
-    float32 ret = float32_muladd(f2, f3, f1, float_muladd_negate_c,
-                                 &env->fpu_status);
+    float32 ret =
+        float32_muladd(f2, f3, f1, float_muladd_negate_c, &env->fpu_status);
     handle_exceptions(env, false, GETPC());
     return ret;
 }
 
 /* 64-bit FP multiply and subtract */
-uint64_t HELPER(msdb)(CPUS390XState *env, uint64_t f1,
-                      uint64_t f2, uint64_t f3)
+uint64_t HELPER(msdb)(CPUS390XState *env, uint64_t f1, uint64_t f2, uint64_t f3)
 {
-    float64 ret = float64_muladd(f2, f3, f1, float_muladd_negate_c,
-                                 &env->fpu_status);
+    float64 ret =
+        float64_muladd(f2, f3, f1, float_muladd_negate_c, &env->fpu_status);
     handle_exceptions(env, false, GETPC());
     return ret;
 }
@@ -821,26 +818,26 @@ static inline uint16_t dcmask(int bit, bool neg)
     return 1 << (11 - bit - neg);
 }
 
-#define DEF_FLOAT_DCMASK(_TYPE) \
-uint16_t _TYPE##_dcmask(CPUS390XState *env, _TYPE f1)              \
-{                                                                  \
-    const bool neg = _TYPE##_is_neg(f1);                           \
-                                                                   \
-    /* Sorted by most common cases - only one class is possible */ \
-    if (_TYPE##_is_normal(f1)) {                                   \
-        return dcmask(2, neg);                                     \
-    } else if (_TYPE##_is_zero(f1)) {                              \
-        return dcmask(0, neg);                                     \
-    } else if (_TYPE##_is_denormal(f1)) {                          \
-        return dcmask(4, neg);                                     \
-    } else if (_TYPE##_is_infinity(f1)) {                          \
-        return dcmask(6, neg);                                     \
-    } else if (_TYPE##_is_quiet_nan(f1, &env->fpu_status)) {       \
-        return dcmask(8, neg);                                     \
-    }                                                              \
-    /* signaling nan, as last remaining case */                    \
-    return dcmask(10, neg);                                        \
-}
+#define DEF_FLOAT_DCMASK(_TYPE)                                        \
+    uint16_t _TYPE##_dcmask(CPUS390XState *env, _TYPE f1)              \
+    {                                                                  \
+        const bool neg = _TYPE##_is_neg(f1);                           \
+                                                                       \
+        /* Sorted by most common cases - only one class is possible */ \
+        if (_TYPE##_is_normal(f1)) {                                   \
+            return dcmask(2, neg);                                     \
+        } else if (_TYPE##_is_zero(f1)) {                              \
+            return dcmask(0, neg);                                     \
+        } else if (_TYPE##_is_denormal(f1)) {                          \
+            return dcmask(4, neg);                                     \
+        } else if (_TYPE##_is_infinity(f1)) {                          \
+            return dcmask(6, neg);                                     \
+        } else if (_TYPE##_is_quiet_nan(f1, &env->fpu_status)) {       \
+            return dcmask(8, neg);                                     \
+        }                                                              \
+        /* signaling nan, as last remaining case */                    \
+        return dcmask(10, neg);                                        \
+    }
 DEF_FLOAT_DCMASK(float32)
 DEF_FLOAT_DCMASK(float64)
 DEF_FLOAT_DCMASK(float128)

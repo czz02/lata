@@ -56,8 +56,8 @@ void HELPER(tcond)(CPUHPPAState *env, target_ureg cond)
     }
 }
 
-static void atomic_store_3(CPUHPPAState *env, target_ulong addr,
-                           uint32_t val, uintptr_t ra)
+static void atomic_store_3(CPUHPPAState *env, target_ulong addr, uint32_t val,
+                           uintptr_t ra)
 {
     int mmu_idx = cpu_mmu_index(env, 0);
     uint32_t old, new, cmp, mask, *haddr;
@@ -158,14 +158,15 @@ void HELPER(stby_e_parallel)(CPUHPPAState *env, target_ulong addr,
 void HELPER(ldc_check)(target_ulong addr)
 {
     if (unlikely(addr & 0xf)) {
-        qemu_log_mask(LOG_GUEST_ERROR,
-                      "Undefined ldc to unaligned address mod 16: "
-                      TARGET_FMT_lx "\n", addr);
+        qemu_log_mask(
+            LOG_GUEST_ERROR,
+            "Undefined ldc to unaligned address mod 16: " TARGET_FMT_lx "\n",
+            addr);
     }
 }
 
-target_ureg HELPER(probe)(CPUHPPAState *env, target_ulong addr,
-                          uint32_t level, uint32_t want)
+target_ureg HELPER(probe)(CPUHPPAState *env, target_ulong addr, uint32_t level,
+                          uint32_t want)
 {
 #ifdef CONFIG_USER_ONLY
     return page_check_range(addr, 1, want);

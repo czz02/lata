@@ -24,7 +24,7 @@
 
 #define RISCV_TIMEBASE_FREQ 1000000000 /* 1Ghz */
 #define MAKE_32BIT_MASK(shift, length) \
-        (((uint32_t)(~0UL) >> (32 - (length))) << (shift))
+    (((uint32_t)(~0UL) >> (32 - (length))) << (shift))
 
 /*
  * To keep it simple, any event can be mapped to any programmable counters in
@@ -41,45 +41,45 @@ void riscv_pmu_generate_fdt_node(void *fdt, int num_ctrs, char *pmu_name)
     /* All the programmable counters can map to any event */
     cmask = MAKE_32BIT_MASK(3, num_ctrs);
 
-   /*
-    * The event encoding is specified in the SBI specification
-    * Event idx is a 20bits wide number encoded as follows:
-    * event_idx[19:16] = type
-    * event_idx[15:0] = code
-    * The code field in cache events are encoded as follows:
-    * event_idx.code[15:3] = cache_id
-    * event_idx.code[2:1] = op_id
-    * event_idx.code[0:0] = result_id
-    */
+    /*
+     * The event encoding is specified in the SBI specification
+     * Event idx is a 20bits wide number encoded as follows:
+     * event_idx[19:16] = type
+     * event_idx[15:0] = code
+     * The code field in cache events are encoded as follows:
+     * event_idx.code[15:3] = cache_id
+     * event_idx.code[2:1] = op_id
+     * event_idx.code[0:0] = result_id
+     */
 
-   /* SBI_PMU_HW_CPU_CYCLES: 0x01 : type(0x00) */
-   fdt_event_ctr_map[0] = cpu_to_be32(0x00000001);
-   fdt_event_ctr_map[1] = cpu_to_be32(0x00000001);
-   fdt_event_ctr_map[2] = cpu_to_be32(cmask | 1 << 0);
+    /* SBI_PMU_HW_CPU_CYCLES: 0x01 : type(0x00) */
+    fdt_event_ctr_map[0] = cpu_to_be32(0x00000001);
+    fdt_event_ctr_map[1] = cpu_to_be32(0x00000001);
+    fdt_event_ctr_map[2] = cpu_to_be32(cmask | 1 << 0);
 
-   /* SBI_PMU_HW_INSTRUCTIONS: 0x02 : type(0x00) */
-   fdt_event_ctr_map[3] = cpu_to_be32(0x00000002);
-   fdt_event_ctr_map[4] = cpu_to_be32(0x00000002);
-   fdt_event_ctr_map[5] = cpu_to_be32(cmask | 1 << 2);
+    /* SBI_PMU_HW_INSTRUCTIONS: 0x02 : type(0x00) */
+    fdt_event_ctr_map[3] = cpu_to_be32(0x00000002);
+    fdt_event_ctr_map[4] = cpu_to_be32(0x00000002);
+    fdt_event_ctr_map[5] = cpu_to_be32(cmask | 1 << 2);
 
-   /* SBI_PMU_HW_CACHE_DTLB : 0x03 READ : 0x00 MISS : 0x00 type(0x01) */
-   fdt_event_ctr_map[6] = cpu_to_be32(0x00010019);
-   fdt_event_ctr_map[7] = cpu_to_be32(0x00010019);
-   fdt_event_ctr_map[8] = cpu_to_be32(cmask);
+    /* SBI_PMU_HW_CACHE_DTLB : 0x03 READ : 0x00 MISS : 0x00 type(0x01) */
+    fdt_event_ctr_map[6] = cpu_to_be32(0x00010019);
+    fdt_event_ctr_map[7] = cpu_to_be32(0x00010019);
+    fdt_event_ctr_map[8] = cpu_to_be32(cmask);
 
-   /* SBI_PMU_HW_CACHE_DTLB : 0x03 WRITE : 0x01 MISS : 0x00 type(0x01) */
-   fdt_event_ctr_map[9] = cpu_to_be32(0x0001001B);
-   fdt_event_ctr_map[10] = cpu_to_be32(0x0001001B);
-   fdt_event_ctr_map[11] = cpu_to_be32(cmask);
+    /* SBI_PMU_HW_CACHE_DTLB : 0x03 WRITE : 0x01 MISS : 0x00 type(0x01) */
+    fdt_event_ctr_map[9] = cpu_to_be32(0x0001001B);
+    fdt_event_ctr_map[10] = cpu_to_be32(0x0001001B);
+    fdt_event_ctr_map[11] = cpu_to_be32(cmask);
 
-   /* SBI_PMU_HW_CACHE_ITLB : 0x04 READ : 0x00 MISS : 0x00 type(0x01) */
-   fdt_event_ctr_map[12] = cpu_to_be32(0x00010021);
-   fdt_event_ctr_map[13] = cpu_to_be32(0x00010021);
-   fdt_event_ctr_map[14] = cpu_to_be32(cmask);
+    /* SBI_PMU_HW_CACHE_ITLB : 0x04 READ : 0x00 MISS : 0x00 type(0x01) */
+    fdt_event_ctr_map[12] = cpu_to_be32(0x00010021);
+    fdt_event_ctr_map[13] = cpu_to_be32(0x00010021);
+    fdt_event_ctr_map[14] = cpu_to_be32(cmask);
 
-   /* This a OpenSBI specific DT property documented in OpenSBI docs */
-   qemu_fdt_setprop(fdt, pmu_name, "riscv,event-to-mhpmcounters",
-                    fdt_event_ctr_map, sizeof(fdt_event_ctr_map));
+    /* This a OpenSBI specific DT property documented in OpenSBI docs */
+    qemu_fdt_setprop(fdt, pmu_name, "riscv,event-to-mhpmcounters",
+                     fdt_event_ctr_map, sizeof(fdt_event_ctr_map));
 }
 
 static bool riscv_pmu_counter_valid(RISCVCPU *cpu, uint32_t ctr_idx)
@@ -113,15 +113,15 @@ static int riscv_pmu_incr_ctr_rv32(RISCVCPU *cpu, uint32_t ctr_idx)
 
     /* Privilege mode filtering */
     if ((env->priv == PRV_M &&
-        (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_MINH)) ||
+         (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_MINH)) ||
         (env->priv == PRV_S && virt_on &&
-        (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_VSINH)) ||
+         (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_VSINH)) ||
         (env->priv == PRV_U && virt_on &&
-        (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_VUINH)) ||
+         (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_VUINH)) ||
         (env->priv == PRV_S && !virt_on &&
-        (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_SINH)) ||
+         (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_SINH)) ||
         (env->priv == PRV_U && !virt_on &&
-        (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_UINH))) {
+         (env->mhpmeventh_val[ctr_idx] & MHPMEVENTH_BIT_UINH))) {
         return 0;
     }
 
@@ -154,15 +154,15 @@ static int riscv_pmu_incr_ctr_rv64(RISCVCPU *cpu, uint32_t ctr_idx)
 
     /* Privilege mode filtering */
     if ((env->priv == PRV_M &&
-        (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_MINH)) ||
+         (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_MINH)) ||
         (env->priv == PRV_S && virt_on &&
-        (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_VSINH)) ||
+         (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_VSINH)) ||
         (env->priv == PRV_U && virt_on &&
-        (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_VUINH)) ||
+         (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_VUINH)) ||
         (env->priv == PRV_S && !virt_on &&
-        (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_SINH)) ||
+         (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_SINH)) ||
         (env->priv == PRV_U && !virt_on &&
-        (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_UINH))) {
+         (env->mhpmevent_val[ctr_idx] & MHPMEVENT_BIT_UINH))) {
         return 0;
     }
 
@@ -211,8 +211,7 @@ int riscv_pmu_incr_ctr(RISCVCPU *cpu, enum riscv_pmu_event_idx event_idx)
     return ret;
 }
 
-bool riscv_pmu_ctr_monitor_instructions(CPURISCVState *env,
-                                        uint32_t target_ctr)
+bool riscv_pmu_ctr_monitor_instructions(CPURISCVState *env, uint32_t target_ctr)
 {
     RISCVCPU *cpu;
     uint32_t event_idx;
@@ -229,8 +228,8 @@ bool riscv_pmu_ctr_monitor_instructions(CPURISCVState *env,
     }
 
     event_idx = RISCV_PMU_EVENT_HW_INSTRUCTIONS;
-    ctr_idx = GPOINTER_TO_UINT(g_hash_table_lookup(cpu->pmu_event_ctr_map,
-                               GUINT_TO_POINTER(event_idx)));
+    ctr_idx = GPOINTER_TO_UINT(g_hash_table_lookup(
+        cpu->pmu_event_ctr_map, GUINT_TO_POINTER(event_idx)));
     if (!ctr_idx) {
         return false;
     }
@@ -255,8 +254,8 @@ bool riscv_pmu_ctr_monitor_cycles(CPURISCVState *env, uint32_t target_ctr)
     }
 
     event_idx = RISCV_PMU_EVENT_HW_CPU_CYCLES;
-    ctr_idx = GPOINTER_TO_UINT(g_hash_table_lookup(cpu->pmu_event_ctr_map,
-                               GUINT_TO_POINTER(event_idx)));
+    ctr_idx = GPOINTER_TO_UINT(g_hash_table_lookup(
+        cpu->pmu_event_ctr_map, GUINT_TO_POINTER(event_idx)));
 
     /* Counter zero is not used for event_ctr_map */
     if (!ctr_idx) {
@@ -344,8 +343,8 @@ static void pmu_timer_trigger_irq(RISCVCPU *cpu,
         return;
     }
 
-    ctr_idx = GPOINTER_TO_UINT(g_hash_table_lookup(cpu->pmu_event_ctr_map,
-                               GUINT_TO_POINTER(evt_idx)));
+    ctr_idx = GPOINTER_TO_UINT(
+        g_hash_table_lookup(cpu->pmu_event_ctr_map, GUINT_TO_POINTER(evt_idx)));
     if (!riscv_pmu_counter_enabled(cpu, ctr_idx)) {
         return;
     }
@@ -353,15 +352,15 @@ static void pmu_timer_trigger_irq(RISCVCPU *cpu,
     if (riscv_cpu_mxl(env) == MXL_RV32) {
         mhpmevent_val = &env->mhpmeventh_val[ctr_idx];
         of_bit_mask = MHPMEVENTH_BIT_OF;
-     } else {
+    } else {
         mhpmevent_val = &env->mhpmevent_val[ctr_idx];
         of_bit_mask = MHPMEVENT_BIT_OF;
     }
 
     counter = &env->pmu_ctrs[ctr_idx];
     if (counter->irq_overflow_left > 0) {
-        irq_trigger_at = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                        counter->irq_overflow_left;
+        irq_trigger_at =
+            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + counter->irq_overflow_left;
         timer_mod_anticipate_ns(cpu->pmu_timer, irq_trigger_at);
         counter->irq_overflow_left = 0;
         return;
@@ -415,12 +414,11 @@ int riscv_pmu_setup_timer(CPURISCVState *env, uint64_t value, uint32_t ctr_idx)
     if (riscv_pmu_ctr_monitor_cycles(env, ctr_idx) ||
         riscv_pmu_ctr_monitor_instructions(env, ctr_idx)) {
         overflow_ns = pmu_icount_ticks_to_ns((int64_t)overflow_delta);
-        overflow_left = pmu_icount_ticks_to_ns(overflow_left) ;
+        overflow_left = pmu_icount_ticks_to_ns(overflow_left);
     } else {
         return -1;
     }
-    overflow_at = (uint64_t)qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                  overflow_ns;
+    overflow_at = (uint64_t)qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + overflow_ns;
 
     if (overflow_at > INT64_MAX) {
         overflow_left += overflow_at - INT64_MAX;

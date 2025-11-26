@@ -45,8 +45,9 @@ static bool avr_cpu_has_work(CPUState *cs)
     AVRCPU *cpu = AVR_CPU(cs);
     CPUAVRState *env = &cpu->env;
 
-    return (cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_RESET))
-            && cpu_interrupts_enabled(env);
+    return (cs->interrupt_request &
+            (CPU_INTERRUPT_HARD | CPU_INTERRUPT_RESET)) &&
+           cpu_interrupts_enabled(env);
 }
 
 static void avr_cpu_synchronize_from_tb(CPUState *cs,
@@ -59,8 +60,7 @@ static void avr_cpu_synchronize_from_tb(CPUState *cs,
     env->pc_w = tb->pc / 2; /* internally PC points to words */
 }
 
-static void avr_restore_state_to_opc(CPUState *cs,
-                                     const TranslationBlock *tb,
+static void avr_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                      const uint64_t *data)
 {
     AVRCPU *cpu = AVR_CPU(cs);
@@ -184,14 +184,11 @@ static void avr_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     qemu_fprintf(f, "Y:       %02x%02x\n", env->r[29], env->r[28]);
     qemu_fprintf(f, "Z:       %02x%02x\n", env->r[31], env->r[30]);
     qemu_fprintf(f, "SREG:    [ %c %c %c %c %c %c %c %c ]\n",
-                 env->sregI ? 'I' : '-',
-                 env->sregT ? 'T' : '-',
-                 env->sregH ? 'H' : '-',
-                 env->sregS ? 'S' : '-',
+                 env->sregI ? 'I' : '-', env->sregT ? 'T' : '-',
+                 env->sregH ? 'H' : '-', env->sregS ? 'S' : '-',
                  env->sregV ? 'V' : '-',
                  env->sregN ? '-' : 'N', /* Zf has negative logic */
-                 env->sregZ ? 'Z' : '-',
-                 env->sregC ? 'I' : '-');
+                 env->sregZ ? 'Z' : '-', env->sregC ? 'I' : '-');
     qemu_fprintf(f, "SKIP:    %02x\n", env->skip);
 
     qemu_fprintf(f, "\n");
@@ -229,7 +226,8 @@ static void avr_cpu_class_init(ObjectClass *oc, void *data)
     AVRCPUClass *mcc = AVR_CPU_CLASS(oc);
     ResettableClass *rc = RESETTABLE_CLASS(oc);
 
-    device_class_set_parent_realize(dc, avr_cpu_realizefn, &mcc->parent_realize);
+    device_class_set_parent_realize(dc, avr_cpu_realizefn,
+                                    &mcc->parent_realize);
 
     resettable_class_set_parent_phases(rc, NULL, avr_cpu_reset_hold, NULL,
                                        &mcc->parent_phases);
@@ -378,11 +376,10 @@ void avr_cpu_list(void)
     g_slist_free(list);
 }
 
-#define DEFINE_AVR_CPU_TYPE(model, initfn) \
-    { \
-        .parent = TYPE_AVR_CPU, \
-        .instance_init = initfn, \
-        .name = AVR_CPU_TYPE_NAME(model), \
+#define DEFINE_AVR_CPU_TYPE(model, initfn)               \
+    {                                                    \
+        .parent = TYPE_AVR_CPU, .instance_init = initfn, \
+        .name = AVR_CPU_TYPE_NAME(model),                \
     }
 
 static const TypeInfo avr_cpu_type_info[] = {

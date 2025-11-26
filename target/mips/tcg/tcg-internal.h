@@ -19,10 +19,9 @@ void mips_tcg_init(void);
 
 void mips_cpu_synchronize_from_tb(CPUState *cs, const TranslationBlock *tb);
 G_NORETURN void mips_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
-                                             MMUAccessType access_type, int mmu_idx,
-                                             uintptr_t retaddr);
-void mips_restore_state_to_opc(CPUState *cs,
-                               const TranslationBlock *tb,
+                                             MMUAccessType access_type,
+                                             int mmu_idx, uintptr_t retaddr);
+void mips_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                const uint64_t *data);
 
 const char *mips_exception_name(int32_t exception);
@@ -30,10 +29,8 @@ const char *mips_exception_name(int32_t exception);
 G_NORETURN void do_raise_exception_err(CPUMIPSState *env, uint32_t exception,
                                        int error_code, uintptr_t pc);
 
-static inline G_NORETURN
-void do_raise_exception(CPUMIPSState *env,
-                        uint32_t exception,
-                        uintptr_t pc)
+static inline G_NORETURN void
+do_raise_exception(CPUMIPSState *env, uint32_t exception, uintptr_t pc)
 {
     do_raise_exception_err(env, exception, 0, pc);
 }
@@ -54,16 +51,15 @@ bool mips_io_recompile_replay_branch(CPUState *cs, const TranslationBlock *tb);
 
 hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address,
                                   MMUAccessType access_type, uintptr_t retaddr);
-void mips_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                    vaddr addr, unsigned size,
-                                    MMUAccessType access_type,
+void mips_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                    unsigned size, MMUAccessType access_type,
                                     int mmu_idx, MemTxAttrs attrs,
                                     MemTxResult response, uintptr_t retaddr);
 void cpu_mips_tlb_flush(CPUMIPSState *env);
 
 bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                       MMUAccessType access_type, int mmu_idx,
-                       bool probe, uintptr_t retaddr);
+                       MMUAccessType access_type, int mmu_idx, bool probe,
+                       uintptr_t retaddr);
 
 void mips_semihosting(CPUMIPSState *env);
 

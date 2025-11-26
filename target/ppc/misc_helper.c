@@ -58,14 +58,14 @@ void helper_spr_core_write_generic(CPUPPCState *env, uint32_t sprn,
         return;
     }
 
-    THREAD_SIBLING_FOREACH(cs, ccs) {
+    THREAD_SIBLING_FOREACH(cs, ccs)
+    {
         CPUPPCState *cenv = &POWERPC_CPU(ccs)->env;
         cenv->spr[sprn] = val;
     }
 }
 
-void helper_spr_write_CTRL(CPUPPCState *env, uint32_t sprn,
-                           target_ulong val)
+void helper_spr_write_CTRL(CPUPPCState *env, uint32_t sprn, target_ulong val)
 {
     CPUState *cs = env_cpu(env);
     CPUState *ccs;
@@ -80,7 +80,8 @@ void helper_spr_write_CTRL(CPUPPCState *env, uint32_t sprn,
     ts_mask = ~(1U << (8 + env->spr[SPR_TIR]));
     ts = run << (8 + env->spr[SPR_TIR]);
 
-    THREAD_SIBLING_FOREACH(cs, ccs) {
+    THREAD_SIBLING_FOREACH(cs, ccs)
+    {
         CPUPPCState *cenv = &POWERPC_CPU(ccs)->env;
 
         cenv->spr[sprn] &= ts_mask;
@@ -94,17 +95,16 @@ static void raise_hv_fu_exception(CPUPPCState *env, uint32_t bit,
                                   const char *caller, uint32_t cause,
                                   uintptr_t raddr)
 {
-    qemu_log_mask(CPU_LOG_INT, "HV Facility %d is unavailable (%s)\n",
-                  bit, caller);
+    qemu_log_mask(CPU_LOG_INT, "HV Facility %d is unavailable (%s)\n", bit,
+                  caller);
 
     env->spr[SPR_HFSCR] &= ~((target_ulong)FSCR_IC_MASK << FSCR_IC_POS);
 
     raise_exception_err_ra(env, POWERPC_EXCP_HV_FU, cause, raddr);
 }
 
-static void raise_fu_exception(CPUPPCState *env, uint32_t bit,
-                               uint32_t sprn, uint32_t cause,
-                               uintptr_t raddr)
+static void raise_fu_exception(CPUPPCState *env, uint32_t bit, uint32_t sprn,
+                               uint32_t cause, uintptr_t raddr)
 {
     qemu_log("Facility SPR %d is unavailable (SPR FSCR:%d)\n", sprn, bit);
 
@@ -121,14 +121,14 @@ void helper_hfscr_facility_check(CPUPPCState *env, uint32_t bit,
 {
 #ifdef TARGET_PPC64
     if ((env->msr_mask & MSR_HVB) && !FIELD_EX64(env->msr, MSR, HV) &&
-                                     !(env->spr[SPR_HFSCR] & (1UL << bit))) {
+        !(env->spr[SPR_HFSCR] & (1UL << bit))) {
         raise_hv_fu_exception(env, bit, caller, cause, GETPC());
     }
 #endif
 }
 
-void helper_fscr_facility_check(CPUPPCState *env, uint32_t bit,
-                                uint32_t sprn, uint32_t cause)
+void helper_fscr_facility_check(CPUPPCState *env, uint32_t bit, uint32_t sprn,
+                                uint32_t cause)
 {
 #ifdef TARGET_PPC64
     if (env->spr[SPR_FSCR] & (1ULL << bit)) {
@@ -139,8 +139,8 @@ void helper_fscr_facility_check(CPUPPCState *env, uint32_t bit,
 #endif
 }
 
-void helper_msr_facility_check(CPUPPCState *env, uint32_t bit,
-                               uint32_t sprn, uint32_t cause)
+void helper_msr_facility_check(CPUPPCState *env, uint32_t bit, uint32_t sprn,
+                               uint32_t cause)
 {
 #ifdef TARGET_PPC64
     if (env->msr & (1ULL << bit)) {
@@ -175,14 +175,15 @@ void helper_store_ptcr(CPUPPCState *env, target_ulong val)
         assert(env->mmu_model & POWERPC_MMU_3_00);
 
         if (val & ~ptcr_mask) {
-            error_report("Invalid bits 0x"TARGET_FMT_lx" set in PTCR",
+            error_report("Invalid bits 0x" TARGET_FMT_lx " set in PTCR",
                          val & ~ptcr_mask);
             val &= ptcr_mask;
         }
 
         if (patbsize > 24) {
             error_report("Invalid Partition Table size 0x" TARGET_FMT_lx
-                         " stored in PTCR", patbsize);
+                         " stored in PTCR",
+                         patbsize);
             return;
         }
 
@@ -224,7 +225,8 @@ target_ulong helper_load_dpdes(CPUPPCState *env)
     }
 
     qemu_mutex_lock_iothread();
-    THREAD_SIBLING_FOREACH(cs, ccs) {
+    THREAD_SIBLING_FOREACH(cs, ccs)
+    {
         PowerPCCPU *ccpu = POWERPC_CPU(ccs);
         CPUPPCState *cenv = &ccpu->env;
         uint32_t thread_id = ppc_cpu_tir(ccpu);
@@ -252,8 +254,8 @@ void helper_store_dpdes(CPUPPCState *env, target_ulong val)
     }
 
     if (val & ~(nr_threads - 1)) {
-        qemu_log_mask(LOG_GUEST_ERROR, "Invalid DPDES register value "
-                      TARGET_FMT_lx"\n", val);
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "Invalid DPDES register value " TARGET_FMT_lx "\n", val);
         val &= (nr_threads - 1); /* Ignore the invalid bits */
     }
 
@@ -264,7 +266,8 @@ void helper_store_dpdes(CPUPPCState *env, target_ulong val)
 
     /* Does iothread need to be locked for walking CPU list? */
     qemu_mutex_lock_iothread();
-    THREAD_SIBLING_FOREACH(cs, ccs) {
+    THREAD_SIBLING_FOREACH(cs, ccs)
+    {
         PowerPCCPU *ccpu = POWERPC_CPU(ccs);
         uint32_t thread_id = ppc_cpu_tir(ccpu);
 
@@ -321,13 +324,13 @@ void helper_fixup_thrm(CPUPPCState *env)
     target_ulong v, t;
     int i;
 
-#define THRM1_TIN       (1 << 31)
-#define THRM1_TIV       (1 << 30)
-#define THRM1_THRES(x)  (((x) & 0x7f) << 23)
-#define THRM1_TID       (1 << 2)
-#define THRM1_TIE       (1 << 1)
-#define THRM1_V         (1 << 0)
-#define THRM3_E         (1 << 0)
+#define THRM1_TIN (1 << 31)
+#define THRM1_TIV (1 << 30)
+#define THRM1_THRES(x) (((x) & 0x7f) << 23)
+#define THRM1_TID (1 << 2)
+#define THRM1_TIE (1 << 1)
+#define THRM1_V (1 << 0)
+#define THRM3_E (1 << 0)
 
     if (!(env->spr[SPR_THRM3] & THRM3_E)) {
         return;

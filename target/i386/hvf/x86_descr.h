@@ -29,16 +29,15 @@ typedef struct vmx_segment {
 } vmx_segment;
 
 /* deal with vmstate descriptors */
-void vmx_read_segment_descriptor(struct CPUState *cpu,
-                                 struct vmx_segment *desc, enum X86Seg seg);
+void vmx_read_segment_descriptor(struct CPUState *cpu, struct vmx_segment *desc,
+                                 enum X86Seg seg);
 void vmx_write_segment_descriptor(CPUState *cpu, struct vmx_segment *desc,
                                   enum X86Seg seg);
 
 x68_segment_selector vmx_read_segment_selector(struct CPUState *cpu,
                                                enum X86Seg seg);
 void vmx_write_segment_selector(struct CPUState *cpu,
-                                x68_segment_selector selector,
-                                enum X86Seg seg);
+                                x68_segment_selector selector, enum X86Seg seg);
 
 uint64_t vmx_read_segment_base(struct CPUState *cpu, enum X86Seg seg);
 void vmx_write_segment_base(struct CPUState *cpu, enum X86Seg seg,

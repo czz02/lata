@@ -20,7 +20,7 @@
 
 #include "cpu.h"
 
-#define INSTRUCTIONS_MAX 7    /* 2 pairs + loopend */
+#define INSTRUCTIONS_MAX 7 /* 2 pairs + loopend */
 #define REG_OPERANDS_MAX 5
 #define IMMEDS_MAX 2
 
@@ -31,22 +31,22 @@ struct DisasContext;
 typedef void (*SemanticInsn)(struct DisasContext *ctx);
 
 struct Instruction {
-    SemanticInsn generate;            /* pointer to genptr routine */
-    uint8_t regno[REG_OPERANDS_MAX];    /* reg operands including predicates */
+    SemanticInsn generate; /* pointer to genptr routine */
+    uint8_t regno[REG_OPERANDS_MAX]; /* reg operands including predicates */
     uint16_t opcode;
 
-    uint32_t iclass:6;
-    uint32_t slot:3;
-    uint32_t which_extended:1;    /* If has an extender, which immediate */
-    uint32_t new_value_producer_slot:4;
+    uint32_t iclass : 6;
+    uint32_t slot : 3;
+    uint32_t which_extended : 1; /* If has an extender, which immediate */
+    uint32_t new_value_producer_slot : 4;
 
-    bool part1;              /*
-                              * cmp-jumps are split into two insns.
-                              * set for the compare and clear for the jump
-                              */
-    bool extension_valid;   /* Has a constant extender attached */
-    bool is_endloop;   /* This is an end of loop */
-    int32_t immed[IMMEDS_MAX];    /* immediate field */
+    bool part1; /*
+                 * cmp-jumps are split into two insns.
+                 * set for the compare and clear for the jump
+                 */
+    bool extension_valid; /* Has a constant extender attached */
+    bool is_endloop; /* This is an end of loop */
+    int32_t immed[IMMEDS_MAX]; /* immediate field */
 };
 
 typedef struct Instruction Insn;
@@ -57,8 +57,8 @@ struct Packet {
     uint32_t pc;
 
     /* Pre-decodes about COF */
-    bool pkt_has_cof;          /* Has any change-of-flow */
-    bool pkt_has_multi_cof;    /* Has more than one change-of-flow */
+    bool pkt_has_cof; /* Has any change-of-flow */
+    bool pkt_has_multi_cof; /* Has more than one change-of-flow */
     bool pkt_has_endloop;
 
     bool pkt_has_dczeroa;

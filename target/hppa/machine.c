@@ -22,25 +22,21 @@
 #include "migration/cpu.h"
 
 #if TARGET_REGISTER_BITS == 64
-#define qemu_put_betr   qemu_put_be64
-#define qemu_get_betr   qemu_get_be64
-#define VMSTATE_UINTTL_V(_f, _s, _v) \
-    VMSTATE_UINT64_V(_f, _s, _v)
+#define qemu_put_betr qemu_put_be64
+#define qemu_get_betr qemu_get_be64
+#define VMSTATE_UINTTL_V(_f, _s, _v) VMSTATE_UINT64_V(_f, _s, _v)
 #define VMSTATE_UINTTL_ARRAY_V(_f, _s, _n, _v) \
     VMSTATE_UINT64_ARRAY_V(_f, _s, _n, _v)
 #else
-#define qemu_put_betr   qemu_put_be32
-#define qemu_get_betr   qemu_get_be32
-#define VMSTATE_UINTTR_V(_f, _s, _v) \
-    VMSTATE_UINT32_V(_f, _s, _v)
+#define qemu_put_betr qemu_put_be32
+#define qemu_get_betr qemu_get_be32
+#define VMSTATE_UINTTR_V(_f, _s, _v) VMSTATE_UINT32_V(_f, _s, _v)
 #define VMSTATE_UINTTR_ARRAY_V(_f, _s, _n, _v) \
     VMSTATE_UINT32_ARRAY_V(_f, _s, _n, _v)
 #endif
 
-#define VMSTATE_UINTTR(_f, _s) \
-    VMSTATE_UINTTR_V(_f, _s, 0)
-#define VMSTATE_UINTTR_ARRAY(_f, _s, _n) \
-    VMSTATE_UINTTR_ARRAY_V(_f, _s, _n, 0)
+#define VMSTATE_UINTTR(_f, _s) VMSTATE_UINTTR_V(_f, _s, 0)
+#define VMSTATE_UINTTR_ARRAY(_f, _s, _n) VMSTATE_UINTTR_ARRAY_V(_f, _s, _n, 0)
 
 
 static int get_psw(QEMUFile *f, void *opaque, size_t size,
@@ -136,14 +132,12 @@ static VMStateField vmstate_env_fields[] = {
        jumping.  We want OFFSET=0 so that we effectively pass ENV
        to the helper functions, and we need to fill in the name by
        hand since there's no field of that name.  */
-    {
-        .name = "psw",
-        .version_id = 0,
-        .size = sizeof(uint64_t),
-        .info = &vmstate_psw,
-        .flags = VMS_SINGLE,
-        .offset = 0
-    },
+    { .name = "psw",
+      .version_id = 0,
+      .size = sizeof(uint64_t),
+      .info = &vmstate_psw,
+      .flags = VMS_SINGLE,
+      .offset = 0 },
 
     VMSTATE_UINTTR(iaoq_f, CPUHPPAState),
     VMSTATE_UINTTR(iaoq_b, CPUHPPAState),
@@ -152,8 +146,8 @@ static VMStateField vmstate_env_fields[] = {
 
     VMSTATE_UINT32(fr0_shadow, CPUHPPAState),
 
-    VMSTATE_ARRAY(tlb, CPUHPPAState, ARRAY_SIZE(((CPUHPPAState *)0)->tlb),
-                  0, vmstate_tlb, hppa_tlb_entry),
+    VMSTATE_ARRAY(tlb, CPUHPPAState, ARRAY_SIZE(((CPUHPPAState *)0)->tlb), 0,
+                  vmstate_tlb, hppa_tlb_entry),
     VMSTATE_UINT32(tlb_last, CPUHPPAState),
 
     VMSTATE_END_OF_LIST()
@@ -167,8 +161,7 @@ static const VMStateDescription vmstate_env = {
 };
 
 static VMStateField vmstate_cpu_fields[] = {
-    VMSTATE_CPU(),
-    VMSTATE_STRUCT(env, HPPACPU, 1, vmstate_env, CPUHPPAState),
+    VMSTATE_CPU(), VMSTATE_STRUCT(env, HPPACPU, 1, vmstate_env, CPUHPPAState),
     VMSTATE_END_OF_LIST()
 };
 

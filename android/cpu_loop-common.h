@@ -24,8 +24,7 @@
 #include "special-errno.h"
 
 void target_exception_dump(CPUArchState *env, const char *fmt, int code);
-#define EXCP_DUMP(env, fmt, code) \
-    target_exception_dump(env, fmt, code)
+#define EXCP_DUMP(env, fmt, code) target_exception_dump(env, fmt, code)
 
 void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs);
 #endif

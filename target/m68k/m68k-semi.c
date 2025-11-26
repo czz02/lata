@@ -27,7 +27,7 @@
 #include "hw/boards.h"
 #include "qemu/log.h"
 
-#define HOSTED_EXIT  0
+#define HOSTED_EXIT 0
 #define HOSTED_INIT_SIM 1
 #define HOSTED_OPEN 2
 #define HOSTED_CLOSE 3
@@ -44,27 +44,29 @@
 
 static int host_to_gdb_errno(int err)
 {
-#define E(X)  case E##X: return GDB_E##X
+#define E(X)   \
+    case E##X: \
+        return GDB_E##X
     switch (err) {
-    E(PERM);
-    E(NOENT);
-    E(INTR);
-    E(BADF);
-    E(ACCES);
-    E(FAULT);
-    E(BUSY);
-    E(EXIST);
-    E(NODEV);
-    E(NOTDIR);
-    E(ISDIR);
-    E(INVAL);
-    E(NFILE);
-    E(MFILE);
-    E(FBIG);
-    E(NOSPC);
-    E(SPIPE);
-    E(ROFS);
-    E(NAMETOOLONG);
+        E(PERM);
+        E(NOENT);
+        E(INTR);
+        E(BADF);
+        E(ACCES);
+        E(FAULT);
+        E(BUSY);
+        E(EXIST);
+        E(NODEV);
+        E(NOTDIR);
+        E(ISDIR);
+        E(INVAL);
+        E(NFILE);
+        E(MFILE);
+        E(FBIG);
+        E(NOSPC);
+        E(SPIPE);
+        E(ROFS);
+        E(NAMETOOLONG);
     default:
         return GDB_EUNKNOWN;
     }
@@ -84,7 +86,8 @@ static void m68k_semi_u32_cb(CPUState *cs, uint64_t ret, int err)
          * error to the guest, so the best we can do is log it in qemu.
          * It is always a guest error not to pass us a valid argument block.
          */
-        qemu_log_mask(LOG_GUEST_ERROR, "m68k-semihosting: return value "
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "m68k-semihosting: return value "
                       "discarded because argument block not writable\n");
     }
 }
@@ -95,11 +98,11 @@ static void m68k_semi_u64_cb(CPUState *cs, uint64_t ret, int err)
     CPUM68KState *env = &cpu->env;
 
     target_ulong args = env->dregs[1];
-    if (put_user_u32(ret >> 32, args) ||
-        put_user_u32(ret, args + 4) ||
+    if (put_user_u32(ret >> 32, args) || put_user_u32(ret, args + 4) ||
         put_user_u32(host_to_gdb_errno(err), args + 8)) {
         /* No way to report this via m68k semihosting ABI; just log it */
-        qemu_log_mask(LOG_GUEST_ERROR, "m68k-semihosting: return value "
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "m68k-semihosting: return value "
                       "discarded because argument block not writable\n");
     }
 }
@@ -108,17 +111,19 @@ static void m68k_semi_u64_cb(CPUState *cs, uint64_t ret, int err)
  * Read the input value from the argument block; fail the semihosting
  * call if the memory read fails.
  */
-#define GET_ARG(n) do {                                 \
-    if (get_user_ual(arg ## n, args + (n) * 4)) {       \
-        goto failed;                                    \
-    }                                                   \
-} while (0)
+#define GET_ARG(n)                                  \
+    do {                                            \
+        if (get_user_ual(arg##n, args + (n) * 4)) { \
+            goto failed;                            \
+        }                                           \
+    } while (0)
 
-#define GET_ARG64(n) do {                               \
-    if (get_user_ual(arg ## n, args + (n) * 4)) {       \
-        goto failed64;                                  \
-    }                                                   \
-} while (0)
+#define GET_ARG64(n)                                \
+    do {                                            \
+        if (get_user_ual(arg##n, args + (n) * 4)) { \
+            goto failed64;                          \
+        }                                           \
+    } while (0)
 
 
 void do_m68k_semihosting(CPUM68KState *env, int nr)

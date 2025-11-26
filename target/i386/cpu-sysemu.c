@@ -43,15 +43,8 @@ static QDict *x86_cpu_static_props(void)
     FeatureWord w;
     int i;
     static const char *props[] = {
-        "min-level",
-        "min-xlevel",
-        "family",
-        "model",
-        "stepping",
-        "model-id",
-        "vendor",
-        "lmce",
-        NULL,
+        "min-level", "min-xlevel", "family", "model", "stepping",
+        "model-id",  "vendor",     "lmce",   NULL,
     };
     static QDict *d;
 
@@ -81,8 +74,8 @@ static QDict *x86_cpu_static_props(void)
 /* Add an entry to @props dict, with the value for property. */
 static void x86_cpu_expand_prop(X86CPU *cpu, QDict *props, const char *prop)
 {
-    QObject *value = object_property_get_qobject(OBJECT(cpu), prop,
-                                                 &error_abort);
+    QObject *value =
+        object_property_get_qobject(OBJECT(cpu), prop, &error_abort);
 
     qdict_put_obj(props, prop, value);
 }
@@ -176,10 +169,9 @@ out:
     return xc;
 }
 
-CpuModelExpansionInfo *
-qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-                                                      CpuModelInfo *model,
-                                                      Error **errp)
+CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+                                                     CpuModelInfo *model,
+                                                     Error **errp)
 {
     X86CPU *xc = NULL;
     Error *err = NULL;
@@ -187,8 +179,7 @@ qmp_query_cpu_model_expansion(CpuModelExpansionType type,
     QDict *props = NULL;
     const char *base_name;
 
-    xc = x86_cpu_from_model(model->name, qobject_to(QDict, model->props),
-                            &err);
+    xc = x86_cpu_from_model(model->name, qobject_to(QDict, model->props), &err);
     if (err) {
         goto out;
     }
@@ -202,7 +193,7 @@ qmp_query_cpu_model_expansion(CpuModelExpansionType type,
         /* Static expansion will be based on "base" only */
         base_name = "base";
         x86_cpu_to_dict(xc, props);
-    break;
+        break;
     case CPU_MODEL_EXPANSION_TYPE_FULL:
         /* As we don't return every single property, full expansion needs
          * to keep the original model name+props, and add extra
@@ -210,7 +201,7 @@ qmp_query_cpu_model_expansion(CpuModelExpansionType type,
          */
         base_name = model->name;
         x86_cpu_to_dict_full(xc, props);
-    break;
+        break;
     default:
         error_setg(&err, "Unsupported expansion type");
         goto out;
@@ -277,8 +268,7 @@ void x86_cpu_apic_create(X86CPU *cpu, Error **errp)
     }
 
     cpu->apic_state = DEVICE(object_new_with_class(OBJECT_CLASS(apic_class)));
-    object_property_add_child(OBJECT(cpu), "lapic",
-                              OBJECT(cpu->apic_state));
+    object_property_add_child(OBJECT(cpu), "lapic", OBJECT(cpu->apic_state));
     object_unref(OBJECT(cpu->apic_state));
 
     qdev_prop_set_uint32(cpu->apic_state, "id", cpu->apic_id);
@@ -301,13 +291,11 @@ void x86_cpu_apic_realize(X86CPU *cpu, Error **errp)
     /* Map APIC MMIO area */
     apic = APIC_COMMON(cpu->apic_state);
     if (!apic_mmio_map_once) {
-        memory_region_add_subregion_overlap(get_system_memory(),
-                                            apic->apicbase &
-                                            MSR_IA32_APICBASE_BASE,
-                                            &apic->io_memory,
-                                            0x1000);
+        memory_region_add_subregion_overlap(
+            get_system_memory(), apic->apicbase & MSR_IA32_APICBASE_BASE,
+            &apic->io_memory, 0x1000);
         apic_mmio_map_once = true;
-     }
+    }
 }
 
 GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
@@ -331,9 +319,8 @@ GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
 
     return panic_info;
 }
-void x86_cpu_get_crash_info_qom(Object *obj, Visitor *v,
-                                const char *name, void *opaque,
-                                Error **errp)
+void x86_cpu_get_crash_info_qom(Object *obj, Visitor *v, const char *name,
+                                void *opaque, Error **errp)
 {
     CPUState *cs = CPU(obj);
     GuestPanicInformation *panic_info;
@@ -349,8 +336,6 @@ void x86_cpu_get_crash_info_qom(Object *obj, Visitor *v,
         return;
     }
 
-    visit_type_GuestPanicInformation(v, "crash-information", &panic_info,
-                                     errp);
+    visit_type_GuestPanicInformation(v, "crash-information", &panic_info, errp);
     qapi_free_GuestPanicInformation(panic_info);
 }
-

@@ -34,19 +34,19 @@
 #define HEADER_BUF_LEN (128 * 1024)
 
 /* Variadic macros to wrap the buffer printing functions */
-#define EMIT(c, ...)                                                           \
-    do {                                                                       \
-        g_string_append_printf((c)->out_str, __VA_ARGS__);                     \
+#define EMIT(c, ...)                                       \
+    do {                                                   \
+        g_string_append_printf((c)->out_str, __VA_ARGS__); \
     } while (0)
 
-#define EMIT_SIG(c, ...)                                                       \
-    do {                                                                       \
-        g_string_append_printf((c)->signature_str, __VA_ARGS__);               \
+#define EMIT_SIG(c, ...)                                         \
+    do {                                                         \
+        g_string_append_printf((c)->signature_str, __VA_ARGS__); \
     } while (0)
 
-#define EMIT_HEAD(c, ...)                                                      \
-    do {                                                                       \
-        g_string_append_printf((c)->header_str, __VA_ARGS__);                  \
+#define EMIT_HEAD(c, ...)                                     \
+    do {                                                      \
+        g_string_append_printf((c)->header_str, __VA_ARGS__); \
     } while (0)
 
 /**
@@ -60,16 +60,16 @@ typedef enum { UNKNOWN_SIGNEDNESS, SIGNED, UNSIGNED } HexSignedness;
  * Semantic record of the REG tokens, identifying registers
  */
 typedef struct HexReg {
-    uint8_t id;                 /**< Identifier of the register               */
-    HexRegType type;            /**< Type of the register                     */
-    unsigned bit_width;         /**< Bit width of the reg, 32 or 64 bits      */
+    uint8_t id; /**< Identifier of the register               */
+    HexRegType type; /**< Type of the register                     */
+    unsigned bit_width; /**< Bit width of the reg, 32 or 64 bits      */
 } HexReg;
 
 /**
  * Data structure, identifying a TCGv temporary value
  */
 typedef struct HexTmp {
-    unsigned index;             /**< Index of the TCGv temporary value        */
+    unsigned index; /**< Index of the TCGv temporary value        */
 } HexTmp;
 
 /**
@@ -90,18 +90,18 @@ enum ImmUnionTag {
  */
 typedef struct HexImm {
     union {
-        char id;                /**< Identifier, used when type is VARIABLE   */
-        uint64_t value;         /**< Immediate value, used when type is VALUE */
-        uint64_t index;         /**< Index, used when type is QEMU_TMP        */
+        char id; /**< Identifier, used when type is VARIABLE   */
+        uint64_t value; /**< Immediate value, used when type is VALUE */
+        uint64_t index; /**< Index, used when type is QEMU_TMP        */
     };
-    enum ImmUnionTag type;      /**< Type of the immediate                    */
+    enum ImmUnionTag type; /**< Type of the immediate                    */
 } HexImm;
 
 /**
  * Semantic record of the PRED token, identifying a predicate
  */
 typedef struct HexPred {
-    char id;                    /**< Identifier of the predicate              */
+    char id; /**< Identifier of the predicate              */
 } HexPred;
 
 /**
@@ -109,24 +109,24 @@ typedef struct HexPred {
  * Note: All saturates are assumed to implicitly set overflow.
  */
 typedef struct HexSat {
-    HexSignedness signedness;   /**< Signedness of the sat. op.               */
+    HexSignedness signedness; /**< Signedness of the sat. op.               */
 } HexSat;
 
 /**
  * Semantic record of the CAST token, identifying the cast operator
  */
 typedef struct HexCast {
-    unsigned bit_width;         /**< Bit width of the cast operator           */
-    HexSignedness signedness;   /**< Unsigned flag for the cast operator      */
+    unsigned bit_width; /**< Bit width of the cast operator           */
+    HexSignedness signedness; /**< Unsigned flag for the cast operator      */
 } HexCast;
 
 /**
  * Semantic record of the EXTRACT token, identifying the cast operator
  */
 typedef struct HexExtract {
-    unsigned bit_width;         /**< Bit width of the extract operator        */
+    unsigned bit_width; /**< Bit width of the extract operator        */
     unsigned storage_bit_width; /**< Actual bit width of the extract operator */
-    HexSignedness signedness;   /**< Unsigned flag for the extract operator   */
+    HexSignedness signedness; /**< Unsigned flag for the extract operator   */
 } HexExtract;
 
 /**
@@ -134,9 +134,9 @@ typedef struct HexExtract {
  * operator
  */
 typedef struct HexMpy {
-    unsigned first_bit_width;        /**< Bit width of 1st operand of fMPY    */
-    unsigned second_bit_width;       /**< Bit width of 2nd operand of fMPY    */
-    HexSignedness first_signedness;  /**< Signedness of 1st operand of fMPY   */
+    unsigned first_bit_width; /**< Bit width of 1st operand of fMPY    */
+    unsigned second_bit_width; /**< Bit width of 2nd operand of fMPY    */
+    HexSignedness first_signedness; /**< Signedness of 1st operand of fMPY   */
     HexSignedness second_signedness; /**< Signedness of 2nd operand of fMPY   */
 } HexMpy;
 
@@ -145,7 +145,7 @@ typedef struct HexMpy {
  * of the input language
  */
 typedef struct HexVar {
-    GString *name;              /**< Name of the VARID variable               */
+    GString *name; /**< Name of the VARID variable               */
 } HexVar;
 
 /**
@@ -155,16 +155,21 @@ typedef struct HexVar {
  * of that variable
  */
 typedef struct Var {
-    GString *name;              /**< Name of the VARID variable               */
-    uint8_t bit_width;          /**< Bit width of the VARID variable          */
-    HexSignedness signedness;   /**< Unsigned flag for the VARID var          */
+    GString *name; /**< Name of the VARID variable               */
+    uint8_t bit_width; /**< Bit width of the VARID variable          */
+    HexSignedness signedness; /**< Unsigned flag for the VARID var          */
 } Var;
 
 /**
  * Enum of the possible rvalue types, used in the HexValue.type field
  */
 typedef enum RvalueUnionTag {
-    REGISTER, REGISTER_ARG, TEMP, IMMEDIATE, PREDICATE, VARID
+    REGISTER,
+    REGISTER_ARG,
+    TEMP,
+    IMMEDIATE,
+    PREDICATE,
+    VARID
 } RvalueUnionTag;
 
 /**
@@ -174,16 +179,16 @@ typedef enum RvalueUnionTag {
  */
 typedef struct HexValue {
     union {
-        HexReg reg;             /**< rvalue of register type                  */
-        HexTmp tmp;             /**< rvalue of temporary type                 */
-        HexImm imm;             /**< rvalue of immediate type                 */
-        HexPred pred;           /**< rvalue of predicate type                 */
-        HexVar var;             /**< rvalue of declared variable type         */
+        HexReg reg; /**< rvalue of register type                  */
+        HexTmp tmp; /**< rvalue of temporary type                 */
+        HexImm imm; /**< rvalue of immediate type                 */
+        HexPred pred; /**< rvalue of predicate type                 */
+        HexVar var; /**< rvalue of declared variable type         */
     };
-    RvalueUnionTag type;        /**< Type of the rvalue                       */
-    unsigned bit_width;         /**< Bit width of the rvalue                  */
-    HexSignedness signedness;   /**< Unsigned flag for the rvalue             */
-    bool is_dotnew;             /**< rvalue of predicate type is dotnew?      */
+    RvalueUnionTag type; /**< Type of the rvalue                       */
+    unsigned bit_width; /**< Bit width of the rvalue                  */
+    HexSignedness signedness; /**< Unsigned flag for the rvalue             */
+    bool is_dotnew; /**< rvalue of predicate type is dotnew?      */
 } HexValue;
 
 /**
@@ -205,8 +210,18 @@ typedef struct Ternary {
  * execute the operation between the two rvalues
  */
 typedef enum OpType {
-    ADD_OP, SUB_OP, MUL_OP, ASL_OP, ASR_OP, LSR_OP, ANDB_OP, ORB_OP,
-    XORB_OP, ANDL_OP, MINI_OP, MAXI_OP
+    ADD_OP,
+    SUB_OP,
+    MUL_OP,
+    ASL_OP,
+    ASR_OP,
+    LSR_OP,
+    ANDB_OP,
+    ORB_OP,
+    XORB_OP,
+    ANDL_OP,
+    MINI_OP,
+    MAXI_OP
 } OpType;
 
 /**
@@ -214,16 +229,16 @@ typedef enum OpType {
  * out after the compilation of each instruction
  */
 typedef struct Inst {
-    GString *name;              /**< Name of the compiled instruction         */
-    char *code_begin;           /**< Beginning of instruction input code      */
-    char *code_end;             /**< End of instruction input code            */
-    unsigned tmp_count;         /**< Index of the last declared TCGv temp     */
-    unsigned qemu_tmp_count;    /**< Index of the last declared int temp      */
-    unsigned if_count;          /**< Index of the last declared if label      */
-    unsigned error_count;       /**< Number of generated errors               */
-    GArray *allocated;          /**< Allocated declaredVARID vars             */
-    GArray *init_list;          /**< List of initialized registers            */
-    GArray *strings;            /**< Strings allocated by the instruction     */
+    GString *name; /**< Name of the compiled instruction         */
+    char *code_begin; /**< Beginning of instruction input code      */
+    char *code_end; /**< End of instruction input code            */
+    unsigned tmp_count; /**< Index of the last declared TCGv temp     */
+    unsigned qemu_tmp_count; /**< Index of the last declared int temp      */
+    unsigned if_count; /**< Index of the last declared if label      */
+    unsigned error_count; /**< Number of generated errors               */
+    GArray *allocated; /**< Allocated declaredVARID vars             */
+    GArray *init_list; /**< List of initialized registers            */
+    GArray *strings; /**< Strings allocated by the instruction     */
 } Inst;
 
 /**
@@ -234,18 +249,18 @@ typedef struct Inst {
  * instructions
  */
 typedef struct Context {
-    void *scanner;              /**< Reentrant parser state pointer           */
-    char *input_buffer;         /**< Buffer containing the input code         */
-    GString *out_str;           /**< String containing the output code        */
-    GString *signature_str;     /**< String containing the signatures code    */
-    GString *header_str;        /**< String containing the header code        */
-    FILE *defines_file;         /**< FILE * of the generated header           */
-    FILE *output_file;          /**< FILE * of the C output file              */
-    FILE *enabled_file;         /**< FILE * of the list of enabled inst       */
-    GArray *ternary;            /**< Array to track nesting of ternary ops    */
-    unsigned total_insn;        /**< Number of instructions in input file     */
-    unsigned implemented_insn;  /**< Instruction compiled without errors      */
-    Inst inst;                  /**< Parsing data of the current inst         */
+    void *scanner; /**< Reentrant parser state pointer           */
+    char *input_buffer; /**< Buffer containing the input code         */
+    GString *out_str; /**< String containing the output code        */
+    GString *signature_str; /**< String containing the signatures code    */
+    GString *header_str; /**< String containing the header code        */
+    FILE *defines_file; /**< FILE * of the generated header           */
+    FILE *output_file; /**< FILE * of the C output file              */
+    FILE *enabled_file; /**< FILE * of the list of enabled inst       */
+    GArray *ternary; /**< Array to track nesting of ternary ops    */
+    unsigned total_insn; /**< Number of instructions in input file     */
+    unsigned implemented_insn; /**< Instruction compiled without errors      */
+    Inst inst; /**< Parsing data of the current inst         */
 } Context;
 
 #endif /* IDEF_PARSER_H */

@@ -171,7 +171,7 @@ static void sigp_store_status_at_address(CPUState *cs, run_on_cpu_data arg)
     si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
 }
 
-#define ADTL_SAVE_LC_MASK  0xfUL
+#define ADTL_SAVE_LC_MASK 0xfUL
 static void sigp_store_adtl_status(CPUState *cs, run_on_cpu_data arg)
 {
     S390CPU *cpu = S390_CPU(cs);
@@ -199,18 +199,14 @@ static void sigp_store_adtl_status(CPUState *cs, run_on_cpu_data arg)
     }
 
     /* no GS: only lc == 0 is valid */
-    if (!s390_has_feat(S390_FEAT_GUARDED_STORAGE) &&
-        lc != 0) {
+    if (!s390_has_feat(S390_FEAT_GUARDED_STORAGE) && lc != 0) {
         set_sigp_status(si, SIGP_STAT_INVALID_PARAMETER);
         return;
     }
 
     /* GS: 0, 10, 11, 12 are valid */
-    if (s390_has_feat(S390_FEAT_GUARDED_STORAGE) &&
-        lc != 0 &&
-        lc != 10 &&
-        lc != 11 &&
-        lc != 12) {
+    if (s390_has_feat(S390_FEAT_GUARDED_STORAGE) && lc != 0 && lc != 10 &&
+        lc != 11 && lc != 12) {
         set_sigp_status(si, SIGP_STAT_INVALID_PARAMETER);
         return;
     }
@@ -318,12 +314,11 @@ static void sigp_cond_emergency(S390CPU *src_cpu, S390CPU *dst_cpu,
     psw_addr = dst_cpu->env.psw.addr;
     psw_mask = dst_cpu->env.psw.mask;
     asn = si->param;
-    p_asn = dst_cpu->env.cregs[4] & 0xffff;  /* Primary ASN */
-    s_asn = dst_cpu->env.cregs[3] & 0xffff;  /* Secondary ASN */
+    p_asn = dst_cpu->env.cregs[4] & 0xffff; /* Primary ASN */
+    s_asn = dst_cpu->env.cregs[3] & 0xffff; /* Secondary ASN */
 
     if (s390_cpu_get_state(dst_cpu) != S390_CPU_STATE_STOPPED ||
-        (psw_mask & psw_int_mask) != psw_int_mask ||
-        (idle && psw_addr != 0) ||
+        (psw_mask & psw_int_mask) != psw_int_mask || (idle && psw_addr != 0) ||
         (!idle && (asn == p_asn || asn == s_asn))) {
         cpu_inject_emergency_signal(dst_cpu, src_cpu->env.core_id);
     } else {
@@ -369,8 +364,7 @@ static int handle_sigp_single_dst(S390CPU *cpu, S390CPU *dst_cpu, uint8_t order,
     }
 
     /* only resets can break pending orders */
-    if (dst_cpu->env.sigp_order != 0 &&
-        order != SIGP_CPU_RESET &&
+    if (dst_cpu->env.sigp_order != 0 && order != SIGP_CPU_RESET &&
         order != SIGP_INITIAL_CPU_RESET) {
         return SIGP_CC_BUSY;
     }
@@ -395,19 +389,23 @@ static int handle_sigp_single_dst(S390CPU *cpu, S390CPU *dst_cpu, uint8_t order,
         run_on_cpu(CPU(dst_cpu), sigp_restart, RUN_ON_CPU_HOST_PTR(&si));
         break;
     case SIGP_STOP_STORE_STATUS:
-        run_on_cpu(CPU(dst_cpu), sigp_stop_and_store_status, RUN_ON_CPU_HOST_PTR(&si));
+        run_on_cpu(CPU(dst_cpu), sigp_stop_and_store_status,
+                   RUN_ON_CPU_HOST_PTR(&si));
         break;
     case SIGP_STORE_STATUS_ADDR:
-        run_on_cpu(CPU(dst_cpu), sigp_store_status_at_address, RUN_ON_CPU_HOST_PTR(&si));
+        run_on_cpu(CPU(dst_cpu), sigp_store_status_at_address,
+                   RUN_ON_CPU_HOST_PTR(&si));
         break;
     case SIGP_STORE_ADTL_STATUS:
-        run_on_cpu(CPU(dst_cpu), sigp_store_adtl_status, RUN_ON_CPU_HOST_PTR(&si));
+        run_on_cpu(CPU(dst_cpu), sigp_store_adtl_status,
+                   RUN_ON_CPU_HOST_PTR(&si));
         break;
     case SIGP_SET_PREFIX:
         run_on_cpu(CPU(dst_cpu), sigp_set_prefix, RUN_ON_CPU_HOST_PTR(&si));
         break;
     case SIGP_INITIAL_CPU_RESET:
-        run_on_cpu(CPU(dst_cpu), sigp_initial_cpu_reset, RUN_ON_CPU_HOST_PTR(&si));
+        run_on_cpu(CPU(dst_cpu), sigp_initial_cpu_reset,
+                   RUN_ON_CPU_HOST_PTR(&si));
         break;
     case SIGP_CPU_RESET:
         run_on_cpu(CPU(dst_cpu), sigp_cpu_reset, RUN_ON_CPU_HOST_PTR(&si));

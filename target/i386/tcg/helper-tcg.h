@@ -26,9 +26,9 @@
 #define TARGET_MAX_INSN_SIZE 16
 
 #if defined(TARGET_X86_64)
-# define TCG_PHYS_ADDR_BITS 40
+#define TCG_PHYS_ADDR_BITS 40
 #else
-# define TCG_PHYS_ADDR_BITS 36
+#define TCG_PHYS_ADDR_BITS 36
 #endif
 
 QEMU_BUILD_BUG_ON(TCG_PHYS_ADDR_BITS > TARGET_PHYS_ADDR_SPACE_BITS);
@@ -71,15 +71,14 @@ G_NORETURN void handle_unaligned_access(CPUX86State *env, vaddr vaddr,
                                         MMUAccessType access_type,
                                         uintptr_t retaddr);
 #ifdef CONFIG_USER_ONLY
-void x86_cpu_record_sigsegv(CPUState *cs, vaddr addr,
-                            MMUAccessType access_type,
+void x86_cpu_record_sigsegv(CPUState *cs, vaddr addr, MMUAccessType access_type,
                             bool maperr, uintptr_t ra);
-void x86_cpu_record_sigbus(CPUState *cs, vaddr addr,
-                           MMUAccessType access_type, uintptr_t ra);
+void x86_cpu_record_sigbus(CPUState *cs, vaddr addr, MMUAccessType access_type,
+                           uintptr_t ra);
 #else
 bool x86_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                      MMUAccessType access_type, int mmu_idx,
-                      bool probe, uintptr_t retaddr);
+                      MMUAccessType access_type, int mmu_idx, bool probe,
+                      uintptr_t retaddr);
 G_NORETURN void x86_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
                                             MMUAccessType access_type,
                                             int mmu_idx, uintptr_t retaddr);
@@ -101,10 +100,10 @@ void do_vmexit(CPUX86State *env);
 
 /* seg_helper.c */
 void do_interrupt_x86_hardirq(CPUX86State *env, int intno, int is_hw);
-void do_interrupt_all(X86CPU *cpu, int intno, int is_int,
-                      int error_code, target_ulong next_eip, int is_hw);
-void handle_even_inj(CPUX86State *env, int intno, int is_int,
-                     int error_code, int is_hw, int rm);
+void do_interrupt_all(X86CPU *cpu, int intno, int is_int, int error_code,
+                      target_ulong next_eip, int is_hw);
+void handle_even_inj(CPUX86State *env, int intno, int is_int, int error_code,
+                     int is_hw, int rm);
 int exception_has_error_code(int intno);
 
 /* smm_helper.c */

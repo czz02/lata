@@ -62,49 +62,49 @@ static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type,
     return id;
 }
 
-#define RISCV_CORE_REG(env, name)  kvm_riscv_reg_id(env, KVM_REG_RISCV_CORE, \
-                 KVM_REG_RISCV_CORE_REG(name))
+#define RISCV_CORE_REG(env, name) \
+    kvm_riscv_reg_id(env, KVM_REG_RISCV_CORE, KVM_REG_RISCV_CORE_REG(name))
 
-#define RISCV_CSR_REG(env, name)  kvm_riscv_reg_id(env, KVM_REG_RISCV_CSR, \
-                 KVM_REG_RISCV_CSR_REG(name))
+#define RISCV_CSR_REG(env, name) \
+    kvm_riscv_reg_id(env, KVM_REG_RISCV_CSR, KVM_REG_RISCV_CSR_REG(name))
 
-#define RISCV_TIMER_REG(env, name)  kvm_riscv_reg_id(env, KVM_REG_RISCV_TIMER, \
-                 KVM_REG_RISCV_TIMER_REG(name))
+#define RISCV_TIMER_REG(env, name) \
+    kvm_riscv_reg_id(env, KVM_REG_RISCV_TIMER, KVM_REG_RISCV_TIMER_REG(name))
 
-#define RISCV_FP_F_REG(env, idx)  kvm_riscv_reg_id(env, KVM_REG_RISCV_FP_F, idx)
+#define RISCV_FP_F_REG(env, idx) kvm_riscv_reg_id(env, KVM_REG_RISCV_FP_F, idx)
 
-#define RISCV_FP_D_REG(env, idx)  kvm_riscv_reg_id(env, KVM_REG_RISCV_FP_D, idx)
+#define RISCV_FP_D_REG(env, idx) kvm_riscv_reg_id(env, KVM_REG_RISCV_FP_D, idx)
 
-#define KVM_RISCV_GET_CSR(cs, env, csr, reg) \
-    do { \
+#define KVM_RISCV_GET_CSR(cs, env, csr, reg)                          \
+    do {                                                              \
         int ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, csr), &reg); \
-        if (ret) { \
-            return ret; \
-        } \
+        if (ret) {                                                    \
+            return ret;                                               \
+        }                                                             \
     } while (0)
 
-#define KVM_RISCV_SET_CSR(cs, env, csr, reg) \
-    do { \
+#define KVM_RISCV_SET_CSR(cs, env, csr, reg)                          \
+    do {                                                              \
         int ret = kvm_set_one_reg(cs, RISCV_CSR_REG(env, csr), &reg); \
-        if (ret) { \
-            return ret; \
-        } \
+        if (ret) {                                                    \
+            return ret;                                               \
+        }                                                             \
     } while (0)
 
-#define KVM_RISCV_GET_TIMER(cs, env, name, reg) \
-    do { \
+#define KVM_RISCV_GET_TIMER(cs, env, name, reg)                          \
+    do {                                                                 \
         int ret = kvm_get_one_reg(cs, RISCV_TIMER_REG(env, name), &reg); \
-        if (ret) { \
-            abort(); \
-        } \
+        if (ret) {                                                       \
+            abort();                                                     \
+        }                                                                \
     } while (0)
 
-#define KVM_RISCV_SET_TIMER(cs, env, name, reg) \
-    do { \
+#define KVM_RISCV_SET_TIMER(cs, env, name, reg)                          \
+    do {                                                                 \
         int ret = kvm_set_one_reg(cs, RISCV_TIMER_REG(env, name), &reg); \
-        if (ret) { \
-            abort(); \
-        } \
+        if (ret) {                                                       \
+            abort();                                                     \
+        }                                                                \
     } while (0)
 
 typedef struct KVMCPUConfig {
@@ -116,8 +116,10 @@ typedef struct KVMCPUConfig {
     bool supported;
 } KVMCPUConfig;
 
-#define KVM_MISA_CFG(_bit, _reg_id) \
-    {.offset = _bit, .kvm_reg_id = _reg_id}
+#define KVM_MISA_CFG(_bit, _reg_id)           \
+    {                                         \
+        .offset = _bit, .kvm_reg_id = _reg_id \
+    }
 
 /* KVM ISA extensions */
 static KVMCPUConfig kvm_misa_ext_cfgs[] = {
@@ -130,8 +132,7 @@ static KVMCPUConfig kvm_misa_ext_cfgs[] = {
     KVM_MISA_CFG(RVM, KVM_RISCV_ISA_EXT_M),
 };
 
-static void kvm_cpu_set_misa_ext_cfg(Object *obj, Visitor *v,
-                                     const char *name,
+static void kvm_cpu_set_misa_ext_cfg(Object *obj, Visitor *v, const char *name,
                                      void *opaque, Error **errp)
 {
     KVMCPUConfig *misa_ext_cfg = opaque;
@@ -159,8 +160,10 @@ static void kvm_cpu_set_misa_ext_cfg(Object *obj, Visitor *v,
      * Forbid users to enable extensions that aren't
      * available in the hart.
      */
-    error_setg(errp, "Enabling MISA bit '%s' is not allowed: it's not "
-               "enabled in the host", misa_ext_cfg->name);
+    error_setg(errp,
+               "Enabling MISA bit '%s' is not allowed: it's not "
+               "enabled in the host",
+               misa_ext_cfg->name);
 }
 
 static void kvm_riscv_update_cpu_misa_ext(RISCVCPU *cpu, CPUState *cs)
@@ -179,8 +182,7 @@ static void kvm_riscv_update_cpu_misa_ext(RISCVCPU *cpu, CPUState *cs)
 
         /* If we're here we're going to disable the MISA bit */
         reg = 0;
-        id = kvm_riscv_reg_id(env, KVM_REG_RISCV_ISA_EXT,
-                              misa_cfg->kvm_reg_id);
+        id = kvm_riscv_reg_id(env, KVM_REG_RISCV_ISA_EXT, misa_cfg->kvm_reg_id);
         ret = kvm_set_one_reg(cs, id, &reg);
         if (ret != 0) {
             /*
@@ -190,8 +192,8 @@ static void kvm_riscv_update_cpu_misa_ext(RISCVCPU *cpu, CPUState *cs)
              * during init() time. Any error at this point is worth
              * aborting.
              */
-            error_report("Unable to set KVM reg %s, error %d",
-                         misa_cfg->name, ret);
+            error_report("Unable to set KVM reg %s, error %d", misa_cfg->name,
+                         ret);
             exit(EXIT_FAILURE);
         }
         env->misa_ext &= ~misa_bit;
@@ -200,9 +202,10 @@ static void kvm_riscv_update_cpu_misa_ext(RISCVCPU *cpu, CPUState *cs)
 
 #define CPUCFG(_prop) offsetof(struct RISCVCPUConfig, _prop)
 
-#define KVM_EXT_CFG(_name, _prop, _reg_id) \
-    {.name = _name, .offset = CPUCFG(_prop), \
-     .kvm_reg_id = _reg_id}
+#define KVM_EXT_CFG(_name, _prop, _reg_id)                            \
+    {                                                                 \
+        .name = _name, .offset = CPUCFG(_prop), .kvm_reg_id = _reg_id \
+    }
 
 static KVMCPUConfig kvm_multi_ext_cfgs[] = {
     KVM_EXT_CFG("zicbom", ext_icbom, KVM_RISCV_ISA_EXT_ZICBOM),
@@ -228,16 +231,14 @@ static void kvm_cpu_cfg_set(RISCVCPU *cpu, KVMCPUConfig *multi_ext,
     *ext_enabled = val;
 }
 
-static uint32_t kvm_cpu_cfg_get(RISCVCPU *cpu,
-                                KVMCPUConfig *multi_ext)
+static uint32_t kvm_cpu_cfg_get(RISCVCPU *cpu, KVMCPUConfig *multi_ext)
 {
     bool *ext_enabled = kvmconfig_get_cfg_addr(cpu, multi_ext);
 
     return *ext_enabled;
 }
 
-static void kvm_cpu_set_multi_ext_cfg(Object *obj, Visitor *v,
-                                      const char *name,
+static void kvm_cpu_set_multi_ext_cfg(Object *obj, Visitor *v, const char *name,
                                       void *opaque, Error **errp)
 {
     KVMCPUConfig *multi_ext_cfg = opaque;
@@ -288,8 +289,7 @@ static KVMCPUConfig kvm_cboz_blocksize = {
     .kvm_reg_id = KVM_REG_RISCV_CONFIG_REG(zicboz_block_size)
 };
 
-static void kvm_cpu_set_cbomz_blksize(Object *obj, Visitor *v,
-                                      const char *name,
+static void kvm_cpu_set_cbomz_blksize(Object *obj, Visitor *v, const char *name,
                                       void *opaque, Error **errp)
 {
     KVMCPUConfig *cbomz_cfg = opaque;
@@ -331,8 +331,7 @@ static void kvm_riscv_update_cpu_cfg_isa_ext(RISCVCPU *cpu, CPUState *cs)
         ret = kvm_set_one_reg(cs, id, &reg);
         if (ret != 0) {
             error_report("Unable to %s extension %s in KVM, error %d",
-                         reg ? "enable" : "disable",
-                         multi_ext_cfg->name, ret);
+                         reg ? "enable" : "disable", multi_ext_cfg->name, ret);
             exit(EXIT_FAILURE);
         }
     }
@@ -349,10 +348,8 @@ static void kvm_riscv_add_cpu_user_properties(Object *cpu_obj)
         misa_cfg->name = riscv_get_misa_ext_name(bit);
         misa_cfg->description = riscv_get_misa_ext_description(bit);
 
-        object_property_add(cpu_obj, misa_cfg->name, "bool",
-                            NULL,
-                            kvm_cpu_set_misa_ext_cfg,
-                            NULL, misa_cfg);
+        object_property_add(cpu_obj, misa_cfg->name, "bool", NULL,
+                            kvm_cpu_set_misa_ext_cfg, NULL, misa_cfg);
         object_property_set_description(cpu_obj, misa_cfg->name,
                                         misa_cfg->description);
     }
@@ -360,19 +357,15 @@ static void kvm_riscv_add_cpu_user_properties(Object *cpu_obj)
     for (i = 0; i < ARRAY_SIZE(kvm_multi_ext_cfgs); i++) {
         KVMCPUConfig *multi_cfg = &kvm_multi_ext_cfgs[i];
 
-        object_property_add(cpu_obj, multi_cfg->name, "bool",
-                            NULL,
-                            kvm_cpu_set_multi_ext_cfg,
-                            NULL, multi_cfg);
+        object_property_add(cpu_obj, multi_cfg->name, "bool", NULL,
+                            kvm_cpu_set_multi_ext_cfg, NULL, multi_cfg);
     }
 
-    object_property_add(cpu_obj, "cbom_blocksize", "uint16",
-                        NULL, kvm_cpu_set_cbomz_blksize,
-                        NULL, &kvm_cbom_blocksize);
+    object_property_add(cpu_obj, "cbom_blocksize", "uint16", NULL,
+                        kvm_cpu_set_cbomz_blksize, NULL, &kvm_cbom_blocksize);
 
-    object_property_add(cpu_obj, "cboz_blocksize", "uint16",
-                        NULL, kvm_cpu_set_cbomz_blksize,
-                        NULL, &kvm_cboz_blocksize);
+    object_property_add(cpu_obj, "cboz_blocksize", "uint16", NULL,
+                        kvm_cpu_set_cbomz_blksize, NULL, &kvm_cboz_blocksize);
 }
 
 static int kvm_riscv_get_regs_core(CPUState *cs)
@@ -608,13 +601,13 @@ static bool kvm_riscv_create_scratch_vcpu(KVMScratchCPU *scratch)
         goto err;
     }
 
-    scratch->kvmfd =  kvmfd;
+    scratch->kvmfd = kvmfd;
     scratch->vmfd = vmfd;
     scratch->cpufd = cpufd;
 
     return true;
 
- err:
+err:
     if (cpufd >= 0) {
         close(cpufd);
     }
@@ -666,8 +659,7 @@ static void kvm_riscv_init_machine_ids(RISCVCPU *cpu, KVMScratchCPU *kvmcpu)
     }
 }
 
-static void kvm_riscv_init_misa_ext_mask(RISCVCPU *cpu,
-                                         KVMScratchCPU *kvmcpu)
+static void kvm_riscv_init_misa_ext_mask(RISCVCPU *cpu, KVMScratchCPU *kvmcpu)
 {
     CPURISCVState *env = &cpu->env;
     struct kvm_one_reg reg;
@@ -680,7 +672,8 @@ static void kvm_riscv_init_misa_ext_mask(RISCVCPU *cpu,
 
     if (ret) {
         error_report("Unable to fetch ISA register from KVM, "
-                     "error %d", ret);
+                     "error %d",
+                     ret);
         kvm_riscv_destroy_scratch_vcpu(kvmcpu);
         exit(EXIT_FAILURE);
     }
@@ -695,13 +688,12 @@ static void kvm_riscv_read_cbomz_blksize(RISCVCPU *cpu, KVMScratchCPU *kvmcpu,
     struct kvm_one_reg reg;
     int ret;
 
-    reg.id = kvm_riscv_reg_id(env, KVM_REG_RISCV_CONFIG,
-                              cbomz_cfg->kvm_reg_id);
+    reg.id = kvm_riscv_reg_id(env, KVM_REG_RISCV_CONFIG, cbomz_cfg->kvm_reg_id);
     reg.addr = (uint64_t)kvmconfig_get_cfg_addr(cpu, cbomz_cfg);
     ret = ioctl(kvmcpu->cpufd, KVM_GET_ONE_REG, &reg);
     if (ret != 0) {
-        error_report("Unable to read KVM reg %s, error %d",
-                     cbomz_cfg->name, ret);
+        error_report("Unable to read KVM reg %s, error %d", cbomz_cfg->name,
+                     ret);
         exit(EXIT_FAILURE);
     }
 }
@@ -727,7 +719,8 @@ static void kvm_riscv_init_multiext_cfg(RISCVCPU *cpu, KVMScratchCPU *kvmcpu)
                 val = false;
             } else {
                 error_report("Unable to read ISA_EXT KVM register %s, "
-                             "error %d", multi_ext_cfg->name, ret);
+                             "error %d",
+                             multi_ext_cfg->name, ret);
                 kvm_riscv_destroy_scratch_vcpu(kvmcpu);
                 exit(EXIT_FAILURE);
             }
@@ -908,8 +901,8 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
     abort();
 }
 
-int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
-                                int vector, PCIDevice *dev)
+int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route, int vector,
+                                PCIDevice *dev)
 {
     return 0;
 }
@@ -979,8 +972,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
         ret = kvm_riscv_handle_sbi(cs, run);
         break;
     default:
-        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-                      __func__, run->exit_reason);
+        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n", __func__,
+                      run->exit_reason);
         ret = -1;
         break;
     }
@@ -996,7 +989,7 @@ void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
     }
     env->pc = cpu->env.kernel_addr;
     env->gpr[10] = kvm_arch_vcpu_id(CPU(cpu)); /* a0 */
-    env->gpr[11] = cpu->env.fdt_addr;          /* a1 */
+    env->gpr[11] = cpu->env.fdt_addr; /* a1 */
     env->satp = 0;
 }
 

@@ -35,13 +35,13 @@
 
 #define HELPER_H "helper.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
 #include "analyze_funcs_generated.c.inc"
 
 typedef void (*AnalyzeInsn)(DisasContext *ctx);
 static const AnalyzeInsn opcode_analyze[XX_LAST_OPCODE] = {
-#define OPCODE(X)    [X] = analyze_##X
+#define OPCODE(X) [X] = analyze_##X
 #include "opcodes_def_generated.h.inc"
 #undef OPCODE
 };
@@ -62,12 +62,10 @@ TCGv hex_vstore_addr[VSTORES_MAX];
 TCGv hex_vstore_size[VSTORES_MAX];
 TCGv hex_vstore_pending[VSTORES_MAX];
 
-static const char * const hexagon_prednames[] = {
-  "p0", "p1", "p2", "p3"
-};
+static const char *const hexagon_prednames[] = { "p0", "p1", "p2", "p3" };
 
-intptr_t ctx_future_vreg_off(DisasContext *ctx, int regnum,
-                          int num, bool alloc_ok)
+intptr_t ctx_future_vreg_off(DisasContext *ctx, int regnum, int num,
+                             bool alloc_ok)
 {
     intptr_t offset;
 
@@ -92,8 +90,7 @@ intptr_t ctx_future_vreg_off(DisasContext *ctx, int regnum,
     return offset;
 }
 
-intptr_t ctx_tmp_vreg_off(DisasContext *ctx, int regnum,
-                          int num, bool alloc_ok)
+intptr_t ctx_tmp_vreg_off(DisasContext *ctx, int regnum, int num, bool alloc_ok)
 {
     intptr_t offset;
 
@@ -134,8 +131,8 @@ static bool use_goto_tb(DisasContext *ctx, target_ulong dest)
     return translator_use_goto_tb(&ctx->base, dest);
 }
 
-static void gen_goto_tb(DisasContext *ctx, int idx, target_ulong dest, bool
-                        move_to_pc)
+static void gen_goto_tb(DisasContext *ctx, int idx, target_ulong dest,
+                        bool move_to_pc)
 {
     if (use_goto_tb(ctx, dest)) {
         tcg_gen_goto_tb(idx);
@@ -192,10 +189,9 @@ static void gen_exception_end_tb(DisasContext *ctx, int excp)
     tcg_gen_movi_tl(hex_gpr[HEX_REG_PC], ctx->next_PC);
     gen_exception_raw(excp);
     ctx->base.is_jmp = DISAS_NORETURN;
-
 }
 
-#define PACKET_BUFFER_LEN              1028
+#define PACKET_BUFFER_LEN 1028
 static void print_pkt(Packet *pkt)
 {
     GString *buf = g_string_sized_new(PACKET_BUFFER_LEN);
@@ -204,10 +200,10 @@ static void print_pkt(Packet *pkt)
     g_string_free(buf, true);
 }
 #define HEX_DEBUG_PRINT_PKT(pkt) \
-    do { \
-        if (HEX_DEBUG) { \
-            print_pkt(pkt); \
-        } \
+    do {                         \
+        if (HEX_DEBUG) {         \
+            print_pkt(pkt);      \
+        }                        \
     } while (0)
 
 static int read_packet_words(CPUHexagonState *env, DisasContext *ctx,
@@ -218,9 +214,8 @@ static int read_packet_words(CPUHexagonState *env, DisasContext *ctx,
 
     memset(words, 0, PACKET_WORDS_MAX * sizeof(uint32_t));
     for (nwords = 0; !found_end && nwords < PACKET_WORDS_MAX; nwords++) {
-        words[nwords] =
-            translator_ldl(env, &ctx->base,
-                           ctx->base.pc_next + nwords * sizeof(uint32_t));
+        words[nwords] = translator_ldl(
+            env, &ctx->base, ctx->base.pc_next + nwords * sizeof(uint32_t));
         found_end = is_packet_end(words[nwords]);
     }
     if (!found_end) {
@@ -299,13 +294,12 @@ static void mark_implicit_reg_write(DisasContext *ctx, int attrib, int rnum)
          * USR is used to set overflow and FP exceptions,
          * so treat it as conditional
          */
-        bool is_predicated = GET_ATTRIB(opcode, A_CONDEXEC) ||
-                             rnum == HEX_REG_USR;
+        bool is_predicated =
+            GET_ATTRIB(opcode, A_CONDEXEC) || rnum == HEX_REG_USR;
 
         /* LC0/LC1 is conditionally written by endloop instructions */
         if ((rnum == HEX_REG_LC0 || rnum == HEX_REG_LC1) &&
-            (opcode == J2_endloop0 ||
-             opcode == J2_endloop1 ||
+            (opcode == J2_endloop0 || opcode == J2_endloop1 ||
              opcode == J2_endloop01)) {
             is_predicated = true;
         }
@@ -316,9 +310,9 @@ static void mark_implicit_reg_write(DisasContext *ctx, int attrib, int rnum)
 
 static void mark_implicit_reg_writes(DisasContext *ctx)
 {
-    mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_FP,  HEX_REG_FP);
-    mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_SP,  HEX_REG_SP);
-    mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_LR,  HEX_REG_LR);
+    mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_FP, HEX_REG_FP);
+    mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_SP, HEX_REG_SP);
+    mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_LR, HEX_REG_LR);
     mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_LC0, HEX_REG_LC0);
     mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_SA0, HEX_REG_SA0);
     mark_implicit_reg_write(ctx, A_IMPLICIT_WRITES_LC1, HEX_REG_LC1);
@@ -344,8 +338,7 @@ static void mark_implicit_pred_writes(DisasContext *ctx)
 
 static bool pkt_raises_exception(Packet *pkt)
 {
-    if (check_for_attrib(pkt, A_LOAD) ||
-        check_for_attrib(pkt, A_STORE)) {
+    if (check_for_attrib(pkt, A_LOAD) || check_for_attrib(pkt, A_STORE)) {
         return true;
     }
     return false;
@@ -578,12 +571,9 @@ static void gen_start_packet(DisasContext *ctx)
     if (!bitmap_empty(ctx->predicated_future_vregs, NUM_VREGS)) {
         int i = find_first_bit(ctx->predicated_future_vregs, NUM_VREGS);
         while (i < NUM_VREGS) {
-            const intptr_t VdV_off =
-                ctx_future_vreg_off(ctx, i, 1, true);
+            const intptr_t VdV_off = ctx_future_vreg_off(ctx, i, 1, true);
             intptr_t src_off = offsetof(CPUHexagonState, VRegs[i]);
-            tcg_gen_gvec_mov(MO_64, VdV_off,
-                             src_off,
-                             sizeof(MMVector),
+            tcg_gen_gvec_mov(MO_64, VdV_off, src_off, sizeof(MMVector),
                              sizeof(MMVector));
             i = find_next_bit(ctx->predicated_future_vregs, NUM_VREGS, i + 1);
         }
@@ -591,12 +581,9 @@ static void gen_start_packet(DisasContext *ctx)
     if (!bitmap_empty(ctx->predicated_tmp_vregs, NUM_VREGS)) {
         int i = find_first_bit(ctx->predicated_tmp_vregs, NUM_VREGS);
         while (i < NUM_VREGS) {
-            const intptr_t VdV_off =
-                ctx_tmp_vreg_off(ctx, i, 1, true);
+            const intptr_t VdV_off = ctx_tmp_vreg_off(ctx, i, 1, true);
             intptr_t src_off = offsetof(CPUHexagonState, VRegs[i]);
-            tcg_gen_gvec_mov(MO_64, VdV_off,
-                             src_off,
-                             sizeof(MMVector),
+            tcg_gen_gvec_mov(MO_64, VdV_off, src_off, sizeof(MMVector),
                              sizeof(MMVector));
             i = find_next_bit(ctx->predicated_tmp_vregs, NUM_VREGS, i + 1);
         }
@@ -755,37 +742,33 @@ void process_store(DisasContext *ctx, int slot_num)
         case 1:
             gen_check_store_width(ctx, slot_num);
             tcg_gen_qemu_st_tl(hex_store_val32[slot_num],
-                               hex_store_addr[slot_num],
-                               ctx->mem_idx, MO_UB);
+                               hex_store_addr[slot_num], ctx->mem_idx, MO_UB);
             break;
         case 2:
             gen_check_store_width(ctx, slot_num);
             tcg_gen_qemu_st_tl(hex_store_val32[slot_num],
-                               hex_store_addr[slot_num],
-                               ctx->mem_idx, MO_TEUW);
+                               hex_store_addr[slot_num], ctx->mem_idx, MO_TEUW);
             break;
         case 4:
             gen_check_store_width(ctx, slot_num);
             tcg_gen_qemu_st_tl(hex_store_val32[slot_num],
-                               hex_store_addr[slot_num],
-                               ctx->mem_idx, MO_TEUL);
+                               hex_store_addr[slot_num], ctx->mem_idx, MO_TEUL);
             break;
         case 8:
             gen_check_store_width(ctx, slot_num);
             tcg_gen_qemu_st_i64(hex_store_val64[slot_num],
-                                hex_store_addr[slot_num],
-                                ctx->mem_idx, MO_TEUQ);
+                                hex_store_addr[slot_num], ctx->mem_idx,
+                                MO_TEUQ);
             break;
-        default:
-            {
-                /*
-                 * If we get to here, we don't know the width at
-                 * TCG generation time, we'll use a helper to
-                 * avoid branching based on the width at runtime.
-                 */
-                TCGv slot = tcg_constant_tl(slot_num);
-                gen_helper_commit_store(cpu_env, slot);
-            }
+        default: {
+            /*
+             * If we get to here, we don't know the width at
+             * TCG generation time, we'll use a helper to
+             * avoid branching based on the width at runtime.
+             */
+            TCGv slot = tcg_constant_tl(slot_num);
+            gen_helper_commit_store(cpu_env, slot);
+        }
         }
     }
     if (is_predicated) {
@@ -895,8 +878,7 @@ static void update_exec_counters(DisasContext *ctx)
     int num_hvx_insns = 0;
 
     for (int i = 0; i < num_insns; i++) {
-        if (!pkt->insn[i].is_endloop &&
-            !pkt->insn[i].part1 &&
+        if (!pkt->insn[i].is_endloop && !pkt->insn[i].part1 &&
             !GET_ATTRIB(pkt->insn[i].opcode, A_IT_NOP)) {
             num_real_insns++;
         }
@@ -956,19 +938,16 @@ static void gen_commit_packet(DisasContext *ctx)
                     FIELD_DP32(mask, PROBE_PKT_SCALAR_HVX_STORES, HAS_ST1, 1);
             }
             if (has_hvx_store) {
-                mask =
-                    FIELD_DP32(mask, PROBE_PKT_SCALAR_HVX_STORES,
-                               HAS_HVX_STORES, 1);
+                mask = FIELD_DP32(mask, PROBE_PKT_SCALAR_HVX_STORES,
+                                  HAS_HVX_STORES, 1);
             }
             if (has_store_s0 && slot_is_predicated(pkt, 0)) {
-                mask =
-                    FIELD_DP32(mask, PROBE_PKT_SCALAR_HVX_STORES,
-                               S0_IS_PRED, 1);
+                mask = FIELD_DP32(mask, PROBE_PKT_SCALAR_HVX_STORES, S0_IS_PRED,
+                                  1);
             }
             if (has_store_s1 && slot_is_predicated(pkt, 1)) {
-                mask =
-                    FIELD_DP32(mask, PROBE_PKT_SCALAR_HVX_STORES,
-                               S1_IS_PRED, 1);
+                mask = FIELD_DP32(mask, PROBE_PKT_SCALAR_HVX_STORES, S1_IS_PRED,
+                                  1);
             }
             mask = FIELD_DP32(mask, PROBE_PKT_SCALAR_HVX_STORES, MMU_IDX,
                               ctx->mem_idx);
@@ -1084,11 +1063,11 @@ static bool pkt_crosses_page(CPUHexagonState *env, DisasContext *ctx)
     int nwords;
 
     for (nwords = 0; !found_end && nwords < PACKET_WORDS_MAX; nwords++) {
-        uint32_t word = cpu_ldl_code(env,
-                            ctx->base.pc_next + nwords * sizeof(uint32_t));
+        uint32_t word =
+            cpu_ldl_code(env, ctx->base.pc_next + nwords * sizeof(uint32_t));
         found_end = is_packet_end(word);
     }
-    uint32_t next_ptr =  ctx->base.pc_next + nwords * sizeof(uint32_t);
+    uint32_t next_ptr = ctx->base.pc_next + nwords * sizeof(uint32_t);
     return found_end && next_ptr - page_start >= TARGET_PAGE_SIZE;
 }
 
@@ -1137,8 +1116,8 @@ static void hexagon_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
     }
 }
 
-static void hexagon_tr_disas_log(const DisasContextBase *dcbase,
-                                 CPUState *cpu, FILE *logfile)
+static void hexagon_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu,
+                                 FILE *logfile)
 {
     fprintf(logfile, "IN: %s\n", lookup_symbol(dcbase->pc_first));
     target_disas(logfile, cpu, dcbase->pc_first, dcbase->tb->size);
@@ -1147,11 +1126,11 @@ static void hexagon_tr_disas_log(const DisasContextBase *dcbase,
 
 static const TranslatorOps hexagon_tr_ops = {
     .init_disas_context = hexagon_tr_init_disas_context,
-    .tb_start           = hexagon_tr_tb_start,
-    .insn_start         = hexagon_tr_insn_start,
-    .translate_insn     = hexagon_tr_translate_packet,
-    .tb_stop            = hexagon_tr_tb_stop,
-    .disas_log          = hexagon_tr_disas_log,
+    .tb_start = hexagon_tr_tb_start,
+    .insn_start = hexagon_tr_insn_start,
+    .translate_insn = hexagon_tr_translate_packet,
+    .tb_stop = hexagon_tr_tb_stop,
+    .disas_log = hexagon_tr_disas_log,
 };
 
 void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
@@ -1159,11 +1138,10 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
 {
     DisasContext ctx;
 
-    translator_loop(cs, tb, max_insns, pc, host_pc,
-                    &hexagon_tr_ops, &ctx.base);
+    translator_loop(cs, tb, max_insns, pc, host_pc, &hexagon_tr_ops, &ctx.base);
 }
 
-#define NAME_LEN               64
+#define NAME_LEN 64
 static char reg_written_names[TOTAL_PER_THREAD_REGS][NAME_LEN];
 static char store_addr_names[STORES_MAX][NAME_LEN];
 static char store_width_names[STORES_MAX][NAME_LEN];
@@ -1180,69 +1158,67 @@ void hexagon_translate_init(void)
     opcode_init();
 
     for (i = 0; i < TOTAL_PER_THREAD_REGS; i++) {
-        hex_gpr[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPUHexagonState, gpr[i]),
-            hexagon_regnames[i]);
+        hex_gpr[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPUHexagonState, gpr[i]), hexagon_regnames[i]);
 
         if (HEX_DEBUG) {
             snprintf(reg_written_names[i], NAME_LEN, "reg_written_%s",
                      hexagon_regnames[i]);
-            hex_reg_written[i] = tcg_global_mem_new(cpu_env,
-                offsetof(CPUHexagonState, reg_written[i]),
+            hex_reg_written[i] = tcg_global_mem_new(
+                cpu_env, offsetof(CPUHexagonState, reg_written[i]),
                 reg_written_names[i]);
         }
     }
-    hex_new_value_usr = tcg_global_mem_new(cpu_env,
-        offsetof(CPUHexagonState, new_value_usr), "new_value_usr");
+    hex_new_value_usr = tcg_global_mem_new(
+        cpu_env, offsetof(CPUHexagonState, new_value_usr), "new_value_usr");
 
     for (i = 0; i < NUM_PREGS; i++) {
-        hex_pred[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPUHexagonState, pred[i]),
-            hexagon_prednames[i]);
+        hex_pred[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPUHexagonState, pred[i]), hexagon_prednames[i]);
     }
-    hex_slot_cancelled = tcg_global_mem_new(cpu_env,
-        offsetof(CPUHexagonState, slot_cancelled), "slot_cancelled");
-    hex_llsc_addr = tcg_global_mem_new(cpu_env,
-        offsetof(CPUHexagonState, llsc_addr), "llsc_addr");
-    hex_llsc_val = tcg_global_mem_new(cpu_env,
-        offsetof(CPUHexagonState, llsc_val), "llsc_val");
-    hex_llsc_val_i64 = tcg_global_mem_new_i64(cpu_env,
-        offsetof(CPUHexagonState, llsc_val_i64), "llsc_val_i64");
+    hex_slot_cancelled = tcg_global_mem_new(
+        cpu_env, offsetof(CPUHexagonState, slot_cancelled), "slot_cancelled");
+    hex_llsc_addr = tcg_global_mem_new(
+        cpu_env, offsetof(CPUHexagonState, llsc_addr), "llsc_addr");
+    hex_llsc_val = tcg_global_mem_new(
+        cpu_env, offsetof(CPUHexagonState, llsc_val), "llsc_val");
+    hex_llsc_val_i64 = tcg_global_mem_new_i64(
+        cpu_env, offsetof(CPUHexagonState, llsc_val_i64), "llsc_val_i64");
     for (i = 0; i < STORES_MAX; i++) {
         snprintf(store_addr_names[i], NAME_LEN, "store_addr_%d", i);
-        hex_store_addr[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPUHexagonState, mem_log_stores[i].va),
+        hex_store_addr[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPUHexagonState, mem_log_stores[i].va),
             store_addr_names[i]);
 
         snprintf(store_width_names[i], NAME_LEN, "store_width_%d", i);
-        hex_store_width[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPUHexagonState, mem_log_stores[i].width),
+        hex_store_width[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPUHexagonState, mem_log_stores[i].width),
             store_width_names[i]);
 
         snprintf(store_val32_names[i], NAME_LEN, "store_val32_%d", i);
-        hex_store_val32[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPUHexagonState, mem_log_stores[i].data32),
+        hex_store_val32[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPUHexagonState, mem_log_stores[i].data32),
             store_val32_names[i]);
 
         snprintf(store_val64_names[i], NAME_LEN, "store_val64_%d", i);
-        hex_store_val64[i] = tcg_global_mem_new_i64(cpu_env,
-            offsetof(CPUHexagonState, mem_log_stores[i].data64),
+        hex_store_val64[i] = tcg_global_mem_new_i64(
+            cpu_env, offsetof(CPUHexagonState, mem_log_stores[i].data64),
             store_val64_names[i]);
     }
     for (int i = 0; i < VSTORES_MAX; i++) {
         snprintf(vstore_addr_names[i], NAME_LEN, "vstore_addr_%d", i);
-        hex_vstore_addr[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPUHexagonState, vstore[i].va),
-            vstore_addr_names[i]);
+        hex_vstore_addr[i] =
+            tcg_global_mem_new(cpu_env, offsetof(CPUHexagonState, vstore[i].va),
+                               vstore_addr_names[i]);
 
         snprintf(vstore_size_names[i], NAME_LEN, "vstore_size_%d", i);
-        hex_vstore_size[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPUHexagonState, vstore[i].size),
+        hex_vstore_size[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPUHexagonState, vstore[i].size),
             vstore_size_names[i]);
 
         snprintf(vstore_pending_names[i], NAME_LEN, "vstore_pending_%d", i);
-        hex_vstore_pending[i] = tcg_global_mem_new(cpu_env,
-            offsetof(CPUHexagonState, vstore_pending[i]),
+        hex_vstore_pending[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPUHexagonState, vstore_pending[i]),
             vstore_pending_names[i]);
     }
 }

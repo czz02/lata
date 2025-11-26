@@ -102,56 +102,32 @@ const uint64 la_ir2_opnd_tab[] = {
  * Register mapping table
  */
 const int reg_gpr_map[] = {
-    REG_MAP_DEF(eax_index, la_s0),
-    REG_MAP_DEF(ecx_index, la_s1),
-    REG_MAP_DEF(edx_index, la_s2),
-    REG_MAP_DEF(ebx_index, la_s3),
-    REG_MAP_DEF(esp_index, la_s4),
-    REG_MAP_DEF(ebp_index, la_s5),
-    REG_MAP_DEF(esi_index, la_s6),
-    REG_MAP_DEF(edi_index, la_s7),
+    REG_MAP_DEF(eax_index, la_s0), REG_MAP_DEF(ecx_index, la_s1),
+    REG_MAP_DEF(edx_index, la_s2), REG_MAP_DEF(ebx_index, la_s3),
+    REG_MAP_DEF(esp_index, la_s4), REG_MAP_DEF(ebp_index, la_s5),
+    REG_MAP_DEF(esi_index, la_s6), REG_MAP_DEF(edi_index, la_s7),
 #ifdef TARGET_X86_64
-    REG_MAP_DEF(r8_index, la_a2),
-    REG_MAP_DEF(r9_index, la_a3),
-    REG_MAP_DEF(r10_index, la_a4),
-    REG_MAP_DEF(r11_index, la_a5),
-    REG_MAP_DEF(r12_index, la_t5),
-    REG_MAP_DEF(r13_index, la_t6),
-    REG_MAP_DEF(r14_index, la_t7),
-    REG_MAP_DEF(r15_index, la_t8),
+    REG_MAP_DEF(r8_index, la_a2),  REG_MAP_DEF(r9_index, la_a3),
+    REG_MAP_DEF(r10_index, la_a4), REG_MAP_DEF(r11_index, la_a5),
+    REG_MAP_DEF(r12_index, la_t5), REG_MAP_DEF(r13_index, la_t6),
+    REG_MAP_DEF(r14_index, la_t7), REG_MAP_DEF(r15_index, la_t8),
 #endif
 };
 
 const int reg_fpr_map[] = {
-    REG_MAP_DEF(0, 0),
-    REG_MAP_DEF(1, 1),
-    REG_MAP_DEF(2, 2),
-    REG_MAP_DEF(3, 3),
-    REG_MAP_DEF(4, 4),
-    REG_MAP_DEF(5, 5),
-    REG_MAP_DEF(6, 6),
-    REG_MAP_DEF(7, 7),
+    REG_MAP_DEF(0, 0), REG_MAP_DEF(1, 1), REG_MAP_DEF(2, 2), REG_MAP_DEF(3, 3),
+    REG_MAP_DEF(4, 4), REG_MAP_DEF(5, 5), REG_MAP_DEF(6, 6), REG_MAP_DEF(7, 7),
 };
 #define reg_mmx_map reg_fpr_map
 
 const int reg_xmm_map[] = {
-    REG_MAP_DEF(0, 16),
-    REG_MAP_DEF(1, 17),
-    REG_MAP_DEF(2, 18),
-    REG_MAP_DEF(3, 19),
-    REG_MAP_DEF(4, 20),
-    REG_MAP_DEF(5, 21),
-    REG_MAP_DEF(6, 22),
-    REG_MAP_DEF(7, 23),
+    REG_MAP_DEF(0, 16),  REG_MAP_DEF(1, 17),  REG_MAP_DEF(2, 18),
+    REG_MAP_DEF(3, 19),  REG_MAP_DEF(4, 20),  REG_MAP_DEF(5, 21),
+    REG_MAP_DEF(6, 22),  REG_MAP_DEF(7, 23),
 #ifdef TARGET_X86_64
-    REG_MAP_DEF(8, 24),
-    REG_MAP_DEF(9, 25),
-    REG_MAP_DEF(10, 26),
-    REG_MAP_DEF(11, 27),
-    REG_MAP_DEF(12, 28),
-    REG_MAP_DEF(13, 29),
-    REG_MAP_DEF(14, 30),
-    REG_MAP_DEF(15, 31),
+    REG_MAP_DEF(8, 24),  REG_MAP_DEF(9, 25),  REG_MAP_DEF(10, 26),
+    REG_MAP_DEF(11, 27), REG_MAP_DEF(12, 28), REG_MAP_DEF(13, 29),
+    REG_MAP_DEF(14, 30), REG_MAP_DEF(15, 31),
 #endif
 };
 
@@ -173,12 +149,9 @@ const int reg_trace_map[] = {
 };
 
 const int reg_itemp_map[] = {
-    REG_MAP_DEF(ITEMP0, la_t0),
-    REG_MAP_DEF(ITEMP1, la_t1),
-    REG_MAP_DEF(ITEMP2, la_t2),
-    REG_MAP_DEF(ITEMP3, la_t3),
-    REG_MAP_DEF(ITEMP4, la_t4),
-    REG_MAP_DEF(ITEMP5, la_t5),
+    REG_MAP_DEF(ITEMP0, la_t0), REG_MAP_DEF(ITEMP1, la_t1),
+    REG_MAP_DEF(ITEMP2, la_t2), REG_MAP_DEF(ITEMP3, la_t3),
+    REG_MAP_DEF(ITEMP4, la_t4), REG_MAP_DEF(ITEMP5, la_t5),
     // REG_MAP_DEF(ITEMP6, la_t6),
     // REG_MAP_DEF(ITEMP7, la_t7),
     // REG_MAP_DEF(ITEMP8, la_t8),
@@ -187,12 +160,9 @@ const int reg_itemp_map[] = {
 };
 
 const int reg_itemp_reverse_map[32] = {
-    REG_MAP_DEF(0 ... 31, INVALID_TEMP),
-    REG_MAP_DEF(la_t0, ITEMP0),
-    REG_MAP_DEF(la_t1, ITEMP1),
-    REG_MAP_DEF(la_t2, ITEMP2),
-    REG_MAP_DEF(la_t3, ITEMP3),
-    REG_MAP_DEF(la_t4, ITEMP4),
+    REG_MAP_DEF(0 ... 31, INVALID_TEMP), REG_MAP_DEF(la_t0, ITEMP0),
+    REG_MAP_DEF(la_t1, ITEMP1),          REG_MAP_DEF(la_t2, ITEMP2),
+    REG_MAP_DEF(la_t3, ITEMP3),          REG_MAP_DEF(la_t4, ITEMP4),
     REG_MAP_DEF(la_t5, ITEMP5),
     // REG_MAP_DEF(la_t6, ITEMP6),
     // REG_MAP_DEF(la_t7, ITEMP7),
@@ -202,12 +172,8 @@ const int reg_itemp_reverse_map[32] = {
 };
 
 const int reg_ftemp_map[] = {
-    REG_MAP_DEF(FTEMP0, 9),
-    REG_MAP_DEF(FTEMP1, 10),
-    REG_MAP_DEF(FTEMP2, 11),
-    REG_MAP_DEF(FTEMP3, 12),
-    REG_MAP_DEF(FTEMP4, 13),
-    REG_MAP_DEF(FTEMP5, 14),
+    REG_MAP_DEF(FTEMP0, 9),  REG_MAP_DEF(FTEMP1, 10), REG_MAP_DEF(FTEMP2, 11),
+    REG_MAP_DEF(FTEMP3, 12), REG_MAP_DEF(FTEMP4, 13), REG_MAP_DEF(FTEMP5, 14),
     // REG_MAP_DEF(FTEMP6, 15),
 };
 

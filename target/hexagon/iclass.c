@@ -42,15 +42,13 @@ SlotMask find_iclass_slots(Opcode opcode, int itype)
         return SLOTS_2;
     } else if (GET_ATTRIB(opcode, A_RESTRICT_SLOT3ONLY)) {
         return SLOTS_3;
-    } else if (GET_ATTRIB(opcode, A_COF) &&
-               GET_ATTRIB(opcode, A_INDIRECT) &&
+    } else if (GET_ATTRIB(opcode, A_COF) && GET_ATTRIB(opcode, A_INDIRECT) &&
                !GET_ATTRIB(opcode, A_MEMLIKE) &&
                !GET_ATTRIB(opcode, A_MEMLIKE_PACKET_RULES)) {
         return SLOTS_2;
     } else if (GET_ATTRIB(opcode, A_RESTRICT_NOSLOT1)) {
         return SLOTS_0;
-    } else if ((opcode == J2_trap0) ||
-               (opcode == Y2_isync) ||
+    } else if ((opcode == J2_trap0) || (opcode == Y2_isync) ||
                (opcode == J2_pause)) {
         return SLOTS_2;
     } else if (opcode == J4_hintjumpr) {

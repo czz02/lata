@@ -83,8 +83,8 @@ static inline void internal_fd_trans_register_unsafe(int fd,
     if (fd >= target_fd_max) {
         oldmax = target_fd_max;
         target_fd_max = ((fd >> 6) + 1) << 6; /* by slice of 64 entries */
-        target_fd_trans = g_renew(TargetFdTrans *,
-                                  target_fd_trans, target_fd_max);
+        target_fd_trans =
+            g_renew(TargetFdTrans *, target_fd_trans, target_fd_max);
         memset((void *)(target_fd_trans + oldmax), 0,
                (target_fd_max - oldmax) * sizeof(TargetFdTrans *));
     }
@@ -132,7 +132,7 @@ extern TargetFdTrans target_signalfd_trans;
 extern TargetFdTrans target_eventfd_trans;
 extern TargetFdTrans target_timerfd_trans;
 #if (defined(TARGET_NR_inotify_init) && defined(__NR_inotify_init)) || \
-    (defined(CONFIG_INOTIFY1) && defined(TARGET_NR_inotify_init1) && \
+    (defined(CONFIG_INOTIFY1) && defined(TARGET_NR_inotify_init1) &&   \
      defined(__NR_inotify_init1))
 extern TargetFdTrans target_inotify_trans;
 #endif

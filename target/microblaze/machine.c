@@ -25,8 +25,7 @@
 static VMStateField vmstate_mmu_fields[] = {
     VMSTATE_UINT64_2DARRAY(rams, MicroBlazeMMU, 2, TLB_ENTRIES),
     VMSTATE_UINT8_ARRAY(tids, MicroBlazeMMU, TLB_ENTRIES),
-    VMSTATE_UINT32_ARRAY(regs, MicroBlazeMMU, 3),
-    VMSTATE_END_OF_LIST()
+    VMSTATE_UINT32_ARRAY(regs, MicroBlazeMMU, 3), VMSTATE_END_OF_LIST()
 };
 
 static const VMStateDescription vmstate_mmu = {

@@ -218,11 +218,10 @@ static void tricore_cpu_class_init(ObjectClass *c, void *data)
     cc->tcg_ops = &tricore_tcg_ops;
 }
 
-#define DEFINE_TRICORE_CPU_TYPE(cpu_model, initfn) \
-    {                                              \
-        .parent = TYPE_TRICORE_CPU,                \
-        .instance_init = initfn,                   \
-        .name = TRICORE_CPU_TYPE_NAME(cpu_model),  \
+#define DEFINE_TRICORE_CPU_TYPE(cpu_model, initfn)           \
+    {                                                        \
+        .parent = TYPE_TRICORE_CPU, .instance_init = initfn, \
+        .name = TRICORE_CPU_TYPE_NAME(cpu_model),            \
     }
 
 static const TypeInfo tricore_cpu_type_infos[] = {

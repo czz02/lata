@@ -79,16 +79,16 @@ struct SevGuestState {
     bool reset_data_valid;
 };
 
-#define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
-#define DEFAULT_SEV_DEVICE      "/dev/sev"
+#define DEFAULT_GUEST_POLICY 0x1 /* disable debug */
+#define DEFAULT_SEV_DEVICE "/dev/sev"
 
-#define SEV_INFO_BLOCK_GUID     "00f771de-1a7e-4fcb-890e-68c77e2fb44e"
+#define SEV_INFO_BLOCK_GUID "00f771de-1a7e-4fcb-890e-68c77e2fb44e"
 typedef struct __attribute__((__packed__)) SevInfoBlock {
     /* SEV-ES Reset Vector Address */
     uint32_t reset_addr;
 } SevInfoBlock;
 
-#define SEV_HASH_TABLE_RV_GUID  "7255371f-3a3b-4b04-927b-1da6efa8d454"
+#define SEV_HASH_TABLE_RV_GUID "7255371f-3a3b-4b04-927b-1da6efa8d454"
 typedef struct QEMU_PACKED SevHashTableDescriptor {
     /* SEV hash table area guest address */
     uint32_t base;
@@ -128,37 +128,36 @@ static SevGuestState *sev_guest;
 static Error *sev_mig_blocker;
 
 static const char *const sev_fw_errlist[] = {
-    [SEV_RET_SUCCESS]                = "",
+    [SEV_RET_SUCCESS] = "",
     [SEV_RET_INVALID_PLATFORM_STATE] = "Platform state is invalid",
-    [SEV_RET_INVALID_GUEST_STATE]    = "Guest state is invalid",
-    [SEV_RET_INAVLID_CONFIG]         = "Platform configuration is invalid",
-    [SEV_RET_INVALID_LEN]            = "Buffer too small",
-    [SEV_RET_ALREADY_OWNED]          = "Platform is already owned",
-    [SEV_RET_INVALID_CERTIFICATE]    = "Certificate is invalid",
-    [SEV_RET_POLICY_FAILURE]         = "Policy is not allowed",
-    [SEV_RET_INACTIVE]               = "Guest is not active",
-    [SEV_RET_INVALID_ADDRESS]        = "Invalid address",
-    [SEV_RET_BAD_SIGNATURE]          = "Bad signature",
-    [SEV_RET_BAD_MEASUREMENT]        = "Bad measurement",
-    [SEV_RET_ASID_OWNED]             = "ASID is already owned",
-    [SEV_RET_INVALID_ASID]           = "Invalid ASID",
-    [SEV_RET_WBINVD_REQUIRED]        = "WBINVD is required",
-    [SEV_RET_DFFLUSH_REQUIRED]       = "DF_FLUSH is required",
-    [SEV_RET_INVALID_GUEST]          = "Guest handle is invalid",
-    [SEV_RET_INVALID_COMMAND]        = "Invalid command",
-    [SEV_RET_ACTIVE]                 = "Guest is active",
-    [SEV_RET_HWSEV_RET_PLATFORM]     = "Hardware error",
-    [SEV_RET_HWSEV_RET_UNSAFE]       = "Hardware unsafe",
-    [SEV_RET_UNSUPPORTED]            = "Feature not supported",
-    [SEV_RET_INVALID_PARAM]          = "Invalid parameter",
-    [SEV_RET_RESOURCE_LIMIT]         = "Required firmware resource depleted",
-    [SEV_RET_SECURE_DATA_INVALID]    = "Part-specific integrity check failure",
+    [SEV_RET_INVALID_GUEST_STATE] = "Guest state is invalid",
+    [SEV_RET_INAVLID_CONFIG] = "Platform configuration is invalid",
+    [SEV_RET_INVALID_LEN] = "Buffer too small",
+    [SEV_RET_ALREADY_OWNED] = "Platform is already owned",
+    [SEV_RET_INVALID_CERTIFICATE] = "Certificate is invalid",
+    [SEV_RET_POLICY_FAILURE] = "Policy is not allowed",
+    [SEV_RET_INACTIVE] = "Guest is not active",
+    [SEV_RET_INVALID_ADDRESS] = "Invalid address",
+    [SEV_RET_BAD_SIGNATURE] = "Bad signature",
+    [SEV_RET_BAD_MEASUREMENT] = "Bad measurement",
+    [SEV_RET_ASID_OWNED] = "ASID is already owned",
+    [SEV_RET_INVALID_ASID] = "Invalid ASID",
+    [SEV_RET_WBINVD_REQUIRED] = "WBINVD is required",
+    [SEV_RET_DFFLUSH_REQUIRED] = "DF_FLUSH is required",
+    [SEV_RET_INVALID_GUEST] = "Guest handle is invalid",
+    [SEV_RET_INVALID_COMMAND] = "Invalid command",
+    [SEV_RET_ACTIVE] = "Guest is active",
+    [SEV_RET_HWSEV_RET_PLATFORM] = "Hardware error",
+    [SEV_RET_HWSEV_RET_UNSAFE] = "Hardware unsafe",
+    [SEV_RET_UNSUPPORTED] = "Feature not supported",
+    [SEV_RET_INVALID_PARAM] = "Invalid parameter",
+    [SEV_RET_RESOURCE_LIMIT] = "Required firmware resource depleted",
+    [SEV_RET_SECURE_DATA_INVALID] = "Part-specific integrity check failure",
 };
 
-#define SEV_FW_MAX_ERROR      ARRAY_SIZE(sev_fw_errlist)
+#define SEV_FW_MAX_ERROR ARRAY_SIZE(sev_fw_errlist)
 
-static int
-sev_ioctl(int fd, int cmd, void *data, int *error)
+static int sev_ioctl(int fd, int cmd, void *data, int *error)
 {
     int r;
     struct kvm_sev_cmd input;
@@ -178,8 +177,7 @@ sev_ioctl(int fd, int cmd, void *data, int *error)
     return r;
 }
 
-static int
-sev_platform_ioctl(int fd, int cmd, void *data, int *error)
+static int sev_platform_ioctl(int fd, int cmd, void *data, int *error)
 {
     int r;
     struct sev_issue_cmd arg;
@@ -194,8 +192,7 @@ sev_platform_ioctl(int fd, int cmd, void *data, int *error)
     return r;
 }
 
-static const char *
-fw_error_to_str(int code)
+static const char *fw_error_to_str(int code)
 {
     if (code < 0 || code >= SEV_FW_MAX_ERROR) {
         return "unknown error";
@@ -204,15 +201,13 @@ fw_error_to_str(int code)
     return sev_fw_errlist[code];
 }
 
-static bool
-sev_check_state(const SevGuestState *sev, SevState state)
+static bool sev_check_state(const SevGuestState *sev, SevState state)
 {
     assert(sev);
     return sev->state == state ? true : false;
 }
 
-static void
-sev_set_guest_state(SevGuestState *sev, SevState new_state)
+static void sev_set_guest_state(SevGuestState *sev, SevState new_state)
 {
     assert(new_state < SEV_STATE__MAX);
     assert(sev);
@@ -222,9 +217,8 @@ sev_set_guest_state(SevGuestState *sev, SevState new_state)
     sev->state = new_state;
 }
 
-static void
-sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size,
-                    size_t max_size)
+static void sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size,
+                                size_t max_size)
 {
     int r;
     struct kvm_enc_region range;
@@ -252,9 +246,8 @@ sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size,
     }
 }
 
-static void
-sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size,
-                      size_t max_size)
+static void sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size,
+                                  size_t max_size)
 {
     int r;
     struct kvm_enc_region range;
@@ -276,8 +269,8 @@ sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size,
     trace_kvm_memcrypt_unregister_region(host, max_size);
     r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_UNREG_REGION, &range);
     if (r) {
-        error_report("%s: failed to unregister region (%p+%#zx)",
-                     __func__, host, max_size);
+        error_report("%s: failed to unregister region (%p+%#zx)", __func__,
+                     host, max_size);
     }
 }
 
@@ -286,53 +279,49 @@ static struct RAMBlockNotifier sev_ram_notifier = {
     .ram_block_removed = sev_ram_block_removed,
 };
 
-static void
-sev_guest_finalize(Object *obj)
+static void sev_guest_finalize(Object *obj)
 {
 }
 
-static char *
-sev_guest_get_session_file(Object *obj, Error **errp)
+static char *sev_guest_get_session_file(Object *obj, Error **errp)
 {
     SevGuestState *s = SEV_GUEST(obj);
 
     return s->session_file ? g_strdup(s->session_file) : NULL;
 }
 
-static void
-sev_guest_set_session_file(Object *obj, const char *value, Error **errp)
+static void sev_guest_set_session_file(Object *obj, const char *value,
+                                       Error **errp)
 {
     SevGuestState *s = SEV_GUEST(obj);
 
     s->session_file = g_strdup(value);
 }
 
-static char *
-sev_guest_get_dh_cert_file(Object *obj, Error **errp)
+static char *sev_guest_get_dh_cert_file(Object *obj, Error **errp)
 {
     SevGuestState *s = SEV_GUEST(obj);
 
     return g_strdup(s->dh_cert_file);
 }
 
-static void
-sev_guest_set_dh_cert_file(Object *obj, const char *value, Error **errp)
+static void sev_guest_set_dh_cert_file(Object *obj, const char *value,
+                                       Error **errp)
 {
     SevGuestState *s = SEV_GUEST(obj);
 
     s->dh_cert_file = g_strdup(value);
 }
 
-static char *
-sev_guest_get_sev_device(Object *obj, Error **errp)
+static char *sev_guest_get_sev_device(Object *obj, Error **errp)
 {
     SevGuestState *sev = SEV_GUEST(obj);
 
     return g_strdup(sev->sev_device);
 }
 
-static void
-sev_guest_set_sev_device(Object *obj, const char *value, Error **errp)
+static void sev_guest_set_sev_device(Object *obj, const char *value,
+                                     Error **errp)
 {
     SevGuestState *sev = SEV_GUEST(obj);
 
@@ -353,33 +342,33 @@ static void sev_guest_set_kernel_hashes(Object *obj, bool value, Error **errp)
     sev->kernel_hashes = value;
 }
 
-static void
-sev_guest_class_init(ObjectClass *oc, void *data)
+static void sev_guest_class_init(ObjectClass *oc, void *data)
 {
-    object_class_property_add_str(oc, "sev-device",
-                                  sev_guest_get_sev_device,
+    object_class_property_add_str(oc, "sev-device", sev_guest_get_sev_device,
                                   sev_guest_set_sev_device);
     object_class_property_set_description(oc, "sev-device",
-            "SEV device to use");
+                                          "SEV device to use");
     object_class_property_add_str(oc, "dh-cert-file",
                                   sev_guest_get_dh_cert_file,
                                   sev_guest_set_dh_cert_file);
-    object_class_property_set_description(oc, "dh-cert-file",
-            "guest owners DH certificate (encoded with base64)");
+    object_class_property_set_description(
+        oc, "dh-cert-file",
+        "guest owners DH certificate (encoded with base64)");
     object_class_property_add_str(oc, "session-file",
                                   sev_guest_get_session_file,
                                   sev_guest_set_session_file);
-    object_class_property_set_description(oc, "session-file",
-            "guest owners session parameters (encoded with base64)");
+    object_class_property_set_description(
+        oc, "session-file",
+        "guest owners session parameters (encoded with base64)");
     object_class_property_add_bool(oc, "kernel-hashes",
                                    sev_guest_get_kernel_hashes,
                                    sev_guest_set_kernel_hashes);
-    object_class_property_set_description(oc, "kernel-hashes",
-            "add kernel hashes to guest firmware for measured Linux boot");
+    object_class_property_set_description(
+        oc, "kernel-hashes",
+        "add kernel hashes to guest firmware for measured Linux boot");
 }
 
-static void
-sev_guest_instance_init(Object *obj)
+static void sev_guest_instance_init(Object *obj)
 {
     SevGuestState *sev = SEV_GUEST(obj);
 
@@ -404,32 +393,25 @@ static const TypeInfo sev_guest_info = {
     .instance_finalize = sev_guest_finalize,
     .class_init = sev_guest_class_init,
     .instance_init = sev_guest_instance_init,
-    .interfaces = (InterfaceInfo[]) {
-        { TYPE_USER_CREATABLE },
-        { }
-    }
+    .interfaces = (InterfaceInfo[]){ { TYPE_USER_CREATABLE }, {} }
 };
 
-bool
-sev_enabled(void)
+bool sev_enabled(void)
 {
     return !!sev_guest;
 }
 
-bool
-sev_es_enabled(void)
+bool sev_es_enabled(void)
 {
     return sev_enabled() && (sev_guest->policy & SEV_POLICY_ES);
 }
 
-uint32_t
-sev_get_cbit_position(void)
+uint32_t sev_get_cbit_position(void)
 {
     return sev_guest ? sev_guest->cbitpos : 0;
 }
 
-uint32_t
-sev_get_reduced_phys_bits(void)
+uint32_t sev_get_reduced_phys_bits(void)
 {
     return sev_guest ? sev_guest->reduced_phys_bits : 0;
 }
@@ -474,8 +456,8 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
         monitor_printf(mon, "handle: %d\n", info->handle);
         monitor_printf(mon, "state: %s\n", SevState_str(info->state));
         monitor_printf(mon, "build: %d\n", info->build_id);
-        monitor_printf(mon, "api version: %d.%d\n",
-                       info->api_major, info->api_minor);
+        monitor_printf(mon, "api version: %d.%d\n", info->api_major,
+                       info->api_minor);
         monitor_printf(mon, "debug: %s\n",
                        info->policy & SEV_POLICY_NODBG ? "off" : "on");
         monitor_printf(mon, "key-sharing: %s\n",
@@ -487,9 +469,9 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
     qapi_free_SevInfo(info);
 }
 
-static int
-sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len, guchar **cert_chain,
-                 size_t *cert_chain_len, Error **errp)
+static int sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len,
+                            guchar **cert_chain, size_t *cert_chain_len,
+                            Error **errp)
 {
     guchar *pdh_data = NULL;
     guchar *cert_chain_data = NULL;
@@ -500,8 +482,9 @@ sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len, guchar **cert_chain,
     r = sev_platform_ioctl(fd, SEV_PDH_CERT_EXPORT, &export, &err);
     if (r < 0) {
         if (err != SEV_RET_INVALID_LEN) {
-            error_setg(errp, "SEV: Failed to export PDH cert"
-                             " ret=%d fw_err=%d (%s)",
+            error_setg(errp,
+                       "SEV: Failed to export PDH cert"
+                       " ret=%d fw_err=%d (%s)",
                        r, err, fw_error_to_str(err));
             return 1;
         }
@@ -540,8 +523,8 @@ static int sev_get_cpu0_id(int fd, guchar **id, size_t *id_len, Error **errp)
     /* query the ID length */
     r = sev_platform_ioctl(fd, SEV_GET_ID2, &get_id2, &err);
     if (r < 0 && err != SEV_RET_INVALID_LEN) {
-        error_setg(errp, "SEV: Failed to get ID ret=%d fw_err=%d (%s)",
-                   r, err, fw_error_to_str(err));
+        error_setg(errp, "SEV: Failed to get ID ret=%d fw_err=%d (%s)", r, err,
+                   fw_error_to_str(err));
         return 1;
     }
 
@@ -550,8 +533,8 @@ static int sev_get_cpu0_id(int fd, guchar **id, size_t *id_len, Error **errp)
 
     r = sev_platform_ioctl(fd, SEV_GET_ID2, &get_id2, &err);
     if (r < 0) {
-        error_setg(errp, "SEV: Failed to get ID ret=%d fw_err=%d (%s)",
-                   r, err, fw_error_to_str(err));
+        error_setg(errp, "SEV: Failed to get ID ret=%d fw_err=%d (%s)", r, err,
+                   fw_error_to_str(err));
         goto err;
     }
 
@@ -590,8 +573,8 @@ static SevCapability *sev_get_capabilities(Error **errp)
         return NULL;
     }
 
-    if (sev_get_pdh_info(fd, &pdh_data, &pdh_len,
-                         &cert_chain_data, &cert_chain_len, errp)) {
+    if (sev_get_pdh_info(fd, &pdh_data, &pdh_len, &cert_chain_data,
+                         &cert_chain_len, errp)) {
         goto out;
     }
 
@@ -651,18 +634,19 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
 
     /* verify the input mnonce length */
     if (len != sizeof(input.mnonce)) {
-        error_setg(errp, "SEV: mnonce must be %zu bytes (got %" G_GSIZE_FORMAT ")",
-                sizeof(input.mnonce), len);
+        error_setg(errp,
+                   "SEV: mnonce must be %zu bytes (got %" G_GSIZE_FORMAT ")",
+                   sizeof(input.mnonce), len);
         return NULL;
     }
 
     /* Query the report length */
-    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-            &input, &err);
+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT, &input, &err);
     if (ret < 0) {
         if (err != SEV_RET_INVALID_LEN) {
-            error_setg(errp, "SEV: Failed to query the attestation report"
-                             " length ret=%d fw_err=%d (%s)",
+            error_setg(errp,
+                       "SEV: Failed to query the attestation report"
+                       " length ret=%d fw_err=%d (%s)",
                        ret, err, fw_error_to_str(err));
             return NULL;
         }
@@ -673,11 +657,12 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
     memcpy(input.mnonce, buf, sizeof(input.mnonce));
 
     /* Query the report */
-    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-            &input, &err);
+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT, &input, &err);
     if (ret) {
-        error_setg_errno(errp, errno, "SEV: Failed to get attestation report"
-                " ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
+        error_setg_errno(errp, errno,
+                         "SEV: Failed to get attestation report"
+                         " ret=%d fw_err=%d (%s)",
+                         ret, err, fw_error_to_str(err));
         return NULL;
     }
 
@@ -695,8 +680,7 @@ SevAttestationReport *qmp_query_sev_attestation_report(const char *mnonce,
     return sev_get_attestation_report(mnonce, errp);
 }
 
-static int
-sev_read_file_base64(const char *filename, guchar **data, gsize *len)
+static int sev_read_file_base64(const char *filename, guchar **data, gsize *len)
 {
     gsize sz;
     g_autofree gchar *base64 = NULL;
@@ -712,15 +696,13 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
     return 0;
 }
 
-static int
-sev_launch_start(SevGuestState *sev)
+static int sev_launch_start(SevGuestState *sev)
 {
     gsize sz;
     int ret = 1;
     int fw_error, rc;
-    struct kvm_sev_launch_start start = {
-        .handle = sev->handle, .policy = sev->policy
-    };
+    struct kvm_sev_launch_start start = { .handle = sev->handle,
+                                          .policy = sev->policy };
     guchar *session = NULL, *dh_cert = NULL;
 
     if (sev->session_file) {
@@ -742,8 +724,8 @@ sev_launch_start(SevGuestState *sev)
     trace_kvm_sev_launch_start(start.policy, session, dh_cert);
     rc = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_START, &start, &fw_error);
     if (rc < 0) {
-        error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
-                __func__, ret, fw_error, fw_error_to_str(fw_error));
+        error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'", __func__, ret,
+                     fw_error, fw_error_to_str(fw_error));
         goto out;
     }
 
@@ -757,8 +739,8 @@ out:
     return ret;
 }
 
-static int
-sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
+static int sev_launch_update_data(SevGuestState *sev, uint8_t *addr,
+                                  uint64_t len)
 {
     int ret, fw_error;
     struct kvm_sev_launch_update_data update;
@@ -770,32 +752,30 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
     update.uaddr = (__u64)(unsigned long)addr;
     update.len = len;
     trace_kvm_sev_launch_update_data(addr, len);
-    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-                    &update, &fw_error);
+    ret =
+        sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA, &update, &fw_error);
     if (ret) {
-        error_report("%s: LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
-                __func__, ret, fw_error, fw_error_to_str(fw_error));
+        error_report("%s: LAUNCH_UPDATE ret=%d fw_error=%d '%s'", __func__, ret,
+                     fw_error, fw_error_to_str(fw_error));
     }
 
     return ret;
 }
 
-static int
-sev_launch_update_vmsa(SevGuestState *sev)
+static int sev_launch_update_vmsa(SevGuestState *sev)
 {
     int ret, fw_error;
 
     ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
     if (ret) {
-        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
-                __func__, ret, fw_error, fw_error_to_str(fw_error));
+        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'", __func__,
+                     ret, fw_error, fw_error_to_str(fw_error));
     }
 
     return ret;
 }
 
-static void
-sev_launch_get_measure(Notifier *notifier, void *unused)
+static void sev_launch_get_measure(Notifier *notifier, void *unused)
 {
     SevGuestState *sev = sev_guest;
     int ret, error;
@@ -815,11 +795,10 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
     }
 
     /* query the measurement blob length */
-    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-                    &measurement, &error);
+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE, &measurement, &error);
     if (!measurement.len) {
-        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-                     __func__, ret, error, fw_error_to_str(errno));
+        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'", __func__,
+                     ret, error, fw_error_to_str(errno));
         return;
     }
 
@@ -827,11 +806,10 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
     measurement.uaddr = (unsigned long)data;
 
     /* get the measurement blob */
-    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-                    &measurement, &error);
+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE, &measurement, &error);
     if (ret) {
-        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-                     __func__, ret, error, fw_error_to_str(errno));
+        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'", __func__,
+                     ret, error, fw_error_to_str(errno));
         return;
     }
 
@@ -844,8 +822,7 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
 
 static char *sev_get_launch_measurement(void)
 {
-    if (sev_guest &&
-        sev_guest->state >= SEV_STATE_LAUNCH_SECRET) {
+    if (sev_guest && sev_guest->state >= SEV_STATE_LAUNCH_SECRET) {
         return g_strdup(sev_guest->measurement);
     }
 
@@ -873,29 +850,26 @@ static Notifier sev_machine_done_notify = {
     .notify = sev_launch_get_measure,
 };
 
-static void
-sev_launch_finish(SevGuestState *sev)
+static void sev_launch_finish(SevGuestState *sev)
 {
     int ret, error;
 
     trace_kvm_sev_launch_finish();
     ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_FINISH, 0, &error);
     if (ret) {
-        error_report("%s: LAUNCH_FINISH ret=%d fw_error=%d '%s'",
-                     __func__, ret, error, fw_error_to_str(error));
+        error_report("%s: LAUNCH_FINISH ret=%d fw_error=%d '%s'", __func__, ret,
+                     error, fw_error_to_str(error));
         exit(1);
     }
 
     sev_set_guest_state(sev, SEV_STATE_RUNNING);
 
     /* add migration blocker */
-    error_setg(&sev_mig_blocker,
-               "SEV: Migration is not implemented");
+    error_setg(&sev_mig_blocker, "SEV: Migration is not implemented");
     migrate_add_blocker(sev_mig_blocker, &error_fatal);
 }
 
-static void
-sev_vm_state_change(void *opaque, bool running, RunState state)
+static void sev_vm_state_change(void *opaque, bool running, RunState state)
 {
     SevGuestState *sev = opaque;
 
@@ -908,8 +882,8 @@ sev_vm_state_change(void *opaque, bool running, RunState state)
 
 int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
 {
-    SevGuestState *sev
-        = (SevGuestState *)object_dynamic_cast(OBJECT(cgs), TYPE_SEV_GUEST);
+    SevGuestState *sev =
+        (SevGuestState *)object_dynamic_cast(OBJECT(cgs), TYPE_SEV_GUEST);
     char *devname;
     int ret, fw_error, cmd;
     uint32_t ebx;
@@ -949,7 +923,8 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
      * is in the range of 1 to 63.
      */
     if (sev->reduced_phys_bits < 1 || sev->reduced_phys_bits > 63) {
-        error_setg(errp, "%s: reduced_phys_bits check failed,"
+        error_setg(errp,
+                   "%s: reduced_phys_bits check failed,"
                    " it should be in the range of 1 to 63, requested '%d'",
                    __func__, sev->reduced_phys_bits);
         goto err;
@@ -958,8 +933,8 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
     devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
     sev->sev_fd = open(devname, O_RDWR);
     if (sev->sev_fd < 0) {
-        error_setg(errp, "%s: Failed to open %s '%s'", __func__,
-                   devname, strerror(errno));
+        error_setg(errp, "%s: Failed to open %s '%s'", __func__, devname,
+                   strerror(errno));
         g_free(devname);
         goto err;
     }
@@ -968,9 +943,10 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
     ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
                              &fw_error);
     if (ret) {
-        error_setg(errp, "%s: failed to get platform status ret=%d "
-                   "fw_error='%d: %s'", __func__, ret, fw_error,
-                   fw_error_to_str(fw_error));
+        error_setg(errp,
+                   "%s: failed to get platform status ret=%d "
+                   "fw_error='%d: %s'",
+                   __func__, ret, fw_error, fw_error_to_str(fw_error));
         goto err;
     }
     sev->build_id = status.build;
@@ -1022,8 +998,7 @@ err:
     return -1;
 }
 
-int
-sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
+int sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
 {
     if (!sev_guest) {
         return 0;
@@ -1059,7 +1034,7 @@ int sev_inject_launch_secret(const char *packet_hdr, const char *secret,
     /* secret can be injected only in this state */
     if (!sev_check_state(sev_guest, SEV_STATE_LAUNCH_SECRET)) {
         error_setg(errp, "SEV: Not in correct state. (LSECRET) %x",
-                     sev_guest->state);
+                   sev_guest->state);
         return 1;
     }
 
@@ -1090,14 +1065,13 @@ int sev_inject_launch_secret(const char *packet_hdr, const char *secret,
     input.guest_uaddr = (uint64_t)(unsigned long)hva;
     input.guest_len = data_sz;
 
-    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
-                                input.trans_uaddr, input.trans_len);
+    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr, input.trans_uaddr,
+                                input.trans_len);
 
-    ret = sev_ioctl(sev_guest->sev_fd, KVM_SEV_LAUNCH_SECRET,
-                    &input, &error);
+    ret = sev_ioctl(sev_guest->sev_fd, KVM_SEV_LAUNCH_SECRET, &input, &error);
     if (ret) {
         error_setg(errp, "SEV: failed to inject secret ret=%d fw_error=%d '%s'",
-                     ret, error, fw_error_to_str(error));
+                   ret, error, fw_error_to_str(error));
         return ret;
     }
 
@@ -1110,10 +1084,8 @@ struct sev_secret_area {
     uint32_t size;
 };
 
-void qmp_sev_inject_launch_secret(const char *packet_hdr,
-                                  const char *secret,
-                                  bool has_gpa, uint64_t gpa,
-                                  Error **errp)
+void qmp_sev_inject_launch_secret(const char *packet_hdr, const char *secret,
+                                  bool has_gpa, uint64_t gpa, Error **errp)
 {
     if (!sev_enabled()) {
         error_setg(errp, "SEV not enabled for guest");
@@ -1125,7 +1097,7 @@ void qmp_sev_inject_launch_secret(const char *packet_hdr,
 
         if (!pc_system_ovmf_table_find(SEV_SECRET_GUID, &data, NULL)) {
             error_setg(errp, "SEV: no secret area found in OVMF,"
-                       " gpa must be specified.");
+                             " gpa must be specified.");
             return;
         }
         area = (struct sev_secret_area *)data;
@@ -1135,8 +1107,7 @@ void qmp_sev_inject_launch_secret(const char *packet_hdr,
     sev_inject_launch_secret(packet_hdr, secret, gpa, errp);
 }
 
-static int
-sev_es_parse_reset_block(SevInfoBlock *info, uint32_t *addr)
+static int sev_es_parse_reset_block(SevInfoBlock *info, uint32_t *addr)
 {
     if (!info->reset_addr) {
         error_report("SEV-ES reset address is zero");
@@ -1148,9 +1119,8 @@ sev_es_parse_reset_block(SevInfoBlock *info, uint32_t *addr)
     return 0;
 }
 
-static int
-sev_es_find_reset_vector(void *flash_ptr, uint64_t flash_size,
-                         uint32_t *addr)
+static int sev_es_find_reset_vector(void *flash_ptr, uint64_t flash_size,
+                                    uint32_t *addr)
 {
     QemuUUID info_guid, *guid;
     SevInfoBlock *info;
@@ -1186,7 +1156,8 @@ sev_es_find_reset_vector(void *flash_ptr, uint64_t flash_size,
 
     guid = (QemuUUID *)(data - sizeof(info_guid));
     if (!qemu_uuid_is_equal(guid, &info_guid)) {
-        error_report("SEV information block/Firmware GUID Table block not found in pflash rom");
+        error_report("SEV information block/Firmware GUID Table block not "
+                     "found in pflash rom");
         return 1;
     }
 
@@ -1216,7 +1187,7 @@ void sev_es_set_reset_vector(CPUState *cpu)
 
     cpu_x86_load_seg_cache(env, R_CS, 0xf000, sev_guest->reset_cs, 0xffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_CS_MASK |
-                           DESC_R_MASK | DESC_A_MASK);
+                               DESC_R_MASK | DESC_A_MASK);
 
     env->eip = sev_guest->reset_ip;
 }
@@ -1232,8 +1203,7 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
     }
 
     addr = 0;
-    ret = sev_es_find_reset_vector(flash_ptr, flash_size,
-                                   &addr);
+    ret = sev_es_find_reset_vector(flash_ptr, flash_size, &addr);
     if (ret) {
         return ret;
     }
@@ -1243,7 +1213,7 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
         sev_guest->reset_ip = addr & 0x0000ffff;
         sev_guest->reset_data_valid = true;
 
-        CPU_FOREACH(cpu) {
+        CPU_FOREACH (cpu) {
             sev_es_set_reset_vector(cpu);
         }
     }
@@ -1252,21 +1222,21 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
 }
 
 static const QemuUUID sev_hash_table_header_guid = {
-    .data = UUID_LE(0x9438d606, 0x4f22, 0x4cc9, 0xb4, 0x79, 0xa7, 0x93,
-                    0xd4, 0x11, 0xfd, 0x21)
+    .data = UUID_LE(0x9438d606, 0x4f22, 0x4cc9, 0xb4, 0x79, 0xa7, 0x93, 0xd4,
+                    0x11, 0xfd, 0x21)
 };
 
 static const QemuUUID sev_kernel_entry_guid = {
-    .data = UUID_LE(0x4de79437, 0xabd2, 0x427f, 0xb8, 0x35, 0xd5, 0xb1,
-                    0x72, 0xd2, 0x04, 0x5b)
+    .data = UUID_LE(0x4de79437, 0xabd2, 0x427f, 0xb8, 0x35, 0xd5, 0xb1, 0x72,
+                    0xd2, 0x04, 0x5b)
 };
 static const QemuUUID sev_initrd_entry_guid = {
-    .data = UUID_LE(0x44baf731, 0x3a2f, 0x4bd7, 0x9a, 0xf1, 0x41, 0xe2,
-                    0x91, 0x69, 0x78, 0x1d)
+    .data = UUID_LE(0x44baf731, 0x3a2f, 0x4bd7, 0x9a, 0xf1, 0x41, 0xe2, 0x91,
+                    0x69, 0x78, 0x1d)
 };
 static const QemuUUID sev_cmdline_entry_guid = {
-    .data = UUID_LE(0x97d02dd8, 0xbd20, 0x4c94, 0xaa, 0x78, 0xe7, 0x71,
-                    0x4d, 0x36, 0xab, 0x2a)
+    .data = UUID_LE(0x97d02dd8, 0xbd20, 0x4c94, 0xaa, 0x78, 0xe7, 0x71, 0x4d,
+                    0x36, 0xab, 0x2a)
 };
 
 /*
@@ -1303,8 +1273,10 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
     }
     area = (SevHashTableDescriptor *)data;
     if (!area->base || area->size < sizeof(PaddedSevHashTable)) {
-        error_setg(errp, "SEV: guest firmware hashes table area is invalid "
-                         "(base=0x%x size=0x%x)", area->base, area->size);
+        error_setg(errp,
+                   "SEV: guest firmware hashes table area is invalid "
+                   "(base=0x%x size=0x%x)",
+                   area->base, area->size);
         return false;
     }
 
@@ -1377,14 +1349,13 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
         ret = false;
     }
 
-    address_space_unmap(&address_space_memory, padded_ht,
-                        mapped_len, true, mapped_len);
+    address_space_unmap(&address_space_memory, padded_ht, mapped_len, true,
+                        mapped_len);
 
     return ret;
 }
 
-static void
-sev_register_types(void)
+static void sev_register_types(void)
 {
     type_register_static(&sev_guest_info);
 }

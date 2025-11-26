@@ -30,8 +30,8 @@ static inline void *host_signal_mask(host_sigcontext *uc)
 
 static inline bool host_signal_write(siginfo_t *info, host_sigcontext *uc)
 {
-    return uc->uc_mcontext.gregs[REG_TRAPNO] == 0xe
-        && (uc->uc_mcontext.gregs[REG_ERR] & 0x2);
+    return uc->uc_mcontext.gregs[REG_TRAPNO] == 0xe &&
+           (uc->uc_mcontext.gregs[REG_ERR] & 0x2);
 }
 
 #endif

@@ -61,10 +61,10 @@ bool x86_read_segment_descriptor(struct CPUState *cpu,
     }
 
     if (GDT_SEL == sel.ti) {
-        base  = rvmcs(cpu->accel->fd, VMCS_GUEST_GDTR_BASE);
+        base = rvmcs(cpu->accel->fd, VMCS_GUEST_GDTR_BASE);
         limit = rvmcs(cpu->accel->fd, VMCS_GUEST_GDTR_LIMIT);
     } else {
-        base  = rvmcs(cpu->accel->fd, VMCS_GUEST_LDTR_BASE);
+        base = rvmcs(cpu->accel->fd, VMCS_GUEST_LDTR_BASE);
         limit = rvmcs(cpu->accel->fd, VMCS_GUEST_LDTR_LIMIT);
     }
 
@@ -82,15 +82,15 @@ bool x86_write_segment_descriptor(struct CPUState *cpu,
 {
     target_ulong base;
     uint32_t limit;
-    
+
     if (GDT_SEL == sel.ti) {
-        base  = rvmcs(cpu->accel->fd, VMCS_GUEST_GDTR_BASE);
+        base = rvmcs(cpu->accel->fd, VMCS_GUEST_GDTR_BASE);
         limit = rvmcs(cpu->accel->fd, VMCS_GUEST_GDTR_LIMIT);
     } else {
-        base  = rvmcs(cpu->accel->fd, VMCS_GUEST_LDTR_BASE);
+        base = rvmcs(cpu->accel->fd, VMCS_GUEST_LDTR_BASE);
         limit = rvmcs(cpu->accel->fd, VMCS_GUEST_LDTR_LIMIT);
     }
-    
+
     if (sel.index * 8 >= limit) {
         printf("%s: gdt limit\n", __func__);
         return false;
@@ -102,7 +102,7 @@ bool x86_write_segment_descriptor(struct CPUState *cpu,
 bool x86_read_call_gate(struct CPUState *cpu, struct x86_call_gate *idt_desc,
                         int gate)
 {
-    target_ulong base  = rvmcs(cpu->accel->fd, VMCS_GUEST_IDTR_BASE);
+    target_ulong base = rvmcs(cpu->accel->fd, VMCS_GUEST_IDTR_BASE);
     uint32_t limit = rvmcs(cpu->accel->fd, VMCS_GUEST_IDTR_LIMIT);
 
     memset(idt_desc, 0, sizeof(*idt_desc));

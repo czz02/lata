@@ -149,7 +149,7 @@ static bool mmu_translate(CPUX86State *env, const TranslateParams *in,
     int page_size;
     int error_code;
 
- restart_all:
+restart_all:
     rsvd_mask = ~MAKE_64BIT_MASK(0, env_archcpu(env)->phys_bits);
     rsvd_mask &= PG_ADDRESS_MASK;
     if (!(pg_mode & PG_MODE_NXE)) {
@@ -163,8 +163,9 @@ static bool mmu_translate(CPUX86State *env, const TranslateParams *in,
                 /*
                  * Page table level 5
                  */
-                pte_addr = ((in->cr3 & ~0xfff) +
-                            (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
+                pte_addr =
+                    ((in->cr3 & ~0xfff) + (((addr >> 48) & 0x1ff) << 3)) &
+                    a20_mask;
                 if (!ptw_translate(&pte_trans, pte_addr)) {
                     return false;
                 }
@@ -188,8 +189,9 @@ static bool mmu_translate(CPUX86State *env, const TranslateParams *in,
             /*
              * Page table level 4
              */
-            pte_addr = ((pte & PG_ADDRESS_MASK) +
-                        (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
+            pte_addr =
+                ((pte & PG_ADDRESS_MASK) + (((addr >> 39) & 0x1ff) << 3)) &
+                a20_mask;
             if (!ptw_translate(&pte_trans, pte_addr)) {
                 return false;
             }
@@ -209,8 +211,9 @@ static bool mmu_translate(CPUX86State *env, const TranslateParams *in,
             /*
              * Page table level 3
              */
-            pte_addr = ((pte & PG_ADDRESS_MASK) +
-                        (((addr >> 30) & 0x1ff) << 3)) & a20_mask;
+            pte_addr =
+                ((pte & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+                a20_mask;
             if (!ptw_translate(&pte_trans, pte_addr)) {
                 return false;
             }
@@ -259,8 +262,8 @@ static bool mmu_translate(CPUX86State *env, const TranslateParams *in,
         /*
          * Page table level 2
          */
-        pte_addr = ((pte & PG_ADDRESS_MASK) +
-                    (((addr >> 21) & 0x1ff) << 3)) & a20_mask;
+        pte_addr = ((pte & PG_ADDRESS_MASK) + (((addr >> 21) & 0x1ff) << 3)) &
+                   a20_mask;
         if (!ptw_translate(&pte_trans, pte_addr)) {
             return false;
         }
@@ -286,8 +289,8 @@ static bool mmu_translate(CPUX86State *env, const TranslateParams *in,
         /*
          * Page table level 1
          */
-        pte_addr = ((pte & PG_ADDRESS_MASK) +
-                    (((addr >> 12) & 0x1ff) << 3)) & a20_mask;
+        pte_addr = ((pte & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
+                   a20_mask;
         if (!ptw_translate(&pte_trans, pte_addr)) {
             return false;
         }
@@ -369,8 +372,7 @@ do_check_protect_pse36:
         }
     }
     if (!(ptep & PG_NX_MASK) &&
-        (is_user ||
-         !((pg_mode & PG_MODE_SMEP) && (ptep & PG_USER_MASK)))) {
+        (is_user || !((pg_mode & PG_MODE_SMEP) && (ptep & PG_USER_MASK)))) {
         prot |= PAGE_EXEC;
     }
 
@@ -422,16 +424,15 @@ do_check_protect_pse36:
     }
 
     /* align to page_size */
-    paddr = (pte & a20_mask & PG_ADDRESS_MASK & ~(page_size - 1))
-          | (addr & (page_size - 1));
+    paddr = (pte & a20_mask & PG_ADDRESS_MASK & ~(page_size - 1)) |
+            (addr & (page_size - 1));
 
     if (in->ptw_idx == MMU_NESTED_IDX) {
         CPUTLBEntryFull *full;
         int flags, nested_page_size;
 
-        flags = probe_access_full(env, paddr, 0, access_type,
-                                  MMU_NESTED_IDX, true,
-                                  &pte_trans.haddr, &full, 0);
+        flags = probe_access_full(env, paddr, 0, access_type, MMU_NESTED_IDX,
+                                  true, &pte_trans.haddr, &full, 0);
         if (unlikely(flags & TLB_INVALID_MASK)) {
             *err = (TranslateFault){
                 .error_code = env->error_code,
@@ -451,8 +452,8 @@ do_check_protect_pse36:
 
         /* Merge stage1 & stage2 addresses to final physical address. */
         nested_page_size = 1 << full->lg_page_size;
-        paddr = (full->phys_addr & ~(nested_page_size - 1))
-              | (paddr & (nested_page_size - 1));
+        paddr = (full->phys_addr & ~(nested_page_size - 1)) |
+                (paddr & (nested_page_size - 1));
 
         /*
          * Use the larger of stage1 & stage2 page sizes, so that
@@ -468,19 +469,19 @@ do_check_protect_pse36:
     out->page_size = page_size;
     return true;
 
- do_fault_rsvd:
+do_fault_rsvd:
     error_code = PG_ERROR_RSVD_MASK;
     goto do_fault_cont;
- do_fault_protect:
+do_fault_protect:
     error_code = PG_ERROR_P_MASK;
     goto do_fault_cont;
- do_fault_pk_protect:
+do_fault_pk_protect:
     assert(access_type != MMU_INST_FETCH);
     error_code = PG_ERROR_PK_MASK | PG_ERROR_P_MASK;
     goto do_fault_cont;
- do_fault:
+do_fault:
     error_code = 0;
- do_fault_cont:
+do_fault_cont:
     if (is_user) {
         error_code |= PG_ERROR_U_MASK;
     }
@@ -593,8 +594,8 @@ static bool get_physical_address(CPUX86State *env, vaddr addr,
 }
 
 bool x86_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-                      MMUAccessType access_type, int mmu_idx,
-                      bool probe, uintptr_t retaddr)
+                      MMUAccessType access_type, int mmu_idx, bool probe,
+                      uintptr_t retaddr)
 {
     CPUX86State *env = cs->env_ptr;
     TranslateResult out;
@@ -606,10 +607,9 @@ bool x86_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
          * avoid filling it too fast.
          */
         assert(out.prot & (1 << access_type));
-        tlb_set_page_with_attrs(cs, addr & TARGET_PAGE_MASK,
-                                out.paddr & TARGET_PAGE_MASK,
-                                cpu_get_mem_attrs(env),
-                                out.prot, mmu_idx, out.page_size);
+        tlb_set_page_with_attrs(
+            cs, addr & TARGET_PAGE_MASK, out.paddr & TARGET_PAGE_MASK,
+            cpu_get_mem_attrs(env), out.prot, mmu_idx, out.page_size);
         return true;
     }
 
@@ -625,8 +625,8 @@ bool x86_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
 
     if (env->intercept_exceptions & (1 << err.exception_index)) {
         /* cr2 is not modified in case of exceptions */
-        x86_stq_phys(cs, env->vm_vmcb +
-                     offsetof(struct vmcb, control.exit_info_2),
+        x86_stq_phys(cs,
+                     env->vm_vmcb + offsetof(struct vmcb, control.exit_info_2),
                      err.cr2);
     } else {
         env->cr[2] = err.cr2;

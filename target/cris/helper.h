@@ -11,12 +11,12 @@ DEF_HELPER_FLAGS_4(btst, TCG_CALL_NO_SE, i32, env, i32, i32, i32)
 
 DEF_HELPER_FLAGS_4(evaluate_flags_muls, TCG_CALL_NO_SE, i32, env, i32, i32, i32)
 DEF_HELPER_FLAGS_4(evaluate_flags_mulu, TCG_CALL_NO_SE, i32, env, i32, i32, i32)
-DEF_HELPER_FLAGS_5(evaluate_flags_mcp, TCG_CALL_NO_SE, i32, env,
-                                                      i32, i32, i32, i32)
-DEF_HELPER_FLAGS_5(evaluate_flags_alu_4, TCG_CALL_NO_SE, i32, env,
-                                                        i32, i32, i32, i32)
-DEF_HELPER_FLAGS_5(evaluate_flags_sub_4, TCG_CALL_NO_SE, i32, env,
-                                                        i32, i32, i32, i32)
+DEF_HELPER_FLAGS_5(evaluate_flags_mcp, TCG_CALL_NO_SE, i32, env, i32, i32, i32,
+                   i32)
+DEF_HELPER_FLAGS_5(evaluate_flags_alu_4, TCG_CALL_NO_SE, i32, env, i32, i32,
+                   i32, i32)
+DEF_HELPER_FLAGS_5(evaluate_flags_sub_4, TCG_CALL_NO_SE, i32, env, i32, i32,
+                   i32, i32)
 DEF_HELPER_FLAGS_3(evaluate_flags_move_4, TCG_CALL_NO_SE, i32, env, i32, i32)
 DEF_HELPER_FLAGS_3(evaluate_flags_move_2, TCG_CALL_NO_SE, i32, env, i32, i32)
 DEF_HELPER_1(evaluate_flags, void, env)

@@ -39,25 +39,23 @@ int hax_populate_ram(uint64_t va, uint64_t size)
     }
 
     if (hax_global.supports_64bit_ramblock) {
-        struct hax_ramblock_info ramblock = {
-            .start_va = va,
-            .size = size,
-            .reserved = 0
-        };
+        struct hax_ramblock_info ramblock = { .start_va = va,
+                                              .size = size,
+                                              .reserved = 0 };
 
         ret = ioctl(hax_global.vm->fd, HAX_VM_IOCTL_ADD_RAMBLOCK, &ramblock);
     } else {
-        struct hax_alloc_ram_info info = {
-            .size = (uint32_t)size,
-            .pad = 0,
-            .va = va
-        };
+        struct hax_alloc_ram_info info = { .size = (uint32_t)size,
+                                           .pad = 0,
+                                           .va = va };
 
         ret = ioctl(hax_global.vm->fd, HAX_VM_IOCTL_ALLOC_RAM, &info);
     }
     if (ret < 0) {
-        fprintf(stderr, "Failed to register RAM block: ret=%d, va=0x%" PRIx64
-                ", size=0x%" PRIx64 ", method=%s\n", ret, va, size,
+        fprintf(stderr,
+                "Failed to register RAM block: ret=%d, va=0x%" PRIx64
+                ", size=0x%" PRIx64 ", method=%s\n",
+                ret, va, size,
                 hax_global.supports_64bit_ramblock ? "new" : "legacy");
         return ret;
     }
@@ -72,7 +70,7 @@ int hax_set_ram(uint64_t start_pa, uint32_t size, uint64_t host_va, int flags)
     info.pa_start = start_pa;
     info.size = size;
     info.va = host_va;
-    info.flags = (uint8_t) flags;
+    info.flags = (uint8_t)flags;
 
     ret = ioctl(hax_global.vm->fd, HAX_VM_IOCTL_SET_RAM, &info);
     if (ret < 0) {
@@ -222,8 +220,8 @@ int hax_host_setup_vcpu_channel(AccelCPUState *vcpu)
         return ret;
     }
 
-    vcpu->tunnel = (struct hax_tunnel *) (intptr_t) (info.va);
-    vcpu->iobuf = (unsigned char *) (intptr_t) (info.io_va);
+    vcpu->tunnel = (struct hax_tunnel *)(intptr_t)(info.va);
+    vcpu->iobuf = (unsigned char *)(intptr_t)(info.io_va);
     return 0;
 }
 

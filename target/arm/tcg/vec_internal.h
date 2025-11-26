@@ -30,24 +30,24 @@
  * casting the final pointer to a type of size N.
  */
 #if HOST_BIG_ENDIAN
-#define H1(x)   ((x) ^ 7)
+#define H1(x) ((x) ^ 7)
 #define H1_2(x) ((x) ^ 6)
 #define H1_4(x) ((x) ^ 4)
-#define H2(x)   ((x) ^ 3)
-#define H4(x)   ((x) ^ 1)
+#define H2(x) ((x) ^ 3)
+#define H4(x) ((x) ^ 1)
 #else
-#define H1(x)   (x)
+#define H1(x) (x)
 #define H1_2(x) (x)
 #define H1_4(x) (x)
-#define H2(x)   (x)
-#define H4(x)   (x)
+#define H2(x) (x)
+#define H4(x) (x)
 #endif
 /*
  * Access to 64-bit elements isn't host-endian dependent; we provide H8
  * and H1_8 so that when a function is being generated from a macro we
  * can pass these rather than an empty macro argument, for clarity.
  */
-#define H8(x)   (x)
+#define H8(x) (x)
 #define H1_8(x) (x)
 
 /*
@@ -152,8 +152,8 @@ static inline int32_t do_suqrshl_bhs(int32_t src, int32_t shift, int bits,
     return do_uqrshl_bhs(src, shift, bits, round, sat);
 }
 
-static inline int64_t do_sqrshl_d(int64_t src, int64_t shift,
-                                  bool round, uint32_t *sat)
+static inline int64_t do_sqrshl_d(int64_t src, int64_t shift, bool round,
+                                  uint32_t *sat)
 {
     if (shift <= -64) {
         /* Rounding the sign bit always produces 0. */
@@ -180,8 +180,8 @@ static inline int64_t do_sqrshl_d(int64_t src, int64_t shift,
     return src < 0 ? INT64_MIN : INT64_MAX;
 }
 
-static inline uint64_t do_uqrshl_d(uint64_t src, int64_t shift,
-                                   bool round, uint32_t *sat)
+static inline uint64_t do_uqrshl_d(uint64_t src, int64_t shift, bool round,
+                                   uint32_t *sat)
 {
     if (shift <= -(64 + round)) {
         return 0;
@@ -204,8 +204,8 @@ static inline uint64_t do_uqrshl_d(uint64_t src, int64_t shift,
     return UINT64_MAX;
 }
 
-static inline int64_t do_suqrshl_d(int64_t src, int64_t shift,
-                                   bool round, uint32_t *sat)
+static inline int64_t do_suqrshl_d(int64_t src, int64_t shift, bool round,
+                                   uint32_t *sat)
 {
     if (sat && src < 0) {
         *sat = 1;
@@ -222,7 +222,7 @@ int64_t do_sqrdmlah_d(int64_t, int64_t, int64_t, bool, bool);
 /*
  * 8 x 8 -> 16 vector polynomial multiply where the inputs are
  * in the low 8 bits of each 16-bit element
-*/
+ */
 uint64_t pmull_h(uint64_t op1, uint64_t op2);
 /*
  * 16 x 16 -> 32 vector polynomial multiply where the inputs are

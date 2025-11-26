@@ -161,34 +161,32 @@ void do_smm_enter(X86CPU *cpu)
 #ifdef TARGET_X86_64
     cpu_load_efer(env, 0);
 #endif
-    cpu_load_eflags(env, 0, ~(CC_O | CC_S | CC_Z | CC_A | CC_P | CC_C |
-                              DF_MASK));
+    cpu_load_eflags(env, 0,
+                    ~(CC_O | CC_S | CC_Z | CC_A | CC_P | CC_C | DF_MASK));
     env->eip = 0x00008000;
-    cpu_x86_update_cr0(env,
-                       env->cr[0] & ~(CR0_PE_MASK | CR0_EM_MASK | CR0_TS_MASK |
-                                      CR0_PG_MASK));
+    cpu_x86_update_cr0(env, env->cr[0] & ~(CR0_PE_MASK | CR0_EM_MASK |
+                                           CR0_TS_MASK | CR0_PG_MASK));
     cpu_x86_update_cr4(env, 0);
     env->dr[7] = 0x00000400;
 
-    cpu_x86_load_seg_cache(env, R_CS, (env->smbase >> 4) & 0xffff, env->smbase,
-                           0xffffffff,
-                           DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_G_MASK | DESC_A_MASK);
+    cpu_x86_load_seg_cache(
+        env, R_CS, (env->smbase >> 4) & 0xffff, env->smbase, 0xffffffff,
+        DESC_P_MASK | DESC_S_MASK | DESC_W_MASK | DESC_G_MASK | DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_DS, 0, 0, 0xffffffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_G_MASK | DESC_A_MASK);
+                               DESC_G_MASK | DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_ES, 0, 0, 0xffffffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_G_MASK | DESC_A_MASK);
+                               DESC_G_MASK | DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_SS, 0, 0, 0xffffffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_G_MASK | DESC_A_MASK);
+                               DESC_G_MASK | DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_FS, 0, 0, 0xffffffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_G_MASK | DESC_A_MASK);
+                               DESC_G_MASK | DESC_A_MASK);
     cpu_x86_load_seg_cache(env, R_GS, 0, 0, 0xffffffff,
                            DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
-                           DESC_G_MASK | DESC_A_MASK);
+                               DESC_G_MASK | DESC_A_MASK);
 }
 
 void helper_rsm(CPUX86State *env)
@@ -242,12 +240,11 @@ void helper_rsm(CPUX86State *env)
 
     for (i = 0; i < 6; i++) {
         offset = 0x7e00 + i * 16;
-        cpu_x86_load_seg_cache(env, i,
-                               x86_lduw_phys(cs, sm_state + offset),
-                               x86_ldq_phys(cs, sm_state + offset + 8),
-                               x86_ldl_phys(cs, sm_state + offset + 4),
-                               (x86_lduw_phys(cs, sm_state + offset + 2) &
-                                0xf0ff) << 8);
+        cpu_x86_load_seg_cache(
+            env, i, x86_lduw_phys(cs, sm_state + offset),
+            x86_ldq_phys(cs, sm_state + offset + 8),
+            x86_ldl_phys(cs, sm_state + offset + 4),
+            (x86_lduw_phys(cs, sm_state + offset + 2) & 0xf0ff) << 8);
     }
 
     val = x86_ldl_phys(cs, sm_state + 0x7efc); /* revision ID */
@@ -293,13 +290,11 @@ void helper_rsm(CPUX86State *env)
         } else {
             offset = 0x7f2c + (i - 3) * 12;
         }
-        cpu_x86_load_seg_cache(env, i,
-                               x86_ldl_phys(cs,
-                                        sm_state + 0x7fa8 + i * 4) & 0xffff,
-                               x86_ldl_phys(cs, sm_state + offset + 8),
-                               x86_ldl_phys(cs, sm_state + offset + 4),
-                               (x86_ldl_phys(cs,
-                                         sm_state + offset) & 0xf0ff) << 8);
+        cpu_x86_load_seg_cache(
+            env, i, x86_ldl_phys(cs, sm_state + 0x7fa8 + i * 4) & 0xffff,
+            x86_ldl_phys(cs, sm_state + offset + 8),
+            x86_ldl_phys(cs, sm_state + offset + 4),
+            (x86_ldl_phys(cs, sm_state + offset) & 0xf0ff) << 8);
     }
     cpu_x86_update_cr4(env, x86_ldl_phys(cs, sm_state + 0x7f14));
 

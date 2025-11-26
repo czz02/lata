@@ -52,8 +52,7 @@ typedef struct TCGState TCGState;
 
 #define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
 
-DECLARE_INSTANCE_CHECKER(TCGState, TCG_STATE,
-                         TYPE_TCG_ACCEL)
+DECLARE_INSTANCE_CHECKER(TCGState, TCG_STATE, TYPE_TCG_ACCEL)
 
 /*
  * We default to false if we know other options have been enabled
@@ -74,9 +73,9 @@ static bool default_mttcg_enabled(void)
         return false;
     }
 #ifdef TARGET_SUPPORTS_MTTCG
-# ifndef TCG_GUEST_DEFAULT_MO
-#  error "TARGET_SUPPORTS_MTTCG without TCG_GUEST_DEFAULT_MO"
-# endif
+#ifndef TCG_GUEST_DEFAULT_MO
+#error "TARGET_SUPPORTS_MTTCG without TCG_GUEST_DEFAULT_MO"
+#endif
     return true;
 #else
     return false;
@@ -157,9 +156,8 @@ static void tcg_set_thread(Object *obj, const char *value, Error **errp)
     }
 }
 
-static void tcg_get_tb_size(Object *obj, Visitor *v,
-                            const char *name, void *opaque,
-                            Error **errp)
+static void tcg_get_tb_size(Object *obj, Visitor *v, const char *name,
+                            void *opaque, Error **errp)
 {
     TCGState *s = TCG_STATE(obj);
     uint32_t value = s->tb_size;
@@ -167,9 +165,8 @@ static void tcg_get_tb_size(Object *obj, Visitor *v,
     visit_type_uint32(v, name, &value, errp);
 }
 
-static void tcg_set_tb_size(Object *obj, Visitor *v,
-                            const char *name, void *opaque,
-                            Error **errp)
+static void tcg_set_tb_size(Object *obj, Visitor *v, const char *name,
+                            void *opaque, Error **errp)
 {
     TCGState *s = TCG_STATE(obj);
     uint32_t value;
@@ -230,25 +227,23 @@ static void tcg_accel_class_init(ObjectClass *oc, void *data)
     ac->allowed = &tcg_allowed;
     ac->gdbstub_supported_sstep_flags = tcg_gdbstub_supported_sstep_flags;
 
-    object_class_property_add_str(oc, "thread",
-                                  tcg_get_thread,
-                                  tcg_set_thread);
+    object_class_property_add_str(oc, "thread", tcg_get_thread, tcg_set_thread);
 
-    object_class_property_add(oc, "tb-size", "int",
-        tcg_get_tb_size, tcg_set_tb_size,
-        NULL, NULL);
+    object_class_property_add(oc, "tb-size", "int", tcg_get_tb_size,
+                              tcg_set_tb_size, NULL, NULL);
     object_class_property_set_description(oc, "tb-size",
-        "TCG translation block cache size");
+                                          "TCG translation block cache size");
 
-    object_class_property_add_bool(oc, "split-wx",
-        tcg_get_splitwx, tcg_set_splitwx);
-    object_class_property_set_description(oc, "split-wx",
-        "Map jit pages into separate RW and RX regions");
+    object_class_property_add_bool(oc, "split-wx", tcg_get_splitwx,
+                                   tcg_set_splitwx);
+    object_class_property_set_description(
+        oc, "split-wx", "Map jit pages into separate RW and RX regions");
 
     object_class_property_add_bool(oc, "one-insn-per-tb",
                                    tcg_get_one_insn_per_tb,
                                    tcg_set_one_insn_per_tb);
-    object_class_property_set_description(oc, "one-insn-per-tb",
+    object_class_property_set_description(
+        oc, "one-insn-per-tb",
         "Only put one guest insn in each translation block");
 }
 

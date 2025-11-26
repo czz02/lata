@@ -33,7 +33,7 @@ static uint32_t cpu_mips_get_count_val(CPUMIPSState *env)
     int64_t now_ns;
     now_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
     return env->CP0_Count +
-            (uint32_t)clock_ns_to_ticks(env->count_clock, now_ns);
+           (uint32_t)clock_ns_to_ticks(env->count_clock, now_ns);
 }
 
 static void cpu_mips_timer_update(CPUMIPSState *env)
@@ -69,8 +69,7 @@ uint32_t cpu_mips_get_count(CPUMIPSState *env)
         uint64_t now_ns;
 
         now_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-        if (timer_pending(env->timer)
-            && timer_expired(env->timer, now_ns)) {
+        if (timer_pending(env->timer) && timer_expired(env->timer, now_ns)) {
             /* The timer has already expired.  */
             cpu_mips_timer_expire(env);
         }
@@ -90,8 +89,9 @@ void cpu_mips_store_count(CPUMIPSState *env, uint32_t count)
         env->CP0_Count = count;
     } else {
         /* Store new count register */
-        env->CP0_Count = count - (uint32_t)clock_ns_to_ticks(env->count_clock,
-                        qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+        env->CP0_Count = count - (uint32_t)clock_ns_to_ticks(
+                                     env->count_clock,
+                                     qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
         /* Update timer timer */
         cpu_mips_timer_update(env);
     }
@@ -117,8 +117,8 @@ void cpu_mips_start_count(CPUMIPSState *env)
 void cpu_mips_stop_count(CPUMIPSState *env)
 {
     /* Store the current value */
-    env->CP0_Count += (uint32_t)clock_ns_to_ticks(env->count_clock,
-                        qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+    env->CP0_Count += (uint32_t)clock_ns_to_ticks(
+        env->count_clock, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
 }
 
 static void mips_timer_cb(void *opaque)

@@ -32,17 +32,17 @@ typedef struct CPUArchState {
     uint32_t gpr_d[16];
     /* CSFR Register */
     uint32_t PCXI;
-/* Frequently accessed PSW_USB bits are stored separately for efficiency.
-       This contains all the other bits.  Use psw_{read,write} to access
-       the whole PSW.  */
+    /* Frequently accessed PSW_USB bits are stored separately for efficiency.
+           This contains all the other bits.  Use psw_{read,write} to access
+           the whole PSW.  */
     uint32_t PSW;
 
     /* PSW flag cache for faster execution
-    */
+     */
     uint32_t PSW_USB_C;
-    uint32_t PSW_USB_V;   /* Only if bit 31 set, then flag is set  */
-    uint32_t PSW_USB_SV;  /* Only if bit 31 set, then flag is set  */
-    uint32_t PSW_USB_AV;  /* Only if bit 31 set, then flag is set. */
+    uint32_t PSW_USB_V; /* Only if bit 31 set, then flag is set  */
+    uint32_t PSW_USB_SV; /* Only if bit 31 set, then flag is set  */
+    uint32_t PSW_USB_AV; /* Only if bit 31 set, then flag is set. */
     uint32_t PSW_USB_SAV; /* Only if bit 31 set, then flag is set. */
 
     uint32_t PC;
@@ -229,25 +229,25 @@ void icr_set_ccpn(CPUTriCoreState *env, uint32_t val);
 void icr_set_ie(CPUTriCoreState *env, uint32_t val);
 
 #define MASK_PSW_USB 0xff000000
-#define MASK_USB_C   0x80000000
-#define MASK_USB_V   0x40000000
-#define MASK_USB_SV  0x20000000
-#define MASK_USB_AV  0x10000000
+#define MASK_USB_C 0x80000000
+#define MASK_USB_V 0x40000000
+#define MASK_USB_SV 0x20000000
+#define MASK_USB_AV 0x10000000
 #define MASK_USB_SAV 0x08000000
 #define MASK_PSW_PRS 0x00003000
-#define MASK_PSW_IO  0x00000c00
-#define MASK_PSW_IS  0x00000200
-#define MASK_PSW_GW  0x00000100
+#define MASK_PSW_IO 0x00000c00
+#define MASK_PSW_IS 0x00000200
+#define MASK_PSW_GW 0x00000100
 #define MASK_PSW_CDE 0x00000080
 #define MASK_PSW_CDC 0x0000007f
 #define MASK_PSW_FPU_RM 0x3000000
 
 #define MASK_SYSCON_PRO_TEN 0x2
-#define MASK_SYSCON_FCD_SF  0x1
+#define MASK_SYSCON_FCD_SF 0x1
 
-#define MASK_CPUID_MOD     0xffff0000
+#define MASK_CPUID_MOD 0xffff0000
 #define MASK_CPUID_MOD_32B 0x0000ff00
-#define MASK_CPUID_REV     0x000000ff
+#define MASK_CPUID_REV 0x000000ff
 
 
 #define MASK_FCX_FCXS 0x000f0000
@@ -266,7 +266,7 @@ void icr_set_ie(CPUTriCoreState *env, uint32_t val);
 enum tricore_priv_levels {
     TRICORE_PRIV_UM0 = 0x0, /* user mode-0 flag */
     TRICORE_PRIV_UM1 = 0x1, /* user mode-1 flag */
-    TRICORE_PRIV_SM  = 0x2, /* kernel mode flag */
+    TRICORE_PRIV_SM = 0x2, /* kernel mode flag */
 };
 
 enum tricore_features {
@@ -284,16 +284,16 @@ static inline int tricore_has_feature(CPUTriCoreState *env, int feature)
 
 /* TriCore Traps Classes*/
 enum {
-    TRAPC_NONE     = -1,
-    TRAPC_MMU      = 0,
-    TRAPC_PROT     = 1,
+    TRAPC_NONE = -1,
+    TRAPC_MMU = 0,
+    TRAPC_PROT = 1,
     TRAPC_INSN_ERR = 2,
-    TRAPC_CTX_MNG  = 3,
-    TRAPC_SYSBUS   = 4,
-    TRAPC_ASSERT   = 5,
-    TRAPC_SYSCALL  = 6,
-    TRAPC_NMI      = 7,
-    TRAPC_IRQ      = 8
+    TRAPC_CTX_MNG = 3,
+    TRAPC_SYSBUS = 4,
+    TRAPC_ASSERT = 5,
+    TRAPC_SYSCALL = 6,
+    TRAPC_NMI = 7,
+    TRAPC_IRQ = 8
 };
 
 /* Class 0 TIN */
@@ -305,11 +305,11 @@ enum {
 /* Class 1 TIN */
 enum {
     TIN1_PRIV = 1,
-    TIN1_MPR  = 2,
-    TIN1_MPW  = 3,
-    TIN1_MPX  = 4,
-    TIN1_MPP  = 5,
-    TIN1_MPN  = 6,
+    TIN1_MPR = 2,
+    TIN1_MPW = 3,
+    TIN1_MPX = 4,
+    TIN1_MPP = 5,
+    TIN1_MPN = 6,
     TIN1_GRWP = 7,
 };
 
@@ -317,18 +317,18 @@ enum {
 enum {
     TIN2_IOPC = 1,
     TIN2_UOPC = 2,
-    TIN2_OPD  = 3,
-    TIN2_ALN  = 4,
-    TIN2_MEM  = 5,
+    TIN2_OPD = 3,
+    TIN2_ALN = 4,
+    TIN2_MEM = 5,
 };
 
 /* Class 3 TIN */
 enum {
-    TIN3_FCD  = 1,
-    TIN3_CDO  = 2,
-    TIN3_CDU  = 3,
-    TIN3_FCU  = 4,
-    TIN3_CSU  = 5,
+    TIN3_FCD = 1,
+    TIN3_CDO = 2,
+    TIN3_CDU = 3,
+    TIN3_FCU = 4,
+    TIN3_CSU = 5,
     TIN3_CTYP = 6,
     TIN3_NEST = 7,
 };
@@ -345,7 +345,7 @@ enum {
 
 /* Class 5 TIN */
 enum {
-    TIN5_OVF  = 1,
+    TIN5_OVF = 1,
     TIN5_SOVF = 1,
 };
 
@@ -391,8 +391,8 @@ static inline void cpu_get_tb_cpu_state(CPUTriCoreState *env, vaddr *pc,
     *pc = env->PC;
     *cs_base = 0;
 
-    new_flags |= FIELD_DP32(new_flags, TB_FLAGS, PRIV,
-            extract32(env->PSW, 10, 2));
+    new_flags |=
+        FIELD_DP32(new_flags, TB_FLAGS, PRIV, extract32(env->PSW, 10, 2));
     *flags = new_flags;
 }
 
@@ -402,7 +402,7 @@ static inline void cpu_get_tb_cpu_state(CPUTriCoreState *env, vaddr *pc,
 
 /* helpers.c */
 bool tricore_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                          MMUAccessType access_type, int mmu_idx,
-                          bool probe, uintptr_t retaddr);
+                          MMUAccessType access_type, int mmu_idx, bool probe,
+                          uintptr_t retaddr);
 
 #endif /* TRICORE_CPU_H */

@@ -78,20 +78,18 @@ target_ulong helper_check_ieee_exceptions(CPUSPARCState *env)
 
 #define F_HELPER(name, p) void helper_f##name##p(CPUSPARCState *env)
 
-#define F_BINOP(name)                                           \
-    float32 helper_f ## name ## s (CPUSPARCState *env, float32 src1, \
-                                   float32 src2)                \
-    {                                                           \
-        return float32_ ## name (src1, src2, &env->fp_status);  \
-    }                                                           \
-    float64 helper_f ## name ## d (CPUSPARCState * env, float64 src1,\
-                                   float64 src2)                \
-    {                                                           \
-        return float64_ ## name (src1, src2, &env->fp_status);  \
-    }                                                           \
-    F_HELPER(name, q)                                           \
-    {                                                           \
-        QT0 = float128_ ## name (QT0, QT1, &env->fp_status);    \
+#define F_BINOP(name)                                                         \
+    float32 helper_f##name##s(CPUSPARCState *env, float32 src1, float32 src2) \
+    {                                                                         \
+        return float32_##name(src1, src2, &env->fp_status);                   \
+    }                                                                         \
+    float64 helper_f##name##d(CPUSPARCState *env, float64 src1, float64 src2) \
+    {                                                                         \
+        return float64_##name(src1, src2, &env->fp_status);                   \
+    }                                                                         \
+    F_HELPER(name, q)                                                         \
+    {                                                                         \
+        QT0 = float128_##name(QT0, QT1, &env->fp_status);                     \
     }
 
 F_BINOP(add);
@@ -261,66 +259,65 @@ void helper_fsqrtq(CPUSPARCState *env)
     QT0 = float128_sqrt(QT1, &env->fp_status);
 }
 
-#define GEN_FCMP(name, size, reg1, reg2, FS, E)                         \
-    target_ulong glue(helper_, name) (CPUSPARCState *env)               \
-    {                                                                   \
-        FloatRelation ret;                                              \
-        target_ulong fsr;                                               \
-        if (E) {                                                        \
-            ret = glue(size, _compare)(reg1, reg2, &env->fp_status);    \
-        } else {                                                        \
-            ret = glue(size, _compare_quiet)(reg1, reg2,                \
-                                             &env->fp_status);          \
-        }                                                               \
-        fsr = do_check_ieee_exceptions(env, GETPC());                   \
-        switch (ret) {                                                  \
-        case float_relation_unordered:                                  \
-            fsr |= (FSR_FCC1 | FSR_FCC0) << FS;                         \
-            fsr |= FSR_NVA;                                             \
-            break;                                                      \
-        case float_relation_less:                                       \
-            fsr &= ~(FSR_FCC1) << FS;                                   \
-            fsr |= FSR_FCC0 << FS;                                      \
-            break;                                                      \
-        case float_relation_greater:                                    \
-            fsr &= ~(FSR_FCC0) << FS;                                   \
-            fsr |= FSR_FCC1 << FS;                                      \
-            break;                                                      \
-        default:                                                        \
-            fsr &= ~((FSR_FCC1 | FSR_FCC0) << FS);                      \
-            break;                                                      \
-        }                                                               \
-        return fsr;                                                     \
+#define GEN_FCMP(name, size, reg1, reg2, FS, E)                            \
+    target_ulong glue(helper_, name)(CPUSPARCState * env)                  \
+    {                                                                      \
+        FloatRelation ret;                                                 \
+        target_ulong fsr;                                                  \
+        if (E) {                                                           \
+            ret = glue(size, _compare)(reg1, reg2, &env->fp_status);       \
+        } else {                                                           \
+            ret = glue(size, _compare_quiet)(reg1, reg2, &env->fp_status); \
+        }                                                                  \
+        fsr = do_check_ieee_exceptions(env, GETPC());                      \
+        switch (ret) {                                                     \
+        case float_relation_unordered:                                     \
+            fsr |= (FSR_FCC1 | FSR_FCC0) << FS;                            \
+            fsr |= FSR_NVA;                                                \
+            break;                                                         \
+        case float_relation_less:                                          \
+            fsr &= ~(FSR_FCC1) << FS;                                      \
+            fsr |= FSR_FCC0 << FS;                                         \
+            break;                                                         \
+        case float_relation_greater:                                       \
+            fsr &= ~(FSR_FCC0) << FS;                                      \
+            fsr |= FSR_FCC1 << FS;                                         \
+            break;                                                         \
+        default:                                                           \
+            fsr &= ~((FSR_FCC1 | FSR_FCC0) << FS);                         \
+            break;                                                         \
+        }                                                                  \
+        return fsr;                                                        \
     }
-#define GEN_FCMP_T(name, size, FS, E)                                   \
-    target_ulong glue(helper_, name)(CPUSPARCState *env, size src1, size src2)\
-    {                                                                   \
-        FloatRelation ret;                                              \
-        target_ulong fsr;                                               \
-        if (E) {                                                        \
-            ret = glue(size, _compare)(src1, src2, &env->fp_status);    \
-        } else {                                                        \
-            ret = glue(size, _compare_quiet)(src1, src2,                \
-                                             &env->fp_status);          \
-        }                                                               \
-        fsr = do_check_ieee_exceptions(env, GETPC());                   \
-        switch (ret) {                                                  \
-        case float_relation_unordered:                                  \
-            fsr |= (FSR_FCC1 | FSR_FCC0) << FS;                         \
-            break;                                                      \
-        case float_relation_less:                                       \
-            fsr &= ~(FSR_FCC1 << FS);                                   \
-            fsr |= FSR_FCC0 << FS;                                      \
-            break;                                                      \
-        case float_relation_greater:                                    \
-            fsr &= ~(FSR_FCC0 << FS);                                   \
-            fsr |= FSR_FCC1 << FS;                                      \
-            break;                                                      \
-        default:                                                        \
-            fsr &= ~((FSR_FCC1 | FSR_FCC0) << FS);                      \
-            break;                                                      \
-        }                                                               \
-        return fsr;                                                     \
+#define GEN_FCMP_T(name, size, FS, E)                                      \
+    target_ulong glue(helper_, name)(CPUSPARCState * env, size src1,       \
+                                     size src2)                            \
+    {                                                                      \
+        FloatRelation ret;                                                 \
+        target_ulong fsr;                                                  \
+        if (E) {                                                           \
+            ret = glue(size, _compare)(src1, src2, &env->fp_status);       \
+        } else {                                                           \
+            ret = glue(size, _compare_quiet)(src1, src2, &env->fp_status); \
+        }                                                                  \
+        fsr = do_check_ieee_exceptions(env, GETPC());                      \
+        switch (ret) {                                                     \
+        case float_relation_unordered:                                     \
+            fsr |= (FSR_FCC1 | FSR_FCC0) << FS;                            \
+            break;                                                         \
+        case float_relation_less:                                          \
+            fsr &= ~(FSR_FCC1 << FS);                                      \
+            fsr |= FSR_FCC0 << FS;                                         \
+            break;                                                         \
+        case float_relation_greater:                                       \
+            fsr &= ~(FSR_FCC0 << FS);                                      \
+            fsr |= FSR_FCC1 << FS;                                         \
+            break;                                                         \
+        default:                                                           \
+            fsr &= ~((FSR_FCC1 | FSR_FCC0) << FS);                         \
+            break;                                                         \
+        }                                                                  \
+        return fsr;                                                        \
     }
 
 GEN_FCMP_T(fcmps, float32, 0, 0);

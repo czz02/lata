@@ -31,15 +31,14 @@ static void tcg_cpu_machine_done(Notifier *n, void *unused)
 {
     X86CPU *cpu = container_of(n, X86CPU, machine_done);
     MemoryRegion *smram =
-        (MemoryRegion *) object_resolve_path("/machine/smram", NULL);
+        (MemoryRegion *)object_resolve_path("/machine/smram", NULL);
 
     if (smram) {
         cpu->smram = g_new(MemoryRegion, 1);
-        memory_region_init_alias(cpu->smram, OBJECT(cpu), "smram",
-                                 smram, 0, 4 * GiB);
+        memory_region_init_alias(cpu->smram, OBJECT(cpu), "smram", smram, 0,
+                                 4 * GiB);
         memory_region_set_enabled(cpu->smram, true);
-        memory_region_add_subregion_overlap(cpu->cpu_as_root, 0,
-                                            cpu->smram, 1);
+        memory_region_add_subregion_overlap(cpu->cpu_as_root, 0, cpu->smram, 1);
     }
 }
 
@@ -69,7 +68,8 @@ bool tcg_cpu_realizefn(CPUState *cs, Error **errp)
      */
     memory_region_init_alias(cpu->cpu_as_mem, OBJECT(cpu), "memory",
                              get_system_memory(), 0, ~0ull);
-    memory_region_add_subregion_overlap(cpu->cpu_as_root, 0, cpu->cpu_as_mem, 0);
+    memory_region_add_subregion_overlap(cpu->cpu_as_root, 0, cpu->cpu_as_mem,
+                                        0);
     memory_region_set_enabled(cpu->cpu_as_mem, true);
 
     cs->num_ases = 2;

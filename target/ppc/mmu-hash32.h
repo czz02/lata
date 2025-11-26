@@ -12,53 +12,53 @@ bool ppc_hash32_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
  * Segment register definitions
  */
 
-#define SR32_T                  0x80000000
-#define SR32_KS                 0x40000000
-#define SR32_KP                 0x20000000
-#define SR32_NX                 0x10000000
-#define SR32_VSID               0x00ffffff
+#define SR32_T 0x80000000
+#define SR32_KS 0x40000000
+#define SR32_KP 0x20000000
+#define SR32_NX 0x10000000
+#define SR32_VSID 0x00ffffff
 
 /*
  * Block Address Translation (BAT) definitions
  */
 
-#define BATU32_BEPIU            0xf0000000
-#define BATU32_BEPIL            0x0ffe0000
-#define BATU32_BEPI             0xfffe0000
-#define BATU32_BL               0x00001ffc
-#define BATU32_VS               0x00000002
-#define BATU32_VP               0x00000001
+#define BATU32_BEPIU 0xf0000000
+#define BATU32_BEPIL 0x0ffe0000
+#define BATU32_BEPI 0xfffe0000
+#define BATU32_BL 0x00001ffc
+#define BATU32_VS 0x00000002
+#define BATU32_VP 0x00000001
 
 
-#define BATL32_BRPN             0xfffe0000
-#define BATL32_WIMG             0x00000078
-#define BATL32_PP               0x00000003
+#define BATL32_BRPN 0xfffe0000
+#define BATL32_WIMG 0x00000078
+#define BATL32_PP 0x00000003
 
 /*
  * Hash page table definitions
  */
-#define SDR_32_HTABORG         0xFFFF0000UL
-#define SDR_32_HTABMASK        0x000001FFUL
+#define SDR_32_HTABORG 0xFFFF0000UL
+#define SDR_32_HTABMASK 0x000001FFUL
 
-#define HPTES_PER_GROUP         8
-#define HASH_PTE_SIZE_32        8
-#define HASH_PTEG_SIZE_32       (HASH_PTE_SIZE_32 * HPTES_PER_GROUP)
+#define HPTES_PER_GROUP 8
+#define HASH_PTE_SIZE_32 8
+#define HASH_PTEG_SIZE_32 (HASH_PTE_SIZE_32 * HPTES_PER_GROUP)
 
-#define HPTE32_V_VALID          0x80000000
-#define HPTE32_V_VSID           0x7fffff80
-#define HPTE32_V_SECONDARY      0x00000040
-#define HPTE32_V_API            0x0000003f
-#define HPTE32_V_COMPARE(x, y)  (!(((x) ^ (y)) & 0x7fffffbf))
+#define HPTE32_V_VALID 0x80000000
+#define HPTE32_V_VSID 0x7fffff80
+#define HPTE32_V_SECONDARY 0x00000040
+#define HPTE32_V_API 0x0000003f
+#define HPTE32_V_COMPARE(x, y) (!(((x) ^ (y)) & 0x7fffffbf))
 
-#define HPTE32_R_RPN            0xfffff000
-#define HPTE32_R_R              0x00000100
-#define HPTE32_R_C              0x00000080
-#define HPTE32_R_W              0x00000040
-#define HPTE32_R_I              0x00000020
-#define HPTE32_R_M              0x00000010
-#define HPTE32_R_G              0x00000008
-#define HPTE32_R_WIMG           0x00000078
-#define HPTE32_R_PP             0x00000003
+#define HPTE32_R_RPN 0xfffff000
+#define HPTE32_R_R 0x00000100
+#define HPTE32_R_C 0x00000080
+#define HPTE32_R_W 0x00000040
+#define HPTE32_R_I 0x00000020
+#define HPTE32_R_M 0x00000010
+#define HPTE32_R_G 0x00000008
+#define HPTE32_R_WIMG 0x00000078
+#define HPTE32_R_PP 0x00000003
 
 static inline hwaddr ppc_hash32_hpt_base(PowerPCCPU *cpu)
 {
@@ -86,16 +86,16 @@ static inline target_ulong ppc_hash32_load_hpte1(PowerPCCPU *cpu,
     return ldl_phys(CPU(cpu)->as, base + pte_offset + HASH_PTE_SIZE_32 / 2);
 }
 
-static inline void ppc_hash32_store_hpte0(PowerPCCPU *cpu,
-                                          hwaddr pte_offset, target_ulong pte0)
+static inline void ppc_hash32_store_hpte0(PowerPCCPU *cpu, hwaddr pte_offset,
+                                          target_ulong pte0)
 {
     target_ulong base = ppc_hash32_hpt_base(cpu);
 
     stl_phys(CPU(cpu)->as, base + pte_offset, pte0);
 }
 
-static inline void ppc_hash32_store_hpte1(PowerPCCPU *cpu,
-                                          hwaddr pte_offset, target_ulong pte1)
+static inline void ppc_hash32_store_hpte1(PowerPCCPU *cpu, hwaddr pte_offset,
+                                          target_ulong pte1)
 {
     target_ulong base = ppc_hash32_hpt_base(cpu);
 

@@ -102,8 +102,7 @@ static void s390_cpu_get_crash_info_qom(Object *obj, Visitor *v,
 
     panic_info = s390_cpu_get_crash_info(cs);
 
-    visit_type_GuestPanicInformation(v, "crash-information", &panic_info,
-                                     errp);
+    visit_type_GuestPanicInformation(v, "crash-information", &panic_info, errp);
     qapi_free_GuestPanicInformation(panic_info);
 }
 
@@ -115,10 +114,8 @@ void s390_cpu_init_sysemu(Object *obj)
     cs->start_powered_off = true;
     object_property_add(obj, "crash-information", "GuestPanicInformation",
                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL);
-    cpu->env.tod_timer =
-        timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
-    cpu->env.cpu_timer =
-        timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
+    cpu->env.tod_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
+    cpu->env.cpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
 }
 
@@ -129,15 +126,18 @@ bool s390_cpu_realize_sysemu(DeviceState *dev, Error **errp)
     unsigned int max_cpus = ms->smp.max_cpus;
 
     if (cpu->env.core_id >= max_cpus) {
-        error_setg(errp, "Unable to add CPU with core-id: %" PRIu32
-                   ", maximum core-id: %d", cpu->env.core_id,
-                   max_cpus - 1);
+        error_setg(errp,
+                   "Unable to add CPU with core-id: %" PRIu32
+                   ", maximum core-id: %d",
+                   cpu->env.core_id, max_cpus - 1);
         return false;
     }
 
     if (cpu_exists(cpu->env.core_id)) {
-        error_setg(errp, "Unable to add CPU with core-id: %" PRIu32
-                   ", it already exists", cpu->env.core_id);
+        error_setg(errp,
+                   "Unable to add CPU with core-id: %" PRIu32
+                   ", it already exists",
+                   cpu->env.core_id);
         return false;
     }
 
@@ -183,10 +183,9 @@ static unsigned s390_count_running_cpus(void)
     CPUState *cpu;
     int nr_running = 0;
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         uint8_t state = S390_CPU(cpu)->env.cpu_state;
-        if (state == S390_CPU_STATE_OPERATING ||
-            state == S390_CPU_STATE_LOAD) {
+        if (state == S390_CPU_STATE_OPERATING || state == S390_CPU_STATE_LOAD) {
             if (!disabled_wait(cpu)) {
                 nr_running++;
             }
@@ -221,7 +220,7 @@ void s390_cpu_unhalt(S390CPU *cpu)
 }
 
 unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
- {
+{
     trace_cpu_set_state(CPU(cpu)->cpu_index, cpu_state);
 
     switch (cpu_state) {

@@ -6,7 +6,8 @@ bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
 bool sve_access_check(DisasContext *s);
 void lata_gen_exit_tb_ret_0(DisasContext *s);
 void lata_gen_a64_update_pc(DisasContext *s, target_long diff);
-DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc, int max_insns);
+DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
+                           int max_insns);
 void target_disasm(struct TranslationBlock *tb, int *max_insns, CPUState *cpu);
 bool tr_ir2_generate(struct TranslationBlock *tb);
 void translate_aarch64_insn(DisasContext *s, CPUState *cpu);
@@ -15,15 +16,18 @@ void get_last_info(TranslationBlock *tb, DisasContext *s);
 #endif
 
 #ifdef CONFIG_ANDROID
-void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func, uint64_t callee);
+void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
+                        uint64_t callee);
 #endif
 
 static inline void assert_fp_access_checked(DisasContext *s)
 {
 #ifdef CONFIG_DEBUG_TCG
     if (unlikely(!s->fp_access_checked || s->fp_excp_el)) {
-        fprintf(stderr, "target-arm: FP access check missing for "
-                "instruction 0x%08x\n", s->insn);
+        fprintf(stderr,
+                "target-arm: FP access check missing for "
+                "instruction 0x%08x\n",
+                s->insn);
         abort();
     }
 #endif

@@ -30,12 +30,12 @@
 
 void s390x_tod_timer(void *opaque)
 {
-    cpu_inject_clock_comparator((S390CPU *) opaque);
+    cpu_inject_clock_comparator((S390CPU *)opaque);
 }
 
 void s390x_cpu_timer(void *opaque)
 {
-    cpu_inject_cpu_timer((S390CPU *) opaque);
+    cpu_inject_cpu_timer((S390CPU *)opaque);
 }
 
 hwaddr s390_cpu_get_phys_page_debug(CPUState *cs, vaddr vaddr)
@@ -163,32 +163,32 @@ void s390_cpu_recompute_watchpoints(CPUState *cs)
         cpu_watchpoint_insert(cs, 1ULL << 63, 1ULL << 63, wp_flags, NULL);
     } else if (env->cregs[10] > env->cregs[11]) {
         /* The address range loops, create two watchpoints.  */
-        cpu_watchpoint_insert(cs, env->cregs[10], -env->cregs[10],
-                              wp_flags, NULL);
+        cpu_watchpoint_insert(cs, env->cregs[10], -env->cregs[10], wp_flags,
+                              NULL);
         cpu_watchpoint_insert(cs, 0, env->cregs[11] + 1, wp_flags, NULL);
 
     } else {
         /* Default case, create a single watchpoint.  */
         cpu_watchpoint_insert(cs, env->cregs[10],
-                              env->cregs[11] - env->cregs[10] + 1,
-                              wp_flags, NULL);
+                              env->cregs[11] - env->cregs[10] + 1, wp_flags,
+                              NULL);
     }
 }
 
 typedef struct SigpSaveArea {
-    uint64_t    fprs[16];                       /* 0x0000 */
-    uint64_t    grs[16];                        /* 0x0080 */
-    PSW         psw;                            /* 0x0100 */
-    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
-    uint32_t    prefix;                         /* 0x0118 */
-    uint32_t    fpc;                            /* 0x011c */
-    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
-    uint32_t    todpr;                          /* 0x0124 */
-    uint64_t    cputm;                          /* 0x0128 */
-    uint64_t    ckc;                            /* 0x0130 */
-    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
-    uint32_t    ars[16];                        /* 0x0140 */
-    uint64_t    crs[16];                        /* 0x0384 */
+    uint64_t fprs[16]; /* 0x0000 */
+    uint64_t grs[16]; /* 0x0080 */
+    PSW psw; /* 0x0100 */
+    uint8_t pad_0x0110[0x0118 - 0x0110]; /* 0x0110 */
+    uint32_t prefix; /* 0x0118 */
+    uint32_t fpc; /* 0x011c */
+    uint8_t pad_0x0120[0x0124 - 0x0120]; /* 0x0120 */
+    uint32_t todpr; /* 0x0124 */
+    uint64_t cputm; /* 0x0128 */
+    uint64_t ckc; /* 0x0130 */
+    uint8_t pad_0x0138[0x0140 - 0x0138]; /* 0x0138 */
+    uint32_t ars[16]; /* 0x0140 */
+    uint64_t crs[16]; /* 0x0384 */
 } SigpSaveArea;
 QEMU_BUILD_BUG_ON(sizeof(SigpSaveArea) != 512);
 
@@ -242,10 +242,10 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
 }
 
 typedef struct SigpAdtlSaveArea {
-    uint64_t    vregs[32][2];                     /* 0x0000 */
-    uint8_t     pad_0x0200[0x0400 - 0x0200];      /* 0x0200 */
-    uint64_t    gscb[4];                          /* 0x0400 */
-    uint8_t     pad_0x0420[0x1000 - 0x0420];      /* 0x0420 */
+    uint64_t vregs[32][2]; /* 0x0000 */
+    uint8_t pad_0x0200[0x0400 - 0x0200]; /* 0x0200 */
+    uint64_t gscb[4]; /* 0x0400 */
+    uint8_t pad_0x0420[0x1000 - 0x0420]; /* 0x0420 */
 } SigpAdtlSaveArea;
 QEMU_BUILD_BUG_ON(sizeof(SigpAdtlSaveArea) != 4096);
 

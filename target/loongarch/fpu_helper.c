@@ -19,12 +19,9 @@ static inline uint64_t nanbox_s(float32 fp)
 }
 
 /* Convert loongarch rounding mode in fcsr0 to IEEE library */
-static const FloatRoundMode ieee_rm[4] = {
-    float_round_nearest_even,
-    float_round_to_zero,
-    float_round_up,
-    float_round_down
-};
+static const FloatRoundMode ieee_rm[4] = { float_round_nearest_even,
+                                           float_round_to_zero, float_round_up,
+                                           float_round_down };
 
 void restore_fp_status(CPULoongArchState *env)
 {
@@ -194,8 +191,8 @@ uint64_t helper_fmaxa_s(CPULoongArchState *env, uint64_t fj, uint64_t fk)
 {
     uint64_t fd;
 
-    fd = nanbox_s(float32_maxnummag((uint32_t)fj,
-                                    (uint32_t)fk, &env->fp_status));
+    fd = nanbox_s(
+        float32_maxnummag((uint32_t)fj, (uint32_t)fk, &env->fp_status));
     update_fcsr0(env, GETPC());
     return fd;
 }
@@ -213,8 +210,8 @@ uint64_t helper_fmina_s(CPULoongArchState *env, uint64_t fj, uint64_t fk)
 {
     uint64_t fd;
 
-    fd = nanbox_s(float32_minnummag((uint32_t)fj,
-                                    (uint32_t)fk, &env->fp_status));
+    fd = nanbox_s(
+        float32_minnummag((uint32_t)fj, (uint32_t)fk, &env->fp_status));
     update_fcsr0(env, GETPC());
     return fd;
 }
@@ -234,8 +231,9 @@ uint64_t helper_fscaleb_s(CPULoongArchState *env, uint64_t fj, uint64_t fk)
     int32_t n = (int32_t)fk;
 
     fd = nanbox_s(float32_scalbn((uint32_t)fj,
-                                 n >  0x200 ?  0x200 :
-                                 n < -0x200 ? -0x200 : n,
+                                 n > 0x200  ? 0x200 :
+                                 n < -0x200 ? -0x200 :
+                                              n,
                                  &env->fp_status));
     update_fcsr0(env, GETPC());
     return fd;
@@ -247,8 +245,9 @@ uint64_t helper_fscaleb_d(CPULoongArchState *env, uint64_t fj, uint64_t fk)
     int64_t n = (int64_t)fk;
 
     fd = float64_scalbn(fj,
-                        n >  0x1000 ?  0x1000 :
-                        n < -0x1000 ? -0x1000 : n,
+                        n > 0x1000  ? 0x1000 :
+                        n < -0x1000 ? -0x1000 :
+                                      n,
                         &env->fp_status);
     update_fcsr0(env, GETPC());
     return fd;
@@ -352,7 +351,7 @@ uint64_t helper_fclass_s(CPULoongArchState *env, uint64_t fj)
     } else if (float32_is_zero_or_denormal(f)) {
         return sign ? 1 << 4 : 1 << 8;
     } else if (float32_is_any_nan(f)) {
-        float_status s = { }; /* for snan_bit_is_one */
+        float_status s = {}; /* for snan_bit_is_one */
         return float32_is_quiet_nan(f, &s) ? 1 << 1 : 1 << 0;
     } else {
         return sign ? 1 << 3 : 1 << 7;
@@ -371,26 +370,26 @@ uint64_t helper_fclass_d(CPULoongArchState *env, uint64_t fj)
     } else if (float64_is_zero_or_denormal(f)) {
         return sign ? 1 << 4 : 1 << 8;
     } else if (float64_is_any_nan(f)) {
-        float_status s = { }; /* for snan_bit_is_one */
+        float_status s = {}; /* for snan_bit_is_one */
         return float64_is_quiet_nan(f, &s) ? 1 << 1 : 1 << 0;
     } else {
         return sign ? 1 << 3 : 1 << 7;
     }
 }
 
-uint64_t helper_fmuladd_s(CPULoongArchState *env, uint64_t fj,
-                          uint64_t fk, uint64_t fa, uint32_t flag)
+uint64_t helper_fmuladd_s(CPULoongArchState *env, uint64_t fj, uint64_t fk,
+                          uint64_t fa, uint32_t flag)
 {
     uint64_t fd;
 
-    fd = nanbox_s(float32_muladd((uint32_t)fj, (uint32_t)fk,
-                                 (uint32_t)fa, flag, &env->fp_status));
+    fd = nanbox_s(float32_muladd((uint32_t)fj, (uint32_t)fk, (uint32_t)fa, flag,
+                                 &env->fp_status));
     update_fcsr0(env, GETPC());
     return fd;
 }
 
-uint64_t helper_fmuladd_d(CPULoongArchState *env, uint64_t fj,
-                          uint64_t fk, uint64_t fa, uint32_t flag)
+uint64_t helper_fmuladd_d(CPULoongArchState *env, uint64_t fj, uint64_t fk,
+                          uint64_t fa, uint32_t flag)
 {
     uint64_t fd;
 
@@ -426,34 +425,34 @@ static uint64_t fcmp_common(CPULoongArchState *env, FloatRelation cmp,
 }
 
 /* fcmp_cXXX_s */
-uint64_t helper_fcmp_c_s(CPULoongArchState *env, uint64_t fj,
-                         uint64_t fk, uint32_t flags)
+uint64_t helper_fcmp_c_s(CPULoongArchState *env, uint64_t fj, uint64_t fk,
+                         uint32_t flags)
 {
-    FloatRelation cmp = float32_compare_quiet((uint32_t)fj,
-                                              (uint32_t)fk, &env->fp_status);
+    FloatRelation cmp =
+        float32_compare_quiet((uint32_t)fj, (uint32_t)fk, &env->fp_status);
     return fcmp_common(env, cmp, flags);
 }
 
 /* fcmp_sXXX_s */
-uint64_t helper_fcmp_s_s(CPULoongArchState *env, uint64_t fj,
-                         uint64_t fk, uint32_t flags)
+uint64_t helper_fcmp_s_s(CPULoongArchState *env, uint64_t fj, uint64_t fk,
+                         uint32_t flags)
 {
-    FloatRelation cmp = float32_compare((uint32_t)fj,
-                                        (uint32_t)fk, &env->fp_status);
+    FloatRelation cmp =
+        float32_compare((uint32_t)fj, (uint32_t)fk, &env->fp_status);
     return fcmp_common(env, cmp, flags);
 }
 
 /* fcmp_cXXX_d */
-uint64_t helper_fcmp_c_d(CPULoongArchState *env, uint64_t fj,
-                         uint64_t fk, uint32_t flags)
+uint64_t helper_fcmp_c_d(CPULoongArchState *env, uint64_t fj, uint64_t fk,
+                         uint32_t flags)
 {
     FloatRelation cmp = float64_compare_quiet(fj, fk, &env->fp_status);
     return fcmp_common(env, cmp, flags);
 }
 
 /* fcmp_sXXX_d */
-uint64_t helper_fcmp_s_d(CPULoongArchState *env, uint64_t fj,
-                         uint64_t fk, uint32_t flags)
+uint64_t helper_fcmp_s_d(CPULoongArchState *env, uint64_t fj, uint64_t fk,
+                         uint32_t flags)
 {
     FloatRelation cmp = float64_compare(fj, fk, &env->fp_status);
     return fcmp_common(env, cmp, flags);

@@ -46,8 +46,8 @@ static void host_cpu_enable_cpu_pm(X86CPU *cpu)
 {
     CPUX86State *env = &cpu->env;
 
-    host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
-               &cpu->mwait.ecx, &cpu->mwait.edx);
+    host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx, &cpu->mwait.ecx,
+               &cpu->mwait.edx);
     env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
 }
 
@@ -61,8 +61,7 @@ static uint32_t host_cpu_adjust_phys_bits(X86CPU *cpu)
      * Print a warning if the user set it to a value that's not the
      * host value.
      */
-    if (phys_bits != host_phys_bits && phys_bits != 0 &&
-        !warned) {
+    if (phys_bits != host_phys_bits && phys_bits != 0 && !warned) {
         warn_report("Host physical bits (%u)"
                     " does not match phys-bits property (%u)",
                     host_phys_bits, phys_bits);
@@ -93,9 +92,9 @@ bool host_cpu_realizefn(CPUState *cs, Error **errp)
         uint32_t phys_bits = host_cpu_adjust_phys_bits(cpu);
 
         if (phys_bits &&
-            (phys_bits > TARGET_PHYS_ADDR_SPACE_BITS ||
-             phys_bits < 32)) {
-            error_setg(errp, "phys-bits should be between 32 and %u "
+            (phys_bits > TARGET_PHYS_ADDR_SPACE_BITS || phys_bits < 32)) {
+            error_setg(errp,
+                       "phys-bits should be between 32 and %u "
                        " (but is %u)",
                        TARGET_PHYS_ADDR_SPACE_BITS, phys_bits);
             return false;
@@ -122,9 +121,9 @@ static int host_cpu_fill_model_id(char *str)
 
     for (i = 0; i < 3; i++) {
         host_cpuid(0x80000002 + i, 0, &eax, &ebx, &ecx, &edx);
-        memcpy(str + i * 16 +  0, &eax, 4);
-        memcpy(str + i * 16 +  4, &ebx, 4);
-        memcpy(str + i * 16 +  8, &ecx, 4);
+        memcpy(str + i * 16 + 0, &eax, 4);
+        memcpy(str + i * 16 + 4, &ebx, 4);
+        memcpy(str + i * 16 + 8, &ecx, 4);
         memcpy(str + i * 16 + 12, &edx, 4);
     }
     return 0;
@@ -178,10 +177,8 @@ void host_cpu_max_instance_init(X86CPU *cpu)
     object_property_set_str(OBJECT(cpu), "vendor", vendor, &error_abort);
     object_property_set_int(OBJECT(cpu), "family", family, &error_abort);
     object_property_set_int(OBJECT(cpu), "model", model, &error_abort);
-    object_property_set_int(OBJECT(cpu), "stepping", stepping,
-                            &error_abort);
-    object_property_set_str(OBJECT(cpu), "model-id", model_id,
-                            &error_abort);
+    object_property_set_int(OBJECT(cpu), "stepping", stepping, &error_abort);
+    object_property_set_str(OBJECT(cpu), "model-id", model_id, &error_abort);
 }
 
 static void host_cpu_class_init(ObjectClass *oc, void *data)

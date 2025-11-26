@@ -266,12 +266,10 @@ int hppa_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
         env->fr[0] = deposit64(env->fr[0], 32, 32, val);
         cpu_hppa_loaded_fr0(env);
         break;
-    case 65 ... 127:
-        {
-            uint64_t *fr = &env->fr[(n - 64) / 2];
-            *fr = deposit64(*fr, (n & 1 ? 0 : 32), 32, val);
-        }
-        break;
+    case 65 ... 127: {
+        uint64_t *fr = &env->fr[(n - 64) / 2];
+        *fr = deposit64(*fr, (n & 1 ? 0 : 32), 32, val);
+    } break;
     default:
         if (n >= 128) {
             return 0;

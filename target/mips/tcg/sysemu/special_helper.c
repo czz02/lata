@@ -46,7 +46,7 @@ static void debug_pre_eret(CPUMIPSState *env)
 {
     if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
         qemu_log("ERET: PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx,
-                env->active_tc.PC, env->CP0_EPC);
+                 env->active_tc.PC, env->CP0_EPC);
         if (env->CP0_Status & (1 << CP0St_ERL)) {
             qemu_log(" ErrorEPC " TARGET_FMT_lx, env->CP0_ErrorEPC);
         }
@@ -61,7 +61,7 @@ static void debug_post_eret(CPUMIPSState *env)
 {
     if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
         qemu_log("  =>  PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx,
-                env->active_tc.PC, env->CP0_EPC);
+                 env->active_tc.PC, env->CP0_EPC);
         if (env->CP0_Status & (1 << CP0St_ERL)) {
             qemu_log(" ErrorEPC " TARGET_FMT_lx, env->CP0_ErrorEPC);
         }
@@ -93,8 +93,8 @@ bool mips_io_recompile_replay_branch(CPUState *cs, const TranslationBlock *tb)
     MIPSCPU *cpu = MIPS_CPU(cs);
     CPUMIPSState *env = &cpu->env;
 
-    if ((env->hflags & MIPS_HFLAG_BMASK) != 0
-        && !(cs->tcg_cflags & CF_PCREL) && env->active_tc.PC != tb->pc) {
+    if ((env->hflags & MIPS_HFLAG_BMASK) != 0 && !(cs->tcg_cflags & CF_PCREL) &&
+        env->active_tc.PC != tb->pc) {
         env->active_tc.PC -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
         env->hflags &= ~MIPS_HFLAG_BMASK;
         return true;
@@ -142,24 +142,21 @@ void helper_deret(CPUMIPSState *env)
 
 void helper_cache(CPUMIPSState *env, target_ulong addr, uint32_t op)
 {
-    static const char *const type_name[] = {
-        "Primary Instruction",
-        "Primary Data or Unified Primary",
-        "Tertiary",
-        "Secondary"
-    };
+    static const char *const type_name[] = { "Primary Instruction",
+                                             "Primary Data or Unified Primary",
+                                             "Tertiary", "Secondary" };
     uint32_t cache_type = extract32(op, 0, 2);
     uint32_t cache_operation = extract32(op, 2, 3);
     target_ulong index = addr & 0x1fffffff;
 
     switch (cache_operation) {
     case 0b010: /* Index Store Tag */
-        memory_region_dispatch_write(env->itc_tag, index, env->CP0_TagLo,
-                                     MO_64, MEMTXATTRS_UNSPECIFIED);
+        memory_region_dispatch_write(env->itc_tag, index, env->CP0_TagLo, MO_64,
+                                     MEMTXATTRS_UNSPECIFIED);
         break;
     case 0b001: /* Index Load Tag */
-        memory_region_dispatch_read(env->itc_tag, index, &env->CP0_TagLo,
-                                    MO_64, MEMTXATTRS_UNSPECIFIED);
+        memory_region_dispatch_read(env->itc_tag, index, &env->CP0_TagLo, MO_64,
+                                    MEMTXATTRS_UNSPECIFIED);
         break;
     case 0b000: /* Index Invalidate */
     case 0b100: /* Hit Invalidate */

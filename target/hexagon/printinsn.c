@@ -40,8 +40,8 @@ static void snprintinsn(GString *buf, Insn *insn)
 {
     switch (insn->opcode) {
 #define DEF_VECX_PRINTINFO(TAG, FMT, ...) DEF_PRINTINFO(TAG, FMT, __VA_ARGS__)
-#define DEF_PRINTINFO(TAG, FMT, ...) \
-    case TAG: \
+#define DEF_PRINTINFO(TAG, FMT, ...)                   \
+    case TAG:                                          \
         g_string_append_printf(buf, FMT, __VA_ARGS__); \
         break;
 #include "printinsn_generated.h.inc"
@@ -137,8 +137,8 @@ void snprint_a_pkt_debug(GString *buf, Packet *pkt)
         }
         slot = pkt->insn[i].slot;
         opcode = pkt->insn[i].opcode;
-        g_string_append_printf(buf, " //slot=%d:tag=%s\n",
-                               slot, opcode_names[opcode]);
+        g_string_append_printf(buf, " //slot=%d:tag=%s\n", slot,
+                               opcode_names[opcode]);
     }
     if (pkt->num_insns > 1) {
         g_string_append(buf, "}\n");

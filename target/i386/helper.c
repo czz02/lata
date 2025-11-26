@@ -34,11 +34,11 @@
 
 void cpu_sync_avx_hflag(CPUX86State *env)
 {
-    if ((env->cr[4] & CR4_OSXSAVE_MASK)
-        && (env->xcr0 & (XSTATE_SSE_MASK | XSTATE_YMM_MASK))
-            == (XSTATE_SSE_MASK | XSTATE_YMM_MASK)) {
+    if ((env->cr[4] & CR4_OSXSAVE_MASK) &&
+        (env->xcr0 & (XSTATE_SSE_MASK | XSTATE_YMM_MASK)) ==
+            (XSTATE_SSE_MASK | XSTATE_YMM_MASK)) {
         env->hflags |= HF_AVX_EN_MASK;
-    } else{
+    } else {
         env->hflags &= ~HF_AVX_EN_MASK;
     }
 }
@@ -55,9 +55,8 @@ void cpu_sync_bndcs_hflags(CPUX86State *env)
         bndcsr = env->msr_bndcfgs;
     }
 
-    if ((env->cr[4] & CR4_OSXSAVE_MASK)
-        && (env->xcr0 & XSTATE_BNDCSR_MASK)
-        && (bndcsr & BNDCFG_ENABLE)) {
+    if ((env->cr[4] & CR4_OSXSAVE_MASK) && (env->xcr0 & XSTATE_BNDCSR_MASK) &&
+        (bndcsr & BNDCFG_ENABLE)) {
         hflags |= HF_MPX_EN_MASK;
     } else {
         hflags &= ~HF_MPX_EN_MASK;
@@ -160,7 +159,8 @@ void cpu_x86_update_cr0(CPUX86State *env, uint32_t new_cr0)
     env->hflags |= ((pe_state ^ 1) << HF_ADDSEG_SHIFT);
     /* update FPU flags */
     env->hflags = (env->hflags & ~(HF_MP_MASK | HF_EM_MASK | HF_TS_MASK)) |
-        ((new_cr0 << (HF_MP_SHIFT - 1)) & (HF_MP_MASK | HF_EM_MASK | HF_TS_MASK));
+                  ((new_cr0 << (HF_MP_SHIFT - 1)) &
+                   (HF_MP_MASK | HF_EM_MASK | HF_TS_MASK));
 }
 
 /* XXX: in legacy PAE mode, generate a GPF if reserved bits are set in
@@ -169,8 +169,8 @@ void cpu_x86_update_cr3(CPUX86State *env, target_ulong new_cr3)
 {
     env->cr[3] = new_cr3;
     if (env->cr[0] & CR0_PG_MASK) {
-        qemu_log_mask(CPU_LOG_MMU,
-                        "CR3 update: CR3=" TARGET_FMT_lx "\n", new_cr3);
+        qemu_log_mask(CPU_LOG_MMU, "CR3 update: CR3=" TARGET_FMT_lx "\n",
+                      new_cr3);
         tlb_flush(env_cpu(env));
     }
 }
@@ -183,8 +183,8 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
     printf("CR4 update: %08x -> %08x\n", (uint32_t)env->cr[4], new_cr4);
 #endif
     if ((new_cr4 ^ env->cr[4]) &
-        (CR4_PGE_MASK | CR4_PAE_MASK | CR4_PSE_MASK |
-         CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_LA57_MASK)) {
+        (CR4_PGE_MASK | CR4_PAE_MASK | CR4_PSE_MASK | CR4_SMEP_MASK |
+         CR4_SMAP_MASK | CR4_LA57_MASK)) {
         tlb_flush(env_cpu(env));
     }
 
@@ -262,8 +262,9 @@ hwaddr x86_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
             }
 
             if (la57) {
-                pml5e_addr = ((env->cr[3] & ~0xfff) +
-                        (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
+                pml5e_addr =
+                    ((env->cr[3] & ~0xfff) + (((addr >> 48) & 0x1ff) << 3)) &
+                    a20_mask;
                 pml5e = x86_ldq_phys(cs, pml5e_addr);
                 if (!(pml5e & PG_PRESENT_MASK)) {
                     return -1;
@@ -272,14 +273,16 @@ hwaddr x86_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
                 pml5e = env->cr[3];
             }
 
-            pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
-                    (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
+            pml4e_addr =
+                ((pml5e & PG_ADDRESS_MASK) + (((addr >> 39) & 0x1ff) << 3)) &
+                a20_mask;
             pml4e = x86_ldq_phys(cs, pml4e_addr);
             if (!(pml4e & PG_PRESENT_MASK)) {
                 return -1;
             }
-            pdpe_addr = ((pml4e & PG_ADDRESS_MASK) +
-                         (((addr >> 30) & 0x1ff) << 3)) & a20_mask;
+            pdpe_addr =
+                ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+                a20_mask;
             pdpe = x86_ldq_phys(cs, pdpe_addr);
             if (!(pdpe & PG_PRESENT_MASK)) {
                 return -1;
@@ -293,15 +296,15 @@ hwaddr x86_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
         } else
 #endif
         {
-            pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
-                a20_mask;
+            pdpe_addr =
+                ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) & a20_mask;
             pdpe = x86_ldq_phys(cs, pdpe_addr);
             if (!(pdpe & PG_PRESENT_MASK))
                 return -1;
         }
 
-        pde_addr = ((pdpe & PG_ADDRESS_MASK) +
-                    (((addr >> 21) & 0x1ff) << 3)) & a20_mask;
+        pde_addr = ((pdpe & PG_ADDRESS_MASK) + (((addr >> 21) & 0x1ff) << 3)) &
+                   a20_mask;
         pde = x86_ldq_phys(cs, pde_addr);
         if (!(pde & PG_PRESENT_MASK)) {
             return -1;
@@ -312,8 +315,9 @@ hwaddr x86_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
             pte = pde;
         } else {
             /* 4 KB page */
-            pte_addr = ((pde & PG_ADDRESS_MASK) +
-                        (((addr >> 12) & 0x1ff) << 3)) & a20_mask;
+            pte_addr =
+                ((pde & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
+                a20_mask;
             page_size = 4096;
             pte = x86_ldq_phys(cs, pte_addr);
         }
@@ -364,7 +368,7 @@ typedef struct MCEInjectionParams {
 static void emit_guest_memory_failure(MemoryFailureAction action, bool ar,
                                       bool recursive)
 {
-    MemoryFailureFlags mff = {.action_required = ar, .recursive = recursive};
+    MemoryFailureFlags mff = { .action_required = ar, .recursive = recursive };
 
     qapi_event_send_memory_failure(MEMORY_FAILURE_RECIPIENT_GUEST, action,
                                    &mff);
@@ -420,11 +424,13 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
         if (!(cenv->cr[4] & CR4_MCE_MASK)) {
             need_reset = true;
             msg = g_strdup_printf("CPU %d: MCE capability is not enabled, "
-                                  "raising triple fault", cs->cpu_index);
+                                  "raising triple fault",
+                                  cs->cpu_index);
         } else if (recursive) {
             need_reset = true;
             msg = g_strdup_printf("CPU %d: Previous MCE still in progress, "
-                                  "raising triple fault", cs->cpu_index);
+                                  "raising triple fault",
+                                  cs->cpu_index);
         }
 
         if (need_reset) {
@@ -444,8 +450,7 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
         cenv->mcg_status = params->mcg_status;
         banks[1] = params->status;
         cpu_interrupt(cs, CPU_INTERRUPT_MCE);
-    } else if (!(banks[1] & MCI_STATUS_VAL)
-               || !(banks[1] & MCI_STATUS_UC)) {
+    } else if (!(banks[1] & MCI_STATUS_VAL) || !(banks[1] & MCI_STATUS_UC)) {
         if (banks[1] & MCI_STATUS_VAL) {
             params->status |= MCI_STATUS_OVER;
         }
@@ -459,9 +464,9 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
     emit_guest_memory_failure(MEMORY_FAILURE_ACTION_INJECT, ar, recursive);
 }
 
-void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
-                        uint64_t status, uint64_t mcg_status, uint64_t addr,
-                        uint64_t misc, int flags)
+void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank, uint64_t status,
+                        uint64_t mcg_status, uint64_t addr, uint64_t misc,
+                        int flags)
 {
     CPUState *cs = CPU(cpu);
     CPUX86State *cenv = &cpu->env;
@@ -488,8 +493,8 @@ void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
         monitor_printf(mon, "Invalid MCE status code\n");
         return;
     }
-    if ((flags & MCE_INJECT_BROADCAST)
-        && !cpu_x86_support_mca_broadcast(cenv)) {
+    if ((flags & MCE_INJECT_BROADCAST) &&
+        !cpu_x86_support_mca_broadcast(cenv)) {
         monitor_printf(mon, "Guest CPU does not support MCA broadcast\n");
         return;
     }
@@ -503,11 +508,12 @@ void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
         params.mcg_status = MCG_STATUS_MCIP | MCG_STATUS_RIPV;
         params.addr = 0;
         params.misc = 0;
-        CPU_FOREACH(other_cs) {
+        CPU_FOREACH (other_cs) {
             if (other_cs == cs) {
                 continue;
             }
-            run_on_cpu(other_cs, do_inject_x86_mce, RUN_ON_CPU_HOST_PTR(&params));
+            run_on_cpu(other_cs, do_inject_x86_mce,
+                       RUN_ON_CPU_HOST_PTR(&params));
         }
     }
 }
@@ -566,9 +572,9 @@ int cpu_x86_get_descr_debug(CPUX86State *env, unsigned int selector,
         dt = &env->gdt;
     index = selector & ~7;
     ptr = dt->base + index;
-    if ((index + 7) > dt->limit
-        || cpu_memory_rw_debug(cs, ptr, (uint8_t *)&e1, sizeof(e1), 0) != 0
-        || cpu_memory_rw_debug(cs, ptr+4, (uint8_t *)&e2, sizeof(e2), 0) != 0)
+    if ((index + 7) > dt->limit ||
+        cpu_memory_rw_debug(cs, ptr, (uint8_t *)&e1, sizeof(e1), 0) != 0 ||
+        cpu_memory_rw_debug(cs, ptr + 4, (uint8_t *)&e2, sizeof(e2), 0) != 0)
         return 0;
 
     *base = ((e1 >> 16) | ((e2 & 0xff) << 16) | (e2 & 0xff000000));
@@ -594,7 +600,7 @@ void do_cpu_init(X86CPU *cpu)
     cs->interrupt_request = sipi;
     memcpy(&env->start_init_save, &save->start_init_save,
            offsetof(CPUX86State, end_init_save) -
-           offsetof(CPUX86State, start_init_save));
+               offsetof(CPUX86State, start_init_save));
     g_free(save);
 
     if (kvm_enabled()) {

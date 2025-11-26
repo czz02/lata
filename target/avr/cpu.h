@@ -215,14 +215,9 @@ static inline int cpu_interrupts_enabled(CPUAVRState *env)
 
 static inline uint8_t cpu_get_sreg(CPUAVRState *env)
 {
-    return (env->sregC) << 0
-         | (env->sregZ) << 1
-         | (env->sregN) << 2
-         | (env->sregV) << 3
-         | (env->sregS) << 4
-         | (env->sregH) << 5
-         | (env->sregT) << 6
-         | (env->sregI) << 7;
+    return (env->sregC) << 0 | (env->sregZ) << 1 | (env->sregN) << 2 |
+           (env->sregV) << 3 | (env->sregS) << 4 | (env->sregH) << 5 |
+           (env->sregT) << 6 | (env->sregI) << 7;
 }
 
 static inline void cpu_set_sreg(CPUAVRState *env, uint8_t sreg)
@@ -238,8 +233,8 @@ static inline void cpu_set_sreg(CPUAVRState *env, uint8_t sreg)
 }
 
 bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                      MMUAccessType access_type, int mmu_idx,
-                      bool probe, uintptr_t retaddr);
+                      MMUAccessType access_type, int mmu_idx, bool probe,
+                      uintptr_t retaddr);
 
 #include "exec/cpu-all.h"
 

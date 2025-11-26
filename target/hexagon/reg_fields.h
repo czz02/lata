@@ -24,8 +24,7 @@ typedef struct {
 } RegField;
 
 enum {
-#define DEF_REG_FIELD(TAG, START, WIDTH) \
-    TAG,
+#define DEF_REG_FIELD(TAG, START, WIDTH) TAG,
 #include "reg_fields_def.h.inc"
     NUM_REG_FIELDS
 #undef DEF_REG_FIELD

@@ -53,14 +53,13 @@ void s390_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     if (flags & CPU_DUMP_FPU) {
         if (s390_has_feat(S390_FEAT_VECTOR)) {
             for (i = 0; i < 32; i++) {
-                qemu_fprintf(f, "V%02d=%016" PRIx64 "%016" PRIx64 "%c",
-                             i, env->vregs[i][0], env->vregs[i][1],
+                qemu_fprintf(f, "V%02d=%016" PRIx64 "%016" PRIx64 "%c", i,
+                             env->vregs[i][0], env->vregs[i][1],
                              i % 2 ? '\n' : ' ');
             }
         } else {
             for (i = 0; i < 16; i++) {
-                qemu_fprintf(f, "F%02d=%016" PRIx64 "%c",
-                             i, *get_freg(env, i),
+                qemu_fprintf(f, "F%02d=%016" PRIx64 "%c", i, *get_freg(env, i),
                              (i % 4) == 3 ? '\n' : ' ');
             }
         }
@@ -89,44 +88,44 @@ void s390_cpu_dump_state(CPUState *cs, FILE *f, int flags)
 
 const char *cc_name(enum cc_op cc_op)
 {
-    static const char * const cc_names[] = {
-        [CC_OP_CONST0]    = "CC_OP_CONST0",
-        [CC_OP_CONST1]    = "CC_OP_CONST1",
-        [CC_OP_CONST2]    = "CC_OP_CONST2",
-        [CC_OP_CONST3]    = "CC_OP_CONST3",
-        [CC_OP_DYNAMIC]   = "CC_OP_DYNAMIC",
-        [CC_OP_STATIC]    = "CC_OP_STATIC",
-        [CC_OP_NZ]        = "CC_OP_NZ",
-        [CC_OP_ADDU]      = "CC_OP_ADDU",
-        [CC_OP_SUBU]      = "CC_OP_SUBU",
-        [CC_OP_LTGT_32]   = "CC_OP_LTGT_32",
-        [CC_OP_LTGT_64]   = "CC_OP_LTGT_64",
+    static const char *const cc_names[] = {
+        [CC_OP_CONST0] = "CC_OP_CONST0",
+        [CC_OP_CONST1] = "CC_OP_CONST1",
+        [CC_OP_CONST2] = "CC_OP_CONST2",
+        [CC_OP_CONST3] = "CC_OP_CONST3",
+        [CC_OP_DYNAMIC] = "CC_OP_DYNAMIC",
+        [CC_OP_STATIC] = "CC_OP_STATIC",
+        [CC_OP_NZ] = "CC_OP_NZ",
+        [CC_OP_ADDU] = "CC_OP_ADDU",
+        [CC_OP_SUBU] = "CC_OP_SUBU",
+        [CC_OP_LTGT_32] = "CC_OP_LTGT_32",
+        [CC_OP_LTGT_64] = "CC_OP_LTGT_64",
         [CC_OP_LTUGTU_32] = "CC_OP_LTUGTU_32",
         [CC_OP_LTUGTU_64] = "CC_OP_LTUGTU_64",
-        [CC_OP_LTGT0_32]  = "CC_OP_LTGT0_32",
-        [CC_OP_LTGT0_64]  = "CC_OP_LTGT0_64",
-        [CC_OP_ADD_64]    = "CC_OP_ADD_64",
-        [CC_OP_SUB_64]    = "CC_OP_SUB_64",
-        [CC_OP_ABS_64]    = "CC_OP_ABS_64",
-        [CC_OP_NABS_64]   = "CC_OP_NABS_64",
-        [CC_OP_ADD_32]    = "CC_OP_ADD_32",
-        [CC_OP_SUB_32]    = "CC_OP_SUB_32",
-        [CC_OP_ABS_32]    = "CC_OP_ABS_32",
-        [CC_OP_NABS_32]   = "CC_OP_NABS_32",
-        [CC_OP_COMP_32]   = "CC_OP_COMP_32",
-        [CC_OP_COMP_64]   = "CC_OP_COMP_64",
-        [CC_OP_TM_32]     = "CC_OP_TM_32",
-        [CC_OP_TM_64]     = "CC_OP_TM_64",
-        [CC_OP_NZ_F32]    = "CC_OP_NZ_F32",
-        [CC_OP_NZ_F64]    = "CC_OP_NZ_F64",
-        [CC_OP_NZ_F128]   = "CC_OP_NZ_F128",
-        [CC_OP_ICM]       = "CC_OP_ICM",
-        [CC_OP_SLA]       = "CC_OP_SLA",
-        [CC_OP_FLOGR]     = "CC_OP_FLOGR",
-        [CC_OP_LCBB]      = "CC_OP_LCBB",
-        [CC_OP_VC]        = "CC_OP_VC",
-        [CC_OP_MULS_32]   = "CC_OP_MULS_32",
-        [CC_OP_MULS_64]   = "CC_OP_MULS_64",
+        [CC_OP_LTGT0_32] = "CC_OP_LTGT0_32",
+        [CC_OP_LTGT0_64] = "CC_OP_LTGT0_64",
+        [CC_OP_ADD_64] = "CC_OP_ADD_64",
+        [CC_OP_SUB_64] = "CC_OP_SUB_64",
+        [CC_OP_ABS_64] = "CC_OP_ABS_64",
+        [CC_OP_NABS_64] = "CC_OP_NABS_64",
+        [CC_OP_ADD_32] = "CC_OP_ADD_32",
+        [CC_OP_SUB_32] = "CC_OP_SUB_32",
+        [CC_OP_ABS_32] = "CC_OP_ABS_32",
+        [CC_OP_NABS_32] = "CC_OP_NABS_32",
+        [CC_OP_COMP_32] = "CC_OP_COMP_32",
+        [CC_OP_COMP_64] = "CC_OP_COMP_64",
+        [CC_OP_TM_32] = "CC_OP_TM_32",
+        [CC_OP_TM_64] = "CC_OP_TM_64",
+        [CC_OP_NZ_F32] = "CC_OP_NZ_F32",
+        [CC_OP_NZ_F64] = "CC_OP_NZ_F64",
+        [CC_OP_NZ_F128] = "CC_OP_NZ_F128",
+        [CC_OP_ICM] = "CC_OP_ICM",
+        [CC_OP_SLA] = "CC_OP_SLA",
+        [CC_OP_FLOGR] = "CC_OP_FLOGR",
+        [CC_OP_LCBB] = "CC_OP_LCBB",
+        [CC_OP_VC] = "CC_OP_VC",
+        [CC_OP_MULS_32] = "CC_OP_MULS_32",
+        [CC_OP_MULS_64] = "CC_OP_MULS_64",
     };
 
     return cc_names[cc_op];

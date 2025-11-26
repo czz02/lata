@@ -54,20 +54,20 @@ static int vcpuop_stop_singleshot_timer(CPUState *cs);
 static bool kvm_gva_to_gpa(CPUState *cs, uint64_t gva, uint64_t *gpa,
                            size_t *len, bool is_write)
 {
-        struct kvm_translation tr = {
-            .linear_address = gva,
-        };
+    struct kvm_translation tr = {
+        .linear_address = gva,
+    };
 
-        if (len) {
-            *len = TARGET_PAGE_SIZE - (gva & ~TARGET_PAGE_MASK);
-        }
+    if (len) {
+        *len = TARGET_PAGE_SIZE - (gva & ~TARGET_PAGE_MASK);
+    }
 
-        if (kvm_vcpu_ioctl(cs, KVM_TRANSLATE, &tr) || !tr.valid ||
-            (is_write && !tr.writeable)) {
-            return false;
-        }
-        *gpa = tr.physical_address;
-        return true;
+    if (kvm_vcpu_ioctl(cs, KVM_TRANSLATE, &tr) || !tr.valid ||
+        (is_write && !tr.writeable)) {
+        return false;
+    }
+    *gpa = tr.physical_address;
+    return true;
 }
 
 static int kvm_gva_rw(CPUState *cs, uint64_t gva, void *_buf, size_t sz,
@@ -110,7 +110,8 @@ static inline int kvm_copy_to_gva(CPUState *cs, uint64_t gva, void *buf,
 int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
 {
     const int required_caps = KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
-        KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL | KVM_XEN_HVM_CONFIG_SHARED_INFO;
+                              KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
+                              KVM_XEN_HVM_CONFIG_SHARED_INFO;
     struct kvm_xen_hvm_config cfg = {
         .msr = hypercall_msr,
         .flags = KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL,
@@ -221,17 +222,15 @@ int kvm_xen_init_vcpu(CPUState *cs)
     env->xen_vcpu_runstate_gpa = INVALID_GPA;
 
     qemu_mutex_init(&env->xen_timers_lock);
-    env->xen_singleshot_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                             xen_vcpu_singleshot_timer_event,
-                                             cpu);
+    env->xen_singleshot_timer =
+        timer_new_ns(QEMU_CLOCK_VIRTUAL, xen_vcpu_singleshot_timer_event, cpu);
     if (!env->xen_singleshot_timer) {
         return -ENOMEM;
     }
     env->xen_singleshot_timer->opaque = cs;
 
-    env->xen_periodic_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                           xen_vcpu_periodic_timer_event,
-                                           cpu);
+    env->xen_periodic_timer =
+        timer_new_ns(QEMU_CLOCK_VIRTUAL, xen_vcpu_periodic_timer_event, cpu);
     if (!env->xen_periodic_timer) {
         return -ENOMEM;
     }
@@ -246,7 +245,7 @@ uint32_t kvm_xen_get_caps(void)
 }
 
 static bool kvm_xen_hcall_xen_version(struct kvm_xen_exit *exit, X86CPU *cpu,
-                                     int cmd, uint64_t arg)
+                                      int cmd, uint64_t arg)
 {
     int err = 0;
 
@@ -269,8 +268,7 @@ static bool kvm_xen_hcall_xen_version(struct kvm_xen_exit *exit, X86CPU *cpu,
                          1 << XENFEAT_auto_translated_physmap |
                          1 << XENFEAT_supervisor_mode_kernel |
                          1 << XENFEAT_hvm_callback_vector |
-                         1 << XENFEAT_hvm_safe_pvclock |
-                         1 << XENFEAT_hvm_pirqs;
+                         1 << XENFEAT_hvm_safe_pvclock | 1 << XENFEAT_hvm_pirqs;
         }
 
         err = kvm_copy_to_gva(CPU(cpu), arg, &fi, sizeof(fi));
@@ -335,12 +333,12 @@ static int set_vcpu_info(CPUState *cs, uint64_t gpa)
         goto out;
     }
 
-    mrs = memory_region_find(get_system_memory(), gpa,
-                             sizeof(struct vcpu_info));
+    mrs =
+        memory_region_find(get_system_memory(), gpa, sizeof(struct vcpu_info));
     if (mrs.mr && mrs.mr->ram_block &&
         !int128_lt(mrs.size, int128_make64(sizeof(struct vcpu_info)))) {
-        vcpu_info_hva = qemu_map_ram_ptr(mrs.mr->ram_block,
-                                         mrs.offset_within_region);
+        vcpu_info_hva =
+            qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
     }
     if (!vcpu_info_hva) {
         if (mrs.mr) {
@@ -350,7 +348,7 @@ static int set_vcpu_info(CPUState *cs, uint64_t gpa)
         ret = -EINVAL;
     }
 
- out:
+out:
     if (env->xen_vcpu_info_mr) {
         memory_region_unref(env->xen_vcpu_info_mr);
     }
@@ -510,8 +508,7 @@ int kvm_xen_set_vcpu_virq(uint32_t vcpu_id, uint16_t virq, uint16_t port)
 
     X86_CPU(cs)->env.xen_virq[virq] = port;
     if (virq == VIRQ_TIMER && kvm_xen_has_cap(EVTCHN_SEND)) {
-        async_run_on_cpu(cs, do_set_vcpu_timer_virq,
-                         RUN_ON_CPU_HOST_INT(port));
+        async_run_on_cpu(cs, do_set_vcpu_timer_virq, RUN_ON_CPU_HOST_INT(port));
     }
     return 0;
 }
@@ -564,7 +561,6 @@ static void do_vcpu_soft_reset(CPUState *cs, run_on_cpu_data data)
     } else {
         vcpuop_stop_singleshot_timer(cs);
     };
-
 }
 
 static int xen_set_shared_info(uint64_t gfn)
@@ -582,7 +578,7 @@ static int xen_set_shared_info(uint64_t gfn)
      */
     err = xen_overlay_map_shinfo_page(gpa);
     if (err) {
-            return err;
+        return err;
     }
 
     trace_kvm_xen_set_shared_info(gfn);
@@ -721,7 +717,7 @@ static int do_add_to_physmap_batch(struct kvm_xen_exit *exit, X86CPU *cpu,
 }
 
 static bool kvm_xen_hcall_memory_op(struct kvm_xen_exit *exit, X86CPU *cpu,
-                                   int cmd, uint64_t arg)
+                                    int cmd, uint64_t arg)
 {
     int err;
 
@@ -972,7 +968,7 @@ static uint64_t kvm_get_current_ns(void)
     ret = kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data);
     if (ret < 0) {
         fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", strerror(ret));
-                abort();
+        abort();
     }
 
     return data.clock;
@@ -1030,8 +1026,8 @@ static int do_set_periodic_timer(CPUState *target, uint64_t period_ns)
     return 0;
 }
 
-#define MILLISECS(_ms)  ((int64_t)((_ms) * 1000000ULL))
-#define MICROSECS(_us)  ((int64_t)((_us) * 1000ULL))
+#define MILLISECS(_ms) ((int64_t)((_ms) * 1000000ULL))
+#define MICROSECS(_us) ((int64_t)((_us) * 1000ULL))
 #define STIME_MAX ((time_t)((int64_t)~0ull >> 1))
 /* Chosen so (NOW() + delta) wont overflow without an uptime of 200 years */
 #define STIME_DELTA_MAX ((int64_t)((uint64_t)~0ull >> 2))
@@ -1124,8 +1120,7 @@ static int vcpuop_set_singleshot_timer(CPUState *cs, uint64_t arg)
 
     QEMU_LOCK_GUARD(&X86_CPU(cs)->env.xen_timers_lock);
     return do_set_singleshot_timer(cs, sst.timeout_abs_ns,
-                                   !!(sst.flags & VCPU_SSHOTTMR_future),
-                                   false);
+                                   !!(sst.flags & VCPU_SSHOTTMR_future), false);
 }
 
 static int vcpuop_stop_singleshot_timer(CPUState *cs)
@@ -1205,7 +1200,7 @@ static bool kvm_xen_hcall_vcpu_op(struct kvm_xen_exit *exit, X86CPU *cpu,
         return false;
     }
 
- out:
+out:
     exit->u.hcall.result = err;
     return true;
 }
@@ -1407,7 +1402,7 @@ int kvm_xen_soft_reset(void)
         return err;
     }
 
-    CPU_FOREACH(cpu) {
+    CPU_FOREACH (cpu) {
         async_run_on_cpu(cpu, do_vcpu_soft_reset, RUN_ON_CPU_NULL);
     }
 
@@ -1593,9 +1588,11 @@ static bool kvm_xen_hcall_physdev_op(struct kvm_xen_exit *exit, X86CPU *cpu,
              * it 64-bit aligned in the 64-bit version.
              */
             qemu_build_assert(sizeof(*map32) == 36);
-            qemu_build_assert(offsetof(struct physdev_map_pirq, entry_nr) ==
-                              offsetof(struct compat_physdev_map_pirq, entry_nr));
-            memmove(&map.table_base, &map32->table_base, sizeof(map.table_base));
+            qemu_build_assert(
+                offsetof(struct physdev_map_pirq, entry_nr) ==
+                offsetof(struct compat_physdev_map_pirq, entry_nr));
+            memmove(&map.table_base, &map32->table_base,
+                    sizeof(map.table_base));
         } else {
             if (kvm_copy_from_gva(cs, arg, &map, sizeof(map))) {
                 err = -EFAULT;
@@ -1702,7 +1699,7 @@ static bool do_kvm_xen_handle_exit(X86CPU *cpu, struct kvm_xen_exit *exit)
         } else {
             /* In 32-bit mode, the 64-bit timer value is in two args. */
             uint64_t val = ((uint64_t)exit->u.hcall.params[1]) << 32 |
-                (uint32_t)exit->u.hcall.params[0];
+                           (uint32_t)exit->u.hcall.params[0];
             return kvm_xen_hcall_set_timer_op(exit, cpu, val);
         }
     case __HYPERVISOR_grant_table_op:
@@ -1716,8 +1713,7 @@ static bool do_kvm_xen_handle_exit(X86CPU *cpu, struct kvm_xen_exit *exit)
         return kvm_xen_hcall_evtchn_op(exit, cpu, exit->u.hcall.params[0],
                                        exit->u.hcall.params[1]);
     case __HYPERVISOR_vcpu_op:
-        return kvm_xen_hcall_vcpu_op(exit, cpu,
-                                     exit->u.hcall.params[0],
+        return kvm_xen_hcall_vcpu_op(exit, cpu, exit->u.hcall.params[0],
                                      exit->u.hcall.params[1],
                                      exit->u.hcall.params[2]);
     case __HYPERVISOR_hvm_op:
@@ -1759,8 +1755,9 @@ int kvm_xen_handle_exit(X86CPU *cpu, struct kvm_xen_exit *exit)
          * -ENOSYS. This case is for hypercalls which are unexpected.
          */
         exit->u.hcall.result = -ENOSYS;
-        qemu_log_mask(LOG_UNIMP, "Unimplemented Xen hypercall %"
-                      PRId64 " (0x%" PRIx64 " 0x%" PRIx64 " 0x%" PRIx64 ")\n",
+        qemu_log_mask(LOG_UNIMP,
+                      "Unimplemented Xen hypercall %" PRId64 " (0x%" PRIx64
+                      " 0x%" PRIx64 " 0x%" PRIx64 ")\n",
                       (uint64_t)exit->u.hcall.input,
                       (uint64_t)exit->u.hcall.params[0],
                       (uint64_t)exit->u.hcall.params[1],
@@ -1838,7 +1835,7 @@ int kvm_put_xen_state(CPUState *cs)
         QEMU_LOCK_GUARD(&env->xen_timers_lock);
         if (env->xen_singleshot_timer_ns) {
             ret = do_set_singleshot_timer(cs, env->xen_singleshot_timer_ns,
-                                    false, false);
+                                          false, false);
             if (ret < 0) {
                 return ret;
             }
@@ -1878,8 +1875,7 @@ int kvm_get_xen_state(CPUState *cs)
         gpa = env->xen_vcpu_info_default_gpa;
     }
     if (gpa != INVALID_GPA) {
-        MemoryRegionSection mrs = memory_region_find(get_system_memory(),
-                                                     gpa,
+        MemoryRegionSection mrs = memory_region_find(get_system_memory(), gpa,
                                                      sizeof(struct vcpu_info));
         if (mrs.mr &&
             !int128_lt(mrs.size, int128_make64(sizeof(struct vcpu_info)))) {

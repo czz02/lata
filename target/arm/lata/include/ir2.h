@@ -8,10 +8,8 @@
 
 #define IR2_ITEMP_MAX 32
 
-#define itemp_status_num \
-    (sizeof(reg_itemp_map) / sizeof(int))
-#define ftemp_status_num \
-    (sizeof(reg_ftemp_map) / sizeof(int))
+#define itemp_status_num (sizeof(reg_itemp_map) / sizeof(int))
+#define ftemp_status_num (sizeof(reg_ftemp_map) / sizeof(int))
 
 
 void ir2_opnd_build(IR2_OPND *, IR2_OPND_TYPE, int value);
@@ -82,11 +80,16 @@ IR2_INST *la_append_ir2_opndi(IR2_OPCODE type, int imm);
 IR2_INST *la_append_ir2_opnd1(IR2_OPCODE type, IR2_OPND op0);
 IR2_INST *la_append_ir2_opnd1i(IR2_OPCODE type, IR2_OPND op0, int imm);
 IR2_INST *la_append_ir2_opnd2(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1);
-IR2_INST *la_append_ir2_opnd2i(IR2_OPCODE type, IR2_OPND op0,IR2_OPND op1, int imm);
-IR2_INST *la_append_ir2_opnd2ii(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1, int imm0, int imm1);
-IR2_INST *la_append_ir2_opnd3(IR2_OPCODE type, IR2_OPND op0,IR2_OPND op1, IR2_OPND op2);
-IR2_INST *la_append_ir2_opnd3i(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1, IR2_OPND op2, int imm0);
-IR2_INST *la_append_ir2_opnd4(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1, IR2_OPND op2, IR2_OPND op3);
+IR2_INST *la_append_ir2_opnd2i(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1,
+                               int imm);
+IR2_INST *la_append_ir2_opnd2ii(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1,
+                                int imm0, int imm1);
+IR2_INST *la_append_ir2_opnd3(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1,
+                              IR2_OPND op2);
+IR2_INST *la_append_ir2_opnd3i(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1,
+                               IR2_OPND op2, int imm0);
+IR2_INST *la_append_ir2_opnd4(IR2_OPCODE type, IR2_OPND op0, IR2_OPND op1,
+                              IR2_OPND op2, IR2_OPND op3);
 
 
 IR2_INST *la_append_ir2_opnda(IR2_OPCODE opcode, ADDR addr);

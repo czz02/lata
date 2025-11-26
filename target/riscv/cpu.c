@@ -47,8 +47,10 @@ struct isa_ext_data {
     int ext_enable_offset;
 };
 
-#define ISA_EXT_DATA_ENTRY(_name, _min_ver, _prop) \
-    {#_name, _min_ver, offsetof(struct RISCVCPUConfig, _prop)}
+#define ISA_EXT_DATA_ENTRY(_name, _min_ver, _prop)               \
+    {                                                            \
+        #_name, _min_ver, offsetof(struct RISCVCPUConfig, _prop) \
+    }
 
 /*
  * From vector_helper.c
@@ -56,9 +58,9 @@ struct isa_ext_data {
  * so addressing bytes needs a host-endian fixup.
  */
 #if HOST_BIG_ENDIAN
-#define BYTE(x)   ((x) ^ 7)
+#define BYTE(x) ((x) ^ 7)
 #else
-#define BYTE(x)   (x)
+#define BYTE(x) (x)
 #endif
 
 /*
@@ -148,11 +150,11 @@ static const struct isa_ext_data isa_edata_arr[] = {
     ISA_EXT_DATA_ENTRY(xtheadmemidx, PRIV_VERSION_1_11_0, ext_xtheadmemidx),
     ISA_EXT_DATA_ENTRY(xtheadmempair, PRIV_VERSION_1_11_0, ext_xtheadmempair),
     ISA_EXT_DATA_ENTRY(xtheadsync, PRIV_VERSION_1_11_0, ext_xtheadsync),
-    ISA_EXT_DATA_ENTRY(xventanacondops, PRIV_VERSION_1_12_0, ext_XVentanaCondOps),
+    ISA_EXT_DATA_ENTRY(xventanacondops, PRIV_VERSION_1_12_0,
+                       ext_XVentanaCondOps),
 };
 
-static bool isa_ext_is_enabled(RISCVCPU *cpu,
-                               const struct isa_ext_data *edata)
+static bool isa_ext_is_enabled(RISCVCPU *cpu, const struct isa_ext_data *edata)
 {
     bool *ext_enabled = (void *)&cpu->cfg + edata->ext_enable_offset;
 
@@ -167,7 +169,7 @@ static void isa_ext_update_enabled(RISCVCPU *cpu,
     *ext_enabled = en;
 }
 
-const char * const riscv_int_regnames[] = {
+const char *const riscv_int_regnames[] = {
     "x0/zero", "x1/ra",  "x2/sp",  "x3/gp",  "x4/tp",  "x5/t0",   "x6/t1",
     "x7/t2",   "x8/s0",  "x9/s1",  "x10/a0", "x11/a1", "x12/a2",  "x13/a3",
     "x14/a4",  "x15/a5", "x16/a6", "x17/a7", "x18/s2", "x19/s3",  "x20/s4",
@@ -175,7 +177,7 @@ const char * const riscv_int_regnames[] = {
     "x28/t3",  "x29/t4", "x30/t5", "x31/t6"
 };
 
-const char * const riscv_int_regnamesh[] = {
+const char *const riscv_int_regnamesh[] = {
     "x0h/zeroh", "x1h/rah",  "x2h/sph",   "x3h/gph",   "x4h/tph",  "x5h/t0h",
     "x6h/t1h",   "x7h/t2h",  "x8h/s0h",   "x9h/s1h",   "x10h/a0h", "x11h/a1h",
     "x12h/a2h",  "x13h/a3h", "x14h/a4h",  "x15h/a5h",  "x16h/a6h", "x17h/a7h",
@@ -184,7 +186,7 @@ const char * const riscv_int_regnamesh[] = {
     "x30h/t5h",  "x31h/t6h"
 };
 
-const char * const riscv_fpr_regnames[] = {
+const char *const riscv_fpr_regnames[] = {
     "f0/ft0",   "f1/ft1",  "f2/ft2",   "f3/ft3",   "f4/ft4",  "f5/ft5",
     "f6/ft6",   "f7/ft7",  "f8/fs0",   "f9/fs1",   "f10/fa0", "f11/fa1",
     "f12/fa2",  "f13/fa3", "f14/fa4",  "f15/fa5",  "f16/fa6", "f17/fa7",
@@ -193,15 +195,13 @@ const char * const riscv_fpr_regnames[] = {
     "f30/ft10", "f31/ft11"
 };
 
-const char * const riscv_rvv_regnames[] = {
-  "v0",  "v1",  "v2",  "v3",  "v4",  "v5",  "v6",
-  "v7",  "v8",  "v9",  "v10", "v11", "v12", "v13",
-  "v14", "v15", "v16", "v17", "v18", "v19", "v20",
-  "v21", "v22", "v23", "v24", "v25", "v26", "v27",
-  "v28", "v29", "v30", "v31"
+const char *const riscv_rvv_regnames[] = {
+    "v0",  "v1",  "v2",  "v3",  "v4",  "v5",  "v6",  "v7",  "v8",  "v9",  "v10",
+    "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18", "v19", "v20", "v21",
+    "v22", "v23", "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31"
 };
 
-static const char * const riscv_excp_names[] = {
+static const char *const riscv_excp_names[] = {
     "misaligned_fetch",
     "fault_fetch",
     "illegal_instruction",
@@ -228,23 +228,11 @@ static const char * const riscv_excp_names[] = {
     "guest_store_page_fault",
 };
 
-static const char * const riscv_intr_names[] = {
-    "u_software",
-    "s_software",
-    "vs_software",
-    "m_software",
-    "u_timer",
-    "s_timer",
-    "vs_timer",
-    "m_timer",
-    "u_external",
-    "s_external",
-    "vs_external",
-    "m_external",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved"
+static const char *const riscv_intr_names[] = {
+    "u_software", "s_software", "vs_software", "m_software",
+    "u_timer",    "s_timer",    "vs_timer",    "m_timer",
+    "u_external", "s_external", "vs_external", "m_external",
+    "reserved",   "reserved",   "reserved",    "reserved"
 };
 
 static void riscv_cpu_add_user_properties(Object *obj);
@@ -253,10 +241,12 @@ const char *riscv_cpu_get_trap_name(target_ulong cause, bool async)
 {
     if (async) {
         return (cause < ARRAY_SIZE(riscv_intr_names)) ?
-               riscv_intr_names[cause] : "(unknown)";
+                   riscv_intr_names[cause] :
+                   "(unknown)";
     } else {
         return (cause < ARRAY_SIZE(riscv_excp_names)) ?
-               riscv_excp_names[cause] : "(unknown)";
+                   riscv_excp_names[cause] :
+                   "(unknown)";
     }
 }
 
@@ -329,8 +319,7 @@ const char *satp_mode_str(uint8_t satp_mode, bool is_32_bit)
     g_assert_not_reached();
 }
 
-static void set_satp_mode_max_supported(RISCVCPU *cpu,
-                                        uint8_t satp_mode)
+static void set_satp_mode_max_supported(RISCVCPU *cpu, uint8_t satp_mode)
 {
     bool rv32 = riscv_cpu_mxl(&cpu->env) == MXL_RV32;
     const bool *valid_vm = rv32 ? valid_vm_1_10_32 : valid_vm_1_10_64;
@@ -360,9 +349,10 @@ static void riscv_any_cpu_init(Object *obj)
 #endif
 
 #ifndef CONFIG_USER_ONLY
-    set_satp_mode_max_supported(RISCV_CPU(obj),
-        riscv_cpu_mxl(&RISCV_CPU(obj)->env) == MXL_RV32 ?
-        VM_1_10_SV32 : VM_1_10_SV57);
+    set_satp_mode_max_supported(
+        RISCV_CPU(obj), riscv_cpu_mxl(&RISCV_CPU(obj)->env) == MXL_RV32 ?
+                            VM_1_10_SV32 :
+                            VM_1_10_SV57);
 #endif
 
     env->priv_ver = PRIV_VERSION_LATEST;
@@ -700,16 +690,16 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
 #endif
 
     for (i = 0; i < 32; i++) {
-        qemu_fprintf(f, " %-8s " TARGET_FMT_lx,
-                     riscv_int_regnames[i], env->gpr[i]);
+        qemu_fprintf(f, " %-8s " TARGET_FMT_lx, riscv_int_regnames[i],
+                     env->gpr[i]);
         if ((i & 3) == 3) {
             qemu_fprintf(f, "\n");
         }
     }
     if (flags & CPU_DUMP_FPU) {
         for (i = 0; i < 32; i++) {
-            qemu_fprintf(f, " %-8s %016" PRIx64,
-                         riscv_fpr_regnames[i], env->fpr[i]);
+            qemu_fprintf(f, " %-8s %016" PRIx64, riscv_fpr_regnames[i],
+                         env->fpr[i]);
             if ((i & 3) == 3) {
                 qemu_fprintf(f, "\n");
             }
@@ -717,14 +707,9 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     }
     if (riscv_has_ext(env, RVV) && (flags & CPU_DUMP_VPU)) {
         static const int dump_rvv_csrs[] = {
-                    CSR_VSTART,
-                    CSR_VXSAT,
-                    CSR_VXRM,
-                    CSR_VCSR,
-                    CSR_VL,
-                    CSR_VTYPE,
-                    CSR_VLENB,
-                };
+            CSR_VSTART, CSR_VXSAT, CSR_VXRM,  CSR_VCSR,
+            CSR_VL,     CSR_VTYPE, CSR_VLENB,
+        };
         for (int i = 0; i < ARRAY_SIZE(dump_rvv_csrs); ++i) {
             int csrno = dump_rvv_csrs[i];
             target_ulong val = 0;
@@ -744,7 +729,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
         for (i = 0; i < 32; i++) {
             qemu_fprintf(f, " %-8s ", riscv_rvv_regnames[i]);
             p = (uint8_t *)env->vreg;
-            for (j = vlenb - 1 ; j >= 0; j--) {
+            for (j = vlenb - 1; j >= 0; j--) {
                 qemu_fprintf(f, "%02x", *(p + i * vlenb + BYTE(j)));
             }
             qemu_fprintf(f, "\n");
@@ -787,7 +772,7 @@ static void riscv_cpu_synchronize_from_tb(CPUState *cs,
         tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
 
         if (xl == MXL_RV32) {
-            env->pc = (int32_t) tb->pc;
+            env->pc = (int32_t)tb->pc;
         } else {
             env->pc = tb->pc;
         }
@@ -809,8 +794,7 @@ static bool riscv_cpu_has_work(CPUState *cs)
 #endif
 }
 
-static void riscv_restore_state_to_opc(CPUState *cs,
-                                       const TranslationBlock *tb,
+static void riscv_restore_state_to_opc(CPUState *cs, const TranslationBlock *tb,
                                        const uint64_t *data)
 {
     RISCVCPU *cpu = RISCV_CPU(cs);
@@ -858,14 +842,14 @@ static void riscv_cpu_reset_hold(Object *obj)
         env->mstatus = set_field(env->mstatus, MSTATUS64_SXL, env->misa_mxl);
         env->mstatus = set_field(env->mstatus, MSTATUS64_UXL, env->misa_mxl);
         if (riscv_has_ext(env, RVH)) {
-            env->vsstatus = set_field(env->vsstatus,
-                                      MSTATUS64_SXL, env->misa_mxl);
-            env->vsstatus = set_field(env->vsstatus,
-                                      MSTATUS64_UXL, env->misa_mxl);
-            env->mstatus_hs = set_field(env->mstatus_hs,
-                                        MSTATUS64_SXL, env->misa_mxl);
-            env->mstatus_hs = set_field(env->mstatus_hs,
-                                        MSTATUS64_UXL, env->misa_mxl);
+            env->vsstatus =
+                set_field(env->vsstatus, MSTATUS64_SXL, env->misa_mxl);
+            env->vsstatus =
+                set_field(env->vsstatus, MSTATUS64_UXL, env->misa_mxl);
+            env->mstatus_hs =
+                set_field(env->mstatus_hs, MSTATUS64_SXL, env->misa_mxl);
+            env->mstatus_hs =
+                set_field(env->mstatus_hs, MSTATUS64_UXL, env->misa_mxl);
         }
     }
     env->mcause = 0;
@@ -946,7 +930,8 @@ static void riscv_cpu_validate_v(CPURISCVState *env, RISCVCPUConfig *cfg,
     if (cfg->vlen > RV_VLEN_MAX || cfg->vlen < 128) {
         error_setg(errp,
                    "Vector extension implementation only supports VLEN "
-                   "in the range [128, %d]", RV_VLEN_MAX);
+                   "in the range [128, %d]",
+                   RV_VLEN_MAX);
         return;
     }
     if (!is_power_of_2(cfg->elen)) {
@@ -954,9 +939,8 @@ static void riscv_cpu_validate_v(CPURISCVState *env, RISCVCPUConfig *cfg,
         return;
     }
     if (cfg->elen > 64 || cfg->elen < 8) {
-        error_setg(errp,
-                   "Vector extension implementation only supports ELEN "
-                   "in the range [8, 64]");
+        error_setg(errp, "Vector extension implementation only supports ELEN "
+                         "in the range [8, 64]");
         return;
     }
     if (cfg->vext_spec) {
@@ -987,8 +971,7 @@ static void riscv_cpu_validate_priv_spec(RISCVCPU *cpu, Error **errp)
         } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.10.0")) {
             priv_version = PRIV_VERSION_1_10_0;
         } else {
-            error_setg(errp,
-                       "Unsupported privilege spec version '%s'",
+            error_setg(errp, "Unsupported privilege spec version '%s'",
                        cpu->cfg.priv_spec);
             return;
         }
@@ -1060,8 +1043,8 @@ void riscv_cpu_validate_set_extensions(RISCVCPU *cpu, Error **errp)
     if (riscv_has_ext(env, RVG) &&
         !(riscv_has_ext(env, RVI) && riscv_has_ext(env, RVM) &&
           riscv_has_ext(env, RVA) && riscv_has_ext(env, RVF) &&
-          riscv_has_ext(env, RVD) &&
-          cpu->cfg.ext_icsr && cpu->cfg.ext_ifencei)) {
+          riscv_has_ext(env, RVD) && cpu->cfg.ext_icsr &&
+          cpu->cfg.ext_ifencei)) {
         warn_report("Setting G will also set IMAFD_Zicsr_Zifencei");
         cpu->cfg.ext_icsr = true;
         cpu->cfg.ext_ifencei = true;
@@ -1071,20 +1054,17 @@ void riscv_cpu_validate_set_extensions(RISCVCPU *cpu, Error **errp)
     }
 
     if (riscv_has_ext(env, RVI) && riscv_has_ext(env, RVE)) {
-        error_setg(errp,
-                   "I and E extensions are incompatible");
+        error_setg(errp, "I and E extensions are incompatible");
         return;
     }
 
     if (!riscv_has_ext(env, RVI) && !riscv_has_ext(env, RVE)) {
-        error_setg(errp,
-                   "Either I or E extension must be set");
+        error_setg(errp, "Either I or E extension must be set");
         return;
     }
 
     if (riscv_has_ext(env, RVS) && !riscv_has_ext(env, RVU)) {
-        error_setg(errp,
-                   "Setting S extension without U extension is illegal");
+        error_setg(errp, "Setting S extension without U extension is illegal");
         return;
     }
 
@@ -1252,7 +1232,8 @@ void riscv_cpu_validate_set_extensions(RISCVCPU *cpu, Error **errp)
     }
 
     if ((cpu->cfg.ext_zcf || cpu->cfg.ext_zcd || cpu->cfg.ext_zcb ||
-         cpu->cfg.ext_zcmp || cpu->cfg.ext_zcmt) && !cpu->cfg.ext_zca) {
+         cpu->cfg.ext_zcmp || cpu->cfg.ext_zcmt) &&
+        !cpu->cfg.ext_zca) {
         error_setg(errp, "Zcf/Zcd/Zcb/Zcmp/Zcmt extensions require Zca "
                          "extension");
         return;
@@ -1305,7 +1286,7 @@ static void riscv_cpu_satp_mode_finalize(RISCVCPU *cpu, Error **errp)
     bool rv32 = riscv_cpu_mxl(&cpu->env) == MXL_RV32;
     uint8_t satp_mode_map_max;
     uint8_t satp_mode_supported_max =
-                        satp_mode_max_from_map(cpu->cfg.satp_mode.supported);
+        satp_mode_max_from_map(cpu->cfg.satp_mode.supported);
 
     if (cpu->cfg.satp_mode.map == 0) {
         if (cpu->cfg.satp_mode.init == 0) {
@@ -1351,8 +1332,10 @@ static void riscv_cpu_satp_mode_finalize(RISCVCPU *cpu, Error **errp)
             if (!(cpu->cfg.satp_mode.map & (1 << i)) &&
                 (cpu->cfg.satp_mode.init & (1 << i)) &&
                 (cpu->cfg.satp_mode.supported & (1 << i))) {
-                error_setg(errp, "cannot disable %s satp mode if %s "
-                           "is enabled", satp_mode_str(i, false),
+                error_setg(errp,
+                           "cannot disable %s satp mode if %s "
+                           "is enabled",
+                           satp_mode_str(i, false),
                            satp_mode_str(satp_mode_map_max, false));
                 return;
             }
@@ -1437,10 +1420,10 @@ static void riscv_cpu_realize_tcg(DeviceState *dev, Error **errp)
 
     if (cpu->cfg.pmu_num) {
         if (!riscv_pmu_init(cpu, cpu->cfg.pmu_num) && cpu->cfg.ext_sscofpmf) {
-            cpu->pmu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                          riscv_pmu_timer_cb, cpu);
+            cpu->pmu_timer =
+                timer_new_ns(QEMU_CLOCK_VIRTUAL, riscv_pmu_timer_cb, cpu);
         }
-     }
+    }
 #endif
 }
 
@@ -1549,7 +1532,7 @@ static void riscv_cpu_set_irq(void *opaque, int irq, int level)
             } else {
                 riscv_cpu_update_mip(env, 1 << irq, BOOL_TO_MASK(level));
             }
-             break;
+            break;
         case IRQ_S_EXT:
             if (kvm_enabled()) {
                 kvm_riscv_set_irq(cpu, irq, level);
@@ -1649,11 +1632,10 @@ typedef struct misa_ext_info {
     const char *description;
 } MISAExtInfo;
 
-#define MISA_INFO_IDX(_bit) \
-    __builtin_ctz(_bit)
+#define MISA_INFO_IDX(_bit) __builtin_ctz(_bit)
 
 #define MISA_EXT_INFO(_bit, _propname, _descr) \
-    [MISA_INFO_IDX(_bit)] = {.name = _propname, .description = _descr}
+    [MISA_INFO_IDX(_bit)] = { .name = _propname, .description = _descr }
 
 static const MISAExtInfo misa_ext_info_arr[] = {
     MISA_EXT_INFO(RVA, "a", "Atomic instructions"),
@@ -1704,22 +1686,16 @@ const char *riscv_get_misa_ext_description(uint32_t bit)
     return val;
 }
 
-#define MISA_CFG(_bit, _enabled) \
-    {.misa_bit = _bit, .enabled = _enabled}
+#define MISA_CFG(_bit, _enabled)              \
+    {                                         \
+        .misa_bit = _bit, .enabled = _enabled \
+    }
 
 static RISCVCPUMisaExtConfig misa_ext_cfgs[] = {
-    MISA_CFG(RVA, true),
-    MISA_CFG(RVC, true),
-    MISA_CFG(RVD, true),
-    MISA_CFG(RVF, true),
-    MISA_CFG(RVI, true),
-    MISA_CFG(RVE, false),
-    MISA_CFG(RVM, true),
-    MISA_CFG(RVS, true),
-    MISA_CFG(RVU, true),
-    MISA_CFG(RVH, true),
-    MISA_CFG(RVJ, false),
-    MISA_CFG(RVV, false),
+    MISA_CFG(RVA, true),  MISA_CFG(RVC, true),  MISA_CFG(RVD, true),
+    MISA_CFG(RVF, true),  MISA_CFG(RVI, true),  MISA_CFG(RVE, false),
+    MISA_CFG(RVM, true),  MISA_CFG(RVS, true),  MISA_CFG(RVU, true),
+    MISA_CFG(RVH, true),  MISA_CFG(RVJ, false), MISA_CFG(RVV, false),
     MISA_CFG(RVG, false),
 };
 
@@ -1740,13 +1716,12 @@ static void riscv_cpu_add_misa_properties(Object *cpu_obj)
         }
 
         object_property_add(cpu_obj, misa_cfg->name, "bool",
-                            cpu_get_misa_ext_cfg,
-                            cpu_set_misa_ext_cfg,
-                            NULL, (void *)misa_cfg);
+                            cpu_get_misa_ext_cfg, cpu_set_misa_ext_cfg, NULL,
+                            (void *)misa_cfg);
         object_property_set_description(cpu_obj, misa_cfg->name,
                                         misa_cfg->description);
-        object_property_set_bool(cpu_obj, misa_cfg->name,
-                                 misa_cfg->enabled, NULL);
+        object_property_set_bool(cpu_obj, misa_cfg->name, misa_cfg->enabled,
+                                 NULL);
     }
 }
 
@@ -1829,7 +1804,8 @@ static Property riscv_cpu_extensions[] = {
     DEFINE_PROP_BOOL("xtheadmemidx", RISCVCPU, cfg.ext_xtheadmemidx, false),
     DEFINE_PROP_BOOL("xtheadmempair", RISCVCPU, cfg.ext_xtheadmempair, false),
     DEFINE_PROP_BOOL("xtheadsync", RISCVCPU, cfg.ext_xtheadsync, false),
-    DEFINE_PROP_BOOL("xventanacondops", RISCVCPU, cfg.ext_XVentanaCondOps, false),
+    DEFINE_PROP_BOOL("xventanacondops", RISCVCPU, cfg.ext_XVentanaCondOps,
+                     false),
 
     /* These are experimental so mark with 'x-' */
     DEFINE_PROP_BOOL("x-zicond", RISCVCPU, cfg.ext_zicond, false),
@@ -1851,8 +1827,7 @@ static Property riscv_cpu_extensions[] = {
 
 
 #ifndef CONFIG_USER_ONLY
-static void cpu_set_cfg_unavailable(Object *obj, Visitor *v,
-                                    const char *name,
+static void cpu_set_cfg_unavailable(Object *obj, Visitor *v, const char *name,
                                     void *opaque, Error **errp)
 {
     const char *propname = opaque;
@@ -1863,8 +1838,7 @@ static void cpu_set_cfg_unavailable(Object *obj, Visitor *v,
     }
 
     if (value) {
-        error_setg(errp, "extension %s is not available with KVM",
-                   propname);
+        error_setg(errp, "extension %s is not available with KVM", propname);
     }
 }
 #endif
@@ -1908,9 +1882,9 @@ static void riscv_cpu_add_user_properties(Object *obj)
              * safely ignored as is.
              */
             if (prop->info == &qdev_prop_bool) {
-                object_property_add(obj, prop->name, "bool",
-                                    NULL, cpu_set_cfg_unavailable,
-                                    NULL, (void *)prop->name);
+                object_property_add(obj, prop->name, "bool", NULL,
+                                    cpu_set_cfg_unavailable, NULL,
+                                    (void *)prop->name);
                 continue;
             }
         }
@@ -2102,8 +2076,10 @@ static void cpu_set_marchid(Object *obj, Visitor *v, const char *name,
     invalid_val = 1LL << (mxlen - 1);
 
     if (value == invalid_val) {
-        error_setg(errp, "Unable to set marchid with MSB (%u) bit set "
-                         "and the remaining bits zero", mxlen);
+        error_setg(errp,
+                   "Unable to set marchid with MSB (%u) bit set "
+                   "and the remaining bits zero",
+                   mxlen);
         return;
     }
 
@@ -2111,7 +2087,7 @@ static void cpu_set_marchid(Object *obj, Visitor *v, const char *name,
 }
 
 static void cpu_get_marchid(Object *obj, Visitor *v, const char *name,
-                           void *opaque, Error **errp)
+                            void *opaque, Error **errp)
 {
     bool value = RISCV_CPU(obj)->cfg.marchid;
 
@@ -2161,8 +2137,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
     device_class_set_props(dc, riscv_cpu_properties);
 }
 
-static void riscv_isa_string_ext(RISCVCPU *cpu, char **isa_str,
-                                 int max_str_len)
+static void riscv_isa_string_ext(RISCVCPU *cpu, char **isa_str, int max_str_len)
 {
     char *old = *isa_str;
     char *new = *isa_str;
@@ -2226,18 +2201,15 @@ void riscv_cpu_list(void)
     g_slist_free(list);
 }
 
-#define DEFINE_CPU(type_name, initfn)      \
-    {                                      \
-        .name = type_name,                 \
-        .parent = TYPE_RISCV_CPU,          \
-        .instance_init = initfn            \
+#define DEFINE_CPU(type_name, initfn)                                        \
+    {                                                                        \
+        .name = type_name, .parent = TYPE_RISCV_CPU, .instance_init = initfn \
     }
 
-#define DEFINE_DYNAMIC_CPU(type_name, initfn) \
-    {                                         \
-        .name = type_name,                    \
-        .parent = TYPE_RISCV_DYNAMIC_CPU,     \
-        .instance_init = initfn               \
+#define DEFINE_DYNAMIC_CPU(type_name, initfn)                \
+    {                                                        \
+        .name = type_name, .parent = TYPE_RISCV_DYNAMIC_CPU, \
+        .instance_init = initfn                              \
     }
 
 static const TypeInfo riscv_cpu_type_infos[] = {
@@ -2256,24 +2228,24 @@ static const TypeInfo riscv_cpu_type_infos[] = {
         .parent = TYPE_RISCV_CPU,
         .abstract = true,
     },
-    DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_ANY,      riscv_any_cpu_init),
+    DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_ANY, riscv_any_cpu_init),
 #if defined(CONFIG_KVM)
-    DEFINE_CPU(TYPE_RISCV_CPU_HOST,             riscv_host_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_HOST, riscv_host_cpu_init),
 #endif
 #if defined(TARGET_RISCV32)
-    DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_BASE32,   rv32_base_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32_ibex_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32_sifive_e_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32_imafcu_nommu_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32_sifive_u_cpu_init),
+    DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_BASE32, rv32_base_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_IBEX, rv32_ibex_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31, rv32_sifive_e_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34, rv32_imafcu_nommu_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34, rv32_sifive_u_cpu_init),
 #elif defined(TARGET_RISCV64)
-    DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_BASE64,   rv64_base_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64_sifive_e_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64_sifive_u_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_SHAKTI_C,         rv64_sifive_u_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_THEAD_C906,       rv64_thead_c906_cpu_init),
-    DEFINE_CPU(TYPE_RISCV_CPU_VEYRON_V1,        rv64_veyron_v1_cpu_init),
-    DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_BASE128,  rv128_base_cpu_init),
+    DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_BASE64, rv64_base_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51, rv64_sifive_e_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54, rv64_sifive_u_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_SHAKTI_C, rv64_sifive_u_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_THEAD_C906, rv64_thead_c906_cpu_init),
+    DEFINE_CPU(TYPE_RISCV_CPU_VEYRON_V1, rv64_veyron_v1_cpu_init),
+    DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_BASE128, rv128_base_cpu_init),
 #endif
 };
 

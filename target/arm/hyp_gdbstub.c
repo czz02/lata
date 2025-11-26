@@ -56,17 +56,15 @@ GArray *hw_breakpoints, *hw_watchpoints;
 
 int insert_hw_breakpoint(target_ulong addr)
 {
-    HWBreakpoint brk = {
-        .bcr = 0x1,                             /* BCR E=1, enable */
-        .bvr = sextract64(addr, 0, 53)
-    };
+    HWBreakpoint brk = { .bcr = 0x1, /* BCR E=1, enable */
+                         .bvr = sextract64(addr, 0, 53) };
 
     if (cur_hw_bps >= max_hw_bps) {
         return -ENOBUFS;
     }
 
-    brk.bcr = deposit32(brk.bcr, 1, 2, 0x3);   /* PMC = 11 */
-    brk.bcr = deposit32(brk.bcr, 5, 4, 0xf);   /* BAS = RES1 */
+    brk.bcr = deposit32(brk.bcr, 1, 2, 0x3); /* PMC = 11 */
+    brk.bcr = deposit32(brk.bcr, 5, 4, 0xf); /* BAS = RES1 */
 
     g_array_append_val(hw_breakpoints, brk);
 
@@ -127,11 +125,9 @@ int delete_hw_breakpoint(target_ulong pc)
 
 int insert_hw_watchpoint(target_ulong addr, target_ulong len, int type)
 {
-    HWWatchpoint wp = {
-        .wcr = R_DBGWCR_E_MASK, /* E=1, enable */
-        .wvr = addr & (~0x7ULL),
-        .details = { .vaddr = addr, .len = len }
-    };
+    HWWatchpoint wp = { .wcr = R_DBGWCR_E_MASK, /* E=1, enable */
+                        .wvr = addr & (~0x7ULL),
+                        .details = { .vaddr = addr, .len = len } };
 
     if (cur_hw_wps >= max_hw_wps) {
         return -ENOBUFS;

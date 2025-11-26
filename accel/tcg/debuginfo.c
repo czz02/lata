@@ -20,8 +20,7 @@ static const Dwfl_Callbacks dwfl_callbacks = {
     .debuginfo_path = NULL,
 };
 
-__attribute__((constructor))
-static void debuginfo_init(void)
+__attribute__((constructor)) static void debuginfo_init(void)
 {
     qemu_mutex_init(&lock);
 }
@@ -68,9 +67,9 @@ void debuginfo_query(struct debuginfo_query *q, size_t n)
         }
 
         if (q[i].flags & DEBUGINFO_SYMBOL) {
-            symbol = dwfl_module_addrinfo(dwfl_module, q[i].address,
-                                          &dwfl_offset, &dwfl_sym,
-                                          NULL, NULL, NULL);
+            symbol =
+                dwfl_module_addrinfo(dwfl_module, q[i].address, &dwfl_offset,
+                                     &dwfl_sym, NULL, NULL, NULL);
             if (symbol) {
                 q[i].symbol = symbol;
                 q[i].offset = dwfl_offset;

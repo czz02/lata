@@ -26,11 +26,21 @@
 #include "tcg/tcg.h"
 #include "exec/gdbstub.h"
 
-static void hexagon_v67_cpu_init(Object *obj) { }
-static void hexagon_v68_cpu_init(Object *obj) { }
-static void hexagon_v69_cpu_init(Object *obj) { }
-static void hexagon_v71_cpu_init(Object *obj) { }
-static void hexagon_v73_cpu_init(Object *obj) { }
+static void hexagon_v67_cpu_init(Object *obj)
+{
+}
+static void hexagon_v68_cpu_init(Object *obj)
+{
+}
+static void hexagon_v69_cpu_init(Object *obj)
+{
+}
+static void hexagon_v71_cpu_init(Object *obj)
+{
+}
+static void hexagon_v73_cpu_init(Object *obj)
+{
+}
 
 static void hexagon_cpu_list_entry(gpointer data, gpointer user_data)
 {
@@ -73,20 +83,20 @@ static ObjectClass *hexagon_cpu_class_by_name(const char *cpu_model)
 static Property hexagon_lldb_compat_property =
     DEFINE_PROP_BOOL("lldb-compat", HexagonCPU, lldb_compat, false);
 static Property hexagon_lldb_stack_adjust_property =
-    DEFINE_PROP_UNSIGNED("lldb-stack-adjust", HexagonCPU, lldb_stack_adjust,
-                         0, qdev_prop_uint32, target_ulong);
+    DEFINE_PROP_UNSIGNED("lldb-stack-adjust", HexagonCPU, lldb_stack_adjust, 0,
+                         qdev_prop_uint32, target_ulong);
 static Property hexagon_short_circuit_property =
     DEFINE_PROP_BOOL("short-circuit", HexagonCPU, short_circuit, true);
 
-const char * const hexagon_regnames[TOTAL_PER_THREAD_REGS] = {
-   "r0", "r1",  "r2",  "r3",  "r4",   "r5",  "r6",  "r7",
-   "r8", "r9",  "r10", "r11", "r12",  "r13", "r14", "r15",
-  "r16", "r17", "r18", "r19", "r20",  "r21", "r22", "r23",
-  "r24", "r25", "r26", "r27", "r28",  "r29", "r30", "r31",
-  "sa0", "lc0", "sa1", "lc1", "p3_0", "c5",  "m0",  "m1",
-  "usr", "pc",  "ugp", "gp",  "cs0",  "cs1", "c14", "c15",
-  "c16", "c17", "c18", "c19", "pkt_cnt",  "insn_cnt", "hvx_cnt", "c23",
-  "c24", "c25", "c26", "c27", "c28",  "c29", "c30", "c31",
+const char *const hexagon_regnames[TOTAL_PER_THREAD_REGS] = {
+    "r0",  "r1",  "r2",  "r3",  "r4",      "r5",       "r6",      "r7",
+    "r8",  "r9",  "r10", "r11", "r12",     "r13",      "r14",     "r15",
+    "r16", "r17", "r18", "r19", "r20",     "r21",      "r22",     "r23",
+    "r24", "r25", "r26", "r27", "r28",     "r29",      "r30",     "r31",
+    "sa0", "lc0", "sa1", "lc1", "p3_0",    "c5",       "m0",      "m1",
+    "usr", "pc",  "ugp", "gp",  "cs0",     "cs1",      "c14",     "c15",
+    "c16", "c17", "c18", "c19", "pkt_cnt", "insn_cnt", "hvx_cnt", "c23",
+    "c24", "c25", "c26", "c27", "c28",     "c29",      "c30",     "c31",
 };
 
 /*
@@ -131,12 +141,12 @@ static void print_reg(FILE *f, CPUHexagonState *env, int regnum)
     if (regnum == HEX_REG_P3_0_ALIASED) {
         value = read_p3_0(env);
     } else {
-        value = regnum < 32 ? adjust_stack_ptrs(env, env->gpr[regnum])
-                            : env->gpr[regnum];
+        value = regnum < 32 ? adjust_stack_ptrs(env, env->gpr[regnum]) :
+                              env->gpr[regnum];
     }
 
-    qemu_fprintf(f, "  %s = 0x" TARGET_FMT_lx "\n",
-                 hexagon_regnames[regnum], value);
+    qemu_fprintf(f, "  %s = 0x" TARGET_FMT_lx "\n", hexagon_regnames[regnum],
+                 value);
 }
 
 static void print_vreg(FILE *f, CPUHexagonState *env, int regnum,
@@ -342,8 +352,7 @@ static void hexagon_cpu_realize(DeviceState *dev, Error **errp)
 
     gdb_register_coprocessor(cs, hexagon_hvx_gdb_read_register,
                              hexagon_hvx_gdb_write_register,
-                             NUM_VREGS + NUM_QREGS,
-                             "hexagon-hvx.xml", 0);
+                             NUM_VREGS + NUM_QREGS, "hexagon-hvx.xml", 0);
 
     qemu_init_vcpu(cs);
     cpu_reset(cs);
@@ -396,11 +405,9 @@ static void hexagon_cpu_class_init(ObjectClass *c, void *data)
     cc->tcg_ops = &hexagon_tcg_ops;
 }
 
-#define DEFINE_CPU(type_name, initfn)      \
-    {                                      \
-        .name = type_name,                 \
-        .parent = TYPE_HEXAGON_CPU,        \
-        .instance_init = initfn            \
+#define DEFINE_CPU(type_name, initfn)                                          \
+    {                                                                          \
+        .name = type_name, .parent = TYPE_HEXAGON_CPU, .instance_init = initfn \
     }
 
 static const TypeInfo hexagon_cpu_type_infos[] = {
@@ -413,11 +420,11 @@ static const TypeInfo hexagon_cpu_type_infos[] = {
         .class_size = sizeof(HexagonCPUClass),
         .class_init = hexagon_cpu_class_init,
     },
-    DEFINE_CPU(TYPE_HEXAGON_CPU_V67,              hexagon_v67_cpu_init),
-    DEFINE_CPU(TYPE_HEXAGON_CPU_V68,              hexagon_v68_cpu_init),
-    DEFINE_CPU(TYPE_HEXAGON_CPU_V69,              hexagon_v69_cpu_init),
-    DEFINE_CPU(TYPE_HEXAGON_CPU_V71,              hexagon_v71_cpu_init),
-    DEFINE_CPU(TYPE_HEXAGON_CPU_V73,              hexagon_v73_cpu_init),
+    DEFINE_CPU(TYPE_HEXAGON_CPU_V67, hexagon_v67_cpu_init),
+    DEFINE_CPU(TYPE_HEXAGON_CPU_V68, hexagon_v68_cpu_init),
+    DEFINE_CPU(TYPE_HEXAGON_CPU_V69, hexagon_v69_cpu_init),
+    DEFINE_CPU(TYPE_HEXAGON_CPU_V71, hexagon_v71_cpu_init),
+    DEFINE_CPU(TYPE_HEXAGON_CPU_V73, hexagon_v73_cpu_init),
 };
 
 DEFINE_TYPES(hexagon_cpu_type_infos)

@@ -49,16 +49,15 @@ struct qemu_machine {
 static bool nvmm_allowed;
 static struct qemu_machine qemu_mach;
 
-static struct nvmm_machine *
-get_nvmm_mach(void)
+static struct nvmm_machine *get_nvmm_mach(void)
 {
     return &qemu_mach.mach;
 }
 
 /* -------------------------------------------------------------------------- */
 
-static void
-nvmm_set_segment(struct nvmm_x64_state_seg *nseg, const SegmentCache *qseg)
+static void nvmm_set_segment(struct nvmm_x64_state_seg *nseg,
+                             const SegmentCache *qseg)
 {
     uint32_t attrib = qseg->flags;
 
@@ -75,8 +74,7 @@ nvmm_set_segment(struct nvmm_x64_state_seg *nseg, const SegmentCache *qseg)
     nseg->attrib.g = __SHIFTOUT(attrib, DESC_G_MASK);
 }
 
-static void
-nvmm_set_registers(CPUState *cpu)
+static void nvmm_set_registers(CPUState *cpu)
 {
     CPUX86State *env = cpu->env_ptr;
     struct nvmm_machine *mach = get_nvmm_mach();
@@ -99,8 +97,8 @@ nvmm_set_registers(CPUState *cpu)
     state->gprs[NVMM_X64_GPR_RSI] = env->regs[R_ESI];
     state->gprs[NVMM_X64_GPR_RDI] = env->regs[R_EDI];
 #ifdef TARGET_X86_64
-    state->gprs[NVMM_X64_GPR_R8]  = env->regs[R_R8];
-    state->gprs[NVMM_X64_GPR_R9]  = env->regs[R_R9];
+    state->gprs[NVMM_X64_GPR_R8] = env->regs[R_R8];
+    state->gprs[NVMM_X64_GPR_R9] = env->regs[R_R9];
     state->gprs[NVMM_X64_GPR_R10] = env->regs[R_R10];
     state->gprs[NVMM_X64_GPR_R11] = env->regs[R_R11];
     state->gprs[NVMM_X64_GPR_R12] = env->regs[R_R12];
@@ -158,10 +156,10 @@ nvmm_set_registers(CPUState *cpu)
     assert(sizeof(state->fpu.fx_87_ac) == sizeof(env->fpregs));
     memcpy(state->fpu.fx_87_ac, env->fpregs, sizeof(env->fpregs));
     for (i = 0; i < CPU_NB_REGS; i++) {
-        memcpy(&state->fpu.fx_xmm[i].xmm_bytes[0],
-            &env->xmm_regs[i].ZMM_Q(0), 8);
-        memcpy(&state->fpu.fx_xmm[i].xmm_bytes[8],
-            &env->xmm_regs[i].ZMM_Q(1), 8);
+        memcpy(&state->fpu.fx_xmm[i].xmm_bytes[0], &env->xmm_regs[i].ZMM_Q(0),
+               8);
+        memcpy(&state->fpu.fx_xmm[i].xmm_bytes[8], &env->xmm_regs[i].ZMM_Q(1),
+               8);
     }
 
     /* MSRs. */
@@ -173,47 +171,41 @@ nvmm_set_registers(CPUState *cpu)
     state->msrs[NVMM_X64_MSR_SFMASK] = env->fmask;
     state->msrs[NVMM_X64_MSR_KERNELGSBASE] = env->kernelgsbase;
 #endif
-    state->msrs[NVMM_X64_MSR_SYSENTER_CS]  = env->sysenter_cs;
+    state->msrs[NVMM_X64_MSR_SYSENTER_CS] = env->sysenter_cs;
     state->msrs[NVMM_X64_MSR_SYSENTER_ESP] = env->sysenter_esp;
     state->msrs[NVMM_X64_MSR_SYSENTER_EIP] = env->sysenter_eip;
     state->msrs[NVMM_X64_MSR_PAT] = env->pat;
     state->msrs[NVMM_X64_MSR_TSC] = env->tsc;
 
-    bitmap =
-        NVMM_X64_STATE_SEGS |
-        NVMM_X64_STATE_GPRS |
-        NVMM_X64_STATE_CRS  |
-        NVMM_X64_STATE_DRS  |
-        NVMM_X64_STATE_MSRS |
-        NVMM_X64_STATE_FPU;
+    bitmap = NVMM_X64_STATE_SEGS | NVMM_X64_STATE_GPRS | NVMM_X64_STATE_CRS |
+             NVMM_X64_STATE_DRS | NVMM_X64_STATE_MSRS | NVMM_X64_STATE_FPU;
 
     ret = nvmm_vcpu_setstate(mach, vcpu, bitmap);
     if (ret == -1) {
         error_report("NVMM: Failed to set virtual processor context,"
-            " error=%d", errno);
+                     " error=%d",
+                     errno);
     }
 }
 
-static void
-nvmm_get_segment(SegmentCache *qseg, const struct nvmm_x64_state_seg *nseg)
+static void nvmm_get_segment(SegmentCache *qseg,
+                             const struct nvmm_x64_state_seg *nseg)
 {
     qseg->selector = nseg->selector;
     qseg->limit = nseg->limit;
     qseg->base = nseg->base;
 
-    qseg->flags =
-        __SHIFTIN((uint32_t)nseg->attrib.type, DESC_TYPE_MASK) |
-        __SHIFTIN((uint32_t)nseg->attrib.s, DESC_S_MASK) |
-        __SHIFTIN((uint32_t)nseg->attrib.dpl, DESC_DPL_MASK) |
-        __SHIFTIN((uint32_t)nseg->attrib.p, DESC_P_MASK) |
-        __SHIFTIN((uint32_t)nseg->attrib.avl, DESC_AVL_MASK) |
-        __SHIFTIN((uint32_t)nseg->attrib.l, DESC_L_MASK) |
-        __SHIFTIN((uint32_t)nseg->attrib.def, DESC_B_MASK) |
-        __SHIFTIN((uint32_t)nseg->attrib.g, DESC_G_MASK);
+    qseg->flags = __SHIFTIN((uint32_t)nseg->attrib.type, DESC_TYPE_MASK) |
+                  __SHIFTIN((uint32_t)nseg->attrib.s, DESC_S_MASK) |
+                  __SHIFTIN((uint32_t)nseg->attrib.dpl, DESC_DPL_MASK) |
+                  __SHIFTIN((uint32_t)nseg->attrib.p, DESC_P_MASK) |
+                  __SHIFTIN((uint32_t)nseg->attrib.avl, DESC_AVL_MASK) |
+                  __SHIFTIN((uint32_t)nseg->attrib.l, DESC_L_MASK) |
+                  __SHIFTIN((uint32_t)nseg->attrib.def, DESC_B_MASK) |
+                  __SHIFTIN((uint32_t)nseg->attrib.g, DESC_G_MASK);
 }
 
-static void
-nvmm_get_registers(CPUState *cpu)
+static void nvmm_get_registers(CPUState *cpu)
 {
     CPUX86State *env = cpu->env_ptr;
     struct nvmm_machine *mach = get_nvmm_mach();
@@ -227,18 +219,14 @@ nvmm_get_registers(CPUState *cpu)
 
     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
 
-    bitmap =
-        NVMM_X64_STATE_SEGS |
-        NVMM_X64_STATE_GPRS |
-        NVMM_X64_STATE_CRS  |
-        NVMM_X64_STATE_DRS  |
-        NVMM_X64_STATE_MSRS |
-        NVMM_X64_STATE_FPU;
+    bitmap = NVMM_X64_STATE_SEGS | NVMM_X64_STATE_GPRS | NVMM_X64_STATE_CRS |
+             NVMM_X64_STATE_DRS | NVMM_X64_STATE_MSRS | NVMM_X64_STATE_FPU;
 
     ret = nvmm_vcpu_getstate(mach, vcpu, bitmap);
     if (ret == -1) {
         error_report("NVMM: Failed to get virtual processor context,"
-            " error=%d", errno);
+                     " error=%d",
+                     errno);
     }
 
     /* GPRs. */
@@ -251,8 +239,8 @@ nvmm_get_registers(CPUState *cpu)
     env->regs[R_ESI] = state->gprs[NVMM_X64_GPR_RSI];
     env->regs[R_EDI] = state->gprs[NVMM_X64_GPR_RDI];
 #ifdef TARGET_X86_64
-    env->regs[R_R8]  = state->gprs[NVMM_X64_GPR_R8];
-    env->regs[R_R9]  = state->gprs[NVMM_X64_GPR_R9];
+    env->regs[R_R8] = state->gprs[NVMM_X64_GPR_R8];
+    env->regs[R_R9] = state->gprs[NVMM_X64_GPR_R9];
     env->regs[R_R10] = state->gprs[NVMM_X64_GPR_R10];
     env->regs[R_R11] = state->gprs[NVMM_X64_GPR_R11];
     env->regs[R_R12] = state->gprs[NVMM_X64_GPR_R12];
@@ -313,10 +301,10 @@ nvmm_get_registers(CPUState *cpu)
     assert(sizeof(state->fpu.fx_87_ac) == sizeof(env->fpregs));
     memcpy(env->fpregs, state->fpu.fx_87_ac, sizeof(env->fpregs));
     for (i = 0; i < CPU_NB_REGS; i++) {
-        memcpy(&env->xmm_regs[i].ZMM_Q(0),
-            &state->fpu.fx_xmm[i].xmm_bytes[0], 8);
-        memcpy(&env->xmm_regs[i].ZMM_Q(1),
-            &state->fpu.fx_xmm[i].xmm_bytes[8], 8);
+        memcpy(&env->xmm_regs[i].ZMM_Q(0), &state->fpu.fx_xmm[i].xmm_bytes[0],
+               8);
+        memcpy(&env->xmm_regs[i].ZMM_Q(1), &state->fpu.fx_xmm[i].xmm_bytes[8],
+               8);
     }
 
     /* MSRs. */
@@ -328,7 +316,7 @@ nvmm_get_registers(CPUState *cpu)
     env->fmask = state->msrs[NVMM_X64_MSR_SFMASK];
     env->kernelgsbase = state->msrs[NVMM_X64_MSR_KERNELGSBASE];
 #endif
-    env->sysenter_cs  = state->msrs[NVMM_X64_MSR_SYSENTER_CS];
+    env->sysenter_cs = state->msrs[NVMM_X64_MSR_SYSENTER_CS];
     env->sysenter_esp = state->msrs[NVMM_X64_MSR_SYSENTER_ESP];
     env->sysenter_eip = state->msrs[NVMM_X64_MSR_SYSENTER_EIP];
     env->pat = state->msrs[NVMM_X64_MSR_PAT];
@@ -337,8 +325,7 @@ nvmm_get_registers(CPUState *cpu)
     x86_update_hflags(env);
 }
 
-static bool
-nvmm_can_take_int(CPUState *cpu)
+static bool nvmm_can_take_int(CPUState *cpu)
 {
     CPUX86State *env = cpu->env_ptr;
     AccelCPUState *qcpu = cpu->accel;
@@ -363,8 +350,7 @@ nvmm_can_take_int(CPUState *cpu)
     return true;
 }
 
-static bool
-nvmm_can_take_nmi(CPUState *cpu)
+static bool nvmm_can_take_nmi(CPUState *cpu)
 {
     AccelCPUState *qcpu = cpu->accel;
 
@@ -384,8 +370,7 @@ nvmm_can_take_nmi(CPUState *cpu)
  * Called before the VCPU is run. We inject events generated by the I/O
  * thread, and synchronize the guest TPR.
  */
-static void
-nvmm_vcpu_pre_run(CPUState *cpu)
+static void nvmm_vcpu_pre_run(CPUState *cpu)
 {
     CPUX86State *env = cpu->env_ptr;
     struct nvmm_machine *mach = get_nvmm_mach();
@@ -442,7 +427,8 @@ nvmm_vcpu_pre_run(CPUState *cpu)
         ret = nvmm_vcpu_getstate(mach, vcpu, NVMM_X64_STATE_CRS);
         if (ret == -1) {
             error_report("NVMM: Failed to get CPU state,"
-                " error=%d", errno);
+                         " error=%d",
+                         errno);
         }
 
         state->crs[NVMM_X64_CR_CR8] = qcpu->tpr;
@@ -450,7 +436,8 @@ nvmm_vcpu_pre_run(CPUState *cpu)
         ret = nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_CRS);
         if (ret == -1) {
             error_report("NVMM: Failed to set CPU state,"
-                " error=%d", errno);
+                         " error=%d",
+                         errno);
         }
     }
 
@@ -458,7 +445,8 @@ nvmm_vcpu_pre_run(CPUState *cpu)
         ret = nvmm_vcpu_inject(mach, vcpu);
         if (ret == -1) {
             error_report("NVMM: Failed to inject event,"
-                " error=%d", errno);
+                         " error=%d",
+                         errno);
         }
     }
 
@@ -469,8 +457,7 @@ nvmm_vcpu_pre_run(CPUState *cpu)
  * Called after the VCPU ran. We synchronize the host view of the TPR and
  * RFLAGS.
  */
-static void
-nvmm_vcpu_post_run(CPUState *cpu, struct nvmm_vcpu_exit *exit)
+static void nvmm_vcpu_post_run(CPUState *cpu, struct nvmm_vcpu_exit *exit)
 {
     AccelCPUState *qcpu = cpu->accel;
     CPUX86State *env = cpu->env_ptr;
@@ -493,26 +480,24 @@ nvmm_vcpu_post_run(CPUState *cpu, struct nvmm_vcpu_exit *exit)
 
 /* -------------------------------------------------------------------------- */
 
-static void
-nvmm_io_callback(struct nvmm_io *io)
+static void nvmm_io_callback(struct nvmm_io *io)
 {
     MemTxAttrs attrs = { 0 };
     int ret;
 
     ret = address_space_rw(&address_space_io, io->port, attrs, io->data,
-        io->size, !io->in);
+                           io->size, !io->in);
     if (ret != MEMTX_OK) {
         error_report("NVMM: I/O Transaction Failed "
-            "[%s, port=%u, size=%zu]", (io->in ? "in" : "out"),
-            io->port, io->size);
+                     "[%s, port=%u, size=%zu]",
+                     (io->in ? "in" : "out"), io->port, io->size);
     }
 
     /* Needed, otherwise infinite loop. */
     current_cpu->vcpu_dirty = false;
 }
 
-static void
-nvmm_mem_callback(struct nvmm_mem *mem)
+static void nvmm_mem_callback(struct nvmm_mem *mem)
 {
     cpu_physical_memory_rw(mem->gpa, mem->data, mem->size, mem->write);
 
@@ -520,44 +505,40 @@ nvmm_mem_callback(struct nvmm_mem *mem)
     current_cpu->vcpu_dirty = false;
 }
 
-static struct nvmm_assist_callbacks nvmm_callbacks = {
-    .io = nvmm_io_callback,
-    .mem = nvmm_mem_callback
-};
+static struct nvmm_assist_callbacks nvmm_callbacks = { .io = nvmm_io_callback,
+                                                       .mem =
+                                                           nvmm_mem_callback };
 
 /* -------------------------------------------------------------------------- */
 
-static int
-nvmm_handle_mem(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
+static int nvmm_handle_mem(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
     int ret;
 
     ret = nvmm_assist_mem(mach, vcpu);
     if (ret == -1) {
         error_report("NVMM: Mem Assist Failed [gpa=%p]",
-            (void *)vcpu->exit->u.mem.gpa);
+                     (void *)vcpu->exit->u.mem.gpa);
     }
 
     return ret;
 }
 
-static int
-nvmm_handle_io(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
+static int nvmm_handle_io(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
     int ret;
 
     ret = nvmm_assist_io(mach, vcpu);
     if (ret == -1) {
         error_report("NVMM: I/O Assist Failed [port=%d]",
-            (int)vcpu->exit->u.io.port);
+                     (int)vcpu->exit->u.io.port);
     }
 
     return ret;
 }
 
-static int
-nvmm_handle_rdmsr(struct nvmm_machine *mach, CPUState *cpu,
-    struct nvmm_vcpu_exit *exit)
+static int nvmm_handle_rdmsr(struct nvmm_machine *mach, CPUState *cpu,
+                             struct nvmm_vcpu_exit *exit)
 {
     AccelCPUState *qcpu = cpu->accel;
     struct nvmm_vcpu *vcpu = &qcpu->vcpu;
@@ -578,8 +559,7 @@ nvmm_handle_rdmsr(struct nvmm_machine *mach, CPUState *cpu,
         break;
     default: /* More MSRs to add? */
         val = 0;
-        error_report("NVMM: Unexpected RDMSR 0x%x, ignored",
-            exit->u.rdmsr.msr);
+        error_report("NVMM: Unexpected RDMSR 0x%x, ignored", exit->u.rdmsr.msr);
         break;
     }
 
@@ -600,9 +580,8 @@ nvmm_handle_rdmsr(struct nvmm_machine *mach, CPUState *cpu,
     return 0;
 }
 
-static int
-nvmm_handle_wrmsr(struct nvmm_machine *mach, CPUState *cpu,
-    struct nvmm_vcpu_exit *exit)
+static int nvmm_handle_wrmsr(struct nvmm_machine *mach, CPUState *cpu,
+                             struct nvmm_vcpu_exit *exit)
 {
     AccelCPUState *qcpu = cpu->accel;
     struct nvmm_vcpu *vcpu = &qcpu->vcpu;
@@ -622,7 +601,7 @@ nvmm_handle_wrmsr(struct nvmm_machine *mach, CPUState *cpu,
         break;
     default: /* More MSRs to add? */
         error_report("NVMM: Unexpected WRMSR 0x%x [val=0x%lx], ignored",
-            exit->u.wrmsr.msr, val);
+                     exit->u.wrmsr.msr, val);
         break;
     }
 
@@ -641,9 +620,8 @@ nvmm_handle_wrmsr(struct nvmm_machine *mach, CPUState *cpu,
     return 0;
 }
 
-static int
-nvmm_handle_halted(struct nvmm_machine *mach, CPUState *cpu,
-    struct nvmm_vcpu_exit *exit)
+static int nvmm_handle_halted(struct nvmm_machine *mach, CPUState *cpu,
+                              struct nvmm_vcpu_exit *exit)
 {
     CPUX86State *env = cpu->env_ptr;
     int ret = 0;
@@ -663,8 +641,7 @@ nvmm_handle_halted(struct nvmm_machine *mach, CPUState *cpu,
     return ret;
 }
 
-static int
-nvmm_inject_ud(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
+static int nvmm_inject_ud(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
     struct nvmm_vcpu_event *event = vcpu->event;
 
@@ -675,8 +652,7 @@ nvmm_inject_ud(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
     return nvmm_vcpu_inject(mach, vcpu);
 }
 
-static int
-nvmm_vcpu_loop(CPUState *cpu)
+static int nvmm_vcpu_loop(CPUState *cpu)
 {
     CPUX86State *env = cpu->env_ptr;
     struct nvmm_machine *mach = get_nvmm_mach();
@@ -712,7 +688,7 @@ nvmm_vcpu_loop(CPUState *cpu)
         cpu->interrupt_request &= ~CPU_INTERRUPT_TPR;
         nvmm_cpu_synchronize_state(cpu);
         apic_handle_tpr_access_report(x86_cpu->apic_state, env->eip,
-            env->tpr_access_type);
+                                      env->tpr_access_type);
     }
 
     if (cpu->halted) {
@@ -755,7 +731,8 @@ nvmm_vcpu_loop(CPUState *cpu)
         ret = nvmm_vcpu_run(mach, vcpu);
         if (ret == -1) {
             error_report("NVMM: Failed to exec a virtual processor,"
-                " error=%d", errno);
+                         " error=%d",
+                         errno);
             break;
         }
 
@@ -804,7 +781,7 @@ nvmm_vcpu_loop(CPUState *cpu)
             break;
         default:
             error_report("NVMM: Unexpected VM exit code 0x%lx [hw=0x%lx]",
-                exit->reason, exit->u.inv.hwcode);
+                         exit->reason, exit->u.inv.hwcode);
             nvmm_get_registers(cpu);
             qemu_mutex_lock_iothread();
             qemu_system_guest_panicked(cpu_get_crash_info(cpu));
@@ -824,29 +801,28 @@ nvmm_vcpu_loop(CPUState *cpu)
 
 /* -------------------------------------------------------------------------- */
 
-static void
-do_nvmm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
+static void do_nvmm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
 {
     nvmm_get_registers(cpu);
     cpu->vcpu_dirty = true;
 }
 
-static void
-do_nvmm_cpu_synchronize_post_reset(CPUState *cpu, run_on_cpu_data arg)
+static void do_nvmm_cpu_synchronize_post_reset(CPUState *cpu,
+                                               run_on_cpu_data arg)
 {
     nvmm_set_registers(cpu);
     cpu->vcpu_dirty = false;
 }
 
-static void
-do_nvmm_cpu_synchronize_post_init(CPUState *cpu, run_on_cpu_data arg)
+static void do_nvmm_cpu_synchronize_post_init(CPUState *cpu,
+                                              run_on_cpu_data arg)
 {
     nvmm_set_registers(cpu);
     cpu->vcpu_dirty = false;
 }
 
-static void
-do_nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
+static void do_nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu,
+                                               run_on_cpu_data arg)
 {
     cpu->vcpu_dirty = true;
 }
@@ -882,8 +858,7 @@ static Error *nvmm_migration_blocker;
  * and another thread signaling the vCPU thread to exit.
  */
 
-static void
-nvmm_ipi_signal(int sigcpu)
+static void nvmm_ipi_signal(int sigcpu)
 {
     if (current_cpu) {
         AccelCPUState *qcpu = current_cpu->accel;
@@ -896,8 +871,7 @@ nvmm_ipi_signal(int sigcpu)
     }
 }
 
-static void
-nvmm_init_cpu_signals(void)
+static void nvmm_init_cpu_signals(void)
 {
     struct sigaction sigact;
     sigset_t set;
@@ -913,8 +887,7 @@ nvmm_init_cpu_signals(void)
     pthread_sigmask(SIG_SETMASK, &set, NULL);
 }
 
-int
-nvmm_init_vcpu(CPUState *cpu)
+int nvmm_init_vcpu(CPUState *cpu)
 {
     struct nvmm_machine *mach = get_nvmm_mach();
     struct nvmm_vcpu_conf_cpuid cpuid;
@@ -926,8 +899,7 @@ nvmm_init_vcpu(CPUState *cpu)
     nvmm_init_cpu_signals();
 
     if (nvmm_migration_blocker == NULL) {
-        error_setg(&nvmm_migration_blocker,
-            "NVMM: Migration not supported");
+        error_setg(&nvmm_migration_blocker, "NVMM: Migration not supported");
 
         if (migrate_add_blocker(nvmm_migration_blocker, &local_error) < 0) {
             error_report_err(local_error);
@@ -942,7 +914,8 @@ nvmm_init_vcpu(CPUState *cpu)
     if (ret == -1) {
         err = errno;
         error_report("NVMM: Failed to create a virtual processor,"
-            " error=%d", err);
+                     " error=%d",
+                     err);
         g_free(qcpu);
         return -err;
     }
@@ -951,22 +924,23 @@ nvmm_init_vcpu(CPUState *cpu)
     cpuid.mask = 1;
     cpuid.leaf = 0x00000001;
     cpuid.u.mask.set.edx = CPUID_MCE | CPUID_MCA | CPUID_MTRR;
-    ret = nvmm_vcpu_configure(mach, &qcpu->vcpu, NVMM_VCPU_CONF_CPUID,
-        &cpuid);
+    ret = nvmm_vcpu_configure(mach, &qcpu->vcpu, NVMM_VCPU_CONF_CPUID, &cpuid);
     if (ret == -1) {
         err = errno;
         error_report("NVMM: Failed to configure a virtual processor,"
-            " error=%d", err);
+                     " error=%d",
+                     err);
         g_free(qcpu);
         return -err;
     }
 
     ret = nvmm_vcpu_configure(mach, &qcpu->vcpu, NVMM_VCPU_CONF_CALLBACKS,
-        &nvmm_callbacks);
+                              &nvmm_callbacks);
     if (ret == -1) {
         err = errno;
         error_report("NVMM: Failed to configure a virtual processor,"
-            " error=%d", err);
+                     " error=%d",
+                     err);
         g_free(qcpu);
         return -err;
     }
@@ -978,7 +952,8 @@ nvmm_init_vcpu(CPUState *cpu)
         if (ret == -1) {
             err = errno;
             error_report("NVMM: Failed to configure a virtual processor,"
-                " error=%d", err);
+                         " error=%d",
+                         err);
             g_free(qcpu);
             return -err;
         }
@@ -990,8 +965,7 @@ nvmm_init_vcpu(CPUState *cpu)
     return 0;
 }
 
-int
-nvmm_vcpu_exec(CPUState *cpu)
+int nvmm_vcpu_exec(CPUState *cpu)
 {
     int ret, fatal;
 
@@ -1013,8 +987,7 @@ nvmm_vcpu_exec(CPUState *cpu)
     return ret;
 }
 
-void
-nvmm_destroy_vcpu(CPUState *cpu)
+void nvmm_destroy_vcpu(CPUState *cpu)
 {
     struct nvmm_machine *mach = get_nvmm_mach();
     AccelCPUState *qcpu = cpu->accel;
@@ -1025,9 +998,8 @@ nvmm_destroy_vcpu(CPUState *cpu)
 
 /* -------------------------------------------------------------------------- */
 
-static void
-nvmm_update_mapping(hwaddr start_pa, ram_addr_t size, uintptr_t hva,
-    bool add, bool rom, const char *name)
+static void nvmm_update_mapping(hwaddr start_pa, ram_addr_t size, uintptr_t hva,
+                                bool add, bool rom, const char *name)
 {
     struct nvmm_machine *mach = get_nvmm_mach();
     int ret, prot;
@@ -1044,14 +1016,13 @@ nvmm_update_mapping(hwaddr start_pa, ram_addr_t size, uintptr_t hva,
 
     if (ret == -1) {
         error_report("NVMM: Failed to %s GPA range '%s' PA:%p, "
-            "Size:%p bytes, HostVA:%p, error=%d",
-            (add ? "map" : "unmap"), name, (void *)(uintptr_t)start_pa,
-            (void *)size, (void *)hva, errno);
+                     "Size:%p bytes, HostVA:%p, error=%d",
+                     (add ? "map" : "unmap"), name, (void *)(uintptr_t)start_pa,
+                     (void *)size, (void *)hva, errno);
     }
 }
 
-static void
-nvmm_process_section(MemoryRegionSection *section, int add)
+static void nvmm_process_section(MemoryRegionSection *section, int add)
 {
     MemoryRegion *mr = section->mr;
     hwaddr start_pa = section->offset_within_address_space;
@@ -1064,7 +1035,8 @@ nvmm_process_section(MemoryRegionSection *section, int add)
     }
 
     /* Adjust start_pa and size so that they are page-aligned. */
-    delta = qemu_real_host_page_size() - (start_pa & ~qemu_real_host_page_mask());
+    delta =
+        qemu_real_host_page_size() - (start_pa & ~qemu_real_host_page_mask());
     delta &= ~qemu_real_host_page_mask();
     if (delta > size) {
         return;
@@ -1077,40 +1049,38 @@ nvmm_process_section(MemoryRegionSection *section, int add)
     }
 
     hva = (uintptr_t)memory_region_get_ram_ptr(mr) +
-        section->offset_within_region + delta;
+          section->offset_within_region + delta;
 
-    nvmm_update_mapping(start_pa, size, hva, add,
-        memory_region_is_rom(mr), mr->name);
+    nvmm_update_mapping(start_pa, size, hva, add, memory_region_is_rom(mr),
+                        mr->name);
 }
 
-static void
-nvmm_region_add(MemoryListener *listener, MemoryRegionSection *section)
+static void nvmm_region_add(MemoryListener *listener,
+                            MemoryRegionSection *section)
 {
     memory_region_ref(section->mr);
     nvmm_process_section(section, 1);
 }
 
-static void
-nvmm_region_del(MemoryListener *listener, MemoryRegionSection *section)
+static void nvmm_region_del(MemoryListener *listener,
+                            MemoryRegionSection *section)
 {
     nvmm_process_section(section, 0);
     memory_region_unref(section->mr);
 }
 
-static void
-nvmm_transaction_begin(MemoryListener *listener)
+static void nvmm_transaction_begin(MemoryListener *listener)
 {
     /* nothing */
 }
 
-static void
-nvmm_transaction_commit(MemoryListener *listener)
+static void nvmm_transaction_commit(MemoryListener *listener)
 {
     /* nothing */
 }
 
-static void
-nvmm_log_sync(MemoryListener *listener, MemoryRegionSection *section)
+static void nvmm_log_sync(MemoryListener *listener,
+                          MemoryRegionSection *section)
 {
     MemoryRegion *mr = section->mr;
 
@@ -1131,9 +1101,8 @@ static MemoryListener nvmm_memory_listener = {
     .priority = MEMORY_LISTENER_PRIORITY_ACCEL,
 };
 
-static void
-nvmm_ram_block_added(RAMBlockNotifier *n, void *host, size_t size,
-                     size_t max_size)
+static void nvmm_ram_block_added(RAMBlockNotifier *n, void *host, size_t size,
+                                 size_t max_size)
 {
     struct nvmm_machine *mach = get_nvmm_mach();
     uintptr_t hva = (uintptr_t)host;
@@ -1143,19 +1112,17 @@ nvmm_ram_block_added(RAMBlockNotifier *n, void *host, size_t size,
 
     if (ret == -1) {
         error_report("NVMM: Failed to map HVA, HostVA:%p "
-            "Size:%p bytes, error=%d",
-            (void *)hva, (void *)size, errno);
+                     "Size:%p bytes, error=%d",
+                     (void *)hva, (void *)size, errno);
     }
 }
 
-static struct RAMBlockNotifier nvmm_ram_notifier = {
-    .ram_block_added = nvmm_ram_block_added
-};
+static struct RAMBlockNotifier nvmm_ram_notifier = { .ram_block_added =
+                                                         nvmm_ram_block_added };
 
 /* -------------------------------------------------------------------------- */
 
-static int
-nvmm_accel_init(MachineState *ms)
+static int nvmm_accel_init(MachineState *ms)
 {
     int ret, err;
 
@@ -1195,14 +1162,12 @@ nvmm_accel_init(MachineState *ms)
     return 0;
 }
 
-int
-nvmm_enabled(void)
+int nvmm_enabled(void)
 {
     return nvmm_allowed;
 }
 
-static void
-nvmm_accel_class_init(ObjectClass *oc, void *data)
+static void nvmm_accel_class_init(ObjectClass *oc, void *data)
 {
     AccelClass *ac = ACCEL_CLASS(oc);
     ac->name = "NVMM";
@@ -1216,8 +1181,7 @@ static const TypeInfo nvmm_accel_type = {
     .class_init = nvmm_accel_class_init,
 };
 
-static void
-nvmm_type_init(void)
+static void nvmm_type_init(void)
 {
     type_register_static(&nvmm_accel_type);
 }

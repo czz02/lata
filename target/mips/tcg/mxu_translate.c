@@ -353,62 +353,62 @@
  */
 
 enum {
-    OPC_MXU_S32MADD  = 0x00,
+    OPC_MXU_S32MADD = 0x00,
     OPC_MXU_S32MADDU = 0x01,
-    OPC_MXU__POOL00  = 0x03,
-    OPC_MXU_S32MSUB  = 0x04,
+    OPC_MXU__POOL00 = 0x03,
+    OPC_MXU_S32MSUB = 0x04,
     OPC_MXU_S32MSUBU = 0x05,
-    OPC_MXU__POOL01  = 0x06,
-    OPC_MXU__POOL02  = 0x07,
-    OPC_MXU_D16MUL   = 0x08,
-    OPC_MXU__POOL03  = 0x09,
-    OPC_MXU_D16MAC   = 0x0A,
-    OPC_MXU_D16MACF  = 0x0B,
-    OPC_MXU_D16MADL  = 0x0C,
-    OPC_MXU_S16MAD   = 0x0D,
-    OPC_MXU_Q16ADD   = 0x0E,
-    OPC_MXU_D16MACE  = 0x0F,
-    OPC_MXU__POOL04  = 0x10,
-    OPC_MXU__POOL05  = 0x11,
-    OPC_MXU__POOL06  = 0x12,
-    OPC_MXU__POOL07  = 0x13,
-    OPC_MXU__POOL08  = 0x14,
-    OPC_MXU__POOL09  = 0x15,
-    OPC_MXU__POOL10  = 0x16,
-    OPC_MXU__POOL11  = 0x17,
-    OPC_MXU_D32ADD   = 0x18,
-    OPC_MXU__POOL12  = 0x19,
-    OPC_MXU__POOL13  = 0x1B,
-    OPC_MXU__POOL14  = 0x1C,
-    OPC_MXU_Q8ACCE   = 0x1D,
-    OPC_MXU_S8LDD    = 0x22,
-    OPC_MXU_S8STD    = 0x23,
-    OPC_MXU_S8LDI    = 0x24,
-    OPC_MXU_S8SDI    = 0x25,
-    OPC_MXU__POOL15  = 0x26,
-    OPC_MXU__POOL16  = 0x27,
-    OPC_MXU__POOL17  = 0x28,
-    OPC_MXU_S16LDD   = 0x2A,
-    OPC_MXU_S16STD   = 0x2B,
-    OPC_MXU_S16LDI   = 0x2C,
-    OPC_MXU_S16SDI   = 0x2D,
-    OPC_MXU_S32M2I   = 0x2E,
-    OPC_MXU_S32I2M   = 0x2F,
-    OPC_MXU_D32SLL   = 0x30,
-    OPC_MXU_D32SLR   = 0x31,
-    OPC_MXU_D32SARL  = 0x32,
-    OPC_MXU_D32SAR   = 0x33,
-    OPC_MXU_Q16SLL   = 0x34,
-    OPC_MXU_Q16SLR   = 0x35,
-    OPC_MXU__POOL18  = 0x36,
-    OPC_MXU_Q16SAR   = 0x37,
-    OPC_MXU__POOL19  = 0x38,
-    OPC_MXU__POOL20  = 0x39,
-    OPC_MXU__POOL21  = 0x3A,
-    OPC_MXU_Q16SCOP  = 0x3B,
-    OPC_MXU_Q8MADL   = 0x3C,
-    OPC_MXU_S32SFL   = 0x3D,
-    OPC_MXU_Q8SAD    = 0x3E,
+    OPC_MXU__POOL01 = 0x06,
+    OPC_MXU__POOL02 = 0x07,
+    OPC_MXU_D16MUL = 0x08,
+    OPC_MXU__POOL03 = 0x09,
+    OPC_MXU_D16MAC = 0x0A,
+    OPC_MXU_D16MACF = 0x0B,
+    OPC_MXU_D16MADL = 0x0C,
+    OPC_MXU_S16MAD = 0x0D,
+    OPC_MXU_Q16ADD = 0x0E,
+    OPC_MXU_D16MACE = 0x0F,
+    OPC_MXU__POOL04 = 0x10,
+    OPC_MXU__POOL05 = 0x11,
+    OPC_MXU__POOL06 = 0x12,
+    OPC_MXU__POOL07 = 0x13,
+    OPC_MXU__POOL08 = 0x14,
+    OPC_MXU__POOL09 = 0x15,
+    OPC_MXU__POOL10 = 0x16,
+    OPC_MXU__POOL11 = 0x17,
+    OPC_MXU_D32ADD = 0x18,
+    OPC_MXU__POOL12 = 0x19,
+    OPC_MXU__POOL13 = 0x1B,
+    OPC_MXU__POOL14 = 0x1C,
+    OPC_MXU_Q8ACCE = 0x1D,
+    OPC_MXU_S8LDD = 0x22,
+    OPC_MXU_S8STD = 0x23,
+    OPC_MXU_S8LDI = 0x24,
+    OPC_MXU_S8SDI = 0x25,
+    OPC_MXU__POOL15 = 0x26,
+    OPC_MXU__POOL16 = 0x27,
+    OPC_MXU__POOL17 = 0x28,
+    OPC_MXU_S16LDD = 0x2A,
+    OPC_MXU_S16STD = 0x2B,
+    OPC_MXU_S16LDI = 0x2C,
+    OPC_MXU_S16SDI = 0x2D,
+    OPC_MXU_S32M2I = 0x2E,
+    OPC_MXU_S32I2M = 0x2F,
+    OPC_MXU_D32SLL = 0x30,
+    OPC_MXU_D32SLR = 0x31,
+    OPC_MXU_D32SARL = 0x32,
+    OPC_MXU_D32SAR = 0x33,
+    OPC_MXU_Q16SLL = 0x34,
+    OPC_MXU_Q16SLR = 0x35,
+    OPC_MXU__POOL18 = 0x36,
+    OPC_MXU_Q16SAR = 0x37,
+    OPC_MXU__POOL19 = 0x38,
+    OPC_MXU__POOL20 = 0x39,
+    OPC_MXU__POOL21 = 0x3A,
+    OPC_MXU_Q16SCOP = 0x3B,
+    OPC_MXU_Q8MADL = 0x3C,
+    OPC_MXU_S32SFL = 0x3D,
+    OPC_MXU_Q8SAD = 0x3E,
 };
 
 
@@ -416,52 +416,52 @@ enum {
  * MXU pool 00
  */
 enum {
-    OPC_MXU_S32MAX   = 0x00,
-    OPC_MXU_S32MIN   = 0x01,
-    OPC_MXU_D16MAX   = 0x02,
-    OPC_MXU_D16MIN   = 0x03,
-    OPC_MXU_Q8MAX    = 0x04,
-    OPC_MXU_Q8MIN    = 0x05,
-    OPC_MXU_Q8SLT    = 0x06,
-    OPC_MXU_Q8SLTU   = 0x07,
+    OPC_MXU_S32MAX = 0x00,
+    OPC_MXU_S32MIN = 0x01,
+    OPC_MXU_D16MAX = 0x02,
+    OPC_MXU_D16MIN = 0x03,
+    OPC_MXU_Q8MAX = 0x04,
+    OPC_MXU_Q8MIN = 0x05,
+    OPC_MXU_Q8SLT = 0x06,
+    OPC_MXU_Q8SLTU = 0x07,
 };
 
 /*
  * MXU pool 01
  */
 enum {
-    OPC_MXU_S32SLT   = 0x00,
-    OPC_MXU_D16SLT   = 0x01,
-    OPC_MXU_D16AVG   = 0x02,
-    OPC_MXU_D16AVGR  = 0x03,
-    OPC_MXU_Q8AVG    = 0x04,
-    OPC_MXU_Q8AVGR   = 0x05,
-    OPC_MXU_Q8ADD    = 0x07,
+    OPC_MXU_S32SLT = 0x00,
+    OPC_MXU_D16SLT = 0x01,
+    OPC_MXU_D16AVG = 0x02,
+    OPC_MXU_D16AVGR = 0x03,
+    OPC_MXU_Q8AVG = 0x04,
+    OPC_MXU_Q8AVGR = 0x05,
+    OPC_MXU_Q8ADD = 0x07,
 };
 
 /*
  * MXU pool 02
  */
 enum {
-    OPC_MXU_S32CPS   = 0x00,
-    OPC_MXU_D16CPS   = 0x02,
-    OPC_MXU_Q8ABD    = 0x04,
-    OPC_MXU_Q16SAT   = 0x06,
+    OPC_MXU_S32CPS = 0x00,
+    OPC_MXU_D16CPS = 0x02,
+    OPC_MXU_Q8ABD = 0x04,
+    OPC_MXU_Q16SAT = 0x06,
 };
 
 /*
  * MXU pool 03
  */
 enum {
-    OPC_MXU_D16MULF  = 0x00,
-    OPC_MXU_D16MULE  = 0x01,
+    OPC_MXU_D16MULF = 0x00,
+    OPC_MXU_D16MULE = 0x01,
 };
 
 /*
  * MXU pool 04 05 06 07 08 09 10 11
  */
 enum {
-    OPC_MXU_S32LDST  = 0x00,
+    OPC_MXU_S32LDST = 0x00,
     OPC_MXU_S32LDSTR = 0x01,
 };
 
@@ -469,162 +469,162 @@ enum {
  * MXU pool 12
  */
 enum {
-    OPC_MXU_D32ACC    = 0x00,
-    OPC_MXU_D32ACCM   = 0x01,
-    OPC_MXU_D32ASUM   = 0x02,
+    OPC_MXU_D32ACC = 0x00,
+    OPC_MXU_D32ACCM = 0x01,
+    OPC_MXU_D32ASUM = 0x02,
 };
 
 /*
  * MXU pool 13
  */
 enum {
-    OPC_MXU_Q16ACC    = 0x00,
-    OPC_MXU_Q16ACCM   = 0x01,
-    OPC_MXU_D16ASUM   = 0x02,
+    OPC_MXU_Q16ACC = 0x00,
+    OPC_MXU_Q16ACCM = 0x01,
+    OPC_MXU_D16ASUM = 0x02,
 };
 
 /*
  * MXU pool 14
  */
 enum {
-    OPC_MXU_Q8ADDE    = 0x00,
-    OPC_MXU_D8SUM     = 0x01,
-    OPC_MXU_D8SUMC    = 0x02,
+    OPC_MXU_Q8ADDE = 0x00,
+    OPC_MXU_D8SUM = 0x01,
+    OPC_MXU_D8SUMC = 0x02,
 };
 
 /*
  * MXU pool 15
  */
 enum {
-    OPC_MXU_S32MUL    = 0x00,
-    OPC_MXU_S32MULU   = 0x01,
-    OPC_MXU_S32EXTR   = 0x02,
-    OPC_MXU_S32EXTRV  = 0x03,
+    OPC_MXU_S32MUL = 0x00,
+    OPC_MXU_S32MULU = 0x01,
+    OPC_MXU_S32EXTR = 0x02,
+    OPC_MXU_S32EXTRV = 0x03,
 };
 
 /*
  * MXU pool 16
  */
 enum {
-    OPC_MXU_D32SARW  = 0x00,
-    OPC_MXU_S32ALN   = 0x01,
-    OPC_MXU_S32ALNI  = 0x02,
-    OPC_MXU_S32LUI   = 0x03,
-    OPC_MXU_S32NOR   = 0x04,
-    OPC_MXU_S32AND   = 0x05,
-    OPC_MXU_S32OR    = 0x06,
-    OPC_MXU_S32XOR   = 0x07,
+    OPC_MXU_D32SARW = 0x00,
+    OPC_MXU_S32ALN = 0x01,
+    OPC_MXU_S32ALNI = 0x02,
+    OPC_MXU_S32LUI = 0x03,
+    OPC_MXU_S32NOR = 0x04,
+    OPC_MXU_S32AND = 0x05,
+    OPC_MXU_S32OR = 0x06,
+    OPC_MXU_S32XOR = 0x07,
 };
 
 /*
  * MXU pool 17
  */
 enum {
-    OPC_MXU_LXB      = 0x00,
-    OPC_MXU_LXH      = 0x01,
-    OPC_MXU_LXW      = 0x03,
-    OPC_MXU_LXBU     = 0x04,
-    OPC_MXU_LXHU     = 0x05,
+    OPC_MXU_LXB = 0x00,
+    OPC_MXU_LXH = 0x01,
+    OPC_MXU_LXW = 0x03,
+    OPC_MXU_LXBU = 0x04,
+    OPC_MXU_LXHU = 0x05,
 };
 
 /*
  * MXU pool 18
  */
 enum {
-    OPC_MXU_D32SLLV  = 0x00,
-    OPC_MXU_D32SLRV  = 0x01,
-    OPC_MXU_D32SARV  = 0x03,
-    OPC_MXU_Q16SLLV  = 0x04,
-    OPC_MXU_Q16SLRV  = 0x05,
-    OPC_MXU_Q16SARV  = 0x07,
+    OPC_MXU_D32SLLV = 0x00,
+    OPC_MXU_D32SLRV = 0x01,
+    OPC_MXU_D32SARV = 0x03,
+    OPC_MXU_Q16SLLV = 0x04,
+    OPC_MXU_Q16SLRV = 0x05,
+    OPC_MXU_Q16SARV = 0x07,
 };
 
 /*
  * MXU pool 19
  */
 enum {
-    OPC_MXU_Q8MUL    = 0x00,
-    OPC_MXU_Q8MULSU  = 0x02,
+    OPC_MXU_Q8MUL = 0x00,
+    OPC_MXU_Q8MULSU = 0x02,
 };
 
 /*
  * MXU pool 20
  */
 enum {
-    OPC_MXU_Q8MOVZ   = 0x00,
-    OPC_MXU_Q8MOVN   = 0x01,
-    OPC_MXU_D16MOVZ  = 0x02,
-    OPC_MXU_D16MOVN  = 0x03,
-    OPC_MXU_S32MOVZ  = 0x04,
-    OPC_MXU_S32MOVN  = 0x05,
+    OPC_MXU_Q8MOVZ = 0x00,
+    OPC_MXU_Q8MOVN = 0x01,
+    OPC_MXU_D16MOVZ = 0x02,
+    OPC_MXU_D16MOVN = 0x03,
+    OPC_MXU_S32MOVZ = 0x04,
+    OPC_MXU_S32MOVN = 0x05,
 };
 
 /*
  * MXU pool 21
  */
 enum {
-    OPC_MXU_Q8MAC    = 0x00,
-    OPC_MXU_Q8MACSU  = 0x02,
+    OPC_MXU_Q8MAC = 0x00,
+    OPC_MXU_Q8MACSU = 0x02,
 };
 
 
 /* MXU accumulate add/subtract 1-bit pattern 'aptn1' */
-#define MXU_APTN1_A    0
-#define MXU_APTN1_S    1
+#define MXU_APTN1_A 0
+#define MXU_APTN1_S 1
 
 /* MXU accumulate add/subtract 2-bit pattern 'aptn2' */
-#define MXU_APTN2_AA    0
-#define MXU_APTN2_AS    1
-#define MXU_APTN2_SA    2
-#define MXU_APTN2_SS    3
+#define MXU_APTN2_AA 0
+#define MXU_APTN2_AS 1
+#define MXU_APTN2_SA 2
+#define MXU_APTN2_SS 3
 
 /* MXU execute add/subtract 2-bit pattern 'eptn2' */
-#define MXU_EPTN2_AA    0
-#define MXU_EPTN2_AS    1
-#define MXU_EPTN2_SA    2
-#define MXU_EPTN2_SS    3
+#define MXU_EPTN2_AA 0
+#define MXU_EPTN2_AS 1
+#define MXU_EPTN2_SA 2
+#define MXU_EPTN2_SS 3
 
 /* MXU operand getting pattern 'optn2' */
-#define MXU_OPTN2_PTN0  0
-#define MXU_OPTN2_PTN1  1
-#define MXU_OPTN2_PTN2  2
-#define MXU_OPTN2_PTN3  3
+#define MXU_OPTN2_PTN0 0
+#define MXU_OPTN2_PTN1 1
+#define MXU_OPTN2_PTN2 2
+#define MXU_OPTN2_PTN3 3
 /* alternative naming scheme for 'optn2' */
-#define MXU_OPTN2_WW    0
-#define MXU_OPTN2_LW    1
-#define MXU_OPTN2_HW    2
-#define MXU_OPTN2_XW    3
+#define MXU_OPTN2_WW 0
+#define MXU_OPTN2_LW 1
+#define MXU_OPTN2_HW 2
+#define MXU_OPTN2_XW 3
 
 /* MXU operand getting pattern 'optn3' */
-#define MXU_OPTN3_PTN0  0
-#define MXU_OPTN3_PTN1  1
-#define MXU_OPTN3_PTN2  2
-#define MXU_OPTN3_PTN3  3
-#define MXU_OPTN3_PTN4  4
-#define MXU_OPTN3_PTN5  5
-#define MXU_OPTN3_PTN6  6
-#define MXU_OPTN3_PTN7  7
+#define MXU_OPTN3_PTN0 0
+#define MXU_OPTN3_PTN1 1
+#define MXU_OPTN3_PTN2 2
+#define MXU_OPTN3_PTN3 3
+#define MXU_OPTN3_PTN4 4
+#define MXU_OPTN3_PTN5 5
+#define MXU_OPTN3_PTN6 6
+#define MXU_OPTN3_PTN7 7
 
 /* MXU registers */
 static TCGv mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
 static TCGv mxu_CR;
 
 static const char mxuregnames[NUMBER_OF_MXU_REGISTERS][4] = {
-    "XR1",  "XR2",  "XR3",  "XR4",  "XR5",  "XR6",  "XR7",  "XR8",
-    "XR9",  "XR10", "XR11", "XR12", "XR13", "XR14", "XR15", "XCR",
+    "XR1", "XR2",  "XR3",  "XR4",  "XR5",  "XR6",  "XR7",  "XR8",
+    "XR9", "XR10", "XR11", "XR12", "XR13", "XR14", "XR15", "XCR",
 };
 
 void mxu_translate_init(void)
 {
     for (unsigned i = 0; i < NUMBER_OF_MXU_REGISTERS - 1; i++) {
-        mxu_gpr[i] = tcg_global_mem_new(cpu_env,
-                                        offsetof(CPUMIPSState, active_tc.mxu_gpr[i]),
-                                        mxuregnames[i]);
+        mxu_gpr[i] = tcg_global_mem_new(
+            cpu_env, offsetof(CPUMIPSState, active_tc.mxu_gpr[i]),
+            mxuregnames[i]);
     }
 
-    mxu_CR = tcg_global_mem_new(cpu_env,
-                                offsetof(CPUMIPSState, active_tc.mxu_cr),
-                                mxuregnames[NUMBER_OF_MXU_REGISTERS - 1]);
+    mxu_CR =
+        tcg_global_mem_new(cpu_env, offsetof(CPUMIPSState, active_tc.mxu_cr),
+                           mxuregnames[NUMBER_OF_MXU_REGISTERS - 1]);
 }
 
 /* MXU General purpose registers moves. */
@@ -857,10 +857,10 @@ static void gen_mxu_s16ldd(DisasContext *ctx, bool postmodify)
     t0 = tcg_temp_new();
     t1 = tcg_temp_new();
 
-    XRa   = extract32(ctx->opcode,   6, 4);
-    s10   = sextract32(ctx->opcode, 10, 9) * 2;
-    optn2 = extract32(ctx->opcode,  19, 2);
-    Rb    = extract32(ctx->opcode,  21, 5);
+    XRa = extract32(ctx->opcode, 6, 4);
+    s10 = sextract32(ctx->opcode, 10, 9) * 2;
+    optn2 = extract32(ctx->opcode, 19, 2);
+    Rb = extract32(ctx->opcode, 21, 5);
 
     gen_load_gpr(t0, Rb);
     tcg_gen_addi_tl(t0, t0, s10);
@@ -888,7 +888,7 @@ static void gen_mxu_s16ldd(DisasContext *ctx, bool postmodify)
     /* XRa = {tmp16, tmp16} */
     case MXU_OPTN2_PTN3:
         tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UW);
-        tcg_gen_deposit_tl(t0, t1, t1,  0, 16);
+        tcg_gen_deposit_tl(t0, t1, t1, 0, 16);
         tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
         break;
     }
@@ -959,10 +959,10 @@ static void gen_mxu_s32mul(DisasContext *ctx, bool mulu)
     t0 = tcg_temp_new();
     t1 = tcg_temp_new();
 
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
     XRd = extract32(ctx->opcode, 10, 4);
-    rs  = extract32(ctx->opcode, 16, 5);
-    rt  = extract32(ctx->opcode, 21, 5);
+    rs = extract32(ctx->opcode, 16, 5);
+    rt = extract32(ctx->opcode, 21, 5);
 
     if (unlikely(rs == 0 || rt == 0)) {
         tcg_gen_movi_tl(t0, 0);
@@ -1234,11 +1234,11 @@ static void gen_mxu_d16madl(DisasContext *ctx)
     aptn2 = extract32(ctx->opcode, 24, 2);
 
     gen_load_mxu_gpr(t1, XRb);
-    tcg_gen_sextract_tl(t0, t1,  0, 16);
+    tcg_gen_sextract_tl(t0, t1, 0, 16);
     tcg_gen_sextract_tl(t1, t1, 16, 16);
 
     gen_load_mxu_gpr(t3, XRc);
-    tcg_gen_sextract_tl(t2, t3,  0, 16);
+    tcg_gen_sextract_tl(t2, t3, 0, 16);
     tcg_gen_sextract_tl(t3, t3, 16, 16);
 
     switch (optn2) {
@@ -1263,7 +1263,7 @@ static void gen_mxu_d16madl(DisasContext *ctx)
     tcg_gen_extract_tl(t3, t3, 0, 16);
 
     gen_load_mxu_gpr(t1, XRa);
-    tcg_gen_extract_tl(t0, t1,  0, 16);
+    tcg_gen_extract_tl(t0, t1, 0, 16);
     tcg_gen_extract_tl(t1, t1, 16, 16);
 
     switch (aptn2) {
@@ -1323,15 +1323,15 @@ static void gen_mxu_s16mad(DisasContext *ctx)
         tcg_gen_sextract_tl(t1, t1, 16, 16);
         break;
     case MXU_OPTN2_LW: /* XRB.L*XRC.L */
-        tcg_gen_sextract_tl(t0, t0,  0, 16);
-        tcg_gen_sextract_tl(t1, t1,  0, 16);
+        tcg_gen_sextract_tl(t0, t0, 0, 16);
+        tcg_gen_sextract_tl(t1, t1, 0, 16);
         break;
     case MXU_OPTN2_HW: /* XRB.H*XRC.L */
         tcg_gen_sextract_tl(t0, t0, 16, 16);
-        tcg_gen_sextract_tl(t1, t1,  0, 16);
+        tcg_gen_sextract_tl(t1, t1, 0, 16);
         break;
     case MXU_OPTN2_XW: /* XRB.L*XRC.H */
-        tcg_gen_sextract_tl(t0, t0,  0, 16);
+        tcg_gen_sextract_tl(t0, t0, 0, 16);
         tcg_gen_sextract_tl(t1, t1, 16, 16);
         break;
     }
@@ -1384,20 +1384,20 @@ static void gen_mxu_q8mul_mac(DisasContext *ctx, bool su, bool mac)
 
     if (su) {
         /* Q8MULSU / Q8MACSU */
-        tcg_gen_sextract_tl(t0, t3,  0, 8);
-        tcg_gen_sextract_tl(t1, t3,  8, 8);
+        tcg_gen_sextract_tl(t0, t3, 0, 8);
+        tcg_gen_sextract_tl(t1, t3, 8, 8);
         tcg_gen_sextract_tl(t2, t3, 16, 8);
         tcg_gen_sextract_tl(t3, t3, 24, 8);
     } else {
         /* Q8MUL / Q8MAC */
-        tcg_gen_extract_tl(t0, t3,  0, 8);
-        tcg_gen_extract_tl(t1, t3,  8, 8);
+        tcg_gen_extract_tl(t0, t3, 0, 8);
+        tcg_gen_extract_tl(t1, t3, 8, 8);
         tcg_gen_extract_tl(t2, t3, 16, 8);
         tcg_gen_extract_tl(t3, t3, 24, 8);
     }
 
-    tcg_gen_extract_tl(t4, t7,  0, 8);
-    tcg_gen_extract_tl(t5, t7,  8, 8);
+    tcg_gen_extract_tl(t4, t7, 0, 8);
+    tcg_gen_extract_tl(t5, t7, 8, 8);
     tcg_gen_extract_tl(t6, t7, 16, 8);
     tcg_gen_extract_tl(t7, t7, 24, 8);
 
@@ -1409,7 +1409,7 @@ static void gen_mxu_q8mul_mac(DisasContext *ctx, bool su, bool mac)
     if (mac) {
         gen_load_mxu_gpr(t4, XRd);
         gen_load_mxu_gpr(t5, XRa);
-        tcg_gen_extract_tl(t6, t4,  0, 16);
+        tcg_gen_extract_tl(t6, t4, 0, 16);
         tcg_gen_extract_tl(t7, t4, 16, 16);
         if (aptn2 & 1) {
             tcg_gen_sub_tl(t0, t6, t0);
@@ -1418,7 +1418,7 @@ static void gen_mxu_q8mul_mac(DisasContext *ctx, bool su, bool mac)
             tcg_gen_add_tl(t0, t6, t0);
             tcg_gen_add_tl(t1, t7, t1);
         }
-        tcg_gen_extract_tl(t6, t5,  0, 16);
+        tcg_gen_extract_tl(t6, t5, 0, 16);
         tcg_gen_extract_tl(t7, t5, 16, 16);
         if (aptn2 & 2) {
             tcg_gen_sub_tl(t2, t6, t2);
@@ -1464,13 +1464,13 @@ static void gen_mxu_q8madl(DisasContext *ctx)
     gen_load_mxu_gpr(t3, XRb);
     gen_load_mxu_gpr(t7, XRc);
 
-    tcg_gen_extract_tl(t0, t3,  0, 8);
-    tcg_gen_extract_tl(t1, t3,  8, 8);
+    tcg_gen_extract_tl(t0, t3, 0, 8);
+    tcg_gen_extract_tl(t1, t3, 8, 8);
     tcg_gen_extract_tl(t2, t3, 16, 8);
     tcg_gen_extract_tl(t3, t3, 24, 8);
 
-    tcg_gen_extract_tl(t4, t7,  0, 8);
-    tcg_gen_extract_tl(t5, t7,  8, 8);
+    tcg_gen_extract_tl(t4, t7, 0, 8);
+    tcg_gen_extract_tl(t5, t7, 8, 8);
     tcg_gen_extract_tl(t6, t7, 16, 8);
     tcg_gen_extract_tl(t7, t7, 24, 8);
 
@@ -1500,7 +1500,7 @@ static void gen_mxu_q8madl(DisasContext *ctx)
     }
 
     tcg_gen_andi_tl(t5, t0, 0xff);
-    tcg_gen_deposit_tl(t5, t5, t1,  8, 8);
+    tcg_gen_deposit_tl(t5, t5, t1, 8, 8);
     tcg_gen_deposit_tl(t5, t5, t2, 16, 8);
     tcg_gen_deposit_tl(t5, t5, t3, 24, 8);
 
@@ -1534,7 +1534,7 @@ static void gen_mxu_s32ldxx(DisasContext *ctx, bool reversed, bool postinc)
 
     tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx,
                        (MO_TESL ^ (reversed ? MO_BSWAP : 0)) |
-                        ctx->default_tcg_memop_mask);
+                           ctx->default_tcg_memop_mask);
     gen_store_mxu_gpr(t1, XRa);
 
     if (postinc) {
@@ -1570,7 +1570,7 @@ static void gen_mxu_s32stxx(DisasContext *ctx, bool reversed, bool postinc)
     gen_load_mxu_gpr(t1, XRa);
     tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
                        (MO_TESL ^ (reversed ? MO_BSWAP : 0)) |
-                        ctx->default_tcg_memop_mask);
+                           ctx->default_tcg_memop_mask);
 
     if (postinc) {
         gen_store_gpr(t0, Rb);
@@ -1586,8 +1586,8 @@ static void gen_mxu_s32stxx(DisasContext *ctx, bool reversed, bool postinc)
  * S32LDIVR XRa, Rb, Rc, STRD2 - Load a word from memory to XRF,
  *   post modify base address GPR and load in reversed byte seq.
  */
-static void gen_mxu_s32ldxvx(DisasContext *ctx, bool reversed,
-                             bool postinc, uint32_t strd2)
+static void gen_mxu_s32ldxvx(DisasContext *ctx, bool reversed, bool postinc,
+                             uint32_t strd2)
 {
     TCGv t0, t1;
     uint32_t XRa, Rb, Rc;
@@ -1606,7 +1606,7 @@ static void gen_mxu_s32ldxvx(DisasContext *ctx, bool reversed,
 
     tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx,
                        (MO_TESL ^ (reversed ? MO_BSWAP : 0)) |
-                        ctx->default_tcg_memop_mask);
+                           ctx->default_tcg_memop_mask);
     gen_store_mxu_gpr(t1, XRa);
 
     if (postinc) {
@@ -1655,8 +1655,8 @@ static void gen_mxu_lxx(DisasContext *ctx, uint32_t strd2, MemOp mop)
  * S32SDIVR XRa, Rb, Rc, STRD2 - Load a word from memory to XRF,
  *   post modify base address GPR and store in reversed byte seq.
  */
-static void gen_mxu_s32stxvx(DisasContext *ctx, bool reversed,
-                             bool postinc, uint32_t strd2)
+static void gen_mxu_s32stxvx(DisasContext *ctx, bool reversed, bool postinc,
+                             uint32_t strd2)
 {
     TCGv t0, t1;
     uint32_t XRa, Rb, Rc;
@@ -1676,7 +1676,7 @@ static void gen_mxu_s32stxvx(DisasContext *ctx, bool reversed,
     gen_load_mxu_gpr(t1, XRa);
     tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
                        (MO_TESL ^ (reversed ? MO_BSWAP : 0)) |
-                        ctx->default_tcg_memop_mask);
+                           ctx->default_tcg_memop_mask);
 
     if (postinc) {
         gen_store_gpr(t0, Rb);
@@ -1702,7 +1702,7 @@ static void gen_mxu_S32NOR(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -1738,7 +1738,7 @@ static void gen_mxu_S32AND(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -1768,7 +1768,7 @@ static void gen_mxu_S32OR(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -1804,7 +1804,7 @@ static void gen_mxu_S32XOR(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -1853,10 +1853,10 @@ static void gen_mxu_d32sxx(DisasContext *ctx, bool right, bool arithmetic)
 {
     uint32_t XRa, XRb, XRc, XRd, sft4;
 
-    XRa  = extract32(ctx->opcode,  6, 4);
-    XRb  = extract32(ctx->opcode, 10, 4);
-    XRc  = extract32(ctx->opcode, 14, 4);
-    XRd  = extract32(ctx->opcode, 18, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
     sft4 = extract32(ctx->opcode, 22, 4);
 
     TCGv t0 = tcg_temp_new();
@@ -1898,7 +1898,7 @@ static void gen_mxu_d32sxxv(DisasContext *ctx, bool right, bool arithmetic)
 
     XRa = extract32(ctx->opcode, 10, 4);
     XRd = extract32(ctx->opcode, 14, 4);
-    rs  = extract32(ctx->opcode, 21, 5);
+    rs = extract32(ctx->opcode, 21, 5);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -1938,10 +1938,10 @@ static void gen_mxu_d32sarl(DisasContext *ctx, bool sarw)
 {
     uint32_t XRa, XRb, XRc, rb;
 
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
     XRb = extract32(ctx->opcode, 10, 4);
     XRc = extract32(ctx->opcode, 14, 4);
-    rb  = extract32(ctx->opcode, 21, 5);
+    rb = extract32(ctx->opcode, 21, 5);
 
     if (unlikely(XRa == 0)) {
         /* destination is zero register -> do nothing */
@@ -1982,10 +1982,10 @@ static void gen_mxu_q16sxx(DisasContext *ctx, bool right, bool arithmetic)
 {
     uint32_t XRa, XRb, XRc, XRd, sft4;
 
-    XRa  = extract32(ctx->opcode,  6, 4);
-    XRb  = extract32(ctx->opcode, 10, 4);
-    XRc  = extract32(ctx->opcode, 14, 4);
-    XRd  = extract32(ctx->opcode, 18, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
     sft4 = extract32(ctx->opcode, 22, 4);
 
     TCGv t0 = tcg_temp_new();
@@ -1998,14 +1998,14 @@ static void gen_mxu_q16sxx(DisasContext *ctx, bool right, bool arithmetic)
 
     if (arithmetic) {
         tcg_gen_sextract_tl(t1, t0, 16, 16);
-        tcg_gen_sextract_tl(t0, t0,  0, 16);
+        tcg_gen_sextract_tl(t0, t0, 0, 16);
         tcg_gen_sextract_tl(t3, t2, 16, 16);
-        tcg_gen_sextract_tl(t2, t2,  0, 16);
+        tcg_gen_sextract_tl(t2, t2, 0, 16);
     } else {
         tcg_gen_extract_tl(t1, t0, 16, 16);
-        tcg_gen_extract_tl(t0, t0,  0, 16);
+        tcg_gen_extract_tl(t0, t0, 0, 16);
         tcg_gen_extract_tl(t3, t2, 16, 16);
-        tcg_gen_extract_tl(t2, t2,  0, 16);
+        tcg_gen_extract_tl(t2, t2, 0, 16);
     }
 
     if (right) {
@@ -2050,7 +2050,7 @@ static void gen_mxu_q16sxxv(DisasContext *ctx, bool right, bool arithmetic)
 
     XRa = extract32(ctx->opcode, 10, 4);
     XRd = extract32(ctx->opcode, 14, 4);
-    rs  = extract32(ctx->opcode, 21, 5);
+    rs = extract32(ctx->opcode, 21, 5);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -2066,14 +2066,14 @@ static void gen_mxu_q16sxxv(DisasContext *ctx, bool right, bool arithmetic)
 
     if (arithmetic) {
         tcg_gen_sextract_tl(t1, t0, 16, 16);
-        tcg_gen_sextract_tl(t0, t0,  0, 16);
+        tcg_gen_sextract_tl(t0, t0, 0, 16);
         tcg_gen_sextract_tl(t3, t2, 16, 16);
-        tcg_gen_sextract_tl(t2, t2,  0, 16);
+        tcg_gen_sextract_tl(t2, t2, 0, 16);
     } else {
         tcg_gen_extract_tl(t1, t0, 16, 16);
-        tcg_gen_extract_tl(t0, t0,  0, 16);
+        tcg_gen_extract_tl(t0, t0, 0, 16);
         tcg_gen_extract_tl(t3, t2, 16, 16);
-        tcg_gen_extract_tl(t2, t2,  0, 16);
+        tcg_gen_extract_tl(t2, t2, 0, 16);
     }
 
     if (right) {
@@ -2132,7 +2132,7 @@ static void gen_mxu_S32MAX_S32MIN(DisasContext *ctx)
     opc = extract32(ctx->opcode, 18, 3);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2157,10 +2157,10 @@ static void gen_mxu_S32MAX_S32MIN(DisasContext *ctx)
         /* the most general case */
         if (opc == OPC_MXU_S32MAX) {
             tcg_gen_smax_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1],
-                                               mxu_gpr[XRc - 1]);
+                             mxu_gpr[XRc - 1]);
         } else {
             tcg_gen_smin_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1],
-                                               mxu_gpr[XRc - 1]);
+                             mxu_gpr[XRc - 1]);
         }
     }
 }
@@ -2182,7 +2182,7 @@ static void gen_mxu_D16MAX_D16MIN(DisasContext *ctx)
     opc = extract32(ctx->opcode, 18, 3);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2275,7 +2275,7 @@ static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
     opc = extract32(ctx->opcode, 18, 3);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2379,7 +2379,7 @@ static void gen_mxu_q8slt(DisasContext *ctx, bool sltu)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2430,7 +2430,7 @@ static void gen_mxu_S32SLT(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2466,7 +2466,7 @@ static void gen_mxu_D16SLT(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2492,8 +2492,8 @@ static void gen_mxu_D16SLT(DisasContext *ctx)
         tcg_gen_sextract_tl(t1, t4, 16, 16);
         tcg_gen_setcond_tl(TCG_COND_LT, t0, t0, t1);
         tcg_gen_shli_tl(t2, t0, 16);
-        tcg_gen_sextract_tl(t0, t3,  0, 16);
-        tcg_gen_sextract_tl(t1, t4,  0, 16);
+        tcg_gen_sextract_tl(t0, t3, 0, 16);
+        tcg_gen_sextract_tl(t1, t4, 0, 16);
         tcg_gen_setcond_tl(TCG_COND_LT, t0, t0, t1);
         tcg_gen_or_tl(mxu_gpr[XRa - 1], t2, t0);
     }
@@ -2517,7 +2517,7 @@ static void gen_mxu_d16avg(DisasContext *ctx, bool round45)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2547,8 +2547,8 @@ static void gen_mxu_d16avg(DisasContext *ctx, bool round45)
         }
         tcg_gen_shli_tl(t2, t0, 15);
         tcg_gen_andi_tl(t2, t2, 0xffff0000);
-        tcg_gen_sextract_tl(t0, t3,  0, 16);
-        tcg_gen_sextract_tl(t1, t4,  0, 16);
+        tcg_gen_sextract_tl(t0, t3, 0, 16);
+        tcg_gen_sextract_tl(t1, t4, 0, 16);
         tcg_gen_add_tl(t0, t0, t1);
         if (round45) {
             tcg_gen_addi_tl(t0, t0, 1);
@@ -2577,7 +2577,7 @@ static void gen_mxu_q8avg(DisasContext *ctx, bool round45)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2632,7 +2632,7 @@ static void gen_mxu_q8movzn(DisasContext *ctx, TCGCond cond)
 {
     uint32_t XRc, XRb, XRa;
 
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
     XRb = extract32(ctx->opcode, 10, 4);
     XRc = extract32(ctx->opcode, 14, 4);
 
@@ -2693,7 +2693,7 @@ static void gen_mxu_d16movzn(DisasContext *ctx, TCGCond cond)
 {
     uint32_t XRc, XRb, XRa;
 
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
     XRb = extract32(ctx->opcode, 10, 4);
     XRc = extract32(ctx->opcode, 14, 4);
 
@@ -2740,7 +2740,7 @@ static void gen_mxu_s32movzn(DisasContext *ctx, TCGCond cond)
 {
     uint32_t XRc, XRb, XRa;
 
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
     XRb = extract32(ctx->opcode, 10, 4);
     XRc = extract32(ctx->opcode, 14, 4);
 
@@ -2776,7 +2776,7 @@ static void gen_mxu_S32CPS(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2816,7 +2816,7 @@ static void gen_mxu_D16CPS(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2844,14 +2844,14 @@ static void gen_mxu_D16CPS(DisasContext *ctx)
         gen_set_label(l_done_hi);
         tcg_gen_shli_i32(t1, t1, 16);
 
-        tcg_gen_sextract_tl(t0, mxu_gpr[XRc - 1],  0, 16);
+        tcg_gen_sextract_tl(t0, mxu_gpr[XRc - 1], 0, 16);
         tcg_gen_brcondi_tl(TCG_COND_GE, t0, 0, l_not_less_lo);
-        tcg_gen_sextract_tl(t0, mxu_gpr[XRb - 1],  0, 16);
+        tcg_gen_sextract_tl(t0, mxu_gpr[XRb - 1], 0, 16);
         tcg_gen_subfi_tl(t0, 0, t0);
         tcg_gen_br(l_done_lo);
 
         gen_set_label(l_not_less_lo);
-        tcg_gen_extract_tl(t0, mxu_gpr[XRb - 1],  0, 16);
+        tcg_gen_extract_tl(t0, mxu_gpr[XRb - 1], 0, 16);
 
         gen_set_label(l_done_lo);
         tcg_gen_deposit_tl(mxu_gpr[XRa - 1], t1, t0, 0, 16);
@@ -2872,7 +2872,7 @@ static void gen_mxu_Q8ABD(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 3);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2916,10 +2916,10 @@ static void gen_mxu_Q8ADD(DisasContext *ctx)
     uint32_t aptn2, pad, XRc, XRb, XRa;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    pad   = extract32(ctx->opcode, 21, 3);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    pad = extract32(ctx->opcode, 21, 3);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -2991,10 +2991,10 @@ static void gen_mxu_q8adde(DisasContext *ctx, bool accumulate)
     uint32_t aptn2, XRd, XRc, XRb, XRa;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely((XRb == 0) && (XRc == 0))) {
         /* both operands zero registers -> just set destination to zero */
@@ -3027,7 +3027,7 @@ static void gen_mxu_q8adde(DisasContext *ctx, bool accumulate)
             }
             if (accumulate) {
                 gen_load_mxu_gpr(t5, XRa);
-                tcg_gen_extract_tl(t1, t5,  0, 16);
+                tcg_gen_extract_tl(t1, t5, 0, 16);
                 tcg_gen_extract_tl(t3, t5, 16, 16);
                 tcg_gen_add_tl(t0, t0, t1);
                 tcg_gen_add_tl(t2, t2, t3);
@@ -3050,7 +3050,7 @@ static void gen_mxu_q8adde(DisasContext *ctx, bool accumulate)
             }
             if (accumulate) {
                 gen_load_mxu_gpr(t5, XRd);
-                tcg_gen_extract_tl(t1, t5,  0, 16);
+                tcg_gen_extract_tl(t1, t5, 0, 16);
                 tcg_gen_extract_tl(t3, t5, 16, 16);
                 tcg_gen_add_tl(t0, t0, t1);
                 tcg_gen_add_tl(t2, t2, t3);
@@ -3078,11 +3078,11 @@ static void gen_mxu_d8sum(DisasContext *ctx, bool sumc)
 {
     uint32_t pad, pad2, XRc, XRb, XRa;
 
-    pad  = extract32(ctx->opcode, 24, 2);
+    pad = extract32(ctx->opcode, 24, 2);
     pad2 = extract32(ctx->opcode, 18, 4);
-    XRc  = extract32(ctx->opcode, 14, 4);
-    XRb  = extract32(ctx->opcode, 10, 4);
-    XRa  = extract32(ctx->opcode,  6, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0 || pad2 != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -3101,8 +3101,8 @@ static void gen_mxu_d8sum(DisasContext *ctx, bool sumc)
         TCGv t5 = tcg_temp_new();
 
         if (XRb != 0) {
-            tcg_gen_extract_tl(t0, mxu_gpr[XRb - 1],  0, 8);
-            tcg_gen_extract_tl(t1, mxu_gpr[XRb - 1],  8, 8);
+            tcg_gen_extract_tl(t0, mxu_gpr[XRb - 1], 0, 8);
+            tcg_gen_extract_tl(t1, mxu_gpr[XRb - 1], 8, 8);
             tcg_gen_extract_tl(t2, mxu_gpr[XRb - 1], 16, 8);
             tcg_gen_extract_tl(t3, mxu_gpr[XRb - 1], 24, 8);
             tcg_gen_add_tl(t4, t0, t1);
@@ -3112,8 +3112,8 @@ static void gen_mxu_d8sum(DisasContext *ctx, bool sumc)
             tcg_gen_mov_tl(t4, 0);
         }
         if (XRc != 0) {
-            tcg_gen_extract_tl(t0, mxu_gpr[XRc - 1],  0, 8);
-            tcg_gen_extract_tl(t1, mxu_gpr[XRc - 1],  8, 8);
+            tcg_gen_extract_tl(t0, mxu_gpr[XRc - 1], 0, 8);
+            tcg_gen_extract_tl(t1, mxu_gpr[XRc - 1], 8, 8);
             tcg_gen_extract_tl(t2, mxu_gpr[XRc - 1], 16, 8);
             tcg_gen_extract_tl(t3, mxu_gpr[XRc - 1], 24, 8);
             tcg_gen_add_tl(t5, t0, t1);
@@ -3143,10 +3143,10 @@ static void gen_mxu_q16add(DisasContext *ctx)
 
     aptn2 = extract32(ctx->opcode, 24, 2);
     optn2 = extract32(ctx->opcode, 22, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3156,11 +3156,11 @@ static void gen_mxu_q16add(DisasContext *ctx)
     TCGv t5 = tcg_temp_new();
 
     gen_load_mxu_gpr(t1, XRb);
-    tcg_gen_extract_tl(t0, t1,  0, 16);
+    tcg_gen_extract_tl(t0, t1, 0, 16);
     tcg_gen_extract_tl(t1, t1, 16, 16);
 
     gen_load_mxu_gpr(t3, XRc);
-    tcg_gen_extract_tl(t2, t3,  0, 16);
+    tcg_gen_extract_tl(t2, t3, 0, 16);
     tcg_gen_extract_tl(t3, t3, 16, 16);
 
     switch (optn2) {
@@ -3227,10 +3227,10 @@ static void gen_mxu_q16acc(DisasContext *ctx)
     uint32_t aptn2, XRc, XRb, XRa, XRd;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3242,11 +3242,11 @@ static void gen_mxu_q16acc(DisasContext *ctx)
     TCGv s0 = tcg_temp_new();
 
     gen_load_mxu_gpr(t1, XRb);
-    tcg_gen_extract_tl(t0, t1,  0, 16);
+    tcg_gen_extract_tl(t0, t1, 0, 16);
     tcg_gen_extract_tl(t1, t1, 16, 16);
 
     gen_load_mxu_gpr(t3, XRc);
-    tcg_gen_extract_tl(t2, t3,  0, 16);
+    tcg_gen_extract_tl(t2, t3, 0, 16);
     tcg_gen_extract_tl(t3, t3, 16, 16);
 
     switch (aptn2) {
@@ -3304,10 +3304,10 @@ static void gen_mxu_q16accm(DisasContext *ctx)
     uint32_t aptn2, XRc, XRb, XRa, XRd;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3321,11 +3321,11 @@ static void gen_mxu_q16accm(DisasContext *ctx)
         TCGv a0 = tcg_temp_new();
         TCGv a1 = tcg_temp_new();
 
-        tcg_gen_extract_tl(t0, t2,  0, 16);
+        tcg_gen_extract_tl(t0, t2, 0, 16);
         tcg_gen_extract_tl(t1, t2, 16, 16);
 
         gen_load_mxu_gpr(a1, XRa);
-        tcg_gen_extract_tl(a0, a1,  0, 16);
+        tcg_gen_extract_tl(a0, a1, 0, 16);
         tcg_gen_extract_tl(a1, a1, 16, 16);
 
         if (aptn2 & 2) {
@@ -3344,11 +3344,11 @@ static void gen_mxu_q16accm(DisasContext *ctx)
         TCGv a0 = tcg_temp_new();
         TCGv a1 = tcg_temp_new();
 
-        tcg_gen_extract_tl(t0, t3,  0, 16);
+        tcg_gen_extract_tl(t0, t3, 0, 16);
         tcg_gen_extract_tl(t1, t3, 16, 16);
 
         gen_load_mxu_gpr(a1, XRd);
-        tcg_gen_extract_tl(a0, a1,  0, 16);
+        tcg_gen_extract_tl(a0, a1, 0, 16);
         tcg_gen_extract_tl(a1, a1, 16, 16);
 
         if (aptn2 & 1) {
@@ -3374,10 +3374,10 @@ static void gen_mxu_d16asum(DisasContext *ctx)
     uint32_t aptn2, XRc, XRb, XRa, XRd;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3388,7 +3388,7 @@ static void gen_mxu_d16asum(DisasContext *ctx)
     gen_load_mxu_gpr(t3, XRc);
 
     if (XRa != 0) {
-        tcg_gen_sextract_tl(t0, t2,  0, 16);
+        tcg_gen_sextract_tl(t0, t2, 0, 16);
         tcg_gen_sextract_tl(t1, t2, 16, 16);
         tcg_gen_add_tl(t0, t0, t1);
         if (aptn2 & 2) {
@@ -3399,7 +3399,7 @@ static void gen_mxu_d16asum(DisasContext *ctx)
     }
 
     if (XRd != 0) {
-        tcg_gen_sextract_tl(t0, t3,  0, 16);
+        tcg_gen_sextract_tl(t0, t3, 0, 16);
         tcg_gen_sextract_tl(t1, t3, 16, 16);
         tcg_gen_add_tl(t0, t0, t1);
         if (aptn2 & 1) {
@@ -3422,11 +3422,11 @@ static void gen_mxu_d32add(DisasContext *ctx)
     uint32_t aptn2, addc, XRc, XRb, XRa, XRd;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    addc  = extract32(ctx->opcode, 22, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    addc = extract32(ctx->opcode, 22, 2);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3504,10 +3504,10 @@ static void gen_mxu_d32acc(DisasContext *ctx)
     uint32_t aptn2, XRc, XRb, XRa, XRd;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3547,10 +3547,10 @@ static void gen_mxu_d32accm(DisasContext *ctx)
     uint32_t aptn2, XRc, XRb, XRa, XRd;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3590,10 +3590,10 @@ static void gen_mxu_d32asum(DisasContext *ctx)
     uint32_t aptn2, XRc, XRb, XRa, XRd;
 
     aptn2 = extract32(ctx->opcode, 24, 2);
-    XRd   = extract32(ctx->opcode, 18, 4);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3646,10 +3646,10 @@ static void gen_mxu_s32extr(DisasContext *ctx)
     t2 = tcg_temp_new();
     t3 = tcg_temp_new();
 
-    XRa   = extract32(ctx->opcode,  6, 4);
-    XRd   = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
+    XRd = extract32(ctx->opcode, 10, 4);
     bits5 = extract32(ctx->opcode, 16, 5);
-    rs    = extract32(ctx->opcode, 21, 5);
+    rs = extract32(ctx->opcode, 21, 5);
 
     /* {tmp} = {XRa:XRd} >> (64 - rt - bits5); */
     /* {XRa} = extract({tmp}, 0, bits5); */
@@ -3701,10 +3701,10 @@ static void gen_mxu_s32extrv(DisasContext *ctx)
     TCGLabel *l_zero = gen_new_label();
     TCGLabel *l_extract = gen_new_label();
 
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
     XRd = extract32(ctx->opcode, 10, 4);
-    rt  = extract32(ctx->opcode, 16, 5);
-    rs  = extract32(ctx->opcode, 21, 5);
+    rt = extract32(ctx->opcode, 16, 5);
+    rs = extract32(ctx->opcode, 21, 5);
 
     /* {tmp} = {XRa:XRd} >> (64 - rs - rt) */
     gen_load_mxu_gpr(t0, XRd);
@@ -3751,9 +3751,9 @@ static void gen_mxu_s32lui(DisasContext *ctx)
 {
     uint32_t XRa, s8, optn3, pad;
 
-    XRa   = extract32(ctx->opcode,  6, 4);
-    s8    = extract32(ctx->opcode, 10, 8);
-    pad   = extract32(ctx->opcode, 21, 2);
+    XRa = extract32(ctx->opcode, 6, 4);
+    s8 = extract32(ctx->opcode, 10, 8);
+    pad = extract32(ctx->opcode, 21, 2);
     optn3 = extract32(ctx->opcode, 23, 3);
 
     if (unlikely(pad != 0)) {
@@ -3808,7 +3808,7 @@ static void gen_mxu_Q16SAT(DisasContext *ctx)
     pad = extract32(ctx->opcode, 21, 3);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -3905,10 +3905,10 @@ static void gen_mxu_q16scop(DisasContext *ctx)
 {
     uint32_t XRd, XRc, XRb, XRa;
 
-    XRd  = extract32(ctx->opcode, 18, 4);
-    XRc  = extract32(ctx->opcode, 14, 4);
-    XRb  = extract32(ctx->opcode, 10, 4);
-    XRa  = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -3985,10 +3985,10 @@ static void gen_mxu_s32sfl(DisasContext *ctx)
 {
     uint32_t XRd, XRc, XRb, XRa, ptn2;
 
-    XRd  = extract32(ctx->opcode, 18, 4);
-    XRc  = extract32(ctx->opcode, 14, 4);
-    XRb  = extract32(ctx->opcode, 10, 4);
-    XRa  = extract32(ctx->opcode,  6, 4);
+    XRd = extract32(ctx->opcode, 18, 4);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
     ptn2 = extract32(ctx->opcode, 24, 2);
 
     TCGv t0 = tcg_temp_new();
@@ -4003,40 +4003,40 @@ static void gen_mxu_s32sfl(DisasContext *ctx)
     case 0:
         tcg_gen_andi_tl(t2, t0, 0xff000000);
         tcg_gen_andi_tl(t3, t1, 0x000000ff);
-        tcg_gen_deposit_tl(t3, t3, t0,  8, 8);
-        tcg_gen_shri_tl(t0, t0,  8);
-        tcg_gen_shri_tl(t1, t1,  8);
+        tcg_gen_deposit_tl(t3, t3, t0, 8, 8);
+        tcg_gen_shri_tl(t0, t0, 8);
+        tcg_gen_shri_tl(t1, t1, 8);
         tcg_gen_deposit_tl(t3, t3, t0, 24, 8);
         tcg_gen_deposit_tl(t3, t3, t1, 16, 8);
-        tcg_gen_shri_tl(t0, t0,  8);
-        tcg_gen_shri_tl(t1, t1,  8);
-        tcg_gen_deposit_tl(t2, t2, t0,  8, 8);
-        tcg_gen_deposit_tl(t2, t2, t1,  0, 8);
-        tcg_gen_shri_tl(t1, t1,  8);
+        tcg_gen_shri_tl(t0, t0, 8);
+        tcg_gen_shri_tl(t1, t1, 8);
+        tcg_gen_deposit_tl(t2, t2, t0, 8, 8);
+        tcg_gen_deposit_tl(t2, t2, t1, 0, 8);
+        tcg_gen_shri_tl(t1, t1, 8);
         tcg_gen_deposit_tl(t2, t2, t1, 16, 8);
         break;
     case 1:
         tcg_gen_andi_tl(t2, t0, 0xff000000);
         tcg_gen_andi_tl(t3, t1, 0x000000ff);
         tcg_gen_deposit_tl(t3, t3, t0, 16, 8);
-        tcg_gen_shri_tl(t0, t0,  8);
-        tcg_gen_shri_tl(t1, t1,  8);
+        tcg_gen_shri_tl(t0, t0, 8);
+        tcg_gen_shri_tl(t1, t1, 8);
         tcg_gen_deposit_tl(t2, t2, t0, 16, 8);
-        tcg_gen_deposit_tl(t2, t2, t1,  0, 8);
-        tcg_gen_shri_tl(t0, t0,  8);
-        tcg_gen_shri_tl(t1, t1,  8);
+        tcg_gen_deposit_tl(t2, t2, t1, 0, 8);
+        tcg_gen_shri_tl(t0, t0, 8);
+        tcg_gen_shri_tl(t1, t1, 8);
         tcg_gen_deposit_tl(t3, t3, t0, 24, 8);
-        tcg_gen_deposit_tl(t3, t3, t1,  8, 8);
-        tcg_gen_shri_tl(t1, t1,  8);
-        tcg_gen_deposit_tl(t2, t2, t1,  8, 8);
+        tcg_gen_deposit_tl(t3, t3, t1, 8, 8);
+        tcg_gen_shri_tl(t1, t1, 8);
+        tcg_gen_deposit_tl(t2, t2, t1, 8, 8);
         break;
     case 2:
         tcg_gen_andi_tl(t2, t0, 0xff00ff00);
         tcg_gen_andi_tl(t3, t1, 0x00ff00ff);
-        tcg_gen_deposit_tl(t3, t3, t0,  8, 8);
+        tcg_gen_deposit_tl(t3, t3, t0, 8, 8);
         tcg_gen_shri_tl(t0, t0, 16);
-        tcg_gen_shri_tl(t1, t1,  8);
-        tcg_gen_deposit_tl(t2, t2, t1,  0, 8);
+        tcg_gen_shri_tl(t1, t1, 8);
+        tcg_gen_deposit_tl(t2, t2, t1, 0, 8);
         tcg_gen_deposit_tl(t3, t3, t0, 24, 8);
         tcg_gen_shri_tl(t1, t1, 16);
         tcg_gen_deposit_tl(t2, t2, t1, 16, 8);
@@ -4045,7 +4045,7 @@ static void gen_mxu_s32sfl(DisasContext *ctx)
         tcg_gen_andi_tl(t2, t0, 0xffff0000);
         tcg_gen_andi_tl(t3, t1, 0x0000ffff);
         tcg_gen_shri_tl(t1, t1, 16);
-        tcg_gen_deposit_tl(t2, t2, t1,  0, 16);
+        tcg_gen_deposit_tl(t2, t2, t1, 0, 16);
         tcg_gen_deposit_tl(t3, t3, t0, 16, 16);
         break;
     }
@@ -4065,7 +4065,7 @@ static void gen_mxu_q8sad(DisasContext *ctx)
     XRd = extract32(ctx->opcode, 18, 4);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     TCGv t0 = tcg_temp_new();
     TCGv t1 = tcg_temp_new();
@@ -4111,11 +4111,11 @@ static void gen_mxu_S32ALNI(DisasContext *ctx)
 {
     uint32_t optn3, pad, XRc, XRb, XRa;
 
-    optn3 = extract32(ctx->opcode,  23, 3);
-    pad   = extract32(ctx->opcode,  21, 2);
-    XRc   = extract32(ctx->opcode, 14, 4);
-    XRb   = extract32(ctx->opcode, 10, 4);
-    XRa   = extract32(ctx->opcode,  6, 4);
+    optn3 = extract32(ctx->opcode, 23, 3);
+    pad = extract32(ctx->opcode, 21, 2);
+    XRc = extract32(ctx->opcode, 14, 4);
+    XRb = extract32(ctx->opcode, 10, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(pad != 0)) {
         /* opcode padding incorrect -> do nothing */
@@ -4171,103 +4171,93 @@ static void gen_mxu_S32ALNI(DisasContext *ctx)
     } else {
         /* the most general case */
         switch (optn3) {
-        case MXU_OPTN3_PTN0:
-            {
-                /*                                         */
-                /*         XRb                XRc          */
-                /*  +---------------+                      */
-                /*  | A   B   C   D |    E   F   G   H     */
-                /*  +-------+-------+                      */
-                /*          |                              */
-                /*         XRa                             */
-                /*                                         */
+        case MXU_OPTN3_PTN0: {
+            /*                                         */
+            /*         XRb                XRc          */
+            /*  +---------------+                      */
+            /*  | A   B   C   D |    E   F   G   H     */
+            /*  +-------+-------+                      */
+            /*          |                              */
+            /*         XRa                             */
+            /*                                         */
 
-                tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
-            }
-            break;
-        case MXU_OPTN3_PTN1:
-            {
-                /*                                         */
-                /*         XRb                 XRc         */
-                /*      +-------------------+              */
-                /*    A | B   C   D       E | F   G   H    */
-                /*      +---------+---------+              */
-                /*                |                        */
-                /*               XRa                       */
-                /*                                         */
+            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
+        } break;
+        case MXU_OPTN3_PTN1: {
+            /*                                         */
+            /*         XRb                 XRc         */
+            /*      +-------------------+              */
+            /*    A | B   C   D       E | F   G   H    */
+            /*      +---------+---------+              */
+            /*                |                        */
+            /*               XRa                       */
+            /*                                         */
 
-                TCGv_i32 t0 = tcg_temp_new();
-                TCGv_i32 t1 = tcg_temp_new();
+            TCGv_i32 t0 = tcg_temp_new();
+            TCGv_i32 t1 = tcg_temp_new();
 
-                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x00FFFFFF);
-                tcg_gen_shli_i32(t0, t0, 8);
+            tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x00FFFFFF);
+            tcg_gen_shli_i32(t0, t0, 8);
 
-                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFF000000);
-                tcg_gen_shri_i32(t1, t1, 24);
+            tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFF000000);
+            tcg_gen_shri_i32(t1, t1, 24);
 
-                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-            }
-            break;
-        case MXU_OPTN3_PTN2:
-            {
-                /*                                         */
-                /*         XRb                 XRc         */
-                /*          +-------------------+          */
-                /*    A   B | C   D       E   F | G   H    */
-                /*          +---------+---------+          */
-                /*                    |                    */
-                /*                   XRa                   */
-                /*                                         */
+            tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
+        } break;
+        case MXU_OPTN3_PTN2: {
+            /*                                         */
+            /*         XRb                 XRc         */
+            /*          +-------------------+          */
+            /*    A   B | C   D       E   F | G   H    */
+            /*          +---------+---------+          */
+            /*                    |                    */
+            /*                   XRa                   */
+            /*                                         */
 
-                TCGv_i32 t0 = tcg_temp_new();
-                TCGv_i32 t1 = tcg_temp_new();
+            TCGv_i32 t0 = tcg_temp_new();
+            TCGv_i32 t1 = tcg_temp_new();
 
-                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x0000FFFF);
-                tcg_gen_shli_i32(t0, t0, 16);
+            tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x0000FFFF);
+            tcg_gen_shli_i32(t0, t0, 16);
 
-                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFF0000);
-                tcg_gen_shri_i32(t1, t1, 16);
+            tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFF0000);
+            tcg_gen_shri_i32(t1, t1, 16);
 
-                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-            }
-            break;
-        case MXU_OPTN3_PTN3:
-            {
-                /*                                         */
-                /*         XRb                 XRc         */
-                /*              +-------------------+      */
-                /*    A   B   C | D       E   F   G | H    */
-                /*              +---------+---------+      */
-                /*                        |                */
-                /*                       XRa               */
-                /*                                         */
+            tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
+        } break;
+        case MXU_OPTN3_PTN3: {
+            /*                                         */
+            /*         XRb                 XRc         */
+            /*              +-------------------+      */
+            /*    A   B   C | D       E   F   G | H    */
+            /*              +---------+---------+      */
+            /*                        |                */
+            /*                       XRa               */
+            /*                                         */
 
-                TCGv_i32 t0 = tcg_temp_new();
-                TCGv_i32 t1 = tcg_temp_new();
+            TCGv_i32 t0 = tcg_temp_new();
+            TCGv_i32 t1 = tcg_temp_new();
 
-                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x000000FF);
-                tcg_gen_shli_i32(t0, t0, 24);
+            tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x000000FF);
+            tcg_gen_shli_i32(t0, t0, 24);
 
-                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFFFF00);
-                tcg_gen_shri_i32(t1, t1, 8);
+            tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFFFF00);
+            tcg_gen_shri_i32(t1, t1, 8);
 
-                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-            }
-            break;
-        case MXU_OPTN3_PTN4:
-            {
-                /*                                         */
-                /*         XRb                 XRc         */
-                /*                     +---------------+   */
-                /*    A   B   C   D    | E   F   G   H |   */
-                /*                     +-------+-------+   */
-                /*                             |           */
-                /*                            XRa          */
-                /*                                         */
+            tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
+        } break;
+        case MXU_OPTN3_PTN4: {
+            /*                                         */
+            /*         XRb                 XRc         */
+            /*                     +---------------+   */
+            /*    A   B   C   D    | E   F   G   H |   */
+            /*                     +-------+-------+   */
+            /*                             |           */
+            /*                            XRa          */
+            /*                                         */
 
-                tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1]);
-            }
-            break;
+            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1]);
+        } break;
         }
     }
 }
@@ -4281,10 +4271,10 @@ static void gen_mxu_S32ALN(DisasContext *ctx)
 {
     uint32_t rs, XRc, XRb, XRa;
 
-    rs  = extract32(ctx->opcode, 21, 5);
+    rs = extract32(ctx->opcode, 21, 5);
     XRc = extract32(ctx->opcode, 14, 4);
     XRb = extract32(ctx->opcode, 10, 4);
-    XRa = extract32(ctx->opcode,  6, 4);
+    XRa = extract32(ctx->opcode, 6, 4);
 
     if (unlikely(XRa == 0)) {
         /* destination is zero register -> do nothing */
@@ -4349,10 +4339,10 @@ static void gen_mxu_s32madd_sub(DisasContext *ctx, bool sub, bool uns)
 {
     uint32_t XRa, XRd, Rb, Rc;
 
-    XRa  = extract32(ctx->opcode,  6, 4);
-    XRd  = extract32(ctx->opcode, 10, 4);
-    Rb   = extract32(ctx->opcode, 16, 5);
-    Rc   = extract32(ctx->opcode, 21, 5);
+    XRa = extract32(ctx->opcode, 6, 4);
+    XRd = extract32(ctx->opcode, 10, 4);
+    Rb = extract32(ctx->opcode, 16, 5);
+    Rc = extract32(ctx->opcode, 21, 5);
 
     if (unlikely(Rb == 0 || Rc == 0)) {
         /* do nothing because x + 0 * y => x */
@@ -4434,7 +4424,7 @@ static void decode_opc_mxu__pool00(DisasContext *ctx)
 static bool decode_opc_mxu_s32madd_sub(DisasContext *ctx)
 {
     uint32_t opcode = extract32(ctx->opcode, 0, 6);
-    uint32_t pad  = extract32(ctx->opcode, 14, 2);
+    uint32_t pad = extract32(ctx->opcode, 14, 2);
 
     if (pad != 2) {
         /* MIPS32R1 MADD/MADDU/MSUB/MSUBU are on pad == 0 */
@@ -4564,7 +4554,7 @@ static void decode_opc_mxu__pool05(DisasContext *ctx)
 static void decode_opc_mxu__pool06(DisasContext *ctx)
 {
     uint32_t opcode = extract32(ctx->opcode, 10, 4);
-    uint32_t strd2  = extract32(ctx->opcode, 14, 2);
+    uint32_t strd2 = extract32(ctx->opcode, 14, 2);
 
     switch (opcode) {
     case OPC_MXU_S32LDST:
@@ -4584,7 +4574,7 @@ static void decode_opc_mxu__pool06(DisasContext *ctx)
 static void decode_opc_mxu__pool07(DisasContext *ctx)
 {
     uint32_t opcode = extract32(ctx->opcode, 10, 4);
-    uint32_t strd2  = extract32(ctx->opcode, 14, 2);
+    uint32_t strd2 = extract32(ctx->opcode, 14, 2);
 
     switch (opcode) {
     case OPC_MXU_S32LDST:
@@ -4630,7 +4620,7 @@ static void decode_opc_mxu__pool09(DisasContext *ctx)
 static void decode_opc_mxu__pool10(DisasContext *ctx)
 {
     uint32_t opcode = extract32(ctx->opcode, 10, 4);
-    uint32_t strd2  = extract32(ctx->opcode, 14, 2);
+    uint32_t strd2 = extract32(ctx->opcode, 14, 2);
 
     switch (opcode) {
     case OPC_MXU_S32LDST:
@@ -4650,7 +4640,7 @@ static void decode_opc_mxu__pool10(DisasContext *ctx)
 static void decode_opc_mxu__pool11(DisasContext *ctx)
 {
     uint32_t opcode = extract32(ctx->opcode, 10, 4);
-    uint32_t strd2  = extract32(ctx->opcode, 14, 2);
+    uint32_t strd2 = extract32(ctx->opcode, 14, 2);
 
     switch (opcode) {
     case OPC_MXU_S32LDST:
@@ -4793,7 +4783,7 @@ static void decode_opc_mxu__pool16(DisasContext *ctx)
 static void decode_opc_mxu__pool17(DisasContext *ctx)
 {
     uint32_t opcode = extract32(ctx->opcode, 6, 3);
-    uint32_t strd2  = extract32(ctx->opcode, 9, 2);
+    uint32_t strd2 = extract32(ctx->opcode, 9, 2);
 
     if (strd2 > 2) {
         MIPS_INVAL("decode_opc_mxu");
@@ -4803,20 +4793,20 @@ static void decode_opc_mxu__pool17(DisasContext *ctx)
 
     switch (opcode) {
     case OPC_MXU_LXW:
-          gen_mxu_lxx(ctx, strd2, MO_TE | MO_UL);
-          break;
+        gen_mxu_lxx(ctx, strd2, MO_TE | MO_UL);
+        break;
     case OPC_MXU_LXB:
-          gen_mxu_lxx(ctx, strd2, MO_TE | MO_SB);
-          break;
+        gen_mxu_lxx(ctx, strd2, MO_TE | MO_SB);
+        break;
     case OPC_MXU_LXH:
-          gen_mxu_lxx(ctx, strd2, MO_TE | MO_SW);
-          break;
+        gen_mxu_lxx(ctx, strd2, MO_TE | MO_SW);
+        break;
     case OPC_MXU_LXBU:
-          gen_mxu_lxx(ctx, strd2, MO_TE | MO_UB);
-          break;
+        gen_mxu_lxx(ctx, strd2, MO_TE | MO_UB);
+        break;
     case OPC_MXU_LXHU:
-          gen_mxu_lxx(ctx, strd2, MO_TE | MO_UW);
-          break;
+        gen_mxu_lxx(ctx, strd2, MO_TE | MO_UW);
+        break;
     default:
         MIPS_INVAL("decode_opc_mxu");
         gen_reserved_instruction(ctx);

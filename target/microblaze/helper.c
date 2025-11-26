@@ -36,8 +36,8 @@ static bool mb_cpu_access_is_secure(MicroBlazeCPU *cpu,
 }
 
 bool mb_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                     MMUAccessType access_type, int mmu_idx,
-                     bool probe, uintptr_t retaddr)
+                     MMUAccessType access_type, int mmu_idx, bool probe,
+                     uintptr_t retaddr)
 {
     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
     CPUMBState *env = &cpu->env;
@@ -74,8 +74,8 @@ bool mb_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
         return false;
     }
 
-    qemu_log_mask(CPU_LOG_MMU, "mmu=%d miss v=%" VADDR_PRIx "\n",
-                  mmu_idx, address);
+    qemu_log_mask(CPU_LOG_MMU, "mmu=%d miss v=%" VADDR_PRIx "\n", mmu_idx,
+                  address);
 
     env->ear = address;
     switch (lu.err) {
@@ -122,8 +122,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
             return;
         }
 
-        qemu_log_mask(CPU_LOG_INT,
-                      "INT: HWE at pc=%08x msr=%08x iflags=%x\n",
+        qemu_log_mask(CPU_LOG_INT, "INT: HWE at pc=%08x msr=%08x iflags=%x\n",
                       env->pc, msr, env->iflags);
 
         /* Exception breaks branch + dslot sequence?  */
@@ -171,8 +170,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
         assert(msr & MSR_IE);
         assert(!(env->iflags & (D_FLAG | IMM_FLAG)));
 
-        qemu_log_mask(CPU_LOG_INT,
-                      "INT: DEV at pc=%08x msr=%08x iflags=%x\n",
+        qemu_log_mask(CPU_LOG_INT, "INT: DEV at pc=%08x msr=%08x iflags=%x\n",
                       env->pc, msr, env->iflags);
         set_esr = false;
 
@@ -185,8 +183,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
     case EXCP_HW_BREAK:
         assert(!(env->iflags & (D_FLAG | IMM_FLAG)));
 
-        qemu_log_mask(CPU_LOG_INT,
-                      "INT: BRK at pc=%08x msr=%08x iflags=%x\n",
+        qemu_log_mask(CPU_LOG_INT, "INT: BRK at pc=%08x msr=%08x iflags=%x\n",
                       env->pc, msr, env->iflags);
         set_esr = false;
 
@@ -211,15 +208,14 @@ void mb_cpu_do_interrupt(CPUState *cs)
     env->iflags = 0;
 
     if (!set_esr) {
-        qemu_log_mask(CPU_LOG_INT,
-                      "         to pc=%08x msr=%08x\n", env->pc, msr);
+        qemu_log_mask(CPU_LOG_INT, "         to pc=%08x msr=%08x\n", env->pc,
+                      msr);
     } else if (env->esr & D_FLAG) {
         qemu_log_mask(CPU_LOG_INT,
                       "         to pc=%08x msr=%08x esr=%04x btr=%08x\n",
                       env->pc, msr, env->esr, env->btr);
     } else {
-        qemu_log_mask(CPU_LOG_INT,
-                      "         to pc=%08x msr=%08x esr=%04x\n",
+        qemu_log_mask(CPU_LOG_INT, "         to pc=%08x msr=%08x esr=%04x\n",
                       env->pc, msr, env->esr);
     }
 }
@@ -235,7 +231,7 @@ hwaddr mb_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
     unsigned int hit;
 
     /* Caller doesn't initialize */
-    *attrs = (MemTxAttrs) {};
+    *attrs = (MemTxAttrs){};
     attrs->secure = mb_cpu_access_is_secure(cpu, MMU_DATA_LOAD);
 
     if (mmu_idx != MMU_NOMMU_IDX) {
@@ -256,10 +252,9 @@ bool mb_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
     CPUMBState *env = &cpu->env;
 
-    if ((interrupt_request & CPU_INTERRUPT_HARD)
-        && (env->msr & MSR_IE)
-        && !(env->msr & (MSR_EIP | MSR_BIP))
-        && !(env->iflags & (D_FLAG | IMM_FLAG))) {
+    if ((interrupt_request & CPU_INTERRUPT_HARD) && (env->msr & MSR_IE) &&
+        !(env->msr & (MSR_EIP | MSR_BIP)) &&
+        !(env->iflags & (D_FLAG | IMM_FLAG))) {
         cs->exception_index = EXCP_IRQ;
         mb_cpu_do_interrupt(cs);
         return true;
@@ -270,8 +265,8 @@ bool mb_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 #endif /* !CONFIG_USER_ONLY */
 
 void mb_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                MMUAccessType access_type,
-                                int mmu_idx, uintptr_t retaddr)
+                                MMUAccessType access_type, int mmu_idx,
+                                uintptr_t retaddr)
 {
     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
     uint32_t esr, iflags;

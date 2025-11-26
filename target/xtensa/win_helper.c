@@ -33,13 +33,12 @@
 #include "qemu/host-utils.h"
 #include "exec/exec-all.h"
 
-static void copy_window_from_phys(CPUXtensaState *env,
-                                  uint32_t window, uint32_t phys, uint32_t n)
+static void copy_window_from_phys(CPUXtensaState *env, uint32_t window,
+                                  uint32_t phys, uint32_t n)
 {
     assert(phys < env->config->nareg);
     if (phys + n <= env->config->nareg) {
-        memcpy(env->regs + window, env->phys_regs + phys,
-               n * sizeof(uint32_t));
+        memcpy(env->regs + window, env->phys_regs + phys, n * sizeof(uint32_t));
     } else {
         uint32_t n1 = env->config->nareg - phys;
         memcpy(env->regs + window, env->phys_regs + phys,
@@ -49,13 +48,12 @@ static void copy_window_from_phys(CPUXtensaState *env,
     }
 }
 
-static void copy_phys_from_window(CPUXtensaState *env,
-                                  uint32_t phys, uint32_t window, uint32_t n)
+static void copy_phys_from_window(CPUXtensaState *env, uint32_t phys,
+                                  uint32_t window, uint32_t n)
 {
     assert(phys < env->config->nareg);
     if (phys + n <= env->config->nareg) {
-        memcpy(env->phys_regs + phys, env->regs + window,
-               n * sizeof(uint32_t));
+        memcpy(env->phys_regs + phys, env->regs + window, n * sizeof(uint32_t));
     } else {
         uint32_t n1 = env->config->nareg - phys;
         memcpy(env->phys_regs + phys, env->regs + window,
@@ -114,15 +112,15 @@ void HELPER(entry)(CPUXtensaState *env, uint32_t pc, uint32_t s, uint32_t imm)
 void HELPER(window_check)(CPUXtensaState *env, uint32_t pc, uint32_t w)
 {
     uint32_t windowbase = windowbase_bound(env->sregs[WINDOW_BASE], env);
-    uint32_t windowstart = xtensa_replicate_windowstart(env) >>
-        (env->sregs[WINDOW_BASE] + 1);
+    uint32_t windowstart =
+        xtensa_replicate_windowstart(env) >> (env->sregs[WINDOW_BASE] + 1);
     uint32_t n = ctz32(windowstart) + 1;
 
     assert(n <= w);
 
     xtensa_rotate_window(env, n);
-    env->sregs[PS] = (env->sregs[PS] & ~PS_OWB) |
-        (windowbase << PS_OWB_SHIFT) | PS_EXCM;
+    env->sregs[PS] =
+        (env->sregs[PS] & ~PS_OWB) | (windowbase << PS_OWB_SHIFT) | PS_EXCM;
     env->sregs[EPC1] = env->pc = pc;
 
     switch (ctz32(windowstart >> n)) {
@@ -154,7 +152,8 @@ void HELPER(test_ill_retw)(CPUXtensaState *env, uint32_t pc)
     }
 
     if (n == 0 || (m != 0 && m != n)) {
-        qemu_log_mask(LOG_GUEST_ERROR, "Illegal retw instruction(pc = %08x), "
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "Illegal retw instruction(pc = %08x), "
                       "PS = %08x, m = %d, n = %d\n",
                       pc, env->sregs[PS], m, n);
         HELPER(exception_cause)(env, pc, ILLEGAL_INSTRUCTION_CAUSE);
@@ -171,8 +170,8 @@ void HELPER(test_underflow_retw)(CPUXtensaState *env, uint32_t pc)
 
         xtensa_rotate_window(env, -n);
         /* window underflow */
-        env->sregs[PS] = (env->sregs[PS] & ~PS_OWB) |
-            (windowbase << PS_OWB_SHIFT) | PS_EXCM;
+        env->sregs[PS] =
+            (env->sregs[PS] & ~PS_OWB) | (windowbase << PS_OWB_SHIFT) | PS_EXCM;
         env->sregs[EPC1] = env->pc = pc;
 
         if (n == 1) {

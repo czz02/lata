@@ -5,7 +5,7 @@
 #include "reg-map.h"
 #include "stdio.h"
 #include "lata.h"
-//extern __thread TRANSLATION_DATA *tr_data;
+// extern __thread TRANSLATION_DATA *tr_data;
 
 extern IR2_OPND env_ir2_opnd;
 extern IR2_OPND zero_ir2_opnd;
@@ -60,74 +60,77 @@ extern IR2_OPND scr3_ir2_opnd;
 
 #define V0_RENAME_OPND a7_ir2_opnd
 
-#define ra_free_temp(opnd)                                              \
-    do {                                                                \
-        if (ir2_opnd_is_itemp(&opnd)) {                                 \
-            ra_free_itemp(opnd._reg_num);                               \
-        } else if (ir2_opnd_is_ftemp(&opnd)) {                          \
-            ra_free_ftemp(opnd._reg_num);                               \
-        } else {                                                        \
-            lsassertm(0, "attempt to free a non-temp register");        \
-        }                                                               \
+#define ra_free_temp(opnd)                                       \
+    do {                                                         \
+        if (ir2_opnd_is_itemp(&opnd)) {                          \
+            ra_free_itemp(opnd._reg_num);                        \
+        } else if (ir2_opnd_is_ftemp(&opnd)) {                   \
+            ra_free_ftemp(opnd._reg_num);                        \
+        } else {                                                 \
+            lsassertm(0, "attempt to free a non-temp register"); \
+        }                                                        \
     } while (0)
 
-#define ra_free_temp_auto(opnd)                                         \
-    do {                                                                \
-        if (ir2_opnd_is_itemp(&opnd)) {                                 \
-            ra_free_itemp(opnd._reg_num);                               \
-        } else if (ir2_opnd_is_ftemp(&opnd)) {                          \
-            ra_free_ftemp(opnd._reg_num);                               \
-        }                                                               \
+#define ra_free_temp_auto(opnd)                \
+    do {                                       \
+        if (ir2_opnd_is_itemp(&opnd)) {        \
+            ra_free_itemp(opnd._reg_num);      \
+        } else if (ir2_opnd_is_ftemp(&opnd)) { \
+            ra_free_ftemp(opnd._reg_num);      \
+        }                                      \
     } while (0)
 
 /*
  * Template functions
  */
 #define RA_ALLOC_FUNC_DEF(name) IR2_OPND ra_alloc_##name(int)
-#define RA_ALLOC_FUNC(name, type)                                       \
-IR2_OPND ra_alloc_##name(int index)                                     \
-{                                                                       \
-    lsassert(index >= 0 &&                                              \
-             index < (sizeof(reg_##name##_map) / sizeof(int)));         \
-    IR2_OPND opnd;                                                      \
-    opnd._type = type;                                                  \
-    opnd._reg_num = reg_##name##_map[index];                            \
-    opnd._assist = 0;                                                   \
-    return opnd;                                                        \
-}
+#define RA_ALLOC_FUNC(name, type)                                   \
+    IR2_OPND ra_alloc_##name(int index)                             \
+    {                                                               \
+        lsassert(index >= 0 &&                                      \
+                 index < (sizeof(reg_##name##_map) / sizeof(int))); \
+        IR2_OPND opnd;                                              \
+        opnd._type = type;                                          \
+        opnd._reg_num = reg_##name##_map[index];                    \
+        opnd._assist = 0;                                           \
+        return opnd;                                                \
+    }
 /*
  * Calculate the number of used temp reg
  */
 
-#define RA_ALLOC_TEMP_NUM_FUNC(name)                                    \
-static int ra_alloc_##name##_num(void)                                  \
-{                                                                       \
-    int name##_num, cto_num;                                            \
-    __asm("cto.w %0, %1\n\t"                                            \
-    : "=r"(cto_num)                                                     \
-    : "r"(lsenv->tr_data->name##_status));                                     \
-    lsassertm(cto_num < name##_status_num,                              \
-              "\n%s:%d alloc " #name " failed, cto_num %d\n",           \
-              __func__, __LINE__, cto_num);                             \
-    name##_num = reg_##name##_map[cto_num];                             \
-    BITS_SET(lsenv->tr_data->name##_status, 1 << cto_num);                     \
-    return name##_num;                                                  \
-}
+#define RA_ALLOC_TEMP_NUM_FUNC(name)                                        \
+    static int ra_alloc_##name##_num(void)                                  \
+    {                                                                       \
+        int name##_num, cto_num;                                            \
+        __asm("cto.w %0, %1\n\t"                                            \
+              : "=r"(cto_num)                                               \
+              : "r"(lsenv->tr_data->name##_status));                        \
+        lsassertm(cto_num < name##_status_num,                              \
+                  "\n%s:%d alloc " #name " failed, cto_num %d\n", __func__, \
+                  __LINE__, cto_num);                                       \
+        name##_num = reg_##name##_map[cto_num];                             \
+        BITS_SET(lsenv->tr_data->name##_status, 1 << cto_num);              \
+        return name##_num;                                                  \
+    }
 
-#define RA_FREE_CODE(name, phy_id)                                      \
-    do {                                                                \
-        int virt_id = reg_##name##_reverse_map[phy_id];                 \
-        lsassertm(virt_id >= 0 &&                                       \
-                ((lsenv->tr_data->name##_status) & (1 << virt_id)),            \
-                "\n%s:%d free " #name " failed, phy_id %d virt_id %d "  \
-                "lsenv->tr_data->"#name"_status 0x%x\n",                       \
-                 __func__, __LINE__, phy_id, virt_id,                   \
-                lsenv->tr_data->name##_status);                                \
-        lsenv->tr_data->name##_status &= ~(1 << virt_id);                      \
+#define RA_FREE_CODE(name, phy_id)                                        \
+    do {                                                                  \
+        int virt_id = reg_##name##_reverse_map[phy_id];                   \
+        lsassertm(virt_id >= 0 &&                                         \
+                      ((lsenv->tr_data->name##_status) & (1 << virt_id)), \
+                  "\n%s:%d free " #name " failed, phy_id %d virt_id %d "  \
+                  "lsenv->tr_data->" #name "_status 0x%x\n",              \
+                  __func__, __LINE__, phy_id, virt_id,                    \
+                  lsenv->tr_data->name##_status);                         \
+        lsenv->tr_data->name##_status &= ~(1 << virt_id);                 \
     } while (0)
 
-#define INIT_RA(type, phyno)                                            \
-(IR2_OPND){._type = type, ._reg_num = phyno, ._assist = 0}
+#define INIT_RA(type, phyno)                           \
+    (IR2_OPND)                                         \
+    {                                                  \
+        ._type = type, ._reg_num = phyno, ._assist = 0 \
+    }
 
 /*
  * Function declarations
@@ -150,8 +153,8 @@ RA_ALLOC_FUNC_DEF(scr);
 /* allocate and free temp register */
 IR2_OPND ra_alloc_itemp(void);
 IR2_OPND ra_alloc_ftemp(void);
-#define ra_free_itemp(phy_id)   RA_FREE_CODE(itemp, phy_id)
-#define ra_free_ftemp(phy_id)   RA_FREE_CODE(ftemp, phy_id)
+#define ra_free_itemp(phy_id) RA_FREE_CODE(itemp, phy_id)
+#define ra_free_ftemp(phy_id) RA_FREE_CODE(ftemp, phy_id)
 void ra_free_all(void);
 IR2_OPND ra_alloc_num_4095(void);
 void ra_free_num_4095(IR2_OPND);

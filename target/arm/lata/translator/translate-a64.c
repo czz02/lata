@@ -310,7 +310,7 @@ static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
 
     la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
     la_bcnez(fcc1_ir2_opnd, set_qc);
-    
+
     li_d(temp, lower[size]);
     la_vinsgr2vr_d(vtemp, temp, 0);
 
@@ -339,22 +339,23 @@ static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
     la_bcnez(fcc1_ir2_opnd, set_qc);
 
     la_b(exit);
-    
 
-    la_label(set_qc);    
+
+    la_label(set_qc);
 
     li_d(temp, 1);
     la_st_w(temp, env_ir2_opnd, env_offset_QC());
 
     la_label(exit);
-    
+
 
     free_alloc_gpr(temp);
     free_alloc_fpr(vtemp);
 }
 
-static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
-                                          IR2_OPND vreg2, int rd)
+static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d,
+                                          IR2_OPND vreg1, IR2_OPND vreg2,
+                                          int rd)
 {
     assert(0);
     IR2_OPND temp = ra_alloc_itemp();
@@ -386,8 +387,9 @@ static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d, IR
     free_alloc_gpr(temp);
 }
 
-static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d, IR2_OPND vreg1,
-                                          IR2_OPND vreg2, int rd)
+static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d,
+                                          IR2_OPND vreg1, IR2_OPND vreg2,
+                                          int rd)
 {
     assert(0);
     IR2_OPND temp = ra_alloc_itemp();
@@ -489,7 +491,6 @@ static void gen_goto_tb_indirect(DisasContext *s, uint32_t rn)
 
 static void gen_goto_tb_indirect_blr(DisasContext *s, IR2_OPND reg_n)
 {
-
 #ifdef CONFIG_LATA_INDIRECT_JMP
     IR2_OPND guest_pc = ra_alloc_itemp();
     IR2_OPND host_pc = ra_alloc_itemp();
@@ -979,7 +980,7 @@ static bool trans_BLR(DisasContext *s)
         }
     }
 
-    if (a->rn != 30){
+    if (a->rn != 30) {
         reg_n = alloc_gpr_src(a->rn);
     } else {
         reg_n = ra_alloc_itemp();
@@ -3462,7 +3463,7 @@ static bool trans_STR_v(DisasContext *s)
     }
 
     lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
-    
+
     if (is_signed) {
         switch (extsize) {
         case 0:
@@ -9664,7 +9665,6 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
             }
             la_vand_v(vreg_d, vreg_d, fsmask_ir2_opnd);
         }
-
     }
 
     store_fpr_dst(rd, vreg_d);
@@ -9826,8 +9826,10 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
     IR2_OPND vtemp = ra_alloc_ftemp();
     IR2_OPND vreg;
 
-    if(is_q) vreg = vtemp;
-    else vreg = vreg_d;
+    if (is_q)
+        vreg = vtemp;
+    else
+        vreg = vreg_d;
 
     // TODO : need fix saturate
     if (round) {
@@ -9930,7 +9932,7 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
         la_vpickev_d(vreg_d, vtemp, vreg_d);
     else
         la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
-   
+
     store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
@@ -13012,9 +13014,9 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
     switch (opcode) {
     case 0x01: /* SQADD, UQADD */
         if (u) {
-          assert(0);
+            assert(0);
         } else {
-          assert(0);
+            assert(0);
         }
         return;
     case 0x05: /* SQSUB, UQSUB */

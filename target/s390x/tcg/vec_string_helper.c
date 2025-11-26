@@ -75,8 +75,8 @@ static uint64_t get_element_lsbs_mask(uint8_t es)
     return dup_const(es, get_single_element_lsbs_mask(es));
 }
 
-static int vfae(void *v1, const void *v2, const void *v3, bool in,
-                bool rt, bool zs, uint8_t es)
+static int vfae(void *v1, const void *v2, const void *v3, bool in, bool rt,
+                bool zs, uint8_t es)
 {
     const uint64_t mask = get_element_lsbs_mask(es);
     const int bits = get_element_bits(es);
@@ -133,30 +133,30 @@ static int vfae(void *v1, const void *v2, const void *v3, bool in,
     return 0; /* match for zero */
 }
 
-#define DEF_VFAE_HELPER(BITS)                                                  \
-void HELPER(gvec_vfae##BITS)(void *v1, const void *v2, const void *v3,         \
-                             uint32_t desc)                                    \
-{                                                                              \
-    const bool in = extract32(simd_data(desc), 3, 1);                          \
-    const bool rt = extract32(simd_data(desc), 2, 1);                          \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
-                                                                               \
-    vfae(v1, v2, v3, in, rt, zs, MO_##BITS);                                   \
-}
+#define DEF_VFAE_HELPER(BITS)                                              \
+    void HELPER(gvec_vfae##BITS)(void *v1, const void *v2, const void *v3, \
+                                 uint32_t desc)                            \
+    {                                                                      \
+        const bool in = extract32(simd_data(desc), 3, 1);                  \
+        const bool rt = extract32(simd_data(desc), 2, 1);                  \
+        const bool zs = extract32(simd_data(desc), 1, 1);                  \
+                                                                           \
+        vfae(v1, v2, v3, in, rt, zs, MO_##BITS);                           \
+    }
 DEF_VFAE_HELPER(8)
 DEF_VFAE_HELPER(16)
 DEF_VFAE_HELPER(32)
 
-#define DEF_VFAE_CC_HELPER(BITS)                                               \
-void HELPER(gvec_vfae_cc##BITS)(void *v1, const void *v2, const void *v3,      \
-                                CPUS390XState *env, uint32_t desc)             \
-{                                                                              \
-    const bool in = extract32(simd_data(desc), 3, 1);                          \
-    const bool rt = extract32(simd_data(desc), 2, 1);                          \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
-                                                                               \
-    env->cc_op = vfae(v1, v2, v3, in, rt, zs, MO_##BITS);                      \
-}
+#define DEF_VFAE_CC_HELPER(BITS)                                              \
+    void HELPER(gvec_vfae_cc##BITS)(void *v1, const void *v2, const void *v3, \
+                                    CPUS390XState *env, uint32_t desc)        \
+    {                                                                         \
+        const bool in = extract32(simd_data(desc), 3, 1);                     \
+        const bool rt = extract32(simd_data(desc), 2, 1);                     \
+        const bool zs = extract32(simd_data(desc), 1, 1);                     \
+                                                                              \
+        env->cc_op = vfae(v1, v2, v3, in, rt, zs, MO_##BITS);                 \
+    }
 DEF_VFAE_CC_HELPER(8)
 DEF_VFAE_CC_HELPER(16)
 DEF_VFAE_CC_HELPER(32)
@@ -194,26 +194,26 @@ static int vfee(void *v1, const void *v2, const void *v3, bool zs, uint8_t es)
     return 0; /* match for zero */
 }
 
-#define DEF_VFEE_HELPER(BITS)                                                  \
-void HELPER(gvec_vfee##BITS)(void *v1, const void *v2, const void *v3,         \
-                             uint32_t desc)                                    \
-{                                                                              \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
-                                                                               \
-    vfee(v1, v2, v3, zs, MO_##BITS);                                           \
-}
+#define DEF_VFEE_HELPER(BITS)                                              \
+    void HELPER(gvec_vfee##BITS)(void *v1, const void *v2, const void *v3, \
+                                 uint32_t desc)                            \
+    {                                                                      \
+        const bool zs = extract32(simd_data(desc), 1, 1);                  \
+                                                                           \
+        vfee(v1, v2, v3, zs, MO_##BITS);                                   \
+    }
 DEF_VFEE_HELPER(8)
 DEF_VFEE_HELPER(16)
 DEF_VFEE_HELPER(32)
 
-#define DEF_VFEE_CC_HELPER(BITS)                                               \
-void HELPER(gvec_vfee_cc##BITS)(void *v1, const void *v2, const void *v3,      \
-                                CPUS390XState *env, uint32_t desc)             \
-{                                                                              \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
-                                                                               \
-    env->cc_op = vfee(v1, v2, v3, zs, MO_##BITS);                              \
-}
+#define DEF_VFEE_CC_HELPER(BITS)                                              \
+    void HELPER(gvec_vfee_cc##BITS)(void *v1, const void *v2, const void *v3, \
+                                    CPUS390XState *env, uint32_t desc)        \
+    {                                                                         \
+        const bool zs = extract32(simd_data(desc), 1, 1);                     \
+                                                                              \
+        env->cc_op = vfee(v1, v2, v3, zs, MO_##BITS);                         \
+    }
 DEF_VFEE_CC_HELPER(8)
 DEF_VFEE_CC_HELPER(16)
 DEF_VFEE_CC_HELPER(32)
@@ -259,26 +259,26 @@ static int vfene(void *v1, const void *v2, const void *v3, bool zs, uint8_t es)
     return smaller ? 1 : 2;
 }
 
-#define DEF_VFENE_HELPER(BITS)                                                 \
-void HELPER(gvec_vfene##BITS)(void *v1, const void *v2, const void *v3,        \
-                              uint32_t desc)                                   \
-{                                                                              \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
-                                                                               \
-    vfene(v1, v2, v3, zs, MO_##BITS);                                          \
-}
+#define DEF_VFENE_HELPER(BITS)                                              \
+    void HELPER(gvec_vfene##BITS)(void *v1, const void *v2, const void *v3, \
+                                  uint32_t desc)                            \
+    {                                                                       \
+        const bool zs = extract32(simd_data(desc), 1, 1);                   \
+                                                                            \
+        vfene(v1, v2, v3, zs, MO_##BITS);                                   \
+    }
 DEF_VFENE_HELPER(8)
 DEF_VFENE_HELPER(16)
 DEF_VFENE_HELPER(32)
 
 #define DEF_VFENE_CC_HELPER(BITS)                                              \
-void HELPER(gvec_vfene_cc##BITS)(void *v1, const void *v2, const void *v3,     \
-                                 CPUS390XState *env, uint32_t desc)            \
-{                                                                              \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
+    void HELPER(gvec_vfene_cc##BITS)(void *v1, const void *v2, const void *v3, \
+                                     CPUS390XState *env, uint32_t desc)        \
+    {                                                                          \
+        const bool zs = extract32(simd_data(desc), 1, 1);                      \
                                                                                \
-    env->cc_op = vfene(v1, v2, v3, zs, MO_##BITS);                             \
-}
+        env->cc_op = vfene(v1, v2, v3, zs, MO_##BITS);                         \
+    }
 DEF_VFENE_CC_HELPER(8)
 DEF_VFENE_CC_HELPER(16)
 DEF_VFENE_CC_HELPER(32)
@@ -309,21 +309,21 @@ static int vistr(void *v1, const void *v2, uint8_t es)
     return cc;
 }
 
-#define DEF_VISTR_HELPER(BITS)                                                 \
-void HELPER(gvec_vistr##BITS)(void *v1, const void *v2, uint32_t desc)         \
-{                                                                              \
-    vistr(v1, v2, MO_##BITS);                                                  \
-}
+#define DEF_VISTR_HELPER(BITS)                                             \
+    void HELPER(gvec_vistr##BITS)(void *v1, const void *v2, uint32_t desc) \
+    {                                                                      \
+        vistr(v1, v2, MO_##BITS);                                          \
+    }
 DEF_VISTR_HELPER(8)
 DEF_VISTR_HELPER(16)
 DEF_VISTR_HELPER(32)
 
-#define DEF_VISTR_CC_HELPER(BITS)                                              \
-void HELPER(gvec_vistr_cc##BITS)(void *v1, const void *v2, CPUS390XState *env, \
-                                uint32_t desc)                                 \
-{                                                                              \
-    env->cc_op = vistr(v1, v2, MO_##BITS);                                     \
-}
+#define DEF_VISTR_CC_HELPER(BITS)                                       \
+    void HELPER(gvec_vistr_cc##BITS)(void *v1, const void *v2,          \
+                                     CPUS390XState *env, uint32_t desc) \
+    {                                                                   \
+        env->cc_op = vistr(v1, v2, MO_##BITS);                          \
+    }
 DEF_VISTR_CC_HELPER(8)
 DEF_VISTR_CC_HELPER(16)
 DEF_VISTR_CC_HELPER(32)
@@ -417,56 +417,56 @@ static int vstrc(void *v1, const void *v2, const void *v3, const void *v4,
     return 0; /* match for zero */
 }
 
-#define DEF_VSTRC_HELPER(BITS)                                                 \
-void HELPER(gvec_vstrc##BITS)(void *v1, const void *v2, const void *v3,        \
-                              const void *v4, uint32_t desc)                   \
-{                                                                              \
-    const bool in = extract32(simd_data(desc), 3, 1);                          \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
-                                                                               \
-    vstrc(v1, v2, v3, v4, in, 0, zs, MO_##BITS);                               \
-}
+#define DEF_VSTRC_HELPER(BITS)                                              \
+    void HELPER(gvec_vstrc##BITS)(void *v1, const void *v2, const void *v3, \
+                                  const void *v4, uint32_t desc)            \
+    {                                                                       \
+        const bool in = extract32(simd_data(desc), 3, 1);                   \
+        const bool zs = extract32(simd_data(desc), 1, 1);                   \
+                                                                            \
+        vstrc(v1, v2, v3, v4, in, 0, zs, MO_##BITS);                        \
+    }
 DEF_VSTRC_HELPER(8)
 DEF_VSTRC_HELPER(16)
 DEF_VSTRC_HELPER(32)
 
 #define DEF_VSTRC_RT_HELPER(BITS)                                              \
-void HELPER(gvec_vstrc_rt##BITS)(void *v1, const void *v2, const void *v3,     \
-                                 const void *v4, uint32_t desc)                \
-{                                                                              \
-    const bool in = extract32(simd_data(desc), 3, 1);                          \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
+    void HELPER(gvec_vstrc_rt##BITS)(void *v1, const void *v2, const void *v3, \
+                                     const void *v4, uint32_t desc)            \
+    {                                                                          \
+        const bool in = extract32(simd_data(desc), 3, 1);                      \
+        const bool zs = extract32(simd_data(desc), 1, 1);                      \
                                                                                \
-    vstrc(v1, v2, v3, v4, in, 1, zs, MO_##BITS);                               \
-}
+        vstrc(v1, v2, v3, v4, in, 1, zs, MO_##BITS);                           \
+    }
 DEF_VSTRC_RT_HELPER(8)
 DEF_VSTRC_RT_HELPER(16)
 DEF_VSTRC_RT_HELPER(32)
 
 #define DEF_VSTRC_CC_HELPER(BITS)                                              \
-void HELPER(gvec_vstrc_cc##BITS)(void *v1, const void *v2, const void *v3,     \
-                                 const void *v4, CPUS390XState *env,           \
-                                 uint32_t desc)                                \
-{                                                                              \
-    const bool in = extract32(simd_data(desc), 3, 1);                          \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
+    void HELPER(gvec_vstrc_cc##BITS)(void *v1, const void *v2, const void *v3, \
+                                     const void *v4, CPUS390XState *env,       \
+                                     uint32_t desc)                            \
+    {                                                                          \
+        const bool in = extract32(simd_data(desc), 3, 1);                      \
+        const bool zs = extract32(simd_data(desc), 1, 1);                      \
                                                                                \
-    env->cc_op = vstrc(v1, v2, v3, v4, in, 0, zs, MO_##BITS);                  \
-}
+        env->cc_op = vstrc(v1, v2, v3, v4, in, 0, zs, MO_##BITS);              \
+    }
 DEF_VSTRC_CC_HELPER(8)
 DEF_VSTRC_CC_HELPER(16)
 DEF_VSTRC_CC_HELPER(32)
 
-#define DEF_VSTRC_CC_RT_HELPER(BITS)                                           \
-void HELPER(gvec_vstrc_cc_rt##BITS)(void *v1, const void *v2, const void *v3,  \
-                                    const void *v4, CPUS390XState *env,        \
-                                    uint32_t desc)                             \
-{                                                                              \
-    const bool in = extract32(simd_data(desc), 3, 1);                          \
-    const bool zs = extract32(simd_data(desc), 1, 1);                          \
-                                                                               \
-    env->cc_op = vstrc(v1, v2, v3, v4, in, 1, zs, MO_##BITS);                  \
-}
+#define DEF_VSTRC_CC_RT_HELPER(BITS)                                       \
+    void HELPER(gvec_vstrc_cc_rt##BITS)(void *v1, const void *v2,          \
+                                        const void *v3, const void *v4,    \
+                                        CPUS390XState *env, uint32_t desc) \
+    {                                                                      \
+        const bool in = extract32(simd_data(desc), 3, 1);                  \
+        const bool zs = extract32(simd_data(desc), 1, 1);                  \
+                                                                           \
+        env->cc_op = vstrc(v1, v2, v3, v4, in, 1, zs, MO_##BITS);          \
+    }
 DEF_VSTRC_CC_RT_HELPER(8)
 DEF_VSTRC_CC_RT_HELPER(16)
 DEF_VSTRC_CC_RT_HELPER(32)
@@ -512,7 +512,7 @@ static int vstrs(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
 
     substr_0 = s390_vec_read_element(v3, 0, es);
 
-    for (k = 0; ; k++) {
+    for (k = 0;; k++) {
         for (; k < str_elen; k++) {
             if (s390_vec_read_element(v2, k, es) == substr_0) {
                 break;
@@ -552,19 +552,25 @@ static int vstrs(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
         }
     }
 
- done:
+done:
     s390_vec_write_element64(v1, 0, k << es);
     s390_vec_write_element64(v1, 1, 0);
     return cc;
 }
 
-#define DEF_VSTRS_HELPER(BITS)                                             \
-void QEMU_FLATTEN HELPER(gvec_vstrs_##BITS)(void *v1, const void *v2,      \
-    const void *v3, const void *v4, CPUS390XState *env, uint32_t desc)     \
-    { env->cc_op = vstrs(v1, v2, v3, v4, MO_##BITS, false); }              \
-void QEMU_FLATTEN HELPER(gvec_vstrs_zs##BITS)(void *v1, const void *v2,    \
-    const void *v3, const void *v4, CPUS390XState *env, uint32_t desc)     \
-    { env->cc_op = vstrs(v1, v2, v3, v4, MO_##BITS, true); }
+#define DEF_VSTRS_HELPER(BITS)                                    \
+    void QEMU_FLATTEN HELPER(gvec_vstrs_##BITS)(                  \
+        void *v1, const void *v2, const void *v3, const void *v4, \
+        CPUS390XState *env, uint32_t desc)                        \
+    {                                                             \
+        env->cc_op = vstrs(v1, v2, v3, v4, MO_##BITS, false);     \
+    }                                                             \
+    void QEMU_FLATTEN HELPER(gvec_vstrs_zs##BITS)(                \
+        void *v1, const void *v2, const void *v3, const void *v4, \
+        CPUS390XState *env, uint32_t desc)                        \
+    {                                                             \
+        env->cc_op = vstrs(v1, v2, v3, v4, MO_##BITS, true);      \
+    }
 
 DEF_VSTRS_HELPER(8)
 DEF_VSTRS_HELPER(16)

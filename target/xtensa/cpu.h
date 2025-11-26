@@ -35,7 +35,7 @@
 #include "xtensa-isa.h"
 
 /* Xtensa processors have a weak memory model */
-#define TCG_GUEST_DEFAULT_MO      (0)
+#define TCG_GUEST_DEFAULT_MO (0)
 
 enum {
     /* Additional instructions */
@@ -217,7 +217,7 @@ enum {
 #define MEMCTL_IL0EN 0x1
 
 #define MAX_INSN_LENGTH 64
-#define MAX_INSNBUF_LENGTH \
+#define MAX_INSNBUF_LENGTH                                 \
     ((MAX_INSN_LENGTH + sizeof(xtensa_insnbuf_word) - 1) / \
      sizeof(xtensa_insnbuf_word))
 #define MAX_INSN_SLOTS 32
@@ -234,12 +234,12 @@ enum {
 
 #define REGION_PAGE_MASK 0xe0000000
 
-#define PAGE_CACHE_MASK    0x700
-#define PAGE_CACHE_SHIFT   8
+#define PAGE_CACHE_MASK 0x700
+#define PAGE_CACHE_SHIFT 8
 #define PAGE_CACHE_INVALID 0x000
-#define PAGE_CACHE_BYPASS  0x100
-#define PAGE_CACHE_WT      0x200
-#define PAGE_CACHE_WB      0x400
+#define PAGE_CACHE_BYPASS 0x100
+#define PAGE_CACHE_WT 0x200
+#define PAGE_CACHE_WB 0x400
 #define PAGE_CACHE_ISOLATE 0x600
 
 enum {
@@ -392,19 +392,16 @@ enum {
     XTENSA_OP_EXIT_TB_0 = 0x800,
     XTENSA_OP_SYNC_REGISTER_WINDOW = 0x1000,
 
-    XTENSA_OP_POSTPROCESS =
-        XTENSA_OP_CHECK_INTERRUPTS |
-        XTENSA_OP_EXIT_TB_M1 |
-        XTENSA_OP_EXIT_TB_0 |
-        XTENSA_OP_SYNC_REGISTER_WINDOW,
+    XTENSA_OP_POSTPROCESS = XTENSA_OP_CHECK_INTERRUPTS | XTENSA_OP_EXIT_TB_M1 |
+                            XTENSA_OP_EXIT_TB_0 |
+                            XTENSA_OP_SYNC_REGISTER_WINDOW,
 
     XTENSA_OP_NAME_ARRAY = 0x8000,
 
     XTENSA_OP_CONTROL_FLOW = 0x10000,
     XTENSA_OP_STORE = 0x20000,
     XTENSA_OP_LOAD = 0x40000,
-    XTENSA_OP_LOAD_STORE =
-        XTENSA_OP_LOAD | XTENSA_OP_STORE,
+    XTENSA_OP_LOAD_STORE = XTENSA_OP_LOAD | XTENSA_OP_STORE,
 };
 
 typedef struct XtensaOpcodeOps {
@@ -568,8 +565,8 @@ struct ArchCPU {
 
 #ifndef CONFIG_USER_ONLY
 bool xtensa_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr);
+                         MMUAccessType access_type, int mmu_idx, bool probe,
+                         uintptr_t retaddr);
 void xtensa_cpu_do_interrupt(CPUState *cpu);
 bool xtensa_cpu_exec_interrupt(CPUState *cpu, int interrupt_request);
 void xtensa_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
@@ -579,13 +576,13 @@ void xtensa_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
 hwaddr xtensa_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
 #endif
 void xtensa_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
-void xtensa_count_regs(const XtensaConfig *config,
-                       unsigned *n_regs, unsigned *n_core_regs);
+void xtensa_count_regs(const XtensaConfig *config, unsigned *n_regs,
+                       unsigned *n_core_regs);
 int xtensa_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
 int xtensa_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
 G_NORETURN void xtensa_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
-                                               MMUAccessType access_type, int mmu_idx,
-                                               uintptr_t retaddr);
+                                               MMUAccessType access_type,
+                                               int mmu_idx, uintptr_t retaddr);
 
 #define cpu_list xtensa_cpu_list
 
@@ -600,8 +597,7 @@ G_NORETURN void xtensa_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
 #define XTENSA_DEFAULT_CPU_MODEL "dc232b"
 #define XTENSA_DEFAULT_CPU_NOMMU_MODEL "de212"
 #endif
-#define XTENSA_DEFAULT_CPU_TYPE \
-    XTENSA_CPU_TYPE_NAME(XTENSA_DEFAULT_CPU_MODEL)
+#define XTENSA_DEFAULT_CPU_TYPE XTENSA_CPU_TYPE_NAME(XTENSA_DEFAULT_CPU_MODEL)
 #define XTENSA_DEFAULT_CPU_NOMMU_TYPE \
     XTENSA_CPU_TYPE_NAME(XTENSA_DEFAULT_CPU_NOMMU_MODEL)
 
@@ -622,8 +618,7 @@ void xtensa_rotate_window(CPUXtensaState *env, uint32_t delta);
 void xtensa_restore_owb(CPUXtensaState *env);
 void debug_exception_env(CPUXtensaState *new_env, uint32_t cause);
 
-static inline void xtensa_select_static_vectors(CPUXtensaState *env,
-                                                unsigned n)
+static inline void xtensa_select_static_vectors(CPUXtensaState *env, unsigned n)
 {
     assert(n < 2);
     env->static_vectors = n;
@@ -634,7 +629,7 @@ void xtensa_runstall(CPUXtensaState *env, bool runstall);
 #define XTENSA_OPTION_ALL (~(uint64_t)0)
 
 static inline bool xtensa_option_bits_enabled(const XtensaConfig *config,
-        uint64_t opt)
+                                              uint64_t opt)
 {
     return (config->options & opt) != 0;
 }
@@ -657,7 +652,7 @@ static inline int xtensa_get_ring(const CPUXtensaState *env)
 {
     if (xtensa_option_bits_enabled(env->config,
                                    XTENSA_OPTION_BIT(XTENSA_OPTION_MMU) |
-                                   XTENSA_OPTION_BIT(XTENSA_OPTION_MPU))) {
+                                       XTENSA_OPTION_BIT(XTENSA_OPTION_MPU))) {
         return (env->sregs[PS] & PS_RING) >> PS_RING_SHIFT;
     } else {
         return 0;
@@ -668,7 +663,7 @@ static inline int xtensa_get_cring(const CPUXtensaState *env)
 {
     if (xtensa_option_bits_enabled(env->config,
                                    XTENSA_OPTION_BIT(XTENSA_OPTION_MMU) |
-                                   XTENSA_OPTION_BIT(XTENSA_OPTION_MPU)) &&
+                                       XTENSA_OPTION_BIT(XTENSA_OPTION_MPU)) &&
         (env->sregs[PS] & PS_EXCM) == 0) {
         return (env->sregs[PS] & PS_RING) >> PS_RING_SHIFT;
     } else {
@@ -678,8 +673,9 @@ static inline int xtensa_get_cring(const CPUXtensaState *env)
 
 #ifndef CONFIG_USER_ONLY
 int xtensa_get_physical_addr(CPUXtensaState *env, bool update_tlb,
-        uint32_t vaddr, int is_write, int mmu_idx,
-        uint32_t *paddr, uint32_t *page_size, unsigned *access);
+                             uint32_t vaddr, int is_write, int mmu_idx,
+                             uint32_t *paddr, uint32_t *page_size,
+                             unsigned *access);
 void reset_mmu(CPUXtensaState *env);
 void dump_mmu(CPUXtensaState *env);
 
@@ -695,7 +691,7 @@ bool xtensa_abi_call0(void);
 static inline uint32_t xtensa_replicate_windowstart(CPUXtensaState *env)
 {
     return env->sregs[WINDOW_START] |
-        (env->sregs[WINDOW_START] << env->config->nareg / 4);
+           (env->sregs[WINDOW_START] << env->config->nareg / 4);
 }
 
 /* MMU modes definitions */
@@ -764,7 +760,7 @@ static inline void cpu_get_tb_cpu_state(CPUXtensaState *env, vaddr *pc,
         }
     }
     if (xtensa_option_enabled(env->config, XTENSA_OPTION_EXTENDED_L32R) &&
-            (env->sregs[LITBASE] & 1)) {
+        (env->sregs[LITBASE] & 1)) {
         *flags |= XTENSA_TBFLAG_LITBASE;
     }
     if (xtensa_option_enabled(env->config, XTENSA_OPTION_DEBUG)) {
@@ -780,13 +776,13 @@ static inline void cpu_get_tb_cpu_state(CPUXtensaState *env, vaddr *pc,
     }
     if (xtensa_option_enabled(env->config, XTENSA_OPTION_WINDOWED_REGISTER) &&
         (env->sregs[PS] & (PS_WOE | PS_EXCM)) == PS_WOE) {
-        uint32_t windowstart = xtensa_replicate_windowstart(env) >>
-            (env->sregs[WINDOW_BASE] + 1);
+        uint32_t windowstart =
+            xtensa_replicate_windowstart(env) >> (env->sregs[WINDOW_BASE] + 1);
         uint32_t w = ctz32(windowstart | 0x8);
 
         *flags |= (w << XTENSA_TBFLAG_WINDOW_SHIFT) | XTENSA_TBFLAG_CWOE;
-        *flags |= extract32(env->sregs[PS], PS_CALLINC_SHIFT,
-                            PS_CALLINC_LEN) << XTENSA_TBFLAG_CALLINC_SHIFT;
+        *flags |= extract32(env->sregs[PS], PS_CALLINC_SHIFT, PS_CALLINC_LEN)
+                  << XTENSA_TBFLAG_CALLINC_SHIFT;
     } else {
         *flags |= 3 << XTENSA_TBFLAG_WINDOW_SHIFT;
     }

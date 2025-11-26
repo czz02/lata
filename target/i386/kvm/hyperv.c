@@ -37,9 +37,12 @@ void hyperv_x86_synic_update(X86CPU *cpu)
     CPUX86State *env = &cpu->env;
     bool enable = env->msr_hv_synic_control & HV_SYNIC_ENABLE;
     hwaddr msg_page_addr = (env->msr_hv_synic_msg_page & HV_SIMP_ENABLE) ?
-        (env->msr_hv_synic_msg_page & TARGET_PAGE_MASK) : 0;
-    hwaddr event_page_addr = (env->msr_hv_synic_evt_page & HV_SIEFP_ENABLE) ?
-        (env->msr_hv_synic_evt_page & TARGET_PAGE_MASK) : 0;
+                               (env->msr_hv_synic_msg_page & TARGET_PAGE_MASK) :
+                               0;
+    hwaddr event_page_addr =
+        (env->msr_hv_synic_evt_page & HV_SIEFP_ENABLE) ?
+            (env->msr_hv_synic_evt_page & TARGET_PAGE_MASK) :
+            0;
     hyperv_synic_update(CPU(cpu), enable, msg_page_addr, event_page_addr);
 }
 
@@ -104,8 +107,7 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
                 hyperv_hcall_retreive_dbg_data(in_param, out_param, fast);
             break;
         case HV_RESET_DEBUG_SESSION:
-            exit->u.hcall.result =
-                hyperv_hcall_reset_dbg_session(out_param);
+            exit->u.hcall.result = hyperv_hcall_reset_dbg_session(out_param);
             break;
         default:
             exit->u.hcall.result = HV_STATUS_INVALID_HYPERCALL_CODE;
@@ -128,11 +130,10 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
             if (control & HV_SYNDBG_CONTROL_SEND) {
                 exit->u.syndbg.status =
                     hyperv_syndbg_send(env->msr_hv_syndbg_send_page,
-                            HV_SYNDBG_CONTROL_SEND_SIZE(control));
+                                       HV_SYNDBG_CONTROL_SEND_SIZE(control));
             } else if (control & HV_SYNDBG_CONTROL_RECV) {
-                exit->u.syndbg.status =
-                    hyperv_syndbg_recv(env->msr_hv_syndbg_recv_page,
-                            TARGET_PAGE_SIZE);
+                exit->u.syndbg.status = hyperv_syndbg_recv(
+                    env->msr_hv_syndbg_recv_page, TARGET_PAGE_SIZE);
             }
             break;
         }

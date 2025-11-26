@@ -32,7 +32,7 @@
 
 #define HELPER_H "helper.h"
 #include "exec/helper-info.c.inc"
-#undef  HELPER_H
+#undef HELPER_H
 
 
 /*
@@ -67,16 +67,15 @@ static TCGv cpu_sp;
 static TCGv cpu_skip;
 
 static const char reg_names[NUMBER_OF_CPU_REGISTERS][8] = {
-    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
-    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
-    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
-    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
+    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",  "r8",  "r9",  "r10",
+    "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20", "r21",
+    "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
 };
 #define REG(x) (cpu_r[x])
 
-#define DISAS_EXIT   DISAS_TARGET_0  /* We want return to the cpu main loop.  */
-#define DISAS_LOOKUP DISAS_TARGET_1  /* We have a variable condition exit.  */
-#define DISAS_CHAIN  DISAS_TARGET_2  /* We have a single condition exit.  */
+#define DISAS_EXIT DISAS_TARGET_0 /* We want return to the cpu main loop.  */
+#define DISAS_LOOKUP DISAS_TARGET_1 /* We have a variable condition exit.  */
+#define DISAS_CHAIN DISAS_TARGET_2 /* We have a single condition exit.  */
 
 typedef struct DisasContext DisasContext;
 
@@ -145,8 +144,8 @@ void avr_cpu_tcg_init(void)
     cpu_skip = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(skip), "skip");
 
     for (i = 0; i < NUMBER_OF_CPU_REGISTERS; i++) {
-        cpu_r[i] = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(r[i]),
-                                          reg_names[i]);
+        cpu_r[i] =
+            tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(r[i]), reg_names[i]);
     }
 #undef AVR_REG_OFFS
 }
@@ -364,7 +363,7 @@ static bool trans_ADIW(DisasContext *ctx, arg_ADIW *a)
     tcg_gen_shri_tl(cpu_Vf, cpu_Vf, 15);
     tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
     tcg_gen_shri_tl(cpu_Nf, R, 15); /* Nf = R(15) */
-    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf);/* Sf = Nf ^ Vf */
+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
 
     /* update output registers */
     tcg_gen_andi_tl(RdL, R, 0xff);
@@ -1432,7 +1431,6 @@ static bool trans_BRBS(DisasContext *ctx, arg_BRBS *a)
  */
 static void gen_set_addr(TCGv addr, TCGv H, TCGv M, TCGv L)
 {
-
     tcg_gen_andi_tl(L, addr, 0x000000ff);
 
     tcg_gen_andi_tl(M, addr, 0x0000ff00);
@@ -2565,7 +2563,6 @@ static bool trans_BREAK(DisasContext *ctx, arg_BREAK *a)
  */
 static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
 {
-
     /* NOP */
 
     return true;
@@ -2643,8 +2640,8 @@ static bool canonicalize_skip(DisasContext *ctx)
         if (ctx->skip_var1 == NULL) {
             tcg_gen_setcondi_tl(ctx->skip_cond, cpu_skip, ctx->skip_var0, 0);
         } else {
-            tcg_gen_setcond_tl(ctx->skip_cond, cpu_skip,
-                               ctx->skip_var0, ctx->skip_var1);
+            tcg_gen_setcond_tl(ctx->skip_cond, cpu_skip, ctx->skip_var0,
+                               ctx->skip_var1);
             ctx->skip_var1 = NULL;
         }
         ctx->skip_cond = TCG_COND_NE;
@@ -2711,8 +2708,8 @@ static void avr_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
         if (ctx->skip_var1 == NULL) {
             tcg_gen_brcondi_tl(ctx->skip_cond, ctx->skip_var0, 0, skip_label);
         } else {
-            tcg_gen_brcond_tl(ctx->skip_cond, ctx->skip_var0,
-                              ctx->skip_var1, skip_label);
+            tcg_gen_brcond_tl(ctx->skip_cond, ctx->skip_var0, ctx->skip_var1,
+                              skip_label);
             ctx->skip_var1 = NULL;
         }
         ctx->skip_cond = TCG_COND_NEVER;
@@ -2788,8 +2785,8 @@ static void avr_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
     }
 }
 
-static void avr_tr_disas_log(const DisasContextBase *dcbase,
-                             CPUState *cs, FILE *logfile)
+static void avr_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs,
+                             FILE *logfile)
 {
     fprintf(logfile, "IN: %s\n", lookup_symbol(dcbase->pc_first));
     target_disas(logfile, cs, dcbase->pc_first, dcbase->tb->size);
@@ -2797,16 +2794,16 @@ static void avr_tr_disas_log(const DisasContextBase *dcbase,
 
 static const TranslatorOps avr_tr_ops = {
     .init_disas_context = avr_tr_init_disas_context,
-    .tb_start           = avr_tr_tb_start,
-    .insn_start         = avr_tr_insn_start,
-    .translate_insn     = avr_tr_translate_insn,
-    .tb_stop            = avr_tr_tb_stop,
-    .disas_log          = avr_tr_disas_log,
+    .tb_start = avr_tr_tb_start,
+    .insn_start = avr_tr_insn_start,
+    .translate_insn = avr_tr_translate_insn,
+    .tb_stop = avr_tr_tb_stop,
+    .disas_log = avr_tr_disas_log,
 };
 
 void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
                            target_ulong pc, void *host_pc)
 {
-    DisasContext dc = { };
+    DisasContext dc = {};
     translator_loop(cs, tb, max_insns, pc, host_pc, &avr_tr_ops, &dc.base);
 }

@@ -8,7 +8,8 @@
 /*
  * FIXME: This is a intial port code, there is no any verification!!!
  */
-uint32 ir2_assemble(IR2_INST *ir2){
+uint32 ir2_assemble(IR2_INST *ir2)
+{
     GM_LA_OPCODE_FORMAT format = lisa_format_table[ir2->_opcode - LISA_INVALID];
     lsassert(format.type == ir2->_opcode);
     lsassert(format.opcode != 0);
@@ -26,7 +27,7 @@ uint32 ir2_assemble(IR2_INST *ir2){
         int start = bit_field.bit_range_0.start;
         int end = bit_field.bit_range_0.end;
         int bit_len = end - start + 1;
-        //FIXME: this is a unoin here.
+        // FIXME: this is a unoin here.
         int val = ir2->_opnd[i].val;
         int mask = (1 << bit_len) - 1;
 
@@ -65,7 +66,8 @@ bool ir2_op_check(IR2_INST *ir2)
          * There are three main operand type in LA.
          *
          * 1. Regsiter.
-         *    Include GPR, FPR, SCR, FCSR and FCC. The check of them is rigorous.
+         *    Include GPR, FPR, SCR, FCSR and FCC. The check of them is
+         * rigorous.
          * 2. Immediate num.
          *    Include IMMD, IMMH. Either of them can pass the check.
          * 3. Invalid
@@ -78,8 +80,7 @@ bool ir2_op_check(IR2_INST *ir2)
             break;
         }
         if (place.type == IR2_OPND_IMM) {
-            if (!(opnd._type == IR2_OPND_LABEL ||
-                  opnd._type == IR2_OPND_IMM)) {
+            if (!(opnd._type == IR2_OPND_LABEL || opnd._type == IR2_OPND_IMM)) {
                 return false;
             }
         } else if (opnd._type != place.type) {

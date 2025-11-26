@@ -23,8 +23,8 @@
 #include "hw/intc/armv7m_nvic.h"
 #endif
 
-static void v7m_msr_xpsr(CPUARMState *env, uint32_t mask,
-                         uint32_t reg, uint32_t val)
+static void v7m_msr_xpsr(CPUARMState *env, uint32_t mask, uint32_t reg,
+                         uint32_t val)
 {
     /* Only APSR is actually writable */
     if (!(reg & 4)) {
@@ -161,8 +161,8 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
 
 #else /* !CONFIG_USER_ONLY */
 
-static ARMMMUIdx arm_v7m_mmu_idx_all(CPUARMState *env,
-                                     bool secstate, bool priv, bool negpri)
+static ARMMMUIdx arm_v7m_mmu_idx_all(CPUARMState *env, bool secstate, bool priv,
+                                     bool negpri)
 {
     ARMMMUIdx mmu_idx = ARM_MMU_IDX_M;
 
@@ -192,8 +192,8 @@ static ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
 /* Return the MMU index for a v7M CPU in the specified security state */
 ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
 {
-    bool priv = arm_v7m_is_handler_mode(env) ||
-        !(env->v7m.control[secstate] & 1);
+    bool priv =
+        arm_v7m_is_handler_mode(env) || !(env->v7m.control[secstate] & 1);
 
     return arm_v7m_mmu_idx_for_secstate_and_priv(env, secstate, priv);
 }
@@ -224,14 +224,12 @@ static bool v7m_stack_write(ARMCPU *cpu, uint32_t addr, uint32_t value,
         /* MPU/SAU lookup failed */
         if (fi.type == ARMFault_QEMU_SFault) {
             if (mode == STACK_LAZYFP) {
-                qemu_log_mask(CPU_LOG_INT,
-                              "...SecureFault with SFSR.LSPERR "
-                              "during lazy stacking\n");
+                qemu_log_mask(CPU_LOG_INT, "...SecureFault with SFSR.LSPERR "
+                                           "during lazy stacking\n");
                 env->v7m.sfsr |= R_V7M_SFSR_LSPERR_MASK;
             } else {
-                qemu_log_mask(CPU_LOG_INT,
-                              "...SecureFault with SFSR.AUVIOL "
-                              "during stacking\n");
+                qemu_log_mask(CPU_LOG_INT, "...SecureFault with SFSR.AUVIOL "
+                                           "during stacking\n");
                 env->v7m.sfsr |= R_V7M_SFSR_AUVIOL_MASK;
             }
             env->v7m.sfsr |= R_V7M_SFSR_SFARVALID_MASK;
@@ -401,18 +399,19 @@ void HELPER(v7m_preserve_fp_state)(CPUARMState *env)
             if (i >= 16) {
                 faddr += 8; /* skip the slot for the FPSCR/VPR */
             }
-            stacked_ok = stacked_ok &&
+            stacked_ok =
+                stacked_ok &&
                 v7m_stack_write(cpu, faddr, slo, mmu_idx, STACK_LAZYFP) &&
                 v7m_stack_write(cpu, faddr + 4, shi, mmu_idx, STACK_LAZYFP);
         }
 
-        stacked_ok = stacked_ok &&
-            v7m_stack_write(cpu, fpcar + 0x40,
-                            vfp_get_fpscr(env), mmu_idx, STACK_LAZYFP);
+        stacked_ok =
+            stacked_ok && v7m_stack_write(cpu, fpcar + 0x40, vfp_get_fpscr(env),
+                                          mmu_idx, STACK_LAZYFP);
         if (cpu_isar_feature(aa32_mve, cpu)) {
-            stacked_ok = stacked_ok &&
-                v7m_stack_write(cpu, fpcar + 0x44,
-                                env->v7m.vpr, mmu_idx, STACK_LAZYFP);
+            stacked_ok =
+                stacked_ok && v7m_stack_write(cpu, fpcar + 0x44, env->v7m.vpr,
+                                              mmu_idx, STACK_LAZYFP);
         }
     }
 
@@ -424,8 +423,8 @@ void HELPER(v7m_preserve_fp_state)(CPUARMState *env)
      * If it's just pending and won't be taken until the current
      * handler exits, then we do update LSPACT and the FP regs.
      */
-    take_exception = !stacked_ok &&
-        armv7m_nvic_can_take_pending_exception(env->nvic);
+    take_exception =
+        !stacked_ok && armv7m_nvic_can_take_pending_exception(env->nvic);
 
     qemu_mutex_unlock_iothread();
 
@@ -460,14 +459,12 @@ void HELPER(v7m_preserve_fp_state)(CPUARMState *env)
  * security state.
  */
 static void write_v7m_control_spsel_for_secstate(CPUARMState *env,
-                                                 bool new_spsel,
-                                                 bool secstate)
+                                                 bool new_spsel, bool secstate)
 {
     bool old_is_psp = v7m_using_psp(env);
 
     env->v7m.control[secstate] =
-        deposit32(env->v7m.control[secstate],
-                  R_V7M_CONTROL_SPSEL_SHIFT,
+        deposit32(env->v7m.control[secstate], R_V7M_CONTROL_SPSEL_SHIFT,
                   R_V7M_CONTROL_SPSEL_LENGTH, new_spsel);
 
     if (secstate == env->v7m.secure) {
@@ -683,8 +680,8 @@ static bool arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure,
     if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
         V8M_SAttributes sattrs = {};
 
-        v8m_security_lookup(env, addr, MMU_DATA_LOAD, mmu_idx,
-                            targets_secure, &sattrs);
+        v8m_security_lookup(env, addr, MMU_DATA_LOAD, mmu_idx, targets_secure,
+                            &sattrs);
         if (sattrs.ns) {
             attrs.secure = false;
         } else if (!targets_secure) {
@@ -697,8 +694,8 @@ static bool arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure,
         }
     }
 
-    vector_entry = address_space_ldl(arm_addressspace(cs, attrs), addr,
-                                     attrs, &result);
+    vector_entry =
+        address_space_ldl(arm_addressspace(cs, attrs), addr, attrs, &result);
     if (result != MEMTX_OK) {
         /*
          * Underlying exception is BusFault: its target security state
@@ -744,8 +741,8 @@ static uint32_t v7m_integrity_sig(CPUARMState *env, uint32_t lr)
      */
     uint32_t sig = 0xfefa125a;
 
-    if (!cpu_isar_feature(aa32_vfp_simd, env_archcpu(env))
-        || (lr & R_V7M_EXCRET_FTYPE_MASK)) {
+    if (!cpu_isar_feature(aa32_vfp_simd, env_archcpu(env)) ||
+        (lr & R_V7M_EXCRET_FTYPE_MASK)) {
         sig |= 1;
     }
     return sig;
@@ -771,8 +768,8 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
 
     if (dotailchain) {
         bool mode = lr & R_V7M_EXCRET_MODE_MASK;
-        bool priv = !(env->v7m.control[M_REG_S] & R_V7M_CONTROL_NPRIV_MASK) ||
-            !mode;
+        bool priv =
+            !(env->v7m.control[M_REG_S] & R_V7M_CONTROL_NPRIV_MASK) || !mode;
 
         mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, M_REG_S, priv);
         frame_sp_p = arm_v7m_get_sp_ptr(env, M_REG_S, mode,
@@ -800,8 +797,7 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
         qemu_log_mask(CPU_LOG_INT,
                       "...STKOF during callee-saves register stacking\n");
         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_STKOF_MASK;
-        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
-                                env->v7m.secure);
+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
         *frame_sp_p = limit;
         return true;
     }
@@ -920,8 +916,8 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
                  * state was Secure (EXCRET.S == 1) and exception
                  * targets Non-secure state
                  */
-                bool zero_callee_saves = !targets_secure &&
-                    (lr & R_V7M_EXCRET_S_MASK);
+                bool zero_callee_saves =
+                    !targets_secure && (lr & R_V7M_EXCRET_S_MASK);
 
                 for (i = 0; i < 13; i++) {
                     if (i < 4 || i > 11 || zero_callee_saves) {
@@ -1001,7 +997,7 @@ static void v7m_update_fpccr(CPUARMState *env, uint32_t frameptr,
         bool splimviol;
         uint32_t splim = v7m_sp_limit(env);
         bool ign = armv7m_nvic_neg_prio_requested(nvic, is_secure) &&
-            (env->v7m.ccr[is_secure] & R_V7M_CCR_STKOFHFNMIGN_MASK);
+                   (env->v7m.ccr[is_secure] & R_V7M_CCR_STKOFHFNMIGN_MASK);
 
         splimviol = !ign && frameptr < splim;
         *fpccr = FIELD_DP32(*fpccr, V7M_FPCCR, SPLIMVIOL, splimviol);
@@ -1013,8 +1009,8 @@ static void v7m_update_fpccr(CPUARMState *env, uint32_t frameptr,
 
     *fpccr = FIELD_DP32(*fpccr, V7M_FPCCR, USER, arm_current_el(env) == 0);
 
-    *fpccr = FIELD_DP32(*fpccr, V7M_FPCCR, THREAD,
-                        !arm_v7m_is_handler_mode(env));
+    *fpccr =
+        FIELD_DP32(*fpccr, V7M_FPCCR, THREAD, !arm_v7m_is_handler_mode(env));
 
     hfrdy = armv7m_nvic_get_ready_status(nvic, ARMV7M_EXCP_HARD, false);
     *fpccr_s = FIELD_DP32(*fpccr_s, V7M_FPCCR, HFRDY, hfrdy);
@@ -1157,7 +1153,7 @@ void HELPER(v7m_vlldm)(CPUARMState *env, uint32_t fptr)
             slo = cpu_ldl_data_ra(env, faddr, ra);
             shi = cpu_ldl_data_ra(env, faddr + 4, ra);
 
-            dn = (uint64_t) shi << 32 | slo;
+            dn = (uint64_t)shi << 32 | slo;
             *aa32_vfp_dreg(env, i / 2) = dn;
         }
         fpscr = cpu_ldl_data_ra(env, fptr + 0x40, ra);
@@ -1189,8 +1185,7 @@ static bool v7m_push_stack(ARMCPU *cpu)
 
     if ((env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK) &&
         (env->v7m.secure || nsacr_cp10)) {
-        if (env->v7m.secure &&
-            env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_TS_MASK) {
+        if (env->v7m.secure && env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_TS_MASK) {
             framesize = 0xa8;
         } else {
             framesize = 0x68;
@@ -1224,8 +1219,7 @@ static bool v7m_push_stack(ARMCPU *cpu)
              * performed. It is IMPDEF whether pushes above the limit are
              * performed; we choose not to.
              */
-            qemu_log_mask(CPU_LOG_INT,
-                          "...STKOF during stacking\n");
+            qemu_log_mask(CPU_LOG_INT, "...STKOF during stacking\n");
             env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_STKOF_MASK;
             armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
                                     env->v7m.secure);
@@ -1247,20 +1241,21 @@ static bool v7m_push_stack(ARMCPU *cpu)
      * (which may be taken in preference to the one we started with
      * if it has higher priority).
      */
-    stacked_ok = stacked_ok &&
+    stacked_ok =
+        stacked_ok &&
         v7m_stack_write(cpu, frameptr, env->regs[0], mmu_idx, STACK_NORMAL) &&
-        v7m_stack_write(cpu, frameptr + 4, env->regs[1],
-                        mmu_idx, STACK_NORMAL) &&
-        v7m_stack_write(cpu, frameptr + 8, env->regs[2],
-                        mmu_idx, STACK_NORMAL) &&
-        v7m_stack_write(cpu, frameptr + 12, env->regs[3],
-                        mmu_idx, STACK_NORMAL) &&
-        v7m_stack_write(cpu, frameptr + 16, env->regs[12],
-                        mmu_idx, STACK_NORMAL) &&
-        v7m_stack_write(cpu, frameptr + 20, env->regs[14],
-                        mmu_idx, STACK_NORMAL) &&
-        v7m_stack_write(cpu, frameptr + 24, env->regs[15],
-                        mmu_idx, STACK_NORMAL) &&
+        v7m_stack_write(cpu, frameptr + 4, env->regs[1], mmu_idx,
+                        STACK_NORMAL) &&
+        v7m_stack_write(cpu, frameptr + 8, env->regs[2], mmu_idx,
+                        STACK_NORMAL) &&
+        v7m_stack_write(cpu, frameptr + 12, env->regs[3], mmu_idx,
+                        STACK_NORMAL) &&
+        v7m_stack_write(cpu, frameptr + 16, env->regs[12], mmu_idx,
+                        STACK_NORMAL) &&
+        v7m_stack_write(cpu, frameptr + 20, env->regs[14], mmu_idx,
+                        STACK_NORMAL) &&
+        v7m_stack_write(cpu, frameptr + 24, env->regs[15], mmu_idx,
+                        STACK_NORMAL) &&
         v7m_stack_write(cpu, frameptr + 28, xpsr, mmu_idx, STACK_NORMAL);
 
     if (env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK) {
@@ -1311,18 +1306,20 @@ static bool v7m_push_stack(ARMCPU *cpu)
                         faddr += 8; /* skip the slot for the FPSCR and VPR */
                     }
                     stacked_ok = stacked_ok &&
-                        v7m_stack_write(cpu, faddr, slo,
-                                        mmu_idx, STACK_NORMAL) &&
-                        v7m_stack_write(cpu, faddr + 4, shi,
-                                        mmu_idx, STACK_NORMAL);
+                                 v7m_stack_write(cpu, faddr, slo, mmu_idx,
+                                                 STACK_NORMAL) &&
+                                 v7m_stack_write(cpu, faddr + 4, shi, mmu_idx,
+                                                 STACK_NORMAL);
                 }
-                stacked_ok = stacked_ok &&
-                    v7m_stack_write(cpu, frameptr + 0x60,
-                                    vfp_get_fpscr(env), mmu_idx, STACK_NORMAL);
+                stacked_ok =
+                    stacked_ok &&
+                    v7m_stack_write(cpu, frameptr + 0x60, vfp_get_fpscr(env),
+                                    mmu_idx, STACK_NORMAL);
                 if (cpu_isar_feature(aa32_mve, cpu)) {
-                    stacked_ok = stacked_ok &&
-                        v7m_stack_write(cpu, frameptr + 0x64,
-                                        env->v7m.vpr, mmu_idx, STACK_NORMAL);
+                    stacked_ok =
+                        stacked_ok &&
+                        v7m_stack_write(cpu, frameptr + 0x64, env->v7m.vpr,
+                                        mmu_idx, STACK_NORMAL);
                 }
                 if (cpacr_pass) {
                     for (i = 0; i < ((framesize == 0xa8) ? 32 : 16); i += 2) {
@@ -1395,12 +1392,14 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
         excret |= 1;
     }
 
-    qemu_log_mask(CPU_LOG_INT, "Exception return: magic PC %" PRIx32
+    qemu_log_mask(CPU_LOG_INT,
+                  "Exception return: magic PC %" PRIx32
                   " previous exception %d\n",
                   excret, env->v7m.exception);
 
     if ((excret & R_V7M_EXCRET_RES1_MASK) != R_V7M_EXCRET_RES1_MASK) {
-        qemu_log_mask(LOG_GUEST_ERROR, "M profile: zero high bits in exception "
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "M profile: zero high bits in exception "
                       "exit PC value 0x%" PRIx32 " are UNPREDICTABLE\n",
                       excret);
     }
@@ -1408,7 +1407,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
     ftype = excret & R_V7M_EXCRET_FTYPE_MASK;
 
     if (!ftype && !cpu_isar_feature(aa32_vfp_simd, cpu)) {
-        qemu_log_mask(LOG_GUEST_ERROR, "M profile: zero FTYPE in exception "
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "M profile: zero FTYPE in exception "
                       "exit PC value 0x%" PRIx32 " is UNPREDICTABLE "
                       "if FPU not present\n",
                       excret);
@@ -1420,9 +1420,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
          * EXC_RETURN.ES validation check (R_SMFL). We must do this before
          * we pick which FAULTMASK to clear.
          */
-        if (!env->v7m.secure &&
-            ((excret & R_V7M_EXCRET_ES_MASK) ||
-             !(excret & R_V7M_EXCRET_DCRS_MASK))) {
+        if (!env->v7m.secure && ((excret & R_V7M_EXCRET_ES_MASK) ||
+                                 !(excret & R_V7M_EXCRET_DCRS_MASK))) {
             sfault = 1;
             /* For all other purposes, treat ES as 0 (R_HXSR) */
             excret &= ~R_V7M_EXCRET_ES_MASK;
@@ -1447,8 +1446,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
         }
     }
 
-    switch (armv7m_nvic_complete_irq(env->nvic, env->v7m.exception,
-                                     exc_secure)) {
+    switch (
+        armv7m_nvic_complete_irq(env->nvic, env->v7m.exception, exc_secure)) {
     case -1:
         /* attempt to exit an exception that isn't active */
         ufault = true;
@@ -1471,7 +1470,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
     return_to_handler = !(excret & R_V7M_EXCRET_MODE_MASK);
     return_to_sp_process = excret & R_V7M_EXCRET_SPSEL_MASK;
     return_to_secure = arm_feature(env, ARM_FEATURE_M_SECURITY) &&
-        (excret & R_V7M_EXCRET_S_MASK);
+                       (excret & R_V7M_EXCRET_S_MASK);
 
     if (arm_feature(env, ARM_FEATURE_V8)) {
         if (!arm_feature(env, ARM_FEATURE_M_SECURITY)) {
@@ -1499,9 +1498,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
              * We only need to check NONBASETHRDENA for v7M, because in
              * v8M this bit does not exist (it is RES1).
              */
-            if (!rettobase &&
-                !(env->v7m.ccr[env->v7m.secure] &
-                  R_V7M_CCR_NONBASETHRDENA_MASK)) {
+            if (!rettobase && !(env->v7m.ccr[env->v7m.secure] &
+                                R_V7M_CCR_NONBASETHRDENA_MASK)) {
                 ufault = true;
             }
             break;
@@ -1529,20 +1527,23 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
         if (env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_LSPACT_MASK) {
             env->v7m.sfsr |= R_V7M_SFSR_LSERR_MASK;
             armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-            qemu_log_mask(CPU_LOG_INT, "...taking SecureFault on existing "
+            qemu_log_mask(CPU_LOG_INT,
+                          "...taking SecureFault on existing "
                           "stackframe: error during lazy state deactivation\n");
             v7m_exception_taken(cpu, excret, true, false);
             return;
         } else {
             if (arm_feature(env, ARM_FEATURE_V8_1M)) {
                 /* v8.1M adds this NOCP check */
-                bool nsacr_pass = exc_secure ||
-                    extract32(env->v7m.nsacr, 10, 1);
+                bool nsacr_pass =
+                    exc_secure || extract32(env->v7m.nsacr, 10, 1);
                 bool cpacr_pass = v7m_cpacr_pass(env, exc_secure, true);
                 if (!nsacr_pass) {
                     armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, true);
                     env->v7m.cfsr[M_REG_S] |= R_V7M_CFSR_NOCP_MASK;
-                    qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
+                    qemu_log_mask(
+                        CPU_LOG_INT,
+                        "...taking UsageFault on existing "
                         "stackframe: NSACR prevents clearing FPU registers\n");
                     v7m_exception_taken(cpu, excret, true, false);
                     return;
@@ -1550,7 +1551,9 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
                     armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
                                             exc_secure);
                     env->v7m.cfsr[exc_secure] |= R_V7M_CFSR_NOCP_MASK;
-                    qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
+                    qemu_log_mask(
+                        CPU_LOG_INT,
+                        "...taking UsageFault on existing "
                         "stackframe: CPACR prevents clearing FPU registers\n");
                     v7m_exception_taken(cpu, excret, true, false);
                     return;
@@ -1572,7 +1575,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
     if (sfault) {
         env->v7m.sfsr |= R_V7M_SFSR_INVER_MASK;
         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-        qemu_log_mask(CPU_LOG_INT, "...taking SecureFault on existing "
+        qemu_log_mask(CPU_LOG_INT,
+                      "...taking SecureFault on existing "
                       "stackframe: failed EXC_RETURN.ES validity check\n");
         v7m_exception_taken(cpu, excret, true, false);
         return;
@@ -1585,7 +1589,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
          */
         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
-        qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
+        qemu_log_mask(CPU_LOG_INT,
+                      "...taking UsageFault on existing "
                       "stackframe: failed exception return integrity check\n");
         v7m_exception_taken(cpu, excret, true, false);
         return;
@@ -1620,29 +1625,29 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
          * We use this limited C variable scope so we don't accidentally
          * use 'frame_sp_p' after we do something that makes it invalid.
          */
-        bool spsel = env->v7m.control[return_to_secure] & R_V7M_CONTROL_SPSEL_MASK;
+        bool spsel =
+            env->v7m.control[return_to_secure] & R_V7M_CONTROL_SPSEL_MASK;
         uint32_t *frame_sp_p = arm_v7m_get_sp_ptr(env, return_to_secure,
                                                   !return_to_handler, spsel);
         uint32_t frameptr = *frame_sp_p;
         bool pop_ok = true;
         ARMMMUIdx mmu_idx;
-        bool return_to_priv = return_to_handler ||
+        bool return_to_priv =
+            return_to_handler ||
             !(env->v7m.control[return_to_secure] & R_V7M_CONTROL_NPRIV_MASK);
 
         mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, return_to_secure,
                                                         return_to_priv);
 
-        if (!QEMU_IS_ALIGNED(frameptr, 8) &&
-            arm_feature(env, ARM_FEATURE_V8)) {
+        if (!QEMU_IS_ALIGNED(frameptr, 8) && arm_feature(env, ARM_FEATURE_V8)) {
             qemu_log_mask(LOG_GUEST_ERROR,
                           "M profile exception return with non-8-aligned SP "
                           "for destination state is UNPREDICTABLE\n");
         }
 
         /* Do we need to pop callee-saved registers? */
-        if (return_to_secure &&
-            ((excret & R_V7M_EXCRET_ES_MASK) == 0 ||
-             (excret & R_V7M_EXCRET_DCRS_MASK) == 0)) {
+        if (return_to_secure && ((excret & R_V7M_EXCRET_ES_MASK) == 0 ||
+                                 (excret & R_V7M_EXCRET_DCRS_MASK) == 0)) {
             uint32_t actual_sig;
 
             pop_ok = v7m_stack_read(cpu, &actual_sig, frameptr, mmu_idx);
@@ -1651,14 +1656,16 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
                 /* Take a SecureFault on the current stack */
                 env->v7m.sfsr |= R_V7M_SFSR_INVIS_MASK;
                 armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-                qemu_log_mask(CPU_LOG_INT, "...taking SecureFault on existing "
+                qemu_log_mask(CPU_LOG_INT,
+                              "...taking SecureFault on existing "
                               "stackframe: failed exception return integrity "
                               "signature check\n");
                 v7m_exception_taken(cpu, excret, true, false);
                 return;
             }
 
-            pop_ok = pop_ok &&
+            pop_ok =
+                pop_ok &&
                 v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
                 v7m_stack_read(cpu, &env->regs[5], frameptr + 0xc, mmu_idx) &&
                 v7m_stack_read(cpu, &env->regs[6], frameptr + 0x10, mmu_idx) &&
@@ -1672,8 +1679,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
         }
 
         /* Pop registers */
-        pop_ok = pop_ok &&
-            v7m_stack_read(cpu, &env->regs[0], frameptr, mmu_idx) &&
+        pop_ok =
+            pop_ok && v7m_stack_read(cpu, &env->regs[0], frameptr, mmu_idx) &&
             v7m_stack_read(cpu, &env->regs[1], frameptr + 0x4, mmu_idx) &&
             v7m_stack_read(cpu, &env->regs[2], frameptr + 0x8, mmu_idx) &&
             v7m_stack_read(cpu, &env->regs[3], frameptr + 0xc, mmu_idx) &&
@@ -1727,7 +1734,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
                 armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
                                         env->v7m.secure);
                 env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
-                qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
+                qemu_log_mask(CPU_LOG_INT,
+                              "...taking UsageFault on existing "
                               "stackframe: failed exception return integrity "
                               "check\n");
                 v7m_exception_taken(cpu, excret, true, false);
@@ -1750,7 +1758,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
             }
 
             restore_s16_s31 = return_to_secure &&
-                (env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_TS_MASK);
+                              (env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_TS_MASK);
 
             if (env->v7m.fpccr[return_to_secure] & R_V7M_FPCCR_LSPACT_MASK) {
                 /* State in FPU is still valid, just clear LSPACT */
@@ -1760,10 +1768,10 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
                 uint32_t fpscr;
                 bool cpacr_pass, nsacr_pass;
 
-                cpacr_pass = v7m_cpacr_pass(env, return_to_secure,
-                                            return_to_priv);
-                nsacr_pass = return_to_secure ||
-                    extract32(env->v7m.nsacr, 10, 1);
+                cpacr_pass =
+                    v7m_cpacr_pass(env, return_to_secure, return_to_priv);
+                nsacr_pass =
+                    return_to_secure || extract32(env->v7m.nsacr, 10, 1);
 
                 if (!cpacr_pass) {
                     armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
@@ -1796,8 +1804,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
                     }
 
                     pop_ok = pop_ok &&
-                        v7m_stack_read(cpu, &slo, faddr, mmu_idx) &&
-                        v7m_stack_read(cpu, &shi, faddr + 4, mmu_idx);
+                             v7m_stack_read(cpu, &slo, faddr, mmu_idx) &&
+                             v7m_stack_read(cpu, &shi, faddr + 4, mmu_idx);
 
                     if (!pop_ok) {
                         break;
@@ -1807,14 +1815,13 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
                     *aa32_vfp_dreg(env, i / 2) = dn;
                 }
                 pop_ok = pop_ok &&
-                    v7m_stack_read(cpu, &fpscr, frameptr + 0x60, mmu_idx);
+                         v7m_stack_read(cpu, &fpscr, frameptr + 0x60, mmu_idx);
                 if (pop_ok) {
                     vfp_set_fpscr(env, fpscr);
                 }
                 if (cpu_isar_feature(aa32_mve, cpu)) {
-                    pop_ok = pop_ok &&
-                        v7m_stack_read(cpu, &env->v7m.vpr,
-                                       frameptr + 0x64, mmu_idx);
+                    pop_ok = pop_ok && v7m_stack_read(cpu, &env->v7m.vpr,
+                                                      frameptr + 0x64, mmu_idx);
                 }
                 if (!pop_ok) {
                     /*
@@ -1831,8 +1838,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
                 }
             }
         }
-        env->v7m.control[M_REG_S] = FIELD_DP32(env->v7m.control[M_REG_S],
-                                               V7M_CONTROL, FPCA, !ftype);
+        env->v7m.control[M_REG_S] =
+            FIELD_DP32(env->v7m.control[M_REG_S], V7M_CONTROL, FPCA, !ftype);
 
         /* Commit to consuming the stack frame */
         frameptr += 0x20;
@@ -1865,8 +1872,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
     if (env->v7m.secure) {
         bool sfpa = xpsr & XPSR_SFPA;
 
-        env->v7m.control[M_REG_S] = FIELD_DP32(env->v7m.control[M_REG_S],
-                                               V7M_CONTROL, SFPA, sfpa);
+        env->v7m.control[M_REG_S] =
+            FIELD_DP32(env->v7m.control[M_REG_S], V7M_CONTROL, SFPA, sfpa);
     }
 
     /*
@@ -1887,7 +1894,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
         ignore_stackfaults = v7m_push_stack(cpu);
         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on new stackframe: "
-                      "failed exception return integrity check\n");
+                                   "failed exception return integrity check\n");
         v7m_exception_taken(cpu, excret, false, ignore_stackfaults);
         return;
     }
@@ -1948,9 +1955,8 @@ static bool do_v7m_function_return(ARMCPU *cpu)
             env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
             armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
                                     env->v7m.secure);
-            qemu_log_mask(CPU_LOG_INT,
-                          "...taking INVPC UsageFault: "
-                          "IPSR consistency check failed\n");
+            qemu_log_mask(CPU_LOG_INT, "...taking INVPC UsageFault: "
+                                       "IPSR consistency check failed\n");
             return false;
         }
 
@@ -2003,8 +2009,7 @@ static bool v7m_read_half_insn(ARMCPU *cpu, ARMMMUIdx mmu_idx, bool secure,
          */
         env->v7m.sfsr |= R_V7M_SFSR_INVEP_MASK;
         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-        qemu_log_mask(CPU_LOG_INT,
-                      "...really SecureFault with SFSR.INVEP\n");
+        qemu_log_mask(CPU_LOG_INT, "...really SecureFault with SFSR.INVEP\n");
         return false;
     }
     if (get_phys_addr(env, addr, MMU_INST_FETCH, mmu_idx, &res, &fi)) {
@@ -2054,8 +2059,8 @@ static bool v7m_read_sg_stack_word(ARMCPU *cpu, ARMMMUIdx mmu_idx,
         } else {
             qemu_log_mask(CPU_LOG_INT,
                           "...MemManageFault during stack word read\n");
-            env->v7m.cfsr[M_REG_S] |= R_V7M_CFSR_DACCVIOL_MASK |
-                R_V7M_CFSR_MMARVALID_MASK;
+            env->v7m.cfsr[M_REG_S] |=
+                R_V7M_CFSR_DACCVIOL_MASK | R_V7M_CFSR_MMARVALID_MASK;
             env->v7m.mmfar[M_REG_S] = addr;
             armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM, false);
         }
@@ -2065,8 +2070,7 @@ static bool v7m_read_sg_stack_word(ARMCPU *cpu, ARMMMUIdx mmu_idx,
                               res.f.phys_addr, res.f.attrs, &txres);
     if (txres != MEMTX_OK) {
         /* BusFault trying to read the data */
-        qemu_log_mask(CPU_LOG_INT,
-                      "...BusFault during stack word read\n");
+        qemu_log_mask(CPU_LOG_INT, "...BusFault during stack word read\n");
         env->v7m.cfsr[M_REG_NS] |=
             (R_V7M_CFSR_PRECISERR_MASK | R_V7M_CFSR_BFARVALID_MASK);
         env->v7m.bfar = addr;
@@ -2132,8 +2136,10 @@ static bool v7m_handle_execute_nsc(ARMCPU *cpu)
      * OK, we have confirmed that we really have an SG instruction.
      * We know we're NS in S memory so don't need to repeat those checks.
      */
-    qemu_log_mask(CPU_LOG_INT, "...really an SG instruction at 0x%08" PRIx32
-                  ", executing it\n", env->regs[15]);
+    qemu_log_mask(CPU_LOG_INT,
+                  "...really an SG instruction at 0x%08" PRIx32
+                  ", executing it\n",
+                  env->regs[15]);
 
     if (cpu_isar_feature(aa32_m_sec_state, cpu) &&
         !arm_v7m_is_handler_mode(env)) {
@@ -2173,8 +2179,7 @@ static bool v7m_handle_execute_nsc(ARMCPU *cpu)
 gen_invep:
     env->v7m.sfsr |= R_V7M_SFSR_INVEP_MASK;
     armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-    qemu_log_mask(CPU_LOG_INT,
-                  "...really SecureFault with SFSR.INVEP\n");
+    qemu_log_mask(CPU_LOG_INT, "...really SecureFault with SFSR.INVEP\n");
     return false;
 }
 
@@ -2196,8 +2201,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_UNDEFINSTR_MASK;
         break;
-    case EXCP_NOCP:
-    {
+    case EXCP_NOCP: {
         /*
          * NOCP might be directed to something other than the current
          * security state if this fault is because of NSACR; we indicate
@@ -2342,8 +2346,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
         }
         break;
     case EXCP_SEMIHOST:
-        qemu_log_mask(CPU_LOG_INT,
-                      "...handling as semihosting call 0x%x\n",
+        qemu_log_mask(CPU_LOG_INT, "...handling as semihosting call 0x%x\n",
                       env->regs[0]);
 #ifdef CONFIG_TCG
         do_common_semihosting(cs);
@@ -2382,8 +2385,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
     }
 
     if (arm_feature(env, ARM_FEATURE_V8)) {
-        lr = R_V7M_EXCRET_RES1_MASK |
-            R_V7M_EXCRET_DCRS_MASK;
+        lr = R_V7M_EXCRET_RES1_MASK | R_V7M_EXCRET_DCRS_MASK;
         /*
          * The S bit indicates whether we should return to Secure
          * or NonSecure (ie our current state).
@@ -2400,10 +2402,8 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
             lr |= R_V7M_EXCRET_S_MASK;
         }
     } else {
-        lr = R_V7M_EXCRET_RES1_MASK |
-            R_V7M_EXCRET_S_MASK |
-            R_V7M_EXCRET_DCRS_MASK |
-            R_V7M_EXCRET_ES_MASK;
+        lr = R_V7M_EXCRET_RES1_MASK | R_V7M_EXCRET_S_MASK |
+             R_V7M_EXCRET_DCRS_MASK | R_V7M_EXCRET_ES_MASK;
         if (env->v7m.control[M_REG_NS] & R_V7M_CONTROL_SPSEL_MASK) {
             lr |= R_V7M_EXCRET_SPSEL_MASK;
         }
@@ -2438,7 +2438,7 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
             return 0;
         }
         return env->v7m.control[M_REG_NS] |
-            (env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK);
+               (env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK);
     }
 
     if (el == 0) {
@@ -2540,8 +2540,10 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
         return env->v7m.faultmask[env->v7m.secure];
     default:
     bad_reg:
-        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to read unknown special"
-                                       " register %d\n", reg);
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "Attempt to read unknown special"
+                      " register %d\n",
+                      reg);
         return 0;
     }
 }
@@ -2622,9 +2624,8 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
             if (!env->v7m.secure) {
                 return;
             }
-            write_v7m_control_spsel_for_secstate(env,
-                                                 val & R_V7M_CONTROL_SPSEL_MASK,
-                                                 M_REG_NS);
+            write_v7m_control_spsel_for_secstate(
+                env, val & R_V7M_CONTROL_SPSEL_MASK, M_REG_NS);
             if (arm_feature(env, ARM_FEATURE_M_MAIN)) {
                 env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
                 env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
@@ -2717,8 +2718,8 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
             goto bad_reg;
         }
         val &= 0xff;
-        if (val != 0 && (val < env->v7m.basepri[env->v7m.secure]
-                         || env->v7m.basepri[env->v7m.secure] == 0)) {
+        if (val != 0 && (val < env->v7m.basepri[env->v7m.secure] ||
+                         env->v7m.basepri[env->v7m.secure] == 0)) {
             env->v7m.basepri[env->v7m.secure] = val;
         }
         break;
@@ -2767,8 +2768,10 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
         break;
     default:
     bad_reg:
-        qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
-                                       " register %d\n", reg);
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "Attempt to write unknown special"
+                      " register %d\n",
+                      reg);
         return;
     }
 }
@@ -2798,7 +2801,7 @@ uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
         targetpriv = false;
     } else {
         targetpriv = arm_v7m_is_handler_mode(env) ||
-            !(env->v7m.control[targetsec] & R_V7M_CONTROL_NPRIV_MASK);
+                     !(env->v7m.control[targetsec] & R_V7M_CONTROL_NPRIV_MASK);
     }
 
     /* ...and then figure out which MMU index this is */
@@ -2819,8 +2822,8 @@ uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
         ARMMMUFaultInfo fi = {};
 
         /* We can ignore the return value as prot is always set */
-        pmsav8_mpu_lookup(env, addr, MMU_DATA_LOAD, mmu_idx, targetsec,
-                          &res, &fi, &mregion);
+        pmsav8_mpu_lookup(env, addr, MMU_DATA_LOAD, mmu_idx, targetsec, &res,
+                          &fi, &mregion);
         if (mregion == -1) {
             mrvalid = false;
             mregion = 0;
@@ -2837,8 +2840,8 @@ uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
     }
 
     if (env->v7m.secure) {
-        v8m_security_lookup(env, addr, MMU_DATA_LOAD, mmu_idx,
-                            targetsec, &sattrs);
+        v8m_security_lookup(env, addr, MMU_DATA_LOAD, mmu_idx, targetsec,
+                            &sattrs);
         nsr = sattrs.ns && r;
         nsrw = sattrs.ns && rw;
     } else {
@@ -2847,17 +2850,10 @@ uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
         nsrw = false;
     }
 
-    tt_resp = (sattrs.iregion << 24) |
-        (sattrs.irvalid << 23) |
-        ((!sattrs.ns) << 22) |
-        (nsrw << 21) |
-        (nsr << 20) |
-        (rw << 19) |
-        (r << 18) |
-        (sattrs.srvalid << 17) |
-        (mrvalid << 16) |
-        (sattrs.sregion << 8) |
-        mregion;
+    tt_resp = (sattrs.iregion << 24) | (sattrs.irvalid << 23) |
+              ((!sattrs.ns) << 22) | (nsrw << 21) | (nsr << 20) | (rw << 19) |
+              (r << 18) | (sattrs.srvalid << 17) | (mrvalid << 16) |
+              (sattrs.sregion << 8) | mregion;
 
     return tt_resp;
 }

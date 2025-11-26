@@ -124,17 +124,17 @@ static bool trans_ZERO(DisasContext *s, arg_ZERO *a)
 
 static bool trans_MOVA(DisasContext *s, arg_MOVA *a)
 {
-    static gen_helper_gvec_4 * const h_fns[5] = {
-        gen_helper_sve_sel_zpzz_b, gen_helper_sve_sel_zpzz_h,
-        gen_helper_sve_sel_zpzz_s, gen_helper_sve_sel_zpzz_d,
-        gen_helper_sve_sel_zpzz_q
-    };
-    static gen_helper_gvec_3 * const cz_fns[5] = {
+    static gen_helper_gvec_4 *const h_fns[5] = { gen_helper_sve_sel_zpzz_b,
+                                                 gen_helper_sve_sel_zpzz_h,
+                                                 gen_helper_sve_sel_zpzz_s,
+                                                 gen_helper_sve_sel_zpzz_d,
+                                                 gen_helper_sve_sel_zpzz_q };
+    static gen_helper_gvec_3 *const cz_fns[5] = {
         gen_helper_sme_mova_cz_b, gen_helper_sme_mova_cz_h,
         gen_helper_sme_mova_cz_s, gen_helper_sme_mova_cz_d,
         gen_helper_sme_mova_cz_q,
     };
-    static gen_helper_gvec_3 * const zc_fns[5] = {
+    static gen_helper_gvec_3 *const zc_fns[5] = {
         gen_helper_sme_mova_zc_b, gen_helper_sme_mova_zc_h,
         gen_helper_sme_mova_zc_s, gen_helper_sme_mova_zc_d,
         gen_helper_sme_mova_zc_q,
@@ -186,17 +186,26 @@ static bool trans_LDST1(DisasContext *s, arg_LDST1 *a)
      * and so how we must concatenate the pieces.
      */
 
-#define FN_LS(F)     { gen_helper_sme_ld1##F, gen_helper_sme_st1##F }
-#define FN_MTE(F)    { FN_LS(F), FN_LS(F##_mte) }
-#define FN_HV(F)     { FN_MTE(F##_h), FN_MTE(F##_v) }
-#define FN_END(L, B) { FN_HV(L), FN_HV(B) }
+#define FN_LS(F)                                     \
+    {                                                \
+        gen_helper_sme_ld1##F, gen_helper_sme_st1##F \
+    }
+#define FN_MTE(F)                \
+    {                            \
+        FN_LS(F), FN_LS(F##_mte) \
+    }
+#define FN_HV(F)                     \
+    {                                \
+        FN_MTE(F##_h), FN_MTE(F##_v) \
+    }
+#define FN_END(L, B)       \
+    {                      \
+        FN_HV(L), FN_HV(B) \
+    }
 
-    static GenLdSt1 * const fns[5][2][2][2][2] = {
-        FN_END(b, b),
-        FN_END(h_le, h_be),
-        FN_END(s_le, s_be),
-        FN_END(d_le, d_be),
-        FN_END(q_le, q_be),
+    static GenLdSt1 *const fns[5][2][2][2][2] = {
+        FN_END(b, b),       FN_END(h_le, h_be), FN_END(s_le, s_be),
+        FN_END(d_le, d_be), FN_END(q_le, q_be),
     };
 
 #undef FN_LS
@@ -334,7 +343,8 @@ static bool do_outprod_fpst(DisasContext *s, arg_op *a, MemOp esz,
 
 TRANS_FEAT(FMOPA_h, aa64_sme, do_outprod_fpst, a, MO_32, gen_helper_sme_fmopa_h)
 TRANS_FEAT(FMOPA_s, aa64_sme, do_outprod_fpst, a, MO_32, gen_helper_sme_fmopa_s)
-TRANS_FEAT(FMOPA_d, aa64_sme_f64f64, do_outprod_fpst, a, MO_64, gen_helper_sme_fmopa_d)
+TRANS_FEAT(FMOPA_d, aa64_sme_f64f64, do_outprod_fpst, a, MO_64,
+           gen_helper_sme_fmopa_d)
 
 /* TODO: FEAT_EBF16 */
 TRANS_FEAT(BFMOPA, aa64_sme, do_outprod, a, MO_32, gen_helper_sme_bfmopa)
@@ -344,7 +354,11 @@ TRANS_FEAT(UMOPA_s, aa64_sme, do_outprod, a, MO_32, gen_helper_sme_umopa_s)
 TRANS_FEAT(SUMOPA_s, aa64_sme, do_outprod, a, MO_32, gen_helper_sme_sumopa_s)
 TRANS_FEAT(USMOPA_s, aa64_sme, do_outprod, a, MO_32, gen_helper_sme_usmopa_s)
 
-TRANS_FEAT(SMOPA_d, aa64_sme_i16i64, do_outprod, a, MO_64, gen_helper_sme_smopa_d)
-TRANS_FEAT(UMOPA_d, aa64_sme_i16i64, do_outprod, a, MO_64, gen_helper_sme_umopa_d)
-TRANS_FEAT(SUMOPA_d, aa64_sme_i16i64, do_outprod, a, MO_64, gen_helper_sme_sumopa_d)
-TRANS_FEAT(USMOPA_d, aa64_sme_i16i64, do_outprod, a, MO_64, gen_helper_sme_usmopa_d)
+TRANS_FEAT(SMOPA_d, aa64_sme_i16i64, do_outprod, a, MO_64,
+           gen_helper_sme_smopa_d)
+TRANS_FEAT(UMOPA_d, aa64_sme_i16i64, do_outprod, a, MO_64,
+           gen_helper_sme_umopa_d)
+TRANS_FEAT(SUMOPA_d, aa64_sme_i16i64, do_outprod, a, MO_64,
+           gen_helper_sme_sumopa_d)
+TRANS_FEAT(USMOPA_d, aa64_sme_i16i64, do_outprod, a, MO_64,
+           gen_helper_sme_usmopa_d)

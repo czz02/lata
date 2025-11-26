@@ -36,14 +36,13 @@ void x86_cpu_xsave_all_areas(X86CPU *cpu, void *buf, uint32_t buflen)
     legacy->fpop = env->fpop;
     legacy->fpip = env->fpip;
     legacy->fpdp = env->fpdp;
-    memcpy(&legacy->fpregs, env->fpregs,
-           sizeof(env->fpregs));
+    memcpy(&legacy->fpregs, env->fpregs, sizeof(env->fpregs));
     legacy->mxcsr = env->mxcsr;
 
     for (i = 0; i < CPU_NB_REGS; i++) {
         uint8_t *xmm = legacy->xmm_regs[i];
 
-        stq_p(xmm,     env->xmm_regs[i].ZMM_Q(0));
+        stq_p(xmm, env->xmm_regs[i].ZMM_Q(0));
         stq_p(xmm + 8, env->xmm_regs[i].ZMM_Q(1));
     }
 
@@ -58,7 +57,7 @@ void x86_cpu_xsave_all_areas(X86CPU *cpu, void *buf, uint32_t buflen)
         for (i = 0; i < CPU_NB_REGS; i++) {
             uint8_t *ymmh = avx->ymmh[i];
 
-            stq_p(ymmh,     env->xmm_regs[i].ZMM_Q(2));
+            stq_p(ymmh, env->xmm_regs[i].ZMM_Q(2));
             stq_p(ymmh + 8, env->xmm_regs[i].ZMM_Q(3));
         }
     }
@@ -75,8 +74,7 @@ void x86_cpu_xsave_all_areas(X86CPU *cpu, void *buf, uint32_t buflen)
         bndreg = buf + e->offset;
         bndcsr = buf + f->offset;
 
-        memcpy(&bndreg->bnd_regs, env->bnd_regs,
-               sizeof(env->bnd_regs));
+        memcpy(&bndreg->bnd_regs, env->bnd_regs, sizeof(env->bnd_regs));
         bndcsr->bndcsr = env->bndcs_regs;
     }
 
@@ -101,8 +99,8 @@ void x86_cpu_xsave_all_areas(X86CPU *cpu, void *buf, uint32_t buflen)
         for (i = 0; i < CPU_NB_REGS; i++) {
             uint8_t *zmmh = zmm_hi256->zmm_hi256[i];
 
-            stq_p(zmmh,      env->xmm_regs[i].ZMM_Q(4));
-            stq_p(zmmh + 8,  env->xmm_regs[i].ZMM_Q(5));
+            stq_p(zmmh, env->xmm_regs[i].ZMM_Q(4));
+            stq_p(zmmh + 8, env->xmm_regs[i].ZMM_Q(5));
             stq_p(zmmh + 16, env->xmm_regs[i].ZMM_Q(6));
             stq_p(zmmh + 24, env->xmm_regs[i].ZMM_Q(7));
         }
@@ -171,8 +169,7 @@ void x86_cpu_xrstor_all_areas(X86CPU *cpu, const void *buf, uint32_t buflen)
     env->fpip = legacy->fpip;
     env->fpdp = legacy->fpdp;
     env->mxcsr = legacy->mxcsr;
-    memcpy(env->fpregs, &legacy->fpregs,
-           sizeof(env->fpregs));
+    memcpy(env->fpregs, &legacy->fpregs, sizeof(env->fpregs));
 
     for (i = 0; i < CPU_NB_REGS; i++) {
         const uint8_t *xmm = legacy->xmm_regs[i];
@@ -208,8 +205,7 @@ void x86_cpu_xrstor_all_areas(X86CPU *cpu, const void *buf, uint32_t buflen)
         bndreg = buf + e->offset;
         bndcsr = buf + f->offset;
 
-        memcpy(env->bnd_regs, &bndreg->bnd_regs,
-               sizeof(env->bnd_regs));
+        memcpy(env->bnd_regs, &bndreg->bnd_regs, sizeof(env->bnd_regs));
         env->bndcs_regs = bndcsr->bndcsr;
     }
 

@@ -64,8 +64,7 @@ static void openrisc_restore_state_to_opc(CPUState *cs,
 
 static bool openrisc_cpu_has_work(CPUState *cs)
 {
-    return cs->interrupt_request & (CPU_INTERRUPT_HARD |
-                                    CPU_INTERRUPT_TIMER);
+    return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_TIMER);
 }
 
 static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *info)
@@ -181,33 +180,33 @@ static void or1200_initfn(Object *obj)
 
     cpu->env.vr = 0x13000008;
     cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP | UPR_PMP;
-    cpu->env.cpucfgr = CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_OF32S |
-                       CPUCFGR_EVBARP;
+    cpu->env.cpucfgr =
+        CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_OF32S | CPUCFGR_EVBARP;
 
     /* 1Way, TLB_SIZE entries.  */
-    cpu->env.dmmucfgr = (DMMUCFGR_NTW & (0 << 2))
-                      | (DMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
-    cpu->env.immucfgr = (IMMUCFGR_NTW & (0 << 2))
-                      | (IMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
+    cpu->env.dmmucfgr =
+        (DMMUCFGR_NTW & (0 << 2)) | (DMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
+    cpu->env.immucfgr =
+        (IMMUCFGR_NTW & (0 << 2)) | (IMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
 }
 
 static void openrisc_any_initfn(Object *obj)
 {
     OpenRISCCPU *cpu = OPENRISC_CPU(obj);
 
-    cpu->env.vr = 0x13000040;   /* Obsolete VER + UVRP for new SPRs */
-    cpu->env.vr2 = 0;           /* No version specific id */
-    cpu->env.avr = 0x01030000;  /* Architecture v1.3 */
+    cpu->env.vr = 0x13000040; /* Obsolete VER + UVRP for new SPRs */
+    cpu->env.vr2 = 0; /* No version specific id */
+    cpu->env.avr = 0x01030000; /* Architecture v1.3 */
 
     cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP | UPR_PMP;
     cpu->env.cpucfgr = CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_OF32S |
                        CPUCFGR_AVRP | CPUCFGR_EVBARP | CPUCFGR_OF64A32S;
 
     /* 1Way, TLB_SIZE entries.  */
-    cpu->env.dmmucfgr = (DMMUCFGR_NTW & (0 << 2))
-                      | (DMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
-    cpu->env.immucfgr = (IMMUCFGR_NTW & (0 << 2))
-                      | (IMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
+    cpu->env.dmmucfgr =
+        (DMMUCFGR_NTW & (0 << 2)) | (DMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
+    cpu->env.immucfgr =
+        (IMMUCFGR_NTW & (0 << 2)) | (IMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
 }
 
 #ifndef CONFIG_USER_ONLY
@@ -285,8 +284,8 @@ static void openrisc_cpu_list_entry(gpointer data, gpointer user_data)
     char *name;
 
     typename = object_class_get_name(oc);
-    name = g_strndup(typename,
-                     strlen(typename) - strlen("-" TYPE_OPENRISC_CPU));
+    name =
+        g_strndup(typename, strlen(typename) - strlen("-" TYPE_OPENRISC_CPU));
     qemu_printf("  %s\n", name);
     g_free(name);
 }
@@ -302,15 +301,15 @@ void cpu_openrisc_list(void)
     g_slist_free(list);
 }
 
-#define DEFINE_OPENRISC_CPU_TYPE(cpu_model, initfn) \
-    {                                               \
-        .parent = TYPE_OPENRISC_CPU,                \
-        .instance_init = initfn,                    \
-        .name = OPENRISC_CPU_TYPE_NAME(cpu_model),  \
+#define DEFINE_OPENRISC_CPU_TYPE(cpu_model, initfn)           \
+    {                                                         \
+        .parent = TYPE_OPENRISC_CPU, .instance_init = initfn, \
+        .name = OPENRISC_CPU_TYPE_NAME(cpu_model),            \
     }
 
 static const TypeInfo openrisc_cpus_type_infos[] = {
-    { /* base class should be registered first */
+    {
+        /* base class should be registered first */
         .name = TYPE_OPENRISC_CPU,
         .parent = TYPE_CPU,
         .instance_size = sizeof(OpenRISCCPU),
