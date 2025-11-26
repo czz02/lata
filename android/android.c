@@ -75,7 +75,7 @@ char real_exec_path[PATH_MAX];
 #ifdef CONFIG_LATA
 int indirect_jmp_opt_profile = 0;
 #ifdef CONFIG_LATA_INDIRECT_JMP
-int option_fam_jmp_cache = 1;
+int option_fam_jmp_cache = 0;
 #else
 int option_fam_jmp_cache = 0;
 #endif
@@ -397,7 +397,7 @@ void *android_init(BerberisCallbacks *cbs)
     fd_trans_init();
 
 #ifdef CONFIG_LATA_INDIRECT_JMP
-    lata_fast_jmp_cache_init(env,(uint64_t)info->start_code,(uint64_t)info->end_code);
+    lata_fast_jmp_cache_init(cpu->env_ptr, 0, 0);
 #endif
 
 #ifdef CONFIG_LATA

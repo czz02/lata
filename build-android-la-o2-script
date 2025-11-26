@@ -1,3 +1,3 @@
 export GLIB_PATH="/home/zhangchuanzi/android-cross-compile/glib-2.84.0/build/glib"
 export GMODULE_PATH="/home/zhangchuanzi/android-cross-compile/glib-2.84.0/build/gmodule"
-PKG_CONFIG_PATH="$SYSROOT/usr/lib/pkgconfig" ../configure --enable-debug --enable-lata --enable-android  --target-list=aarch64-android --cross-prefix=loongarch64-linux-android35- --extra-cflags="-O2 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/lib/x86_64-linux-gnu/glib-2.0/include --sysroot=$SYSROOT -Wno-error " --extra-cxxflags="--sysroot=$SYSROOT -Wno-error"
+PKG_CONFIG_PATH="$SYSROOT/usr/lib/pkgconfig" ../configure --indirect-jmp-opt --enable-lata --enable-android  --target-list=aarch64-android --cross-prefix=loongarch64-linux-android35- --extra-cflags="-O2 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/lib/x86_64-linux-gnu/glib-2.0/include --sysroot=$SYSROOT -Wno-error " --extra-cxxflags="--sysroot=$SYSROOT -Wno-error"
