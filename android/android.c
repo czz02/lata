@@ -305,7 +305,8 @@ void android_add_state_kv(void *berberis_state, void *env){
 
 // CircularQueue q4pc;
 
-extern void* android_init(BerberisCallbacks *cbs);
+extern void *android_init(BerberisCallbacks *cbs);
+
 struct AndroidRuntimeCallbacks {
     void *(*initialize)(BerberisCallbacks *cbs);
     void *(*create_cpu)(void);
@@ -317,7 +318,10 @@ struct AndroidRuntimeCallbacks {
     void (*set_tls)(void *cpu_env, uint64_t tls);
     void (*clone_env)(void *clone_env, void *env);
     void (*add_tb)(uint64_t guest_pc, uint64_t host_pc, uint64_t arg);
-    void (*add_state_kv)(void* berberis_state, void* env);
+    void (*add_state_kv)(void *berberis_state, void *env);
+    abi_long (*target_mmap)(abi_ulong start, abi_ulong len, int target_prot,
+                            int flags, int fd, off_t offset);
+    int (*target_munmap)(abi_ulong start, abi_ulong len);
     const void *epilogue;
 } android_runtime_callbacks = {
     &android_init,
@@ -331,6 +335,8 @@ struct AndroidRuntimeCallbacks {
     NULL,
     &android_add_tb,
     &android_add_state_kv,
+    &target_mmap,
+    &target_munmap,
     NULL,
 };
 

@@ -249,12 +249,14 @@ static void lata_unallocated_encoding(DisasContext *s)
 static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
                                 int tbi)
 {
+#ifndef CONFIG_ANDROID
     if (tbi == 0) {
         /* Load unmodified address */
     } else {
         /* lata only support user-mode, we don't need Sign-extend */
         la_bstrpick_d(*dst, *src, 56, 0);
     }
+#endif
 }
 
 
