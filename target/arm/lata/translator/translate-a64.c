@@ -3372,7 +3372,7 @@ static bool trans_LDR_v(DisasContext *s)
             la_vinsgr2vr_w(vreg_t, temp, 0);
             break;
         case 3:
-            la_vldx(vreg_t, reg_n, reg_m);
+            la_fldx_d(vreg_t, reg_n, reg_m);
             la_vinsgr2vr_d(vreg_t, zero_ir2_opnd, 1);
             break;
         case 4:
@@ -3408,7 +3408,7 @@ static bool trans_LDR_v(DisasContext *s)
             la_vinsgr2vr_w(vreg_t, temp, 0);
             break;
         case 3:
-            la_vldx(vreg_t, reg_n, temp);
+            la_fldx_d(vreg_t, reg_n, temp);
             la_vinsgr2vr_d(vreg_t, zero_ir2_opnd, 1);
             break;
         case 4:
