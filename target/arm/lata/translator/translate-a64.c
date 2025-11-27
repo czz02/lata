@@ -565,29 +565,21 @@ static void gen_add_CC(IR2_OPND *src1, IR2_OPND *src2, int sf)
 
 static void gen_sub_CC(IR2_OPND *src1, IR2_OPND *src2, int sf)
 {
+    /*  bits(datasize) operand1 = *src1;
+        bits(datasize) operand2 = NOT(*src2);
+        (-, nzcv) = AddWithCarry(operand1, operand2, '1');
+    */
+    IR2_OPND temp = ra_alloc_itemp();
+    la_lu12i_w(temp, 0x20000);
+    la_armmtflag(temp, 0x39); // pstate.c = 1
+    la_orn(temp, zero_ir2_opnd, *src2); // NOT(*src2)
+
     if (sf) {
-        /*  bits(datasize) operand1 = *src1;
-            bits(datasize) operand2 = NOT(*src2);
-            (-, nzcv) = AddWithCarry(operand1, operand2, '1');
-        */
-        IR2_OPND temp = ra_alloc_itemp();
-        la_lu12i_w(temp, 0x20000);
-        la_armmtflag(temp, 0x39); // pstate.c = 1
-        la_orn(temp, zero_ir2_opnd, *src2); // NOT(*src2)
         la_x86adc_d(*src1, temp);
-        free_alloc_gpr(temp);
     } else {
-        /*  bits(datasize) operand1 = *src1;
-            bits(datasize) operand2 = NOT(*src2);
-            (-, nzcv) = AddWithCarry(operand1, operand2, '1');
-        */
-        IR2_OPND temp = ra_alloc_itemp();
-        la_lu12i_w(temp, 0x20000);
-        la_armmtflag(temp, 0x39); // pstate.c = 1
-        la_orn(temp, zero_ir2_opnd, *src2); // NOT(*src2)
         la_x86adc_w(*src1, temp);
-        free_alloc_gpr(temp);
     }
+    free_alloc_gpr(temp);
 }
 
 static void gen_add(IR2_OPND *dst, IR2_OPND *src1, IR2_OPND *src2, int sf)

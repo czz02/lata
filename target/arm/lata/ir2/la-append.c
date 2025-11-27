@@ -2,6 +2,7 @@
 #include "la-append.h"
 #include "reg-alloc.h"
 // #include "latx-options.h"
+inline __attribute__ ((always_inline))
 IR2_INST *la_ill(void)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14,6 +15,7 @@ IR2_INST *la_ill(void)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_label(IR2_OPND rd)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25,6 +27,7 @@ IR2_INST *la_label(IR2_OPND rd)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86_inst(IR2_OPND rd)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -36,6 +39,7 @@ IR2_INST *la_x86_inst(IR2_OPND rd)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mov64(IR2_OPND dest, IR2_OPND src)
 {
     if (ir2_opnd_cmp(&dest, &src)) {
@@ -45,21 +49,25 @@ IR2_INST *la_mov64(IR2_OPND dest, IR2_OPND src)
     }
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mov32_sx(IR2_OPND dest, IR2_OPND src)
 {
     return la_slli_w(dest, src, 0);
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mov32_zx(IR2_OPND dest, IR2_OPND src)
 {
     return la_bstrpick_d(dest, src, 31, 0);
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_clr_h32(IR2_OPND dest, IR2_OPND src)
 {
     return la_bstrpick_d(dest, src, 31, 0);
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_add(IR2_OPND op0, IR2_OPND op1, IR2_OPND op2)
 {
 #ifndef TARGET_X86_64
@@ -69,6 +77,7 @@ IR2_INST *la_add(IR2_OPND op0, IR2_OPND op1, IR2_OPND op2)
 #endif
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sub(IR2_OPND op0, IR2_OPND op1, IR2_OPND op2)
 {
 #ifndef TARGET_X86_64
@@ -78,6 +87,7 @@ IR2_INST *la_sub(IR2_OPND op0, IR2_OPND op1, IR2_OPND op2)
 #endif
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_addi_addrx(IR2_OPND op0, IR2_OPND op1, int imm)
 {
 #ifndef TARGET_X86_64
@@ -87,6 +97,7 @@ IR2_INST *la_addi_addrx(IR2_OPND op0, IR2_OPND op1, int imm)
 #endif
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_load_addrx(IR2_OPND op0, IR2_OPND op1, int imm)
 {
 #ifndef TARGET_X86_64
@@ -96,6 +107,7 @@ IR2_INST *la_load_addrx(IR2_OPND op0, IR2_OPND op1, int imm)
 #endif
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_store_addrx(IR2_OPND op0, IR2_OPND op1, int imm)
 {
 #ifndef TARGET_X86_64
@@ -105,6 +117,7 @@ IR2_INST *la_store_addrx(IR2_OPND op0, IR2_OPND op1, int imm)
 #endif
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_gr2scr(IR2_OPND sd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -117,6 +130,7 @@ IR2_INST *la_gr2scr(IR2_OPND sd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_scr2gr(IR2_OPND rd, IR2_OPND sj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -129,6 +143,7 @@ IR2_INST *la_scr2gr(IR2_OPND rd, IR2_OPND sj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_clo_w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -141,6 +156,7 @@ IR2_INST *la_clo_w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_clz_w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -153,6 +169,7 @@ IR2_INST *la_clz_w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_cto_w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -165,6 +182,7 @@ IR2_INST *la_cto_w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ctz_w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -177,6 +195,7 @@ IR2_INST *la_ctz_w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_clo_d(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -189,6 +208,7 @@ IR2_INST *la_clo_d(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_clz_d(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -201,6 +221,7 @@ IR2_INST *la_clz_d(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_cto_d(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -213,6 +234,7 @@ IR2_INST *la_cto_d(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ctz_d(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -225,6 +247,7 @@ IR2_INST *la_ctz_d(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_revb_2h(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -237,6 +260,7 @@ IR2_INST *la_revb_2h(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_revb_4h(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -249,6 +273,7 @@ IR2_INST *la_revb_4h(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_revb_2w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -261,6 +286,7 @@ IR2_INST *la_revb_2w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_revb_d(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -273,6 +299,7 @@ IR2_INST *la_revb_d(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_revh_2w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -285,6 +312,7 @@ IR2_INST *la_revh_2w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_revh_d(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -297,6 +325,7 @@ IR2_INST *la_revh_d(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bitrev_4b(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -309,6 +338,7 @@ IR2_INST *la_bitrev_4b(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bitrev_8b(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -321,6 +351,7 @@ IR2_INST *la_bitrev_8b(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bitrev_w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -333,6 +364,7 @@ IR2_INST *la_bitrev_w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bitrev_d(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -345,6 +377,7 @@ IR2_INST *la_bitrev_d(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ext_w_h(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -357,6 +390,7 @@ IR2_INST *la_ext_w_h(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ext_w_b(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -369,6 +403,7 @@ IR2_INST *la_ext_w_b(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rdtimel_w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -381,6 +416,7 @@ IR2_INST *la_rdtimel_w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rdtimeh_w(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -393,6 +429,7 @@ IR2_INST *la_rdtimeh_w(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rdtime_d(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -405,6 +442,7 @@ IR2_INST *la_rdtime_d(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_cpucfg(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -417,6 +455,7 @@ IR2_INST *la_cpucfg(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mttop(int imm_ptr)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -429,6 +468,7 @@ IR2_INST *la_x86mttop(int imm_ptr)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mftop(IR2_OPND rd)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -440,6 +480,7 @@ IR2_INST *la_x86mftop(IR2_OPND rd)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86loope(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -452,6 +493,7 @@ IR2_INST *la_x86loope(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86loopne(IR2_OPND rd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -464,6 +506,7 @@ IR2_INST *la_x86loopne(IR2_OPND rd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86inc_b(IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -475,6 +518,7 @@ IR2_INST *la_x86inc_b(IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86inc_h(IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -486,6 +530,7 @@ IR2_INST *la_x86inc_h(IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86inc_w(IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -497,6 +542,7 @@ IR2_INST *la_x86inc_w(IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86inc_d(IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -508,6 +554,7 @@ IR2_INST *la_x86inc_d(IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86dec_b(IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -519,6 +566,7 @@ IR2_INST *la_x86dec_b(IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86dec_h(IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -530,6 +578,7 @@ IR2_INST *la_x86dec_h(IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86dec_w(IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -541,6 +590,7 @@ IR2_INST *la_x86dec_w(IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86dec_d(IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -552,6 +602,7 @@ IR2_INST *la_x86dec_d(IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86settm(void)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -564,6 +615,7 @@ IR2_INST *la_x86settm(void)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86clrtm(void)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -576,6 +628,7 @@ IR2_INST *la_x86clrtm(void)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86inctop(void)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -588,6 +641,7 @@ IR2_INST *la_x86inctop(void)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86dectop(void)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -600,6 +654,7 @@ IR2_INST *la_x86dectop(void)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_asrtle_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -612,6 +667,7 @@ IR2_INST *la_asrtle_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_asrtgt_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -624,6 +680,7 @@ IR2_INST *la_asrtgt_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_alsl_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa2)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -639,6 +696,7 @@ IR2_INST *la_alsl_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_alsl_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa2)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -654,6 +712,7 @@ IR2_INST *la_alsl_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bytepick_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa2)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -669,6 +728,7 @@ IR2_INST *la_bytepick_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bytepick_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa3)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -684,6 +744,7 @@ IR2_INST *la_bytepick_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_add_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -697,6 +758,7 @@ IR2_INST *la_add_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_add_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -710,6 +772,7 @@ IR2_INST *la_add_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sub_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -723,6 +786,7 @@ IR2_INST *la_sub_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sub_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -736,6 +800,7 @@ IR2_INST *la_sub_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_slt(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -749,6 +814,7 @@ IR2_INST *la_slt(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sltu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -762,6 +828,7 @@ IR2_INST *la_sltu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_maskeqz(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -775,6 +842,7 @@ IR2_INST *la_maskeqz(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_masknez(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -788,6 +856,7 @@ IR2_INST *la_masknez(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_nor(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -801,6 +870,7 @@ IR2_INST *la_nor(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_and(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -814,6 +884,7 @@ IR2_INST *la_and(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_or(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -827,6 +898,7 @@ IR2_INST *la_or(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xor(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -840,6 +912,7 @@ IR2_INST *la_xor(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_orn(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -853,6 +926,7 @@ IR2_INST *la_orn(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_andn(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -866,6 +940,7 @@ IR2_INST *la_andn(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sll_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -879,6 +954,7 @@ IR2_INST *la_sll_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_srl_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -892,6 +968,7 @@ IR2_INST *la_srl_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sra_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -905,6 +982,7 @@ IR2_INST *la_sra_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sll_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -918,6 +996,7 @@ IR2_INST *la_sll_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_srl_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -931,6 +1010,7 @@ IR2_INST *la_srl_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sra_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -944,6 +1024,7 @@ IR2_INST *la_sra_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rotr_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -957,6 +1038,7 @@ IR2_INST *la_rotr_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rotr_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -970,6 +1052,7 @@ IR2_INST *la_rotr_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rotr_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -983,6 +1066,7 @@ IR2_INST *la_rotr_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rotr_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -996,6 +1080,7 @@ IR2_INST *la_rotr_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mul_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1009,6 +1094,7 @@ IR2_INST *la_mul_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mulh_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1022,6 +1108,7 @@ IR2_INST *la_mulh_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mulh_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1035,6 +1122,7 @@ IR2_INST *la_mulh_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mul_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1048,6 +1136,7 @@ IR2_INST *la_mul_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mulh_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1061,6 +1150,7 @@ IR2_INST *la_mulh_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mulh_du(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1074,6 +1164,7 @@ IR2_INST *la_mulh_du(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mulw_d_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1087,6 +1178,7 @@ IR2_INST *la_mulw_d_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mulw_d_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1100,6 +1192,7 @@ IR2_INST *la_mulw_d_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_div_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1113,6 +1206,7 @@ IR2_INST *la_div_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mod_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1126,6 +1220,7 @@ IR2_INST *la_mod_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_div_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1139,6 +1234,7 @@ IR2_INST *la_div_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mod_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1152,6 +1248,7 @@ IR2_INST *la_mod_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_div_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1165,6 +1262,7 @@ IR2_INST *la_div_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mod_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1178,6 +1276,7 @@ IR2_INST *la_mod_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_div_du(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1191,6 +1290,7 @@ IR2_INST *la_div_du(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_mod_du(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1204,6 +1304,7 @@ IR2_INST *la_mod_du(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_crc_w_b_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1217,6 +1318,7 @@ IR2_INST *la_crc_w_b_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_crc_w_h_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1230,6 +1332,7 @@ IR2_INST *la_crc_w_h_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_crc_w_w_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1243,6 +1346,7 @@ IR2_INST *la_crc_w_w_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_crc_w_d_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1256,6 +1360,7 @@ IR2_INST *la_crc_w_d_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_crcc_w_b_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1269,6 +1374,7 @@ IR2_INST *la_crcc_w_b_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_crcc_w_h_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1282,6 +1388,7 @@ IR2_INST *la_crcc_w_h_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_crcc_w_w_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1295,6 +1402,7 @@ IR2_INST *la_crcc_w_w_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_crcc_w_d_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1308,6 +1416,7 @@ IR2_INST *la_crcc_w_d_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_addu12i_w(IR2_OPND rd, IR2_OPND rj, int imm_si5)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1322,6 +1431,7 @@ IR2_INST *la_addu12i_w(IR2_OPND rd, IR2_OPND rj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_addu12i_d(IR2_OPND rd, IR2_OPND rj, int imm_si5)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1336,6 +1446,7 @@ IR2_INST *la_addu12i_d(IR2_OPND rd, IR2_OPND rj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_break(int imm_code)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1348,6 +1459,7 @@ IR2_INST *la_break(int imm_code)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_dbgcall(int imm_code)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1360,6 +1472,7 @@ IR2_INST *la_dbgcall(int imm_code)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_syscall(int imm_code)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1372,6 +1485,7 @@ IR2_INST *la_syscall(int imm_code)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_hypcall(int imm_code)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1384,6 +1498,7 @@ IR2_INST *la_hypcall(int imm_code)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_alsl_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa2)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1399,6 +1514,7 @@ IR2_INST *la_alsl_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk, int imm_sa2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_adc_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1412,6 +1528,7 @@ IR2_INST *la_adc_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_adc_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1425,6 +1542,7 @@ IR2_INST *la_adc_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_adc_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1438,6 +1556,7 @@ IR2_INST *la_adc_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_adc_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1451,6 +1570,7 @@ IR2_INST *la_adc_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sbc_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1464,6 +1584,7 @@ IR2_INST *la_sbc_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sbc_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1477,6 +1598,7 @@ IR2_INST *la_sbc_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sbc_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1490,6 +1612,7 @@ IR2_INST *la_sbc_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sbc_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1503,6 +1626,7 @@ IR2_INST *la_sbc_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rcr_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1516,6 +1640,7 @@ IR2_INST *la_rcr_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rcr_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1529,6 +1654,7 @@ IR2_INST *la_rcr_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rcr_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1542,6 +1668,7 @@ IR2_INST *la_rcr_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rcr_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1555,6 +1682,7 @@ IR2_INST *la_rcr_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armmove(IR2_OPND rd, IR2_OPND rj, int imm_condh)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1569,6 +1697,7 @@ IR2_INST *la_armmove(IR2_OPND rd, IR2_OPND rj, int imm_condh)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_setx86j(IR2_OPND rd, int imm_condh)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1582,6 +1711,7 @@ IR2_INST *la_setx86j(IR2_OPND rd, int imm_condh)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_setarmj(IR2_OPND rd, int imm_condh)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1595,6 +1725,7 @@ IR2_INST *la_setarmj(IR2_OPND rd, int imm_condh)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armadd_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1609,6 +1740,7 @@ IR2_INST *la_armadd_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armsub_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1623,6 +1755,7 @@ IR2_INST *la_armsub_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armadc_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1637,6 +1770,7 @@ IR2_INST *la_armadc_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armsbc_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1651,6 +1785,7 @@ IR2_INST *la_armsbc_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armand_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1665,6 +1800,7 @@ IR2_INST *la_armand_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armor_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1679,6 +1815,7 @@ IR2_INST *la_armor_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armxor_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1693,6 +1830,7 @@ IR2_INST *la_armxor_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armsll_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1707,6 +1845,7 @@ IR2_INST *la_armsll_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armsrl_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1721,6 +1860,7 @@ IR2_INST *la_armsrl_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armsra_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1735,6 +1875,7 @@ IR2_INST *la_armsra_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armrotr_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1749,6 +1890,7 @@ IR2_INST *la_armrotr_w(IR2_OPND rj, IR2_OPND rk, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armslli_w(IR2_OPND rj, int imm_ui5l, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1764,6 +1906,7 @@ IR2_INST *la_armslli_w(IR2_OPND rj, int imm_ui5l, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armsrli_w(IR2_OPND rj, int imm_ui5l, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1779,6 +1922,7 @@ IR2_INST *la_armsrli_w(IR2_OPND rj, int imm_ui5l, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armsrai_w(IR2_OPND rj, int imm_ui5l, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1794,6 +1938,7 @@ IR2_INST *la_armsrai_w(IR2_OPND rj, int imm_ui5l, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armrotri_w(IR2_OPND rj, int imm_ui5l, int imm_condl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1809,6 +1954,7 @@ IR2_INST *la_armrotri_w(IR2_OPND rj, int imm_ui5l, int imm_condl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mul_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1821,6 +1967,7 @@ IR2_INST *la_x86mul_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mul_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1833,6 +1980,7 @@ IR2_INST *la_x86mul_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mul_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1845,6 +1993,7 @@ IR2_INST *la_x86mul_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mul_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1857,6 +2006,7 @@ IR2_INST *la_x86mul_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mul_bu(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1869,6 +2019,7 @@ IR2_INST *la_x86mul_bu(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mul_hu(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1881,6 +2032,7 @@ IR2_INST *la_x86mul_hu(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mul_wu(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1893,6 +2045,7 @@ IR2_INST *la_x86mul_wu(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mul_du(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1905,6 +2058,7 @@ IR2_INST *la_x86mul_du(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86add_wu(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1917,6 +2071,7 @@ IR2_INST *la_x86add_wu(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86add_du(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1929,6 +2084,7 @@ IR2_INST *la_x86add_du(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sub_wu(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1941,6 +2097,7 @@ IR2_INST *la_x86sub_wu(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sub_du(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1953,6 +2110,7 @@ IR2_INST *la_x86sub_du(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86add_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1965,6 +2123,7 @@ IR2_INST *la_x86add_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86add_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1977,6 +2136,7 @@ IR2_INST *la_x86add_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86add_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -1989,6 +2149,7 @@ IR2_INST *la_x86add_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86add_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2001,6 +2162,7 @@ IR2_INST *la_x86add_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sub_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2013,6 +2175,7 @@ IR2_INST *la_x86sub_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sub_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2025,6 +2188,7 @@ IR2_INST *la_x86sub_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sub_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2037,6 +2201,7 @@ IR2_INST *la_x86sub_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sub_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2049,6 +2214,7 @@ IR2_INST *la_x86sub_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86adc_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2061,6 +2227,7 @@ IR2_INST *la_x86adc_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86adc_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2073,6 +2240,7 @@ IR2_INST *la_x86adc_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86adc_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2085,6 +2253,7 @@ IR2_INST *la_x86adc_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86adc_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2097,6 +2266,7 @@ IR2_INST *la_x86adc_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sbc_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2109,6 +2279,7 @@ IR2_INST *la_x86sbc_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sbc_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2121,6 +2292,7 @@ IR2_INST *la_x86sbc_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sbc_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2133,6 +2305,7 @@ IR2_INST *la_x86sbc_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sbc_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2145,6 +2318,7 @@ IR2_INST *la_x86sbc_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sll_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2157,6 +2331,7 @@ IR2_INST *la_x86sll_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sll_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2169,6 +2344,7 @@ IR2_INST *la_x86sll_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sll_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2181,6 +2357,7 @@ IR2_INST *la_x86sll_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sll_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2193,6 +2370,7 @@ IR2_INST *la_x86sll_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srl_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2205,6 +2383,7 @@ IR2_INST *la_x86srl_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srl_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2217,6 +2396,7 @@ IR2_INST *la_x86srl_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srl_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2229,6 +2409,7 @@ IR2_INST *la_x86srl_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srl_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2241,6 +2422,7 @@ IR2_INST *la_x86srl_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sra_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2253,6 +2435,7 @@ IR2_INST *la_x86sra_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sra_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2265,6 +2448,7 @@ IR2_INST *la_x86sra_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sra_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2277,6 +2461,7 @@ IR2_INST *la_x86sra_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86sra_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2289,6 +2474,7 @@ IR2_INST *la_x86sra_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotr_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2301,6 +2487,7 @@ IR2_INST *la_x86rotr_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotr_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2313,6 +2500,7 @@ IR2_INST *la_x86rotr_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotr_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2325,6 +2513,7 @@ IR2_INST *la_x86rotr_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotr_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2337,6 +2526,7 @@ IR2_INST *la_x86rotr_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotl_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2349,6 +2539,7 @@ IR2_INST *la_x86rotl_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotl_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2361,6 +2552,7 @@ IR2_INST *la_x86rotl_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotl_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2373,6 +2565,7 @@ IR2_INST *la_x86rotl_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotl_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2385,6 +2578,7 @@ IR2_INST *la_x86rotl_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcr_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2397,6 +2591,7 @@ IR2_INST *la_x86rcr_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcr_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2409,6 +2604,7 @@ IR2_INST *la_x86rcr_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcr_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2421,6 +2617,7 @@ IR2_INST *la_x86rcr_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcr_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2433,6 +2630,7 @@ IR2_INST *la_x86rcr_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcl_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2445,6 +2643,7 @@ IR2_INST *la_x86rcl_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcl_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2457,6 +2656,7 @@ IR2_INST *la_x86rcl_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcl_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2469,6 +2669,7 @@ IR2_INST *la_x86rcl_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcl_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2481,6 +2682,7 @@ IR2_INST *la_x86rcl_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86and_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2493,6 +2695,7 @@ IR2_INST *la_x86and_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86and_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2505,6 +2708,7 @@ IR2_INST *la_x86and_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86and_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2517,6 +2721,7 @@ IR2_INST *la_x86and_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86and_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2529,6 +2734,7 @@ IR2_INST *la_x86and_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86or_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2541,6 +2747,7 @@ IR2_INST *la_x86or_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86or_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2553,6 +2760,7 @@ IR2_INST *la_x86or_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86or_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2565,6 +2773,7 @@ IR2_INST *la_x86or_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86or_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2577,6 +2786,7 @@ IR2_INST *la_x86or_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86xor_b(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2589,6 +2799,7 @@ IR2_INST *la_x86xor_b(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86xor_h(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2601,6 +2812,7 @@ IR2_INST *la_x86xor_h(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86xor_w(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2613,6 +2825,7 @@ IR2_INST *la_x86xor_w(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86xor_d(IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2625,6 +2838,7 @@ IR2_INST *la_x86xor_d(IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armnot_w(IR2_OPND rj, int imm_condh)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2638,6 +2852,7 @@ IR2_INST *la_armnot_w(IR2_OPND rj, int imm_condh)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armmov_w(IR2_OPND rj, int imm_condh)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2651,6 +2866,7 @@ IR2_INST *la_armmov_w(IR2_OPND rj, int imm_condh)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armmov_d(IR2_OPND rj, int imm_condh)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2664,6 +2880,7 @@ IR2_INST *la_armmov_d(IR2_OPND rj, int imm_condh)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armrrx_w(IR2_OPND rj, int imm_condh)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -2677,6 +2894,7 @@ IR2_INST *la_armrrx_w(IR2_OPND rj, int imm_condh)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_slli_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -2692,6 +2910,7 @@ IR2_INST *la_slli_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_slli_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -2707,6 +2926,7 @@ IR2_INST *la_slli_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_srli_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -2722,6 +2942,7 @@ IR2_INST *la_srli_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_srli_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -2737,6 +2958,7 @@ IR2_INST *la_srli_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_srai_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -2752,6 +2974,7 @@ IR2_INST *la_srai_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_srai_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -2767,6 +2990,7 @@ IR2_INST *la_srai_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rotri_b(IR2_OPND rd, IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -2782,6 +3006,7 @@ IR2_INST *la_rotri_b(IR2_OPND rd, IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rotri_h(IR2_OPND rd, IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -2797,6 +3022,7 @@ IR2_INST *la_rotri_h(IR2_OPND rd, IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rotri_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -2812,6 +3038,7 @@ IR2_INST *la_rotri_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rotri_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -2827,6 +3054,7 @@ IR2_INST *la_rotri_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rcri_b(IR2_OPND rd, IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -2842,6 +3070,7 @@ IR2_INST *la_rcri_b(IR2_OPND rd, IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rcri_h(IR2_OPND rd, IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0x1f);
@@ -2857,6 +3086,7 @@ IR2_INST *la_rcri_h(IR2_OPND rd, IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rcri_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -2872,6 +3102,7 @@ IR2_INST *la_rcri_w(IR2_OPND rd, IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_rcri_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -2887,6 +3118,7 @@ IR2_INST *la_rcri_d(IR2_OPND rd, IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86slli_b(IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -2901,6 +3133,7 @@ IR2_INST *la_x86slli_b(IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86slli_h(IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -2915,6 +3148,7 @@ IR2_INST *la_x86slli_h(IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86slli_w(IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0xf);
@@ -2929,6 +3163,7 @@ IR2_INST *la_x86slli_w(IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86slli_d(IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0xf);
@@ -2943,6 +3178,7 @@ IR2_INST *la_x86slli_d(IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srli_b(IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -2957,6 +3193,7 @@ IR2_INST *la_x86srli_b(IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srli_h(IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -2971,6 +3208,7 @@ IR2_INST *la_x86srli_h(IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srli_w(IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -2985,6 +3223,7 @@ IR2_INST *la_x86srli_w(IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srli_d(IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -2999,6 +3238,7 @@ IR2_INST *la_x86srli_d(IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srai_b(IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -3013,6 +3253,7 @@ IR2_INST *la_x86srai_b(IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srai_h(IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -3027,6 +3268,7 @@ IR2_INST *la_x86srai_h(IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srai_w(IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -3041,6 +3283,7 @@ IR2_INST *la_x86srai_w(IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86srai_d(IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -3055,6 +3298,7 @@ IR2_INST *la_x86srai_d(IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotri_b(IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -3069,6 +3313,7 @@ IR2_INST *la_x86rotri_b(IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotri_h(IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -3083,6 +3328,7 @@ IR2_INST *la_x86rotri_h(IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotri_w(IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -3097,6 +3343,7 @@ IR2_INST *la_x86rotri_w(IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotri_d(IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -3111,6 +3358,7 @@ IR2_INST *la_x86rotri_d(IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcri_b(IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -3125,6 +3373,7 @@ IR2_INST *la_x86rcri_b(IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcri_h(IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -3139,6 +3388,7 @@ IR2_INST *la_x86rcri_h(IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcri_w(IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -3153,6 +3403,7 @@ IR2_INST *la_x86rcri_w(IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcri_d(IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -3167,6 +3418,7 @@ IR2_INST *la_x86rcri_d(IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotli_b(IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -3181,6 +3433,7 @@ IR2_INST *la_x86rotli_b(IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotli_h(IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -3195,6 +3448,7 @@ IR2_INST *la_x86rotli_h(IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotli_w(IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -3209,6 +3463,7 @@ IR2_INST *la_x86rotli_w(IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rotli_d(IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -3223,6 +3478,7 @@ IR2_INST *la_x86rotli_d(IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcli_b(IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -3237,6 +3493,7 @@ IR2_INST *la_x86rcli_b(IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcli_h(IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -3251,6 +3508,7 @@ IR2_INST *la_x86rcli_h(IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcli_w(IR2_OPND rj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -3265,6 +3523,7 @@ IR2_INST *la_x86rcli_w(IR2_OPND rj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86rcli_d(IR2_OPND rj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -3279,6 +3538,7 @@ IR2_INST *la_x86rcli_d(IR2_OPND rj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86settag(IR2_OPND rd, int imm_opx86, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -3295,6 +3555,7 @@ IR2_INST *la_x86settag(IR2_OPND rd, int imm_opx86, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mfflag(IR2_OPND rd, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -3309,6 +3570,7 @@ IR2_INST *la_x86mfflag(IR2_OPND rd, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_x86mtflag(IR2_OPND rd, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -3323,6 +3585,7 @@ IR2_INST *la_x86mtflag(IR2_OPND rd, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armmfflag(IR2_OPND rd, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -3337,6 +3600,7 @@ IR2_INST *la_armmfflag(IR2_OPND rd, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_armmtflag(IR2_OPND rd, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -3351,6 +3615,7 @@ IR2_INST *la_armmtflag(IR2_OPND rd, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bstrins_w(IR2_OPND rd, IR2_OPND rj, int imm_msbw, int imm_lsbw)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -3367,6 +3632,7 @@ IR2_INST *la_bstrins_w(IR2_OPND rd, IR2_OPND rj, int imm_msbw, int imm_lsbw)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bstrpick_w(IR2_OPND rd, IR2_OPND rj, int imm_msbw, int imm_lsbw)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -3383,6 +3649,7 @@ IR2_INST *la_bstrpick_w(IR2_OPND rd, IR2_OPND rj, int imm_msbw, int imm_lsbw)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bstrins_d(IR2_OPND rd, IR2_OPND rj, int imm_msbd, int imm_lsbd)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -3399,6 +3666,7 @@ IR2_INST *la_bstrins_d(IR2_OPND rd, IR2_OPND rj, int imm_msbd, int imm_lsbd)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bstrpick_d(IR2_OPND rd, IR2_OPND rj, int imm_msbd, int imm_lsbd)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -3415,6 +3683,7 @@ IR2_INST *la_bstrpick_d(IR2_OPND rd, IR2_OPND rj, int imm_msbd, int imm_lsbd)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_slti(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3430,6 +3699,7 @@ IR2_INST *la_slti(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sltui(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3445,6 +3715,7 @@ IR2_INST *la_sltui(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_addi_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3460,6 +3731,7 @@ IR2_INST *la_addi_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_addi_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3475,6 +3747,7 @@ IR2_INST *la_addi_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_lu52i_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3490,6 +3763,7 @@ IR2_INST *la_lu52i_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_andi(IR2_OPND rd, IR2_OPND rj, int imm_ui12)
 {
     assert(imm_ui12 <= 0xfff);
@@ -3505,6 +3779,7 @@ IR2_INST *la_andi(IR2_OPND rd, IR2_OPND rj, int imm_ui12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ori(IR2_OPND rd, IR2_OPND rj, int imm_ui12)
 {
     assert(imm_ui12 <= 0xfff);
@@ -3520,6 +3795,7 @@ IR2_INST *la_ori(IR2_OPND rd, IR2_OPND rj, int imm_ui12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xori(IR2_OPND rd, IR2_OPND rj, int imm_ui12)
 {
     assert(imm_ui12 <= 0xfff);
@@ -3535,6 +3811,7 @@ IR2_INST *la_xori(IR2_OPND rd, IR2_OPND rj, int imm_ui12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_addu16i_d(IR2_OPND rd, IR2_OPND rj, int imm_si16)
 {
     assert(imm_si16 <= 0xffff);
@@ -3550,6 +3827,7 @@ IR2_INST *la_addu16i_d(IR2_OPND rd, IR2_OPND rj, int imm_si16)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_lu12i_w(IR2_OPND rd, int imm_si20)
 {
     assert(imm_si20 <= 0xfffff);
@@ -3564,6 +3842,7 @@ IR2_INST *la_lu12i_w(IR2_OPND rd, int imm_si20)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_lu32i_d(IR2_OPND rd, int imm_si20)
 {
     assert(imm_si20 <= 0xfffff);
@@ -3578,6 +3857,7 @@ IR2_INST *la_lu32i_d(IR2_OPND rd, int imm_si20)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_pcaddi(IR2_OPND rd, int imm_si20)
 {
     assert(imm_si20 <= 0xfffff);
@@ -3592,6 +3872,7 @@ IR2_INST *la_pcaddi(IR2_OPND rd, int imm_si20)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_pcalau12i(IR2_OPND rd, int imm_si20)
 {
     assert(imm_si20 <= 0xfffff);
@@ -3606,6 +3887,7 @@ IR2_INST *la_pcalau12i(IR2_OPND rd, int imm_si20)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_pcaddu12i(IR2_OPND rd, int imm_si20)
 {
     assert(imm_si20 <= 0xfffff);
@@ -3620,6 +3902,7 @@ IR2_INST *la_pcaddu12i(IR2_OPND rd, int imm_si20)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_pcaddu18i(IR2_OPND rd, int imm_si20)
 {
     assert(imm_si20 <= 0xfffff);
@@ -3634,6 +3917,7 @@ IR2_INST *la_pcaddu18i(IR2_OPND rd, int imm_si20)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ll_w(IR2_OPND rd, IR2_OPND rj, int imm_si14)
 {
     assert(imm_si14 <= 0x3fff);
@@ -3650,6 +3934,7 @@ IR2_INST *la_ll_w(IR2_OPND rd, IR2_OPND rj, int imm_si14)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sc_w(IR2_OPND rd, IR2_OPND rj, int imm_si14)
 {
     assert(imm_si14 <= 0x3fff);
@@ -3666,6 +3951,7 @@ IR2_INST *la_sc_w(IR2_OPND rd, IR2_OPND rj, int imm_si14)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ll_d(IR2_OPND rd, IR2_OPND rj, int imm_si14)
 {
     assert(imm_si14 <= 0x3fff);
@@ -3682,6 +3968,7 @@ IR2_INST *la_ll_d(IR2_OPND rd, IR2_OPND rj, int imm_si14)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sc_d(IR2_OPND rd, IR2_OPND rj, int imm_si14)
 {
     assert(imm_si14 <= 0x3fff);
@@ -3698,6 +3985,7 @@ IR2_INST *la_sc_d(IR2_OPND rd, IR2_OPND rj, int imm_si14)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldptr_w(IR2_OPND rd, IR2_OPND rj, int imm_si14)
 {
     assert(imm_si14 <= 0x3fff);
@@ -3714,6 +4002,7 @@ IR2_INST *la_ldptr_w(IR2_OPND rd, IR2_OPND rj, int imm_si14)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stptr_w(IR2_OPND rd, IR2_OPND rj, int imm_si14)
 {
     assert(imm_si14 <= 0x3fff);
@@ -3730,6 +4019,7 @@ IR2_INST *la_stptr_w(IR2_OPND rd, IR2_OPND rj, int imm_si14)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldptr_d(IR2_OPND rd, IR2_OPND rj, int imm_si14)
 {
     assert(imm_si14 <= 0x3fff);
@@ -3746,6 +4036,7 @@ IR2_INST *la_ldptr_d(IR2_OPND rd, IR2_OPND rj, int imm_si14)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stptr_d(IR2_OPND rd, IR2_OPND rj, int imm_si14)
 {
     assert(imm_si14 <= 0x3fff);
@@ -3762,6 +4053,7 @@ IR2_INST *la_stptr_d(IR2_OPND rd, IR2_OPND rj, int imm_si14)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ld_b(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3777,6 +4069,7 @@ IR2_INST *la_ld_b(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ld_h(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3792,6 +4085,7 @@ IR2_INST *la_ld_h(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ld_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3807,6 +4101,7 @@ IR2_INST *la_ld_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ld_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3822,6 +4117,7 @@ IR2_INST *la_ld_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_st_b(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3837,6 +4133,7 @@ IR2_INST *la_st_b(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_st_h(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3852,6 +4149,7 @@ IR2_INST *la_st_h(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_st_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3867,6 +4165,7 @@ IR2_INST *la_st_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_st_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3882,6 +4181,7 @@ IR2_INST *la_st_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ld_bu(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3897,6 +4197,7 @@ IR2_INST *la_ld_bu(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ld_hu(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3912,6 +4213,7 @@ IR2_INST *la_ld_hu(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ld_wu(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3927,6 +4229,7 @@ IR2_INST *la_ld_wu(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_preld(int imm_hints, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3943,6 +4246,7 @@ IR2_INST *la_preld(int imm_hints, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fld_s(IR2_OPND fd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3958,6 +4262,7 @@ IR2_INST *la_fld_s(IR2_OPND fd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fst_s(IR2_OPND fd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3973,6 +4278,7 @@ IR2_INST *la_fst_s(IR2_OPND fd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fld_d(IR2_OPND fd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -3988,6 +4294,7 @@ IR2_INST *la_fld_d(IR2_OPND fd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fst_d(IR2_OPND fd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4003,6 +4310,7 @@ IR2_INST *la_fst_d(IR2_OPND fd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vld(IR2_OPND vd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4018,6 +4326,7 @@ IR2_INST *la_vld(IR2_OPND vd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vst(IR2_OPND vd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4033,6 +4342,7 @@ IR2_INST *la_vst(IR2_OPND vd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvld(IR2_OPND xd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4048,6 +4358,7 @@ IR2_INST *la_xvld(IR2_OPND xd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvst(IR2_OPND xd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4063,6 +4374,7 @@ IR2_INST *la_xvst(IR2_OPND xd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldl_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4078,6 +4390,7 @@ IR2_INST *la_ldl_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldr_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4093,6 +4406,7 @@ IR2_INST *la_ldr_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldl_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4108,6 +4422,7 @@ IR2_INST *la_ldl_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldr_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4123,6 +4438,7 @@ IR2_INST *la_ldr_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stl_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4138,6 +4454,7 @@ IR2_INST *la_stl_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_str_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4153,6 +4470,7 @@ IR2_INST *la_str_w(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stl_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4168,6 +4486,7 @@ IR2_INST *la_stl_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_str_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4183,6 +4502,7 @@ IR2_INST *la_str_d(IR2_OPND rd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vldrepl_d(IR2_OPND vd, IR2_OPND rj, int imm_si9)
 {
     assert(imm_si9 <= 0x1ff);
@@ -4198,6 +4518,7 @@ IR2_INST *la_vldrepl_d(IR2_OPND vd, IR2_OPND rj, int imm_si9)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vldrepl_w(IR2_OPND vd, IR2_OPND rj, int imm_si10)
 {
     assert(imm_si10 <= 0x3ff);
@@ -4213,6 +4534,7 @@ IR2_INST *la_vldrepl_w(IR2_OPND vd, IR2_OPND rj, int imm_si10)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vldrepl_h(IR2_OPND vd, IR2_OPND rj, int imm_si11)
 {
     assert(imm_si11 <= 0x7ff);
@@ -4228,6 +4550,7 @@ IR2_INST *la_vldrepl_h(IR2_OPND vd, IR2_OPND rj, int imm_si11)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vldrepl_b(IR2_OPND vd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4243,6 +4566,7 @@ IR2_INST *la_vldrepl_b(IR2_OPND vd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vstelm_d(IR2_OPND vd, IR2_OPND rj, int imm_si8, int imm_idxs)
 {
     assert(imm_si8 <= 0xff);
@@ -4260,6 +4584,7 @@ IR2_INST *la_vstelm_d(IR2_OPND vd, IR2_OPND rj, int imm_si8, int imm_idxs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vstelm_w(IR2_OPND vd, IR2_OPND rj, int imm_si8, int imm_idxm)
 {
     assert(imm_si8 <= 0xff);
@@ -4277,6 +4602,7 @@ IR2_INST *la_vstelm_w(IR2_OPND vd, IR2_OPND rj, int imm_si8, int imm_idxm)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vstelm_h(IR2_OPND vd, IR2_OPND rj, int imm_si8, int imm_idxl)
 {
     assert(imm_si8 <= 0xff);
@@ -4294,6 +4620,7 @@ IR2_INST *la_vstelm_h(IR2_OPND vd, IR2_OPND rj, int imm_si8, int imm_idxl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vstelm_b(IR2_OPND vd, IR2_OPND rj, int imm_si8, int imm_idxll)
 {
     assert(imm_si8 <= 0xff);
@@ -4311,6 +4638,7 @@ IR2_INST *la_vstelm_b(IR2_OPND vd, IR2_OPND rj, int imm_si8, int imm_idxll)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvldrepl_d(IR2_OPND xd, IR2_OPND rj, int imm_si9)
 {
     assert(imm_si9 <= 0x1ff);
@@ -4326,6 +4654,7 @@ IR2_INST *la_xvldrepl_d(IR2_OPND xd, IR2_OPND rj, int imm_si9)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvldrepl_w(IR2_OPND xd, IR2_OPND rj, int imm_si10)
 {
     assert(imm_si10 <= 0x3ff);
@@ -4341,6 +4670,7 @@ IR2_INST *la_xvldrepl_w(IR2_OPND xd, IR2_OPND rj, int imm_si10)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvldrepl_h(IR2_OPND xd, IR2_OPND rj, int imm_si11)
 {
     assert(imm_si11 <= 0x7ff);
@@ -4356,6 +4686,7 @@ IR2_INST *la_xvldrepl_h(IR2_OPND xd, IR2_OPND rj, int imm_si11)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvldrepl_b(IR2_OPND xd, IR2_OPND rj, int imm_si12)
 {
     assert(imm_si12 <= 0xfff);
@@ -4371,6 +4702,7 @@ IR2_INST *la_xvldrepl_b(IR2_OPND xd, IR2_OPND rj, int imm_si12)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvstelm_d(IR2_OPND xd, IR2_OPND rj, int imm_si8, int imm_idxs)
 {
     assert(imm_si8 <= 0xff);
@@ -4388,6 +4720,7 @@ IR2_INST *la_xvstelm_d(IR2_OPND xd, IR2_OPND rj, int imm_si8, int imm_idxs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvstelm_w(IR2_OPND xd, IR2_OPND rj, int imm_si8, int imm_idxm)
 {
     assert(imm_si8 <= 0xff);
@@ -4405,6 +4738,7 @@ IR2_INST *la_xvstelm_w(IR2_OPND xd, IR2_OPND rj, int imm_si8, int imm_idxm)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvstelm_h(IR2_OPND xd, IR2_OPND rj, int imm_si8, int imm_idxl)
 {
     assert(imm_si8 <= 0xff);
@@ -4422,6 +4756,7 @@ IR2_INST *la_xvstelm_h(IR2_OPND xd, IR2_OPND rj, int imm_si8, int imm_idxl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvstelm_b(IR2_OPND xd, IR2_OPND rj, int imm_si8, int imm_idxll)
 {
     assert(imm_si8 <= 0xff);
@@ -4439,6 +4774,7 @@ IR2_INST *la_xvstelm_b(IR2_OPND xd, IR2_OPND rj, int imm_si8, int imm_idxll)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldx_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4452,6 +4788,7 @@ IR2_INST *la_ldx_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldx_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4465,6 +4802,7 @@ IR2_INST *la_ldx_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldx_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4478,6 +4816,7 @@ IR2_INST *la_ldx_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldx_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4491,6 +4830,7 @@ IR2_INST *la_ldx_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stx_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4504,6 +4844,7 @@ IR2_INST *la_stx_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stx_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4517,6 +4858,7 @@ IR2_INST *la_stx_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stx_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4530,6 +4872,7 @@ IR2_INST *la_stx_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stx_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4543,6 +4886,7 @@ IR2_INST *la_stx_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldx_bu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4556,6 +4900,7 @@ IR2_INST *la_ldx_bu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldx_hu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4569,6 +4914,7 @@ IR2_INST *la_ldx_hu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldx_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4582,6 +4928,7 @@ IR2_INST *la_ldx_wu(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_preldx(int imm_hints, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4596,6 +4943,7 @@ IR2_INST *la_preldx(int imm_hints, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fldx_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4609,6 +4957,7 @@ IR2_INST *la_fldx_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fldx_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4622,6 +4971,7 @@ IR2_INST *la_fldx_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fstx_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4635,6 +4985,7 @@ IR2_INST *la_fstx_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fstx_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4648,6 +4999,7 @@ IR2_INST *la_fstx_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vldx(IR2_OPND vd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4661,6 +5013,7 @@ IR2_INST *la_vldx(IR2_OPND vd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vstx(IR2_OPND vd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4674,6 +5027,7 @@ IR2_INST *la_vstx(IR2_OPND vd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvldx(IR2_OPND xd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4687,6 +5041,7 @@ IR2_INST *la_xvldx(IR2_OPND xd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvstx(IR2_OPND xd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4700,6 +5055,7 @@ IR2_INST *la_xvstx(IR2_OPND xd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amswap_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4713,6 +5069,7 @@ IR2_INST *la_amswap_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amswap_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4726,6 +5083,7 @@ IR2_INST *la_amswap_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amadd_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4739,6 +5097,7 @@ IR2_INST *la_amadd_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amadd_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4752,6 +5111,7 @@ IR2_INST *la_amadd_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amand_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4765,6 +5125,7 @@ IR2_INST *la_amand_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amand_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4778,6 +5139,7 @@ IR2_INST *la_amand_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amor_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4791,6 +5153,7 @@ IR2_INST *la_amor_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amor_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4804,6 +5167,7 @@ IR2_INST *la_amor_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amxor_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4817,6 +5181,7 @@ IR2_INST *la_amxor_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amxor_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4830,6 +5195,7 @@ IR2_INST *la_amxor_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammax_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4843,6 +5209,7 @@ IR2_INST *la_ammax_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammax_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4856,6 +5223,7 @@ IR2_INST *la_ammax_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammin_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4869,6 +5237,7 @@ IR2_INST *la_ammin_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammin_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4882,6 +5251,7 @@ IR2_INST *la_ammin_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammax_wu(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4895,6 +5265,7 @@ IR2_INST *la_ammax_wu(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammax_du(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4908,6 +5279,7 @@ IR2_INST *la_ammax_du(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammin_wu(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4921,6 +5293,7 @@ IR2_INST *la_ammin_wu(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammin_du(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4934,6 +5307,7 @@ IR2_INST *la_ammin_du(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amswap_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4947,6 +5321,7 @@ IR2_INST *la_amswap_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amswap_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4960,6 +5335,7 @@ IR2_INST *la_amswap_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amadd_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4973,6 +5349,7 @@ IR2_INST *la_amadd_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amadd_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4986,6 +5363,7 @@ IR2_INST *la_amadd_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amand_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -4999,6 +5377,7 @@ IR2_INST *la_amand_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amand_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5012,6 +5391,7 @@ IR2_INST *la_amand_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amor_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5025,6 +5405,7 @@ IR2_INST *la_amor_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amor_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5038,6 +5419,7 @@ IR2_INST *la_amor_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amxor_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5051,6 +5433,7 @@ IR2_INST *la_amxor_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_amxor_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5064,6 +5447,7 @@ IR2_INST *la_amxor_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammax_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5077,6 +5461,7 @@ IR2_INST *la_ammax_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammax_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5090,6 +5475,7 @@ IR2_INST *la_ammax_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammin_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5103,6 +5489,7 @@ IR2_INST *la_ammin_db_w(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammin_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5116,6 +5503,7 @@ IR2_INST *la_ammin_db_d(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammax_db_wu(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5129,6 +5517,7 @@ IR2_INST *la_ammax_db_wu(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammax_db_du(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5142,6 +5531,7 @@ IR2_INST *la_ammax_db_du(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammin_db_wu(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5155,6 +5545,7 @@ IR2_INST *la_ammin_db_wu(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ammin_db_du(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5168,6 +5559,7 @@ IR2_INST *la_ammin_db_du(IR2_OPND rd, IR2_OPND rk, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_dbar(int imm_hintl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5180,6 +5572,7 @@ IR2_INST *la_dbar(int imm_hintl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ibar(int imm_hintl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5192,6 +5585,7 @@ IR2_INST *la_ibar(int imm_hintl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fldgt_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5205,6 +5599,7 @@ IR2_INST *la_fldgt_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fldgt_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5218,6 +5613,7 @@ IR2_INST *la_fldgt_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fldle_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5231,6 +5627,7 @@ IR2_INST *la_fldle_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fldle_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5244,6 +5641,7 @@ IR2_INST *la_fldle_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fstgt_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5257,6 +5655,7 @@ IR2_INST *la_fstgt_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fstgt_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5270,6 +5669,7 @@ IR2_INST *la_fstgt_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fstle_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5283,6 +5683,7 @@ IR2_INST *la_fstle_s(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fstle_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5296,6 +5697,7 @@ IR2_INST *la_fstle_d(IR2_OPND fd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldgt_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5309,6 +5711,7 @@ IR2_INST *la_ldgt_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldgt_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5322,6 +5725,7 @@ IR2_INST *la_ldgt_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldgt_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5335,6 +5739,7 @@ IR2_INST *la_ldgt_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldgt_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5348,6 +5753,7 @@ IR2_INST *la_ldgt_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldle_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5361,6 +5767,7 @@ IR2_INST *la_ldle_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldle_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5374,6 +5781,7 @@ IR2_INST *la_ldle_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldle_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5387,6 +5795,7 @@ IR2_INST *la_ldle_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ldle_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5400,6 +5809,7 @@ IR2_INST *la_ldle_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stgt_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5413,6 +5823,7 @@ IR2_INST *la_stgt_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stgt_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5426,6 +5837,7 @@ IR2_INST *la_stgt_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stgt_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5439,6 +5851,7 @@ IR2_INST *la_stgt_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stgt_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5452,6 +5865,7 @@ IR2_INST *la_stgt_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stle_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5465,6 +5879,7 @@ IR2_INST *la_stle_b(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stle_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5478,6 +5893,7 @@ IR2_INST *la_stle_h(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stle_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5491,6 +5907,7 @@ IR2_INST *la_stle_w(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_stle_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5504,6 +5921,7 @@ IR2_INST *la_stle_d(IR2_OPND rd, IR2_OPND rj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_beqz(IR2_OPND rj, IR2_OPND offl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5516,6 +5934,7 @@ IR2_INST *la_beqz(IR2_OPND rj, IR2_OPND offl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bnez(IR2_OPND rj, IR2_OPND offl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5528,6 +5947,7 @@ IR2_INST *la_bnez(IR2_OPND rj, IR2_OPND offl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bceqz(IR2_OPND cj, IR2_OPND offl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5540,6 +5960,7 @@ IR2_INST *la_bceqz(IR2_OPND cj, IR2_OPND offl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bcnez(IR2_OPND cj, IR2_OPND offl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5552,6 +5973,7 @@ IR2_INST *la_bcnez(IR2_OPND cj, IR2_OPND offl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_jiscr0(int imm_offl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5564,6 +5986,7 @@ IR2_INST *la_jiscr0(int imm_offl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_jiscr1(int imm_offl)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5576,6 +5999,7 @@ IR2_INST *la_jiscr1(int imm_offl)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_jirl(IR2_OPND rd, IR2_OPND rj, int imm_offs)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5590,6 +6014,7 @@ IR2_INST *la_jirl(IR2_OPND rd, IR2_OPND rj, int imm_offs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_b(IR2_OPND offll)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5601,6 +6026,7 @@ IR2_INST *la_b(IR2_OPND offll)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bl(IR2_OPND offll)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5612,6 +6038,7 @@ IR2_INST *la_bl(IR2_OPND offll)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_beq(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5625,6 +6052,7 @@ IR2_INST *la_beq(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bne(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5638,6 +6066,7 @@ IR2_INST *la_bne(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_blt(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5651,6 +6080,7 @@ IR2_INST *la_blt(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bge(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5664,6 +6094,7 @@ IR2_INST *la_bge(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bltu(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5677,6 +6108,7 @@ IR2_INST *la_bltu(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_bgeu(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5690,6 +6122,7 @@ IR2_INST *la_bgeu(IR2_OPND rj, IR2_OPND rd, IR2_OPND offs)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fadd_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5703,6 +6136,7 @@ IR2_INST *la_fadd_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fadd_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5716,6 +6150,7 @@ IR2_INST *la_fadd_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fsub_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5729,6 +6164,7 @@ IR2_INST *la_fsub_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fsub_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5742,6 +6178,7 @@ IR2_INST *la_fsub_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmul_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5755,6 +6192,7 @@ IR2_INST *la_fmul_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmul_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5768,6 +6206,7 @@ IR2_INST *la_fmul_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fdiv_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5781,6 +6220,7 @@ IR2_INST *la_fdiv_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fdiv_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5794,6 +6234,7 @@ IR2_INST *la_fdiv_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmax_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5807,6 +6248,7 @@ IR2_INST *la_fmax_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmax_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5820,6 +6262,7 @@ IR2_INST *la_fmax_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmin_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5833,6 +6276,7 @@ IR2_INST *la_fmin_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmin_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5846,6 +6290,7 @@ IR2_INST *la_fmin_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmaxa_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5859,6 +6304,7 @@ IR2_INST *la_fmaxa_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmaxa_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5872,6 +6318,7 @@ IR2_INST *la_fmaxa_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmina_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5885,6 +6332,7 @@ IR2_INST *la_fmina_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmina_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5898,6 +6346,7 @@ IR2_INST *la_fmina_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fscaleb_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5911,6 +6360,7 @@ IR2_INST *la_fscaleb_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fscaleb_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5924,6 +6374,7 @@ IR2_INST *la_fscaleb_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcopysign_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5937,6 +6388,7 @@ IR2_INST *la_fcopysign_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcopysign_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5950,6 +6402,7 @@ IR2_INST *la_fcopysign_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fabs_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5962,6 +6415,7 @@ IR2_INST *la_fabs_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fabs_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5974,6 +6428,7 @@ IR2_INST *la_fabs_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fneg_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5986,6 +6441,7 @@ IR2_INST *la_fneg_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fneg_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -5998,6 +6454,7 @@ IR2_INST *la_fneg_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_flogb_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6010,6 +6467,7 @@ IR2_INST *la_flogb_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_flogb_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6022,6 +6480,7 @@ IR2_INST *la_flogb_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fclass_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6034,6 +6493,7 @@ IR2_INST *la_fclass_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fclass_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6046,6 +6506,7 @@ IR2_INST *la_fclass_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fsqrt_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6058,6 +6519,7 @@ IR2_INST *la_fsqrt_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fsqrt_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6070,6 +6532,7 @@ IR2_INST *la_fsqrt_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_frecip_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6082,6 +6545,7 @@ IR2_INST *la_frecip_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_frecip_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6094,6 +6558,7 @@ IR2_INST *la_frecip_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_frsqrt_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6106,6 +6571,7 @@ IR2_INST *la_frsqrt_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_frsqrt_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6118,6 +6584,7 @@ IR2_INST *la_frsqrt_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmov_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6130,6 +6597,7 @@ IR2_INST *la_fmov_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmov_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6142,6 +6610,7 @@ IR2_INST *la_fmov_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movgr2fr_w(IR2_OPND fd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6154,6 +6623,7 @@ IR2_INST *la_movgr2fr_w(IR2_OPND fd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movgr2fr_d(IR2_OPND fd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6166,6 +6636,7 @@ IR2_INST *la_movgr2fr_d(IR2_OPND fd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movgr2frh_w(IR2_OPND fd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6178,6 +6649,7 @@ IR2_INST *la_movgr2frh_w(IR2_OPND fd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movfr2gr_s(IR2_OPND rd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6190,6 +6662,7 @@ IR2_INST *la_movfr2gr_s(IR2_OPND rd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movfr2gr_d(IR2_OPND rd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6202,6 +6675,7 @@ IR2_INST *la_movfr2gr_d(IR2_OPND rd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movfrh2gr_s(IR2_OPND rd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6214,6 +6688,7 @@ IR2_INST *la_movfrh2gr_s(IR2_OPND rd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movgr2fcsr(IR2_OPND fcsrl, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6226,6 +6701,7 @@ IR2_INST *la_movgr2fcsr(IR2_OPND fcsrl, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movfcsr2gr(IR2_OPND rd, IR2_OPND fcsrh)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6238,6 +6714,7 @@ IR2_INST *la_movfcsr2gr(IR2_OPND rd, IR2_OPND fcsrh)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movfr2cf(IR2_OPND cd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6250,6 +6727,7 @@ IR2_INST *la_movfr2cf(IR2_OPND cd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movcf2fr(IR2_OPND fd, IR2_OPND cj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6262,6 +6740,7 @@ IR2_INST *la_movcf2fr(IR2_OPND fd, IR2_OPND cj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movgr2cf(IR2_OPND cd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6274,6 +6753,7 @@ IR2_INST *la_movgr2cf(IR2_OPND cd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_movcf2gr(IR2_OPND rd, IR2_OPND cj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6286,6 +6766,7 @@ IR2_INST *la_movcf2gr(IR2_OPND rd, IR2_OPND cj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcvt_ld_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6298,6 +6779,7 @@ IR2_INST *la_fcvt_ld_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcvt_ud_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6310,6 +6792,7 @@ IR2_INST *la_fcvt_ud_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcvt_d_ld(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6323,6 +6806,7 @@ IR2_INST *la_fcvt_d_ld(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcvt_s_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6335,6 +6819,7 @@ IR2_INST *la_fcvt_s_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcvt_d_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6347,6 +6832,7 @@ IR2_INST *la_fcvt_d_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrm_w_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6359,6 +6845,7 @@ IR2_INST *la_ftintrm_w_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrm_w_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6371,6 +6858,7 @@ IR2_INST *la_ftintrm_w_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrm_l_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6383,6 +6871,7 @@ IR2_INST *la_ftintrm_l_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrm_l_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6395,6 +6884,7 @@ IR2_INST *la_ftintrm_l_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrp_w_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6407,6 +6897,7 @@ IR2_INST *la_ftintrp_w_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrp_w_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6419,6 +6910,7 @@ IR2_INST *la_ftintrp_w_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrp_l_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6431,6 +6923,7 @@ IR2_INST *la_ftintrp_l_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrp_l_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6443,6 +6936,7 @@ IR2_INST *la_ftintrp_l_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrz_w_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6455,6 +6949,7 @@ IR2_INST *la_ftintrz_w_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrz_w_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6467,6 +6962,7 @@ IR2_INST *la_ftintrz_w_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrz_l_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6479,6 +6975,7 @@ IR2_INST *la_ftintrz_l_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrz_l_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6491,6 +6988,7 @@ IR2_INST *la_ftintrz_l_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrne_w_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6503,6 +7001,7 @@ IR2_INST *la_ftintrne_w_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrne_w_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6515,6 +7014,7 @@ IR2_INST *la_ftintrne_w_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrne_l_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6527,6 +7027,7 @@ IR2_INST *la_ftintrne_l_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftintrne_l_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6539,6 +7040,7 @@ IR2_INST *la_ftintrne_l_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftint_w_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6551,6 +7053,7 @@ IR2_INST *la_ftint_w_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftint_w_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6563,6 +7066,7 @@ IR2_INST *la_ftint_w_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftint_l_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6575,6 +7079,7 @@ IR2_INST *la_ftint_l_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ftint_l_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6587,6 +7092,7 @@ IR2_INST *la_ftint_l_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ffint_s_w(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6599,6 +7105,7 @@ IR2_INST *la_ffint_s_w(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ffint_s_l(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6611,6 +7118,7 @@ IR2_INST *la_ffint_s_l(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ffint_d_w(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6623,6 +7131,7 @@ IR2_INST *la_ffint_d_w(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_ffint_d_l(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6635,6 +7144,7 @@ IR2_INST *la_ffint_d_l(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_frint_s(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6647,6 +7157,7 @@ IR2_INST *la_frint_s(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_frint_d(IR2_OPND fd, IR2_OPND fj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6659,6 +7170,7 @@ IR2_INST *la_frint_d(IR2_OPND fd, IR2_OPND fj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmadd_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6673,6 +7185,7 @@ IR2_INST *la_fmadd_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmadd_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6687,6 +7200,7 @@ IR2_INST *la_fmadd_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmsub_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6701,6 +7215,7 @@ IR2_INST *la_fmsub_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fmsub_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6715,6 +7230,7 @@ IR2_INST *la_fmsub_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fnmadd_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6729,6 +7245,7 @@ IR2_INST *la_fnmadd_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fnmadd_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6743,6 +7260,7 @@ IR2_INST *la_fnmadd_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fnmsub_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6757,6 +7275,7 @@ IR2_INST *la_fnmsub_s(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fnmsub_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6771,6 +7290,7 @@ IR2_INST *la_fnmsub_d(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND fa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6785,6 +7305,7 @@ IR2_INST *la_vfmadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6799,6 +7320,7 @@ IR2_INST *la_vfmadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6813,6 +7335,7 @@ IR2_INST *la_vfmsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6827,6 +7350,7 @@ IR2_INST *la_vfmsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfnmadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6841,6 +7365,7 @@ IR2_INST *la_vfnmadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfnmadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6855,6 +7380,7 @@ IR2_INST *la_vfnmadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfnmsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6869,6 +7395,7 @@ IR2_INST *la_vfnmsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfnmsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6883,6 +7410,7 @@ IR2_INST *la_vfnmsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6897,6 +7425,7 @@ IR2_INST *la_xvfmadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6911,6 +7440,7 @@ IR2_INST *la_xvfmadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6925,6 +7455,7 @@ IR2_INST *la_xvfmsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6939,6 +7470,7 @@ IR2_INST *la_xvfmsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfnmadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6953,6 +7485,7 @@ IR2_INST *la_xvfnmadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfnmadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6967,6 +7500,7 @@ IR2_INST *la_xvfnmadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfnmsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6981,6 +7515,7 @@ IR2_INST *la_xvfnmsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfnmsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -6995,6 +7530,7 @@ IR2_INST *la_xvfnmsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcmp_cond_s(IR2_OPND cd, IR2_OPND fj, IR2_OPND fk, int imm_condf)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7010,6 +7546,7 @@ IR2_INST *la_fcmp_cond_s(IR2_OPND cd, IR2_OPND fj, IR2_OPND fk, int imm_condf)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fcmp_cond_d(IR2_OPND cd, IR2_OPND fj, IR2_OPND fk, int imm_condf)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7025,6 +7562,7 @@ IR2_INST *la_fcmp_cond_d(IR2_OPND cd, IR2_OPND fj, IR2_OPND fk, int imm_condf)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfcmp_cond_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, int imm_condf)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7040,6 +7578,7 @@ IR2_INST *la_vfcmp_cond_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, int imm_condf)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfcmp_cond_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, int imm_condf)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7055,6 +7594,7 @@ IR2_INST *la_vfcmp_cond_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, int imm_condf)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfcmp_cond_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, int imm_condf)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7070,6 +7610,7 @@ IR2_INST *la_xvfcmp_cond_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, int imm_condf)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfcmp_cond_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, int imm_condf)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7085,6 +7626,7 @@ IR2_INST *la_xvfcmp_cond_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, int imm_condf)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_fsel(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND ca)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7099,6 +7641,7 @@ IR2_INST *la_fsel(IR2_OPND fd, IR2_OPND fj, IR2_OPND fk, IR2_OPND ca)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitsel_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7113,6 +7656,7 @@ IR2_INST *la_vbitsel_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitsel_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7127,6 +7671,7 @@ IR2_INST *la_xvbitsel_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7141,6 +7686,7 @@ IR2_INST *la_vshuf_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7155,6 +7701,7 @@ IR2_INST *la_xvshuf_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextr_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, int imm_ui5h)
 {
     assert(imm_ui5h <= 0x1f);
@@ -7171,6 +7718,7 @@ IR2_INST *la_vextr_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, int imm_ui5h)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextr_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, int imm_ui5h)
 {
     assert(imm_ui5h <= 0x1f);
@@ -7187,6 +7735,7 @@ IR2_INST *la_xvextr_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, int imm_ui5h)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmaddsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7201,6 +7750,7 @@ IR2_INST *la_vfmaddsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmaddsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7215,6 +7765,7 @@ IR2_INST *la_vfmaddsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmsubadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7229,6 +7780,7 @@ IR2_INST *la_vfmsubadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmsubadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7243,6 +7795,7 @@ IR2_INST *la_vfmsubadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk, IR2_OPND va)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmaddsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7257,6 +7810,7 @@ IR2_INST *la_xvfmaddsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmaddsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7271,6 +7825,7 @@ IR2_INST *la_xvfmaddsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmsubadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7285,6 +7840,7 @@ IR2_INST *la_xvfmsubadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmsubadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7299,6 +7855,7 @@ IR2_INST *la_xvfmsubadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk, IR2_OPND xa)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseq_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7312,6 +7869,7 @@ IR2_INST *la_vseq_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseq_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7325,6 +7883,7 @@ IR2_INST *la_vseq_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseq_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7338,6 +7897,7 @@ IR2_INST *la_vseq_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseq_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7351,6 +7911,7 @@ IR2_INST *la_vseq_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsle_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7364,6 +7925,7 @@ IR2_INST *la_vsle_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsle_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7377,6 +7939,7 @@ IR2_INST *la_vsle_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsle_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7390,6 +7953,7 @@ IR2_INST *la_vsle_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsle_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7403,6 +7967,7 @@ IR2_INST *la_vsle_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsle_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7416,6 +7981,7 @@ IR2_INST *la_vsle_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsle_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7429,6 +7995,7 @@ IR2_INST *la_vsle_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsle_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7442,6 +8009,7 @@ IR2_INST *la_vsle_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsle_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7455,6 +8023,7 @@ IR2_INST *la_vsle_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslt_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7468,6 +8037,7 @@ IR2_INST *la_vslt_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslt_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7481,6 +8051,7 @@ IR2_INST *la_vslt_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslt_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7494,6 +8065,7 @@ IR2_INST *la_vslt_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslt_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7507,6 +8079,7 @@ IR2_INST *la_vslt_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslt_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7520,6 +8093,7 @@ IR2_INST *la_vslt_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslt_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7533,6 +8107,7 @@ IR2_INST *la_vslt_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslt_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7546,6 +8121,7 @@ IR2_INST *la_vslt_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslt_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7559,6 +8135,7 @@ IR2_INST *la_vslt_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7572,6 +8149,7 @@ IR2_INST *la_vadd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7585,6 +8163,7 @@ IR2_INST *la_vadd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7598,6 +8177,7 @@ IR2_INST *la_vadd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7611,6 +8191,7 @@ IR2_INST *la_vadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsub_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7624,6 +8205,7 @@ IR2_INST *la_vsub_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsub_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7637,6 +8219,7 @@ IR2_INST *la_vsub_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsub_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7650,6 +8233,7 @@ IR2_INST *la_vsub_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7663,6 +8247,7 @@ IR2_INST *la_vsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddw_h_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7676,6 +8261,7 @@ IR2_INST *la_vaddw_h_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddw_w_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7689,6 +8275,7 @@ IR2_INST *la_vaddw_w_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddw_d_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7702,6 +8289,7 @@ IR2_INST *la_vaddw_d_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddw_h_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7715,6 +8303,7 @@ IR2_INST *la_vaddw_h_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddw_w_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7728,6 +8317,7 @@ IR2_INST *la_vaddw_w_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddw_d_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7741,6 +8331,7 @@ IR2_INST *la_vaddw_d_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubw_h_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7754,6 +8345,7 @@ IR2_INST *la_vsubw_h_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubw_w_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7767,6 +8359,7 @@ IR2_INST *la_vsubw_w_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubw_d_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7780,6 +8373,7 @@ IR2_INST *la_vsubw_d_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubw_h_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7793,6 +8387,7 @@ IR2_INST *la_vsubw_h_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubw_w_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7806,6 +8401,7 @@ IR2_INST *la_vsubw_w_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubw_d_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7819,6 +8415,7 @@ IR2_INST *la_vsubw_d_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsaddw_h_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7832,6 +8429,7 @@ IR2_INST *la_vsaddw_h_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsaddw_w_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7845,6 +8443,7 @@ IR2_INST *la_vsaddw_w_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsaddw_d_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7858,6 +8457,7 @@ IR2_INST *la_vsaddw_d_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsaddw_hu_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7871,6 +8471,7 @@ IR2_INST *la_vsaddw_hu_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsaddw_wu_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7884,6 +8485,7 @@ IR2_INST *la_vsaddw_wu_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsaddw_du_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7897,6 +8499,7 @@ IR2_INST *la_vsaddw_du_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssubw_h_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7910,6 +8513,7 @@ IR2_INST *la_vssubw_h_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssubw_w_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7923,6 +8527,7 @@ IR2_INST *la_vssubw_w_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssubw_d_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7936,6 +8541,7 @@ IR2_INST *la_vssubw_d_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssubw_hu_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7949,6 +8555,7 @@ IR2_INST *la_vssubw_hu_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssubw_wu_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7962,6 +8569,7 @@ IR2_INST *la_vssubw_wu_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssubw_du_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7975,6 +8583,7 @@ IR2_INST *la_vssubw_du_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -7988,6 +8597,7 @@ IR2_INST *la_vaddwev_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8001,6 +8611,7 @@ IR2_INST *la_vaddwev_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8014,6 +8625,7 @@ IR2_INST *la_vaddwev_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8027,6 +8639,7 @@ IR2_INST *la_vaddwev_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwev_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8040,6 +8653,7 @@ IR2_INST *la_vsubwev_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwev_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8053,6 +8667,7 @@ IR2_INST *la_vsubwev_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwev_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8066,6 +8681,7 @@ IR2_INST *la_vsubwev_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwev_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8079,6 +8695,7 @@ IR2_INST *la_vsubwev_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8092,6 +8709,7 @@ IR2_INST *la_vaddwod_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8105,6 +8723,7 @@ IR2_INST *la_vaddwod_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8118,6 +8737,7 @@ IR2_INST *la_vaddwod_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8131,6 +8751,7 @@ IR2_INST *la_vaddwod_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwod_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8144,6 +8765,7 @@ IR2_INST *la_vsubwod_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwod_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8157,6 +8779,7 @@ IR2_INST *la_vsubwod_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwod_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8170,6 +8793,7 @@ IR2_INST *la_vsubwod_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwod_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8183,6 +8807,7 @@ IR2_INST *la_vsubwod_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8196,6 +8821,7 @@ IR2_INST *la_vaddwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8209,6 +8835,7 @@ IR2_INST *la_vaddwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8222,6 +8849,7 @@ IR2_INST *la_vaddwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8235,6 +8863,7 @@ IR2_INST *la_vaddwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8248,6 +8877,7 @@ IR2_INST *la_vsubwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8261,6 +8891,7 @@ IR2_INST *la_vsubwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8274,6 +8905,7 @@ IR2_INST *la_vsubwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8287,6 +8919,7 @@ IR2_INST *la_vsubwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8300,6 +8933,7 @@ IR2_INST *la_vaddwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8313,6 +8947,7 @@ IR2_INST *la_vaddwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8326,6 +8961,7 @@ IR2_INST *la_vaddwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8339,6 +8975,7 @@ IR2_INST *la_vaddwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8352,6 +8989,7 @@ IR2_INST *la_vsubwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8365,6 +9003,7 @@ IR2_INST *la_vsubwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8378,6 +9017,7 @@ IR2_INST *la_vsubwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8391,6 +9031,7 @@ IR2_INST *la_vsubwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8404,6 +9045,7 @@ IR2_INST *la_vaddwev_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8417,6 +9059,7 @@ IR2_INST *la_vaddwev_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8430,6 +9073,7 @@ IR2_INST *la_vaddwev_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8443,6 +9087,7 @@ IR2_INST *la_vaddwev_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwev_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8456,6 +9101,7 @@ IR2_INST *la_vsubwev_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwev_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8469,6 +9115,7 @@ IR2_INST *la_vsubwev_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwev_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8482,6 +9129,7 @@ IR2_INST *la_vsubwev_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwev_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8495,6 +9143,7 @@ IR2_INST *la_vsubwev_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8508,6 +9157,7 @@ IR2_INST *la_vaddwod_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8521,6 +9171,7 @@ IR2_INST *la_vaddwod_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8534,6 +9185,7 @@ IR2_INST *la_vaddwod_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8547,6 +9199,7 @@ IR2_INST *la_vaddwod_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwod_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8560,6 +9213,7 @@ IR2_INST *la_vsubwod_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwod_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8573,6 +9227,7 @@ IR2_INST *la_vsubwod_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwod_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8586,6 +9241,7 @@ IR2_INST *la_vsubwod_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwod_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8599,6 +9255,7 @@ IR2_INST *la_vsubwod_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8612,6 +9269,7 @@ IR2_INST *la_vaddwl_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8625,6 +9283,7 @@ IR2_INST *la_vaddwl_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8638,6 +9297,7 @@ IR2_INST *la_vaddwl_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8651,6 +9311,7 @@ IR2_INST *la_vaddwl_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwl_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8664,6 +9325,7 @@ IR2_INST *la_vsubwl_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwl_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8677,6 +9339,7 @@ IR2_INST *la_vsubwl_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwl_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8690,6 +9353,7 @@ IR2_INST *la_vsubwl_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwl_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8703,6 +9367,7 @@ IR2_INST *la_vsubwl_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8716,6 +9381,7 @@ IR2_INST *la_vaddwh_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8729,6 +9395,7 @@ IR2_INST *la_vaddwh_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8742,6 +9409,7 @@ IR2_INST *la_vaddwh_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8755,6 +9423,7 @@ IR2_INST *la_vaddwh_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwh_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8768,6 +9437,7 @@ IR2_INST *la_vsubwh_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwh_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8781,6 +9451,7 @@ IR2_INST *la_vsubwh_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwh_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8794,6 +9465,7 @@ IR2_INST *la_vsubwh_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubwh_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8807,6 +9479,7 @@ IR2_INST *la_vsubwh_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8820,6 +9493,7 @@ IR2_INST *la_vaddwev_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8833,6 +9507,7 @@ IR2_INST *la_vaddwev_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8846,6 +9521,7 @@ IR2_INST *la_vaddwev_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwev_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8859,6 +9535,7 @@ IR2_INST *la_vaddwev_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8872,6 +9549,7 @@ IR2_INST *la_vaddwod_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8885,6 +9563,7 @@ IR2_INST *la_vaddwod_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8898,6 +9577,7 @@ IR2_INST *la_vaddwod_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwod_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8911,6 +9591,7 @@ IR2_INST *la_vaddwod_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8924,6 +9605,7 @@ IR2_INST *la_vaddwl_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8937,6 +9619,7 @@ IR2_INST *la_vaddwl_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8950,6 +9633,7 @@ IR2_INST *la_vaddwl_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwl_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8963,6 +9647,7 @@ IR2_INST *la_vaddwl_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8976,6 +9661,7 @@ IR2_INST *la_vaddwh_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -8989,6 +9675,7 @@ IR2_INST *la_vaddwh_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9002,6 +9689,7 @@ IR2_INST *la_vaddwh_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddwh_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9015,6 +9703,7 @@ IR2_INST *la_vaddwh_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9028,6 +9717,7 @@ IR2_INST *la_vsadd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9041,6 +9731,7 @@ IR2_INST *la_vsadd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9054,6 +9745,7 @@ IR2_INST *la_vsadd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9067,6 +9759,7 @@ IR2_INST *la_vsadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9080,6 +9773,7 @@ IR2_INST *la_vssub_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9093,6 +9787,7 @@ IR2_INST *la_vssub_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9106,6 +9801,7 @@ IR2_INST *la_vssub_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9119,6 +9815,7 @@ IR2_INST *la_vssub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadd_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9132,6 +9829,7 @@ IR2_INST *la_vsadd_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadd_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9145,6 +9843,7 @@ IR2_INST *la_vsadd_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadd_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9158,6 +9857,7 @@ IR2_INST *la_vsadd_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadd_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9171,6 +9871,7 @@ IR2_INST *la_vsadd_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9184,6 +9885,7 @@ IR2_INST *la_vssub_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9197,6 +9899,7 @@ IR2_INST *la_vssub_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9210,6 +9913,7 @@ IR2_INST *la_vssub_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9223,6 +9927,7 @@ IR2_INST *la_vssub_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_bu_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9236,6 +9941,7 @@ IR2_INST *la_vssub_bu_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_hu_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9249,6 +9955,7 @@ IR2_INST *la_vssub_hu_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_wu_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9262,6 +9969,7 @@ IR2_INST *la_vssub_wu_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_du_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9275,6 +9983,7 @@ IR2_INST *la_vssub_du_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_bu_b_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9288,6 +9997,7 @@ IR2_INST *la_vssub_bu_b_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_hu_h_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9301,6 +10011,7 @@ IR2_INST *la_vssub_hu_h_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_wu_w_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9314,6 +10025,7 @@ IR2_INST *la_vssub_wu_w_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_du_d_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9327,6 +10039,7 @@ IR2_INST *la_vssub_du_d_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_b_bu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9340,6 +10053,7 @@ IR2_INST *la_vssub_b_bu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_h_hu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9353,6 +10067,7 @@ IR2_INST *la_vssub_h_hu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_w_wu_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9366,6 +10081,7 @@ IR2_INST *la_vssub_w_wu_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssub_d_du_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9379,6 +10095,7 @@ IR2_INST *la_vssub_d_du_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhaddw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9392,6 +10109,7 @@ IR2_INST *la_vhaddw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhaddw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9405,6 +10123,7 @@ IR2_INST *la_vhaddw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhaddw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9418,6 +10137,7 @@ IR2_INST *la_vhaddw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhaddw_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9431,6 +10151,7 @@ IR2_INST *la_vhaddw_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhsubw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9444,6 +10165,7 @@ IR2_INST *la_vhsubw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhsubw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9457,6 +10179,7 @@ IR2_INST *la_vhsubw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhsubw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9470,6 +10193,7 @@ IR2_INST *la_vhsubw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhsubw_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9483,6 +10207,7 @@ IR2_INST *la_vhsubw_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhaddw_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9496,6 +10221,7 @@ IR2_INST *la_vhaddw_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhaddw_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9509,6 +10235,7 @@ IR2_INST *la_vhaddw_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhaddw_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9522,6 +10249,7 @@ IR2_INST *la_vhaddw_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhaddw_qu_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9535,6 +10263,7 @@ IR2_INST *la_vhaddw_qu_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhsubw_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9548,6 +10277,7 @@ IR2_INST *la_vhsubw_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhsubw_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9561,6 +10291,7 @@ IR2_INST *la_vhsubw_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhsubw_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9574,6 +10305,7 @@ IR2_INST *la_vhsubw_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhsubw_qu_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9587,6 +10319,7 @@ IR2_INST *la_vhsubw_qu_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadda_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9600,6 +10333,7 @@ IR2_INST *la_vadda_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadda_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9613,6 +10347,7 @@ IR2_INST *la_vadda_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadda_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9626,6 +10361,7 @@ IR2_INST *la_vadda_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadda_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9639,6 +10375,7 @@ IR2_INST *la_vadda_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadda_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9652,6 +10389,7 @@ IR2_INST *la_vsadda_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadda_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9665,6 +10403,7 @@ IR2_INST *la_vsadda_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadda_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9678,6 +10417,7 @@ IR2_INST *la_vsadda_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadda_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9691,6 +10431,7 @@ IR2_INST *la_vsadda_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vabsd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9704,6 +10445,7 @@ IR2_INST *la_vabsd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vabsd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9717,6 +10459,7 @@ IR2_INST *la_vabsd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vabsd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9730,6 +10473,7 @@ IR2_INST *la_vabsd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vabsd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9743,6 +10487,7 @@ IR2_INST *la_vabsd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vabsd_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9756,6 +10501,7 @@ IR2_INST *la_vabsd_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vabsd_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9769,6 +10515,7 @@ IR2_INST *la_vabsd_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vabsd_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9782,6 +10529,7 @@ IR2_INST *la_vabsd_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vabsd_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9795,6 +10543,7 @@ IR2_INST *la_vabsd_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavg_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9808,6 +10557,7 @@ IR2_INST *la_vavg_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavg_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9821,6 +10571,7 @@ IR2_INST *la_vavg_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavg_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9834,6 +10585,7 @@ IR2_INST *la_vavg_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavg_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9847,6 +10599,7 @@ IR2_INST *la_vavg_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavg_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9860,6 +10613,7 @@ IR2_INST *la_vavg_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavg_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9873,6 +10627,7 @@ IR2_INST *la_vavg_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavg_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9886,6 +10641,7 @@ IR2_INST *la_vavg_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavg_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9899,6 +10655,7 @@ IR2_INST *la_vavg_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavgr_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9912,6 +10669,7 @@ IR2_INST *la_vavgr_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavgr_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9925,6 +10683,7 @@ IR2_INST *la_vavgr_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavgr_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9938,6 +10697,7 @@ IR2_INST *la_vavgr_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavgr_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9951,6 +10711,7 @@ IR2_INST *la_vavgr_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavgr_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9964,6 +10725,7 @@ IR2_INST *la_vavgr_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavgr_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9977,6 +10739,7 @@ IR2_INST *la_vavgr_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavgr_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -9990,6 +10753,7 @@ IR2_INST *la_vavgr_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vavgr_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10003,6 +10767,7 @@ IR2_INST *la_vavgr_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhalfd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10016,6 +10781,7 @@ IR2_INST *la_vhalfd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhalfd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10029,6 +10795,7 @@ IR2_INST *la_vhalfd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhalfd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10042,6 +10809,7 @@ IR2_INST *la_vhalfd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhalfd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10055,6 +10823,7 @@ IR2_INST *la_vhalfd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhalfd_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10068,6 +10837,7 @@ IR2_INST *la_vhalfd_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhalfd_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10081,6 +10851,7 @@ IR2_INST *la_vhalfd_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhalfd_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10094,6 +10865,7 @@ IR2_INST *la_vhalfd_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhalfd_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10107,6 +10879,7 @@ IR2_INST *la_vhalfd_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmax_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10120,6 +10893,7 @@ IR2_INST *la_vmax_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmax_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10133,6 +10907,7 @@ IR2_INST *la_vmax_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmax_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10146,6 +10921,7 @@ IR2_INST *la_vmax_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmax_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10159,6 +10935,7 @@ IR2_INST *la_vmax_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmin_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10172,6 +10949,7 @@ IR2_INST *la_vmin_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmin_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10185,6 +10963,7 @@ IR2_INST *la_vmin_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmin_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10198,6 +10977,7 @@ IR2_INST *la_vmin_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmin_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10211,6 +10991,7 @@ IR2_INST *la_vmin_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmax_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10224,6 +11005,7 @@ IR2_INST *la_vmax_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmax_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10237,6 +11019,7 @@ IR2_INST *la_vmax_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmax_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10250,6 +11033,7 @@ IR2_INST *la_vmax_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmax_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10263,6 +11047,7 @@ IR2_INST *la_vmax_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmin_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10276,6 +11061,7 @@ IR2_INST *la_vmin_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmin_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10289,6 +11075,7 @@ IR2_INST *la_vmin_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmin_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10302,6 +11089,7 @@ IR2_INST *la_vmin_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmin_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10315,6 +11103,7 @@ IR2_INST *la_vmin_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxa_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10328,6 +11117,7 @@ IR2_INST *la_vmaxa_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxa_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10341,6 +11131,7 @@ IR2_INST *la_vmaxa_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxa_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10354,6 +11145,7 @@ IR2_INST *la_vmaxa_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxa_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10367,6 +11159,7 @@ IR2_INST *la_vmaxa_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmina_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10380,6 +11173,7 @@ IR2_INST *la_vmina_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmina_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10393,6 +11187,7 @@ IR2_INST *la_vmina_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmina_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10406,6 +11201,7 @@ IR2_INST *la_vmina_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmina_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10419,6 +11215,7 @@ IR2_INST *la_vmina_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10432,6 +11229,7 @@ IR2_INST *la_vsadw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10445,6 +11243,7 @@ IR2_INST *la_vsadw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10458,6 +11257,7 @@ IR2_INST *la_vsadw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadw_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10471,6 +11271,7 @@ IR2_INST *la_vsadw_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadw_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10484,6 +11285,7 @@ IR2_INST *la_vsadw_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsadw_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10497,6 +11299,7 @@ IR2_INST *la_vsadw_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaccsadw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10510,6 +11313,7 @@ IR2_INST *la_vaccsadw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaccsadw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10523,6 +11327,7 @@ IR2_INST *la_vaccsadw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaccsadw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10536,6 +11341,7 @@ IR2_INST *la_vaccsadw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaccsadw_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10549,6 +11355,7 @@ IR2_INST *la_vaccsadw_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaccsadw_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10562,6 +11369,7 @@ IR2_INST *la_vaccsadw_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaccsadw_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10575,6 +11383,7 @@ IR2_INST *la_vaccsadw_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmul_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10588,6 +11397,7 @@ IR2_INST *la_vmul_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmul_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10601,6 +11411,7 @@ IR2_INST *la_vmul_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmul_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10614,6 +11425,7 @@ IR2_INST *la_vmul_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmul_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10627,6 +11439,7 @@ IR2_INST *la_vmul_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10640,6 +11453,7 @@ IR2_INST *la_vmuh_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10653,6 +11467,7 @@ IR2_INST *la_vmuh_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10666,6 +11481,7 @@ IR2_INST *la_vmuh_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10679,6 +11495,7 @@ IR2_INST *la_vmuh_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10692,6 +11509,7 @@ IR2_INST *la_vmuh_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10705,6 +11523,7 @@ IR2_INST *la_vmuh_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10718,6 +11537,7 @@ IR2_INST *la_vmuh_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10731,6 +11551,7 @@ IR2_INST *la_vmuh_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10744,6 +11565,7 @@ IR2_INST *la_vmuh_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10757,6 +11579,7 @@ IR2_INST *la_vmuh_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10770,6 +11593,7 @@ IR2_INST *la_vmuh_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmuh_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10783,6 +11607,7 @@ IR2_INST *la_vmuh_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulxw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10796,6 +11621,7 @@ IR2_INST *la_vmulxw_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulxw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10809,6 +11635,7 @@ IR2_INST *la_vmulxw_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulxw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10822,6 +11649,7 @@ IR2_INST *la_vmulxw_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulxw_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10835,6 +11663,7 @@ IR2_INST *la_vmulxw_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulxw_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10848,6 +11677,7 @@ IR2_INST *la_vmulxw_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulxw_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10861,6 +11691,7 @@ IR2_INST *la_vmulxw_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10874,6 +11705,7 @@ IR2_INST *la_vmulwev_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10887,6 +11719,7 @@ IR2_INST *la_vmulwev_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10900,6 +11733,7 @@ IR2_INST *la_vmulwev_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10913,6 +11747,7 @@ IR2_INST *la_vmulwev_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10926,6 +11761,7 @@ IR2_INST *la_vmulwod_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10939,6 +11775,7 @@ IR2_INST *la_vmulwod_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10952,6 +11789,7 @@ IR2_INST *la_vmulwod_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10965,6 +11803,7 @@ IR2_INST *la_vmulwod_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10978,6 +11817,7 @@ IR2_INST *la_vmulwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -10991,6 +11831,7 @@ IR2_INST *la_vmulwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11004,6 +11845,7 @@ IR2_INST *la_vmulwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11017,6 +11859,7 @@ IR2_INST *la_vmulwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11030,6 +11873,7 @@ IR2_INST *la_vmulwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11043,6 +11887,7 @@ IR2_INST *la_vmulwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11056,6 +11901,7 @@ IR2_INST *la_vmulwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11069,6 +11915,7 @@ IR2_INST *la_vmulwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11082,6 +11929,7 @@ IR2_INST *la_vmulwev_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11095,6 +11943,7 @@ IR2_INST *la_vmulwev_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11108,6 +11957,7 @@ IR2_INST *la_vmulwev_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11121,6 +11971,7 @@ IR2_INST *la_vmulwev_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11134,6 +11985,7 @@ IR2_INST *la_vmulwod_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11147,6 +11999,7 @@ IR2_INST *la_vmulwod_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11160,6 +12013,7 @@ IR2_INST *la_vmulwod_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11173,6 +12027,7 @@ IR2_INST *la_vmulwod_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11186,6 +12041,7 @@ IR2_INST *la_vmulwl_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11199,6 +12055,7 @@ IR2_INST *la_vmulwl_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11212,6 +12069,7 @@ IR2_INST *la_vmulwl_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11225,6 +12083,7 @@ IR2_INST *la_vmulwl_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11238,6 +12097,7 @@ IR2_INST *la_vmulwh_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11251,6 +12111,7 @@ IR2_INST *la_vmulwh_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11264,6 +12125,7 @@ IR2_INST *la_vmulwh_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11277,6 +12139,7 @@ IR2_INST *la_vmulwh_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11290,6 +12153,7 @@ IR2_INST *la_vmulwev_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11303,6 +12167,7 @@ IR2_INST *la_vmulwev_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11316,6 +12181,7 @@ IR2_INST *la_vmulwev_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwev_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11329,6 +12195,7 @@ IR2_INST *la_vmulwev_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11342,6 +12209,7 @@ IR2_INST *la_vmulwod_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11355,6 +12223,7 @@ IR2_INST *la_vmulwod_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11368,6 +12237,7 @@ IR2_INST *la_vmulwod_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwod_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11381,6 +12251,7 @@ IR2_INST *la_vmulwod_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11394,6 +12265,7 @@ IR2_INST *la_vmulwl_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11407,6 +12279,7 @@ IR2_INST *la_vmulwl_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11420,6 +12293,7 @@ IR2_INST *la_vmulwl_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwl_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11433,6 +12307,7 @@ IR2_INST *la_vmulwl_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11446,6 +12321,7 @@ IR2_INST *la_vmulwh_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11459,6 +12335,7 @@ IR2_INST *la_vmulwh_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11472,6 +12349,7 @@ IR2_INST *la_vmulwh_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmulwh_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11485,6 +12363,7 @@ IR2_INST *la_vmulwh_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmadd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11498,6 +12377,7 @@ IR2_INST *la_vmadd_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmadd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11511,6 +12391,7 @@ IR2_INST *la_vmadd_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmadd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11524,6 +12405,7 @@ IR2_INST *la_vmadd_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11537,6 +12419,7 @@ IR2_INST *la_vmadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmsub_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11550,6 +12433,7 @@ IR2_INST *la_vmsub_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmsub_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11563,6 +12447,7 @@ IR2_INST *la_vmsub_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmsub_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11576,6 +12461,7 @@ IR2_INST *la_vmsub_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11589,6 +12475,7 @@ IR2_INST *la_vmsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11602,6 +12489,7 @@ IR2_INST *la_vmaddwev_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11615,6 +12503,7 @@ IR2_INST *la_vmaddwev_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11628,6 +12517,7 @@ IR2_INST *la_vmaddwev_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11641,6 +12531,7 @@ IR2_INST *la_vmaddwev_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11654,6 +12545,7 @@ IR2_INST *la_vmaddwod_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11667,6 +12559,7 @@ IR2_INST *la_vmaddwod_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11680,6 +12573,7 @@ IR2_INST *la_vmaddwod_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11693,6 +12587,7 @@ IR2_INST *la_vmaddwod_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11706,6 +12601,7 @@ IR2_INST *la_vmaddwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11719,6 +12615,7 @@ IR2_INST *la_vmaddwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11732,6 +12629,7 @@ IR2_INST *la_vmaddwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11745,6 +12643,7 @@ IR2_INST *la_vmaddwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11758,6 +12657,7 @@ IR2_INST *la_vmaddwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11771,6 +12671,7 @@ IR2_INST *la_vmaddwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11784,6 +12685,7 @@ IR2_INST *la_vmaddwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11797,6 +12699,7 @@ IR2_INST *la_vmaddwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11810,6 +12713,7 @@ IR2_INST *la_vmaddwev_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11823,6 +12727,7 @@ IR2_INST *la_vmaddwev_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11836,6 +12741,7 @@ IR2_INST *la_vmaddwev_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11849,6 +12755,7 @@ IR2_INST *la_vmaddwev_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11862,6 +12769,7 @@ IR2_INST *la_vmaddwod_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11875,6 +12783,7 @@ IR2_INST *la_vmaddwod_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11888,6 +12797,7 @@ IR2_INST *la_vmaddwod_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11901,6 +12811,7 @@ IR2_INST *la_vmaddwod_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11914,6 +12825,7 @@ IR2_INST *la_vmaddwl_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11927,6 +12839,7 @@ IR2_INST *la_vmaddwl_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11940,6 +12853,7 @@ IR2_INST *la_vmaddwl_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11953,6 +12867,7 @@ IR2_INST *la_vmaddwl_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11966,6 +12881,7 @@ IR2_INST *la_vmaddwh_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11979,6 +12895,7 @@ IR2_INST *la_vmaddwh_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -11992,6 +12909,7 @@ IR2_INST *la_vmaddwh_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12005,6 +12923,7 @@ IR2_INST *la_vmaddwh_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12018,6 +12937,7 @@ IR2_INST *la_vmaddwev_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12031,6 +12951,7 @@ IR2_INST *la_vmaddwev_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12044,6 +12965,7 @@ IR2_INST *la_vmaddwev_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwev_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12057,6 +12979,7 @@ IR2_INST *la_vmaddwev_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12070,6 +12993,7 @@ IR2_INST *la_vmaddwod_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12083,6 +13007,7 @@ IR2_INST *la_vmaddwod_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12096,6 +13021,7 @@ IR2_INST *la_vmaddwod_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwod_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12109,6 +13035,7 @@ IR2_INST *la_vmaddwod_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12122,6 +13049,7 @@ IR2_INST *la_vmaddwl_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12135,6 +13063,7 @@ IR2_INST *la_vmaddwl_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12148,6 +13077,7 @@ IR2_INST *la_vmaddwl_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwl_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12161,6 +13091,7 @@ IR2_INST *la_vmaddwl_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12174,6 +13105,7 @@ IR2_INST *la_vmaddwh_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12187,6 +13119,7 @@ IR2_INST *la_vmaddwh_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12200,6 +13133,7 @@ IR2_INST *la_vmaddwh_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaddwh_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12213,6 +13147,7 @@ IR2_INST *la_vmaddwh_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12226,6 +13161,7 @@ IR2_INST *la_vdp2_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12239,6 +13175,7 @@ IR2_INST *la_vdp2_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12252,6 +13189,7 @@ IR2_INST *la_vdp2_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12265,6 +13203,7 @@ IR2_INST *la_vdp2_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12278,6 +13217,7 @@ IR2_INST *la_vdp2_hu_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12291,6 +13231,7 @@ IR2_INST *la_vdp2_wu_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12304,6 +13245,7 @@ IR2_INST *la_vdp2_du_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_qu_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12317,6 +13259,7 @@ IR2_INST *la_vdp2_qu_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12330,6 +13273,7 @@ IR2_INST *la_vdp2_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12343,6 +13287,7 @@ IR2_INST *la_vdp2_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12356,6 +13301,7 @@ IR2_INST *la_vdp2_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12369,6 +13315,7 @@ IR2_INST *la_vdp2_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12382,6 +13329,7 @@ IR2_INST *la_vdp2add_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12395,6 +13343,7 @@ IR2_INST *la_vdp2add_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12408,6 +13357,7 @@ IR2_INST *la_vdp2add_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12421,6 +13371,7 @@ IR2_INST *la_vdp2add_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12434,6 +13385,7 @@ IR2_INST *la_vdp2add_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12447,6 +13399,7 @@ IR2_INST *la_vdp2add_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12460,6 +13413,7 @@ IR2_INST *la_vdp2add_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12473,6 +13427,7 @@ IR2_INST *la_vdp2add_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12486,6 +13441,7 @@ IR2_INST *la_vdp2add_h_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12499,6 +13455,7 @@ IR2_INST *la_vdp2add_w_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12512,6 +13469,7 @@ IR2_INST *la_vdp2add_d_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2add_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12525,6 +13483,7 @@ IR2_INST *la_vdp2add_q_du_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2sub_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12538,6 +13497,7 @@ IR2_INST *la_vdp2sub_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2sub_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12551,6 +13511,7 @@ IR2_INST *la_vdp2sub_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2sub_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12564,6 +13525,7 @@ IR2_INST *la_vdp2sub_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2sub_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12577,6 +13539,7 @@ IR2_INST *la_vdp2sub_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2sub_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12590,6 +13553,7 @@ IR2_INST *la_vdp2sub_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2sub_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12603,6 +13567,7 @@ IR2_INST *la_vdp2sub_w_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2sub_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12616,6 +13581,7 @@ IR2_INST *la_vdp2sub_d_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp2sub_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12629,6 +13595,7 @@ IR2_INST *la_vdp2sub_q_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_w_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12642,6 +13609,7 @@ IR2_INST *la_vdp4_w_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12655,6 +13623,7 @@ IR2_INST *la_vdp4_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12668,6 +13637,7 @@ IR2_INST *la_vdp4_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_w_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12681,6 +13651,7 @@ IR2_INST *la_vdp4_w_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_d_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12694,6 +13665,7 @@ IR2_INST *la_vdp4_d_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_q_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12707,6 +13679,7 @@ IR2_INST *la_vdp4_q_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_w_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12720,6 +13693,7 @@ IR2_INST *la_vdp4_w_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_d_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12733,6 +13707,7 @@ IR2_INST *la_vdp4_d_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4_q_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12746,6 +13721,7 @@ IR2_INST *la_vdp4_q_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_w_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12759,6 +13735,7 @@ IR2_INST *la_vdp4add_w_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12772,6 +13749,7 @@ IR2_INST *la_vdp4add_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12785,6 +13763,7 @@ IR2_INST *la_vdp4add_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_w_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12798,6 +13777,7 @@ IR2_INST *la_vdp4add_w_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_d_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12811,6 +13791,7 @@ IR2_INST *la_vdp4add_d_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_q_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12824,6 +13805,7 @@ IR2_INST *la_vdp4add_q_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_w_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12837,6 +13819,7 @@ IR2_INST *la_vdp4add_w_bu_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_d_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12850,6 +13833,7 @@ IR2_INST *la_vdp4add_d_hu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdp4add_q_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12863,6 +13847,7 @@ IR2_INST *la_vdp4add_q_wu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdiv_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12876,6 +13861,7 @@ IR2_INST *la_vdiv_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdiv_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12889,6 +13875,7 @@ IR2_INST *la_vdiv_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdiv_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12902,6 +13889,7 @@ IR2_INST *la_vdiv_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdiv_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12915,6 +13903,7 @@ IR2_INST *la_vdiv_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmod_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12928,6 +13917,7 @@ IR2_INST *la_vmod_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmod_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12941,6 +13931,7 @@ IR2_INST *la_vmod_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmod_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12954,6 +13945,7 @@ IR2_INST *la_vmod_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmod_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12967,6 +13959,7 @@ IR2_INST *la_vmod_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdiv_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12980,6 +13973,7 @@ IR2_INST *la_vdiv_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdiv_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -12993,6 +13987,7 @@ IR2_INST *la_vdiv_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdiv_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13006,6 +14001,7 @@ IR2_INST *la_vdiv_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vdiv_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13019,6 +14015,7 @@ IR2_INST *la_vdiv_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmod_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13032,6 +14029,7 @@ IR2_INST *la_vmod_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmod_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13045,6 +14043,7 @@ IR2_INST *la_vmod_hu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmod_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13058,6 +14057,7 @@ IR2_INST *la_vmod_wu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmod_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13071,6 +14071,7 @@ IR2_INST *la_vmod_du(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsll_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13084,6 +14085,7 @@ IR2_INST *la_vsll_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsll_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13097,6 +14099,7 @@ IR2_INST *la_vsll_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsll_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13110,6 +14113,7 @@ IR2_INST *la_vsll_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsll_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13123,6 +14127,7 @@ IR2_INST *la_vsll_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrl_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13136,6 +14141,7 @@ IR2_INST *la_vsrl_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrl_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13149,6 +14155,7 @@ IR2_INST *la_vsrl_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrl_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13162,6 +14169,7 @@ IR2_INST *la_vsrl_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrl_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13175,6 +14183,7 @@ IR2_INST *la_vsrl_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsra_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13188,6 +14197,7 @@ IR2_INST *la_vsra_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsra_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13201,6 +14211,7 @@ IR2_INST *la_vsra_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsra_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13214,6 +14225,7 @@ IR2_INST *la_vsra_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsra_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13227,6 +14239,7 @@ IR2_INST *la_vsra_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrotr_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13240,6 +14253,7 @@ IR2_INST *la_vrotr_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrotr_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13253,6 +14267,7 @@ IR2_INST *la_vrotr_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrotr_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13266,6 +14281,7 @@ IR2_INST *la_vrotr_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrotr_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13279,6 +14295,7 @@ IR2_INST *la_vrotr_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlr_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13292,6 +14309,7 @@ IR2_INST *la_vsrlr_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlr_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13305,6 +14323,7 @@ IR2_INST *la_vsrlr_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlr_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13318,6 +14337,7 @@ IR2_INST *la_vsrlr_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlr_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13331,6 +14351,7 @@ IR2_INST *la_vsrlr_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrar_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13344,6 +14365,7 @@ IR2_INST *la_vsrar_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrar_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13357,6 +14379,7 @@ IR2_INST *la_vsrar_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrar_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13370,6 +14393,7 @@ IR2_INST *la_vsrar_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrar_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13383,6 +14407,7 @@ IR2_INST *la_vsrar_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrln_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13396,6 +14421,7 @@ IR2_INST *la_vsrln_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrln_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13409,6 +14435,7 @@ IR2_INST *la_vsrln_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrln_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13422,6 +14449,7 @@ IR2_INST *la_vsrln_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsran_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13435,6 +14463,7 @@ IR2_INST *la_vsran_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsran_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13448,6 +14477,7 @@ IR2_INST *la_vsran_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsran_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13461,6 +14491,7 @@ IR2_INST *la_vsran_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrn_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13474,6 +14505,7 @@ IR2_INST *la_vsrlrn_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrn_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13487,6 +14519,7 @@ IR2_INST *la_vsrlrn_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrn_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13500,6 +14533,7 @@ IR2_INST *la_vsrlrn_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarn_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13513,6 +14547,7 @@ IR2_INST *la_vsrarn_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarn_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13526,6 +14561,7 @@ IR2_INST *la_vsrarn_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarn_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13539,6 +14575,7 @@ IR2_INST *la_vsrarn_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrln_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13552,6 +14589,7 @@ IR2_INST *la_vssrln_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrln_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13565,6 +14603,7 @@ IR2_INST *la_vssrln_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrln_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13578,6 +14617,7 @@ IR2_INST *la_vssrln_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssran_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13591,6 +14631,7 @@ IR2_INST *la_vssran_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssran_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13604,6 +14645,7 @@ IR2_INST *la_vssran_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssran_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13617,6 +14659,7 @@ IR2_INST *la_vssran_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrn_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13630,6 +14673,7 @@ IR2_INST *la_vssrlrn_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrn_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13643,6 +14687,7 @@ IR2_INST *la_vssrlrn_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrn_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13656,6 +14701,7 @@ IR2_INST *la_vssrlrn_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarn_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13669,6 +14715,7 @@ IR2_INST *la_vssrarn_b_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarn_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13682,6 +14729,7 @@ IR2_INST *la_vssrarn_h_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarn_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13695,6 +14743,7 @@ IR2_INST *la_vssrarn_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrln_bu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13708,6 +14757,7 @@ IR2_INST *la_vssrln_bu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrln_hu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13721,6 +14771,7 @@ IR2_INST *la_vssrln_hu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrln_wu_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13734,6 +14785,7 @@ IR2_INST *la_vssrln_wu_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssran_bu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13747,6 +14799,7 @@ IR2_INST *la_vssran_bu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssran_hu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13760,6 +14813,7 @@ IR2_INST *la_vssran_hu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssran_wu_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13773,6 +14827,7 @@ IR2_INST *la_vssran_wu_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrn_bu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13786,6 +14841,7 @@ IR2_INST *la_vssrlrn_bu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrn_hu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13799,6 +14855,7 @@ IR2_INST *la_vssrlrn_hu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrn_wu_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13812,6 +14869,7 @@ IR2_INST *la_vssrlrn_wu_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarn_bu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13825,6 +14883,7 @@ IR2_INST *la_vssrarn_bu_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarn_hu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13838,6 +14897,7 @@ IR2_INST *la_vssrarn_hu_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarn_wu_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13851,6 +14911,7 @@ IR2_INST *la_vssrarn_wu_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitclr_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13864,6 +14925,7 @@ IR2_INST *la_vbitclr_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitclr_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13877,6 +14939,7 @@ IR2_INST *la_vbitclr_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitclr_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13890,6 +14953,7 @@ IR2_INST *la_vbitclr_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitclr_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13903,6 +14967,7 @@ IR2_INST *la_vbitclr_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitset_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13916,6 +14981,7 @@ IR2_INST *la_vbitset_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitset_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13929,6 +14995,7 @@ IR2_INST *la_vbitset_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitset_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13942,6 +15009,7 @@ IR2_INST *la_vbitset_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitset_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13955,6 +15023,7 @@ IR2_INST *la_vbitset_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitrev_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13968,6 +15037,7 @@ IR2_INST *la_vbitrev_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitrev_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13981,6 +15051,7 @@ IR2_INST *la_vbitrev_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitrev_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -13994,6 +15065,7 @@ IR2_INST *la_vbitrev_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitrev_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14007,6 +15079,7 @@ IR2_INST *la_vbitrev_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc12_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14020,6 +15093,7 @@ IR2_INST *la_vbstrc12_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc12_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14033,6 +15107,7 @@ IR2_INST *la_vbstrc12_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc12_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14046,6 +15121,7 @@ IR2_INST *la_vbstrc12_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc12_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14059,6 +15135,7 @@ IR2_INST *la_vbstrc12_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc21_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14072,6 +15149,7 @@ IR2_INST *la_vbstrc21_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc21_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14085,6 +15163,7 @@ IR2_INST *la_vbstrc21_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc21_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14098,6 +15177,7 @@ IR2_INST *la_vbstrc21_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc21_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14111,6 +15191,7 @@ IR2_INST *la_vbstrc21_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpackev_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14124,6 +15205,7 @@ IR2_INST *la_vpackev_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpackev_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14137,6 +15219,7 @@ IR2_INST *la_vpackev_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpackev_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14150,6 +15233,7 @@ IR2_INST *la_vpackev_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpackev_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14163,6 +15247,7 @@ IR2_INST *la_vpackev_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpackod_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14176,6 +15261,7 @@ IR2_INST *la_vpackod_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpackod_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14189,6 +15275,7 @@ IR2_INST *la_vpackod_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpackod_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14202,6 +15289,7 @@ IR2_INST *la_vpackod_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpackod_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14215,6 +15303,7 @@ IR2_INST *la_vpackod_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vilvl_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14228,6 +15317,7 @@ IR2_INST *la_vilvl_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vilvl_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14241,6 +15331,7 @@ IR2_INST *la_vilvl_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vilvl_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14254,6 +15345,7 @@ IR2_INST *la_vilvl_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vilvl_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14267,6 +15359,7 @@ IR2_INST *la_vilvl_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vilvh_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14280,6 +15373,7 @@ IR2_INST *la_vilvh_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vilvh_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14293,6 +15387,7 @@ IR2_INST *la_vilvh_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vilvh_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14306,6 +15401,7 @@ IR2_INST *la_vilvh_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vilvh_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14319,6 +15415,7 @@ IR2_INST *la_vilvh_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickev_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14332,6 +15429,7 @@ IR2_INST *la_vpickev_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickev_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14345,6 +15443,7 @@ IR2_INST *la_vpickev_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickev_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14358,6 +15457,7 @@ IR2_INST *la_vpickev_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickev_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14371,6 +15471,7 @@ IR2_INST *la_vpickev_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickod_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14384,6 +15485,7 @@ IR2_INST *la_vpickod_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickod_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14397,6 +15499,7 @@ IR2_INST *la_vpickod_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickod_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14410,6 +15513,7 @@ IR2_INST *la_vpickod_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickod_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14423,6 +15527,7 @@ IR2_INST *la_vpickod_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplve_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14436,6 +15541,7 @@ IR2_INST *la_vreplve_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplve_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14449,6 +15555,7 @@ IR2_INST *la_vreplve_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplve_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14462,6 +15569,7 @@ IR2_INST *la_vreplve_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplve_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14475,6 +15583,7 @@ IR2_INST *la_vreplve_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrcol_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14488,6 +15597,7 @@ IR2_INST *la_vextrcol_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrcol_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14501,6 +15611,7 @@ IR2_INST *la_vextrcol_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrcol_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14514,6 +15625,7 @@ IR2_INST *la_vextrcol_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrcol_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14527,6 +15639,7 @@ IR2_INST *la_vextrcol_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vand_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14540,6 +15653,7 @@ IR2_INST *la_vand_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vor_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14553,6 +15667,7 @@ IR2_INST *la_vor_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vxor_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14566,6 +15681,7 @@ IR2_INST *la_vxor_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vnor_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14579,6 +15695,7 @@ IR2_INST *la_vnor_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vandn_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14592,6 +15709,7 @@ IR2_INST *la_vandn_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vorn_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14605,6 +15723,7 @@ IR2_INST *la_vorn_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrandsign_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14618,6 +15737,7 @@ IR2_INST *la_vrandsign_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrandsign_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14631,6 +15751,7 @@ IR2_INST *la_vrandsign_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrorsign_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14644,6 +15765,7 @@ IR2_INST *la_vrorsign_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrorsign_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14657,6 +15779,7 @@ IR2_INST *la_vrorsign_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrstp_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14670,6 +15793,7 @@ IR2_INST *la_vfrstp_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrstp_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14683,6 +15807,7 @@ IR2_INST *la_vfrstp_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclrstrr_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14696,6 +15821,7 @@ IR2_INST *la_vclrstrr_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclrstrv_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14709,6 +15835,7 @@ IR2_INST *la_vclrstrv_v(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vadd_q(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14722,6 +15849,7 @@ IR2_INST *la_vadd_q(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsub_q(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14735,6 +15863,7 @@ IR2_INST *la_vsub_q(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsigncov_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14748,6 +15877,7 @@ IR2_INST *la_vsigncov_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsigncov_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14761,6 +15891,7 @@ IR2_INST *la_vsigncov_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsigncov_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14774,6 +15905,7 @@ IR2_INST *la_vsigncov_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsigncov_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14787,6 +15919,7 @@ IR2_INST *la_vsigncov_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14800,6 +15933,7 @@ IR2_INST *la_vfadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14813,6 +15947,7 @@ IR2_INST *la_vfadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14826,6 +15961,7 @@ IR2_INST *la_vfsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14839,6 +15975,7 @@ IR2_INST *la_vfsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfaddsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14852,6 +15989,7 @@ IR2_INST *la_vfaddsub_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfaddsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14865,6 +16003,7 @@ IR2_INST *la_vfaddsub_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfsubadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14878,6 +16017,7 @@ IR2_INST *la_vfsubadd_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfsubadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14891,6 +16031,7 @@ IR2_INST *la_vfsubadd_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmul_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14904,6 +16045,7 @@ IR2_INST *la_vfmul_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmul_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14917,6 +16059,7 @@ IR2_INST *la_vfmul_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfdiv_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14930,6 +16073,7 @@ IR2_INST *la_vfdiv_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfdiv_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14943,6 +16087,7 @@ IR2_INST *la_vfdiv_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmax_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14956,6 +16101,7 @@ IR2_INST *la_vfmax_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmax_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14969,6 +16115,7 @@ IR2_INST *la_vfmax_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmin_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14982,6 +16129,7 @@ IR2_INST *la_vfmin_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmin_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -14995,6 +16143,7 @@ IR2_INST *la_vfmin_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmaxa_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15008,6 +16157,7 @@ IR2_INST *la_vfmaxa_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmaxa_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15021,6 +16171,7 @@ IR2_INST *la_vfmaxa_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmina_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15034,6 +16185,7 @@ IR2_INST *la_vfmina_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfmina_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15047,6 +16199,7 @@ IR2_INST *la_vfmina_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfscaleb_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15060,6 +16213,7 @@ IR2_INST *la_vfscaleb_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfscaleb_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15073,6 +16227,7 @@ IR2_INST *la_vfscaleb_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfcvt_h_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15086,6 +16241,7 @@ IR2_INST *la_vfcvt_h_s(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfcvt_s_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15099,6 +16255,7 @@ IR2_INST *la_vfcvt_s_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vffint_s_l(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15112,6 +16269,7 @@ IR2_INST *la_vffint_s_l(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftint_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15125,6 +16283,7 @@ IR2_INST *la_vftint_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrm_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15138,6 +16297,7 @@ IR2_INST *la_vftintrm_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrp_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15151,6 +16311,7 @@ IR2_INST *la_vftintrp_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrz_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15164,6 +16325,7 @@ IR2_INST *la_vftintrz_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrne_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15177,6 +16339,7 @@ IR2_INST *la_vftintrne_w_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhadd4_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15190,6 +16353,7 @@ IR2_INST *la_vhadd4_h_bu(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf4_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15203,6 +16367,7 @@ IR2_INST *la_vshuf4_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf2_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15216,6 +16381,7 @@ IR2_INST *la_vshuf2_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes128_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15229,6 +16395,7 @@ IR2_INST *la_aes128_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes128_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15242,6 +16409,7 @@ IR2_INST *la_aes128_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes192_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15255,6 +16423,7 @@ IR2_INST *la_aes192_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes192_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15268,6 +16437,7 @@ IR2_INST *la_aes192_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes256_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15281,6 +16451,7 @@ IR2_INST *la_aes256_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes256_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15294,6 +16465,7 @@ IR2_INST *la_aes256_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_kg(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15307,6 +16479,7 @@ IR2_INST *la_aes_kg(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_fr_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15320,6 +16493,7 @@ IR2_INST *la_aes_fr_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_fr_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15333,6 +16507,7 @@ IR2_INST *la_aes_fr_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_lr_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15346,6 +16521,7 @@ IR2_INST *la_aes_lr_enc(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_lr_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15359,6 +16535,7 @@ IR2_INST *la_aes_lr_dec(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_mc_enc(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15371,6 +16548,7 @@ IR2_INST *la_aes_mc_enc(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_mc_dec(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15383,6 +16561,7 @@ IR2_INST *la_aes_mc_dec(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_sb_enc(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15395,6 +16574,7 @@ IR2_INST *la_aes_sb_enc(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_sb_dec(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15407,6 +16587,7 @@ IR2_INST *la_aes_sb_dec(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_sr_enc(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15419,6 +16600,7 @@ IR2_INST *la_aes_sr_enc(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_aes_sr_dec(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15431,6 +16613,7 @@ IR2_INST *la_aes_sr_dec(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_md5_ms(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15444,6 +16627,7 @@ IR2_INST *la_md5_ms(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_md5_4r(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15457,6 +16641,7 @@ IR2_INST *la_md5_4r(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha1_ms_1(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15470,6 +16655,7 @@ IR2_INST *la_sha1_ms_1(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha1_ms_2(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15483,6 +16669,7 @@ IR2_INST *la_sha1_ms_2(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha1_hash_4r(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15496,6 +16683,7 @@ IR2_INST *la_sha1_hash_4r(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha256_ms_1(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15509,6 +16697,7 @@ IR2_INST *la_sha256_ms_1(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha256_ms_2(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15522,6 +16711,7 @@ IR2_INST *la_sha256_ms_2(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha256_hash_2r(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15535,6 +16725,7 @@ IR2_INST *la_sha256_hash_2r(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha512_ms_1(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15548,6 +16739,7 @@ IR2_INST *la_sha512_ms_1(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha512_ms_2(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15561,6 +16753,7 @@ IR2_INST *la_sha512_ms_2(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha512_hash_r_1(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15574,6 +16767,7 @@ IR2_INST *la_sha512_hash_r_1(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_sha512_hash_r_2(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15587,6 +16781,7 @@ IR2_INST *la_sha512_hash_r_2(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmul_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15600,6 +16795,7 @@ IR2_INST *la_vpmul_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmul_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15613,6 +16809,7 @@ IR2_INST *la_vpmul_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmuh_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15626,6 +16823,7 @@ IR2_INST *la_vpmuh_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmuh_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15639,6 +16837,7 @@ IR2_INST *la_vpmuh_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulacc_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15652,6 +16851,7 @@ IR2_INST *la_vpmulacc_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulacc_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15665,6 +16865,7 @@ IR2_INST *la_vpmulacc_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmuhacc_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15678,6 +16879,7 @@ IR2_INST *la_vpmuhacc_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmuhacc_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15691,6 +16893,7 @@ IR2_INST *la_vpmuhacc_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15704,6 +16907,7 @@ IR2_INST *la_vpmulwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15717,6 +16921,7 @@ IR2_INST *la_vpmulwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15730,6 +16935,7 @@ IR2_INST *la_vpmulwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15743,6 +16949,7 @@ IR2_INST *la_vpmulwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15756,6 +16963,7 @@ IR2_INST *la_vpmulwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15769,6 +16977,7 @@ IR2_INST *la_vpmulwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15782,6 +16991,7 @@ IR2_INST *la_vpmulwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmulwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15795,6 +17005,7 @@ IR2_INST *la_vpmulwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmaddwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15808,6 +17019,7 @@ IR2_INST *la_vpmaddwl_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmaddwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15821,6 +17033,7 @@ IR2_INST *la_vpmaddwl_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmaddwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15834,6 +17047,7 @@ IR2_INST *la_vpmaddwl_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmaddwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15847,6 +17061,7 @@ IR2_INST *la_vpmaddwl_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmaddwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15860,6 +17075,7 @@ IR2_INST *la_vpmaddwh_h_b(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmaddwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15873,6 +17089,7 @@ IR2_INST *la_vpmaddwh_w_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmaddwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15886,6 +17103,7 @@ IR2_INST *la_vpmaddwh_d_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpmaddwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15899,6 +17117,7 @@ IR2_INST *la_vpmaddwh_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpdp2_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15912,6 +17131,7 @@ IR2_INST *la_vpdp2_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpdp2add_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15925,6 +17145,7 @@ IR2_INST *la_vpdp2add_q_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vcdp4_re_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15938,6 +17159,7 @@ IR2_INST *la_vcdp4_re_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vcdp4_im_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15951,6 +17173,7 @@ IR2_INST *la_vcdp4_im_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vcdp4add_re_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15964,6 +17187,7 @@ IR2_INST *la_vcdp4add_re_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vcdp4add_im_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15977,6 +17201,7 @@ IR2_INST *la_vcdp4add_im_d_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vcdp2_re_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -15990,6 +17215,7 @@ IR2_INST *la_vcdp2_re_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vcdp2_im_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16003,6 +17229,7 @@ IR2_INST *la_vcdp2_im_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vcdp2add_re_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16016,6 +17243,7 @@ IR2_INST *la_vcdp2add_re_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vcdp2add_im_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16029,6 +17257,7 @@ IR2_INST *la_vcdp2add_im_q_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsignsel_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16042,6 +17271,7 @@ IR2_INST *la_vsignsel_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsignsel_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16055,6 +17285,7 @@ IR2_INST *la_vsignsel_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16068,6 +17299,7 @@ IR2_INST *la_vshuf_h(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16081,6 +17313,7 @@ IR2_INST *la_vshuf_w(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16094,6 +17327,7 @@ IR2_INST *la_vshuf_d(IR2_OPND vd, IR2_OPND vj, IR2_OPND vk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseqi_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16109,6 +17343,7 @@ IR2_INST *la_vseqi_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseqi_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16124,6 +17359,7 @@ IR2_INST *la_vseqi_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseqi_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16139,6 +17375,7 @@ IR2_INST *la_vseqi_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseqi_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16154,6 +17391,7 @@ IR2_INST *la_vseqi_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslei_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16169,6 +17407,7 @@ IR2_INST *la_vslei_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslei_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16184,6 +17423,7 @@ IR2_INST *la_vslei_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslei_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16199,6 +17439,7 @@ IR2_INST *la_vslei_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslei_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16214,6 +17455,7 @@ IR2_INST *la_vslei_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslei_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16229,6 +17471,7 @@ IR2_INST *la_vslei_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslei_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16244,6 +17487,7 @@ IR2_INST *la_vslei_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslei_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16259,6 +17503,7 @@ IR2_INST *la_vslei_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslei_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16274,6 +17519,7 @@ IR2_INST *la_vslei_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslti_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16289,6 +17535,7 @@ IR2_INST *la_vslti_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslti_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16304,6 +17551,7 @@ IR2_INST *la_vslti_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslti_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16319,6 +17567,7 @@ IR2_INST *la_vslti_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslti_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16334,6 +17583,7 @@ IR2_INST *la_vslti_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslti_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16349,6 +17599,7 @@ IR2_INST *la_vslti_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslti_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16364,6 +17615,7 @@ IR2_INST *la_vslti_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslti_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16379,6 +17631,7 @@ IR2_INST *la_vslti_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslti_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16394,6 +17647,7 @@ IR2_INST *la_vslti_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddi_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16409,6 +17663,7 @@ IR2_INST *la_vaddi_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddi_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16424,6 +17679,7 @@ IR2_INST *la_vaddi_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddi_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16439,6 +17695,7 @@ IR2_INST *la_vaddi_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vaddi_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16454,6 +17711,7 @@ IR2_INST *la_vaddi_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubi_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16469,6 +17727,7 @@ IR2_INST *la_vsubi_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubi_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16484,6 +17743,7 @@ IR2_INST *la_vsubi_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubi_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16499,6 +17759,7 @@ IR2_INST *la_vsubi_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsubi_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16514,6 +17775,7 @@ IR2_INST *la_vsubi_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbsll_v(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16529,6 +17791,7 @@ IR2_INST *la_vbsll_v(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbsrl_v(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16544,6 +17807,7 @@ IR2_INST *la_vbsrl_v(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxi_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16559,6 +17823,7 @@ IR2_INST *la_vmaxi_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxi_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16574,6 +17839,7 @@ IR2_INST *la_vmaxi_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxi_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16589,6 +17855,7 @@ IR2_INST *la_vmaxi_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxi_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16604,6 +17871,7 @@ IR2_INST *la_vmaxi_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmini_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16619,6 +17887,7 @@ IR2_INST *la_vmini_b(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmini_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16634,6 +17903,7 @@ IR2_INST *la_vmini_h(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmini_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16649,6 +17919,7 @@ IR2_INST *la_vmini_w(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmini_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -16664,6 +17935,7 @@ IR2_INST *la_vmini_d(IR2_OPND vd, IR2_OPND vj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxi_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16679,6 +17951,7 @@ IR2_INST *la_vmaxi_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxi_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16694,6 +17967,7 @@ IR2_INST *la_vmaxi_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxi_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16709,6 +17983,7 @@ IR2_INST *la_vmaxi_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmaxi_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16724,6 +17999,7 @@ IR2_INST *la_vmaxi_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmini_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16739,6 +18015,7 @@ IR2_INST *la_vmini_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmini_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16754,6 +18031,7 @@ IR2_INST *la_vmini_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmini_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16769,6 +18047,7 @@ IR2_INST *la_vmini_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmini_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16784,6 +18063,7 @@ IR2_INST *la_vmini_du(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrandsigni_b(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16799,6 +18079,7 @@ IR2_INST *la_vrandsigni_b(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrandsigni_h(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16814,6 +18095,7 @@ IR2_INST *la_vrandsigni_h(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrorsigni_b(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16829,6 +18111,7 @@ IR2_INST *la_vrorsigni_b(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrorsigni_h(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16844,6 +18127,7 @@ IR2_INST *la_vrorsigni_h(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrstpi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16859,6 +18143,7 @@ IR2_INST *la_vfrstpi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrstpi_h(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16874,6 +18159,7 @@ IR2_INST *la_vfrstpi_h(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclrstri_v(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16889,6 +18175,7 @@ IR2_INST *la_vclrstri_v(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmepatmsk_v(IR2_OPND vd, int imm_mode, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -16905,6 +18192,7 @@ IR2_INST *la_vmepatmsk_v(IR2_OPND vd, int imm_mode, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclo_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16917,6 +18205,7 @@ IR2_INST *la_vclo_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclo_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16929,6 +18218,7 @@ IR2_INST *la_vclo_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclo_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16941,6 +18231,7 @@ IR2_INST *la_vclo_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclo_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16953,6 +18244,7 @@ IR2_INST *la_vclo_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclz_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16965,6 +18257,7 @@ IR2_INST *la_vclz_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclz_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16977,6 +18270,7 @@ IR2_INST *la_vclz_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclz_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -16989,6 +18283,7 @@ IR2_INST *la_vclz_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclz_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17001,6 +18296,7 @@ IR2_INST *la_vclz_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpcnt_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17013,6 +18309,7 @@ IR2_INST *la_vpcnt_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpcnt_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17025,6 +18322,7 @@ IR2_INST *la_vpcnt_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpcnt_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17037,6 +18335,7 @@ IR2_INST *la_vpcnt_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpcnt_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17049,6 +18348,7 @@ IR2_INST *la_vpcnt_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vneg_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17061,6 +18361,7 @@ IR2_INST *la_vneg_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vneg_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17073,6 +18374,7 @@ IR2_INST *la_vneg_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vneg_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17085,6 +18387,7 @@ IR2_INST *la_vneg_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vneg_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17097,6 +18400,7 @@ IR2_INST *la_vneg_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmskltz_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17109,6 +18413,7 @@ IR2_INST *la_vmskltz_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmskltz_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17121,6 +18426,7 @@ IR2_INST *la_vmskltz_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmskltz_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17133,6 +18439,7 @@ IR2_INST *la_vmskltz_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmskltz_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17145,6 +18452,7 @@ IR2_INST *la_vmskltz_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmskgez_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17157,6 +18465,7 @@ IR2_INST *la_vmskgez_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmsknz_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17169,6 +18478,7 @@ IR2_INST *la_vmsknz_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmskcopy_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17181,6 +18491,7 @@ IR2_INST *la_vmskcopy_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vmskfill_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17193,6 +18504,7 @@ IR2_INST *la_vmskfill_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrstm_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17205,6 +18517,7 @@ IR2_INST *la_vfrstm_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrstm_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17217,6 +18530,7 @@ IR2_INST *la_vfrstm_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseteqz_v(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17229,6 +18543,7 @@ IR2_INST *la_vseteqz_v(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetnez_v(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17241,6 +18556,7 @@ IR2_INST *la_vsetnez_v(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetanyeqz_b(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17253,6 +18569,7 @@ IR2_INST *la_vsetanyeqz_b(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetanyeqz_h(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17265,6 +18582,7 @@ IR2_INST *la_vsetanyeqz_h(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetanyeqz_w(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17277,6 +18595,7 @@ IR2_INST *la_vsetanyeqz_w(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetanyeqz_d(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17289,6 +18608,7 @@ IR2_INST *la_vsetanyeqz_d(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetallnez_b(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17301,6 +18621,7 @@ IR2_INST *la_vsetallnez_b(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetallnez_h(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17313,6 +18634,7 @@ IR2_INST *la_vsetallnez_h(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetallnez_w(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17325,6 +18647,7 @@ IR2_INST *la_vsetallnez_w(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsetallnez_d(IR2_OPND cd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17337,6 +18660,7 @@ IR2_INST *la_vsetallnez_d(IR2_OPND cd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vflogb_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17349,6 +18673,7 @@ IR2_INST *la_vflogb_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vflogb_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17361,6 +18686,7 @@ IR2_INST *la_vflogb_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfclass_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17373,6 +18699,7 @@ IR2_INST *la_vfclass_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfclass_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17385,6 +18712,7 @@ IR2_INST *la_vfclass_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfsqrt_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17397,6 +18725,7 @@ IR2_INST *la_vfsqrt_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfsqrt_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17409,6 +18738,7 @@ IR2_INST *la_vfsqrt_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrecip_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17421,6 +18751,7 @@ IR2_INST *la_vfrecip_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrecip_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17433,6 +18764,7 @@ IR2_INST *la_vfrecip_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrsqrt_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17445,6 +18777,7 @@ IR2_INST *la_vfrsqrt_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrsqrt_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17457,6 +18790,7 @@ IR2_INST *la_vfrsqrt_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrint_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17469,6 +18803,7 @@ IR2_INST *la_vfrint_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrint_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17481,6 +18816,7 @@ IR2_INST *la_vfrint_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrintrm_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17493,6 +18829,7 @@ IR2_INST *la_vfrintrm_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrintrm_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17505,6 +18842,7 @@ IR2_INST *la_vfrintrm_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrintrp_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17517,6 +18855,7 @@ IR2_INST *la_vfrintrp_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrintrp_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17529,6 +18868,7 @@ IR2_INST *la_vfrintrp_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrintrz_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17541,6 +18881,7 @@ IR2_INST *la_vfrintrz_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrintrz_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17553,6 +18894,7 @@ IR2_INST *la_vfrintrz_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrintrne_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17565,6 +18907,7 @@ IR2_INST *la_vfrintrne_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfrintrne_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17577,6 +18920,7 @@ IR2_INST *la_vfrintrne_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextl_w_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17589,6 +18933,7 @@ IR2_INST *la_vextl_w_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextl_d_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17601,6 +18946,7 @@ IR2_INST *la_vextl_d_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextl_d_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17613,6 +18959,7 @@ IR2_INST *la_vextl_d_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextl_w_bu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17625,6 +18972,7 @@ IR2_INST *la_vextl_w_bu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextl_d_bu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17637,6 +18985,7 @@ IR2_INST *la_vextl_d_bu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextl_d_hu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17649,6 +18998,7 @@ IR2_INST *la_vextl_d_hu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhadd8_d_bu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17661,6 +19011,7 @@ IR2_INST *la_vhadd8_d_bu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhminpos_w_hu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17673,6 +19024,7 @@ IR2_INST *la_vhminpos_w_hu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhminpos_d_hu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17685,6 +19037,7 @@ IR2_INST *la_vhminpos_d_hu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vhminpos_q_hu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17697,6 +19050,7 @@ IR2_INST *la_vhminpos_q_hu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclrtail_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17709,6 +19063,7 @@ IR2_INST *la_vclrtail_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vclrtail_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17721,6 +19076,7 @@ IR2_INST *la_vclrtail_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfcvtl_s_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17733,6 +19089,7 @@ IR2_INST *la_vfcvtl_s_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfcvth_s_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17745,6 +19102,7 @@ IR2_INST *la_vfcvth_s_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfcvtl_d_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17757,6 +19115,7 @@ IR2_INST *la_vfcvtl_d_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vfcvth_d_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17769,6 +19128,7 @@ IR2_INST *la_vfcvth_d_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vffint_s_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17781,6 +19141,7 @@ IR2_INST *la_vffint_s_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vffint_s_wu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17793,6 +19154,7 @@ IR2_INST *la_vffint_s_wu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vffint_d_l(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17805,6 +19167,7 @@ IR2_INST *la_vffint_d_l(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vffint_d_lu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17817,6 +19180,7 @@ IR2_INST *la_vffint_d_lu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vffintl_d_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17829,6 +19193,7 @@ IR2_INST *la_vffintl_d_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vffinth_d_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17841,6 +19206,7 @@ IR2_INST *la_vffinth_d_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftint_w_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17853,6 +19219,7 @@ IR2_INST *la_vftint_w_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftint_l_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17865,6 +19232,7 @@ IR2_INST *la_vftint_l_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrm_w_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17877,6 +19245,7 @@ IR2_INST *la_vftintrm_w_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrm_l_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17889,6 +19258,7 @@ IR2_INST *la_vftintrm_l_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrp_w_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17901,6 +19271,7 @@ IR2_INST *la_vftintrp_w_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrp_l_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17913,6 +19284,7 @@ IR2_INST *la_vftintrp_l_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrz_w_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17925,6 +19297,7 @@ IR2_INST *la_vftintrz_w_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrz_l_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17937,6 +19310,7 @@ IR2_INST *la_vftintrz_l_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrne_w_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17949,6 +19323,7 @@ IR2_INST *la_vftintrne_w_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrne_l_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17961,6 +19336,7 @@ IR2_INST *la_vftintrne_l_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftint_wu_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17973,6 +19349,7 @@ IR2_INST *la_vftint_wu_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftint_lu_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17985,6 +19362,7 @@ IR2_INST *la_vftint_lu_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrz_wu_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -17997,6 +19375,7 @@ IR2_INST *la_vftintrz_wu_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrz_lu_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18009,6 +19388,7 @@ IR2_INST *la_vftintrz_lu_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintl_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18021,6 +19401,7 @@ IR2_INST *la_vftintl_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftinth_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18033,6 +19414,7 @@ IR2_INST *la_vftinth_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrml_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18045,6 +19427,7 @@ IR2_INST *la_vftintrml_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrmh_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18057,6 +19440,7 @@ IR2_INST *la_vftintrmh_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrpl_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18069,6 +19453,7 @@ IR2_INST *la_vftintrpl_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrph_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18081,6 +19466,7 @@ IR2_INST *la_vftintrph_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrzl_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18093,6 +19479,7 @@ IR2_INST *la_vftintrzl_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrzh_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18105,6 +19492,7 @@ IR2_INST *la_vftintrzh_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrnel_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18117,6 +19505,7 @@ IR2_INST *la_vftintrnel_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vftintrneh_l_s(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18129,6 +19518,7 @@ IR2_INST *la_vftintrneh_l_s(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vexth_h_b(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18141,6 +19531,7 @@ IR2_INST *la_vexth_h_b(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vexth_w_h(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18153,6 +19544,7 @@ IR2_INST *la_vexth_w_h(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vexth_d_w(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18165,6 +19557,7 @@ IR2_INST *la_vexth_d_w(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vexth_q_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18177,6 +19570,7 @@ IR2_INST *la_vexth_q_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vexth_hu_bu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18189,6 +19583,7 @@ IR2_INST *la_vexth_hu_bu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vexth_wu_hu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18201,6 +19596,7 @@ IR2_INST *la_vexth_wu_hu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vexth_du_wu(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18213,6 +19609,7 @@ IR2_INST *la_vexth_du_wu(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vexth_qu_du(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18225,6 +19622,7 @@ IR2_INST *la_vexth_qu_du(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplgr2vr_b(IR2_OPND vd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18237,6 +19635,7 @@ IR2_INST *la_vreplgr2vr_b(IR2_OPND vd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplgr2vr_h(IR2_OPND vd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18249,6 +19648,7 @@ IR2_INST *la_vreplgr2vr_h(IR2_OPND vd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplgr2vr_w(IR2_OPND vd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18261,6 +19661,7 @@ IR2_INST *la_vreplgr2vr_w(IR2_OPND vd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplgr2vr_d(IR2_OPND vd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18273,6 +19674,7 @@ IR2_INST *la_vreplgr2vr_d(IR2_OPND vd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrotri_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18288,6 +19690,7 @@ IR2_INST *la_vrotri_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrotri_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18303,6 +19706,7 @@ IR2_INST *la_vrotri_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrotri_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -18318,6 +19722,7 @@ IR2_INST *la_vrotri_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vrotri_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -18333,6 +19738,7 @@ IR2_INST *la_vrotri_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlri_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18348,6 +19754,7 @@ IR2_INST *la_vsrlri_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlri_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18363,6 +19770,7 @@ IR2_INST *la_vsrlri_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlri_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -18378,6 +19786,7 @@ IR2_INST *la_vsrlri_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlri_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -18393,6 +19802,7 @@ IR2_INST *la_vsrlri_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrari_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18408,6 +19818,7 @@ IR2_INST *la_vsrari_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrari_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18423,6 +19834,7 @@ IR2_INST *la_vsrari_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrari_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -18438,6 +19850,7 @@ IR2_INST *la_vsrari_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrari_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -18453,6 +19866,7 @@ IR2_INST *la_vsrari_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vinsgr2vr_b(IR2_OPND vd, IR2_OPND rj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18468,6 +19882,7 @@ IR2_INST *la_vinsgr2vr_b(IR2_OPND vd, IR2_OPND rj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vinsgr2vr_h(IR2_OPND vd, IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18483,6 +19898,7 @@ IR2_INST *la_vinsgr2vr_h(IR2_OPND vd, IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vinsgr2vr_w(IR2_OPND vd, IR2_OPND rj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -18498,6 +19914,7 @@ IR2_INST *la_vinsgr2vr_w(IR2_OPND vd, IR2_OPND rj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vinsgr2vr_d(IR2_OPND vd, IR2_OPND rj, int imm_ui1)
 {
     assert(imm_ui1 <= 0x1);
@@ -18513,6 +19930,7 @@ IR2_INST *la_vinsgr2vr_d(IR2_OPND vd, IR2_OPND rj, int imm_ui1)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickve2gr_b(IR2_OPND rd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18528,6 +19946,7 @@ IR2_INST *la_vpickve2gr_b(IR2_OPND rd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickve2gr_h(IR2_OPND rd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18543,6 +19962,7 @@ IR2_INST *la_vpickve2gr_h(IR2_OPND rd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickve2gr_w(IR2_OPND rd, IR2_OPND vj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -18558,6 +19978,7 @@ IR2_INST *la_vpickve2gr_w(IR2_OPND rd, IR2_OPND vj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickve2gr_d(IR2_OPND rd, IR2_OPND vj, int imm_ui1)
 {
     assert(imm_ui1 <= 0x1);
@@ -18573,6 +19994,7 @@ IR2_INST *la_vpickve2gr_d(IR2_OPND rd, IR2_OPND vj, int imm_ui1)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickve2gr_bu(IR2_OPND rd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18588,6 +20010,7 @@ IR2_INST *la_vpickve2gr_bu(IR2_OPND rd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickve2gr_hu(IR2_OPND rd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18603,6 +20026,7 @@ IR2_INST *la_vpickve2gr_hu(IR2_OPND rd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickve2gr_wu(IR2_OPND rd, IR2_OPND vj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -18618,6 +20042,7 @@ IR2_INST *la_vpickve2gr_wu(IR2_OPND rd, IR2_OPND vj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpickve2gr_du(IR2_OPND rd, IR2_OPND vj, int imm_ui1)
 {
     assert(imm_ui1 <= 0x1);
@@ -18633,6 +20058,7 @@ IR2_INST *la_vpickve2gr_du(IR2_OPND rd, IR2_OPND vj, int imm_ui1)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplvei_b(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18648,6 +20074,7 @@ IR2_INST *la_vreplvei_b(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplvei_h(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18663,6 +20090,7 @@ IR2_INST *la_vreplvei_h(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplvei_w(IR2_OPND vd, IR2_OPND vj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -18678,6 +20106,7 @@ IR2_INST *la_vreplvei_w(IR2_OPND vd, IR2_OPND vj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vreplvei_d(IR2_OPND vd, IR2_OPND vj, int imm_ui1)
 {
     assert(imm_ui1 <= 0x1);
@@ -18693,6 +20122,7 @@ IR2_INST *la_vreplvei_d(IR2_OPND vd, IR2_OPND vj, int imm_ui1)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrcoli_b(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18708,6 +20138,7 @@ IR2_INST *la_vextrcoli_b(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrcoli_h(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18723,6 +20154,7 @@ IR2_INST *la_vextrcoli_h(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrcoli_w(IR2_OPND vd, IR2_OPND vj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -18738,6 +20170,7 @@ IR2_INST *la_vextrcoli_w(IR2_OPND vd, IR2_OPND vj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrcoli_d(IR2_OPND vd, IR2_OPND vj, int imm_ui1)
 {
     assert(imm_ui1 <= 0x1);
@@ -18753,6 +20186,7 @@ IR2_INST *la_vextrcoli_d(IR2_OPND vd, IR2_OPND vj, int imm_ui1)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsllwil_h_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18768,6 +20202,7 @@ IR2_INST *la_vsllwil_h_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsllwil_w_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18783,6 +20218,7 @@ IR2_INST *la_vsllwil_w_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsllwil_d_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -18798,6 +20234,7 @@ IR2_INST *la_vsllwil_d_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextl_q_d(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18810,6 +20247,7 @@ IR2_INST *la_vextl_q_d(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsllwil_hu_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18825,6 +20263,7 @@ IR2_INST *la_vsllwil_hu_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsllwil_wu_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18840,6 +20279,7 @@ IR2_INST *la_vsllwil_wu_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsllwil_du_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -18855,6 +20295,7 @@ IR2_INST *la_vsllwil_du_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextl_qu_du(IR2_OPND vd, IR2_OPND vj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -18867,6 +20308,7 @@ IR2_INST *la_vextl_qu_du(IR2_OPND vd, IR2_OPND vj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitclri_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18882,6 +20324,7 @@ IR2_INST *la_vbitclri_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitclri_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18897,6 +20340,7 @@ IR2_INST *la_vbitclri_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitclri_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -18912,6 +20356,7 @@ IR2_INST *la_vbitclri_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitclri_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -18927,6 +20372,7 @@ IR2_INST *la_vbitclri_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitseti_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -18942,6 +20388,7 @@ IR2_INST *la_vbitseti_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitseti_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -18957,6 +20404,7 @@ IR2_INST *la_vbitseti_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitseti_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -18972,6 +20420,7 @@ IR2_INST *la_vbitseti_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitseti_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -18987,6 +20436,7 @@ IR2_INST *la_vbitseti_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitrevi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -19002,6 +20452,7 @@ IR2_INST *la_vbitrevi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitrevi_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19017,6 +20468,7 @@ IR2_INST *la_vbitrevi_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitrevi_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19032,6 +20484,7 @@ IR2_INST *la_vbitrevi_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitrevi_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19047,6 +20500,7 @@ IR2_INST *la_vbitrevi_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc12i_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -19062,6 +20516,7 @@ IR2_INST *la_vbstrc12i_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc12i_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19077,6 +20532,7 @@ IR2_INST *la_vbstrc12i_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc12i_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19092,6 +20548,7 @@ IR2_INST *la_vbstrc12i_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc12i_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19107,6 +20564,7 @@ IR2_INST *la_vbstrc12i_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc21i_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -19122,6 +20580,7 @@ IR2_INST *la_vbstrc21i_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc21i_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19137,6 +20596,7 @@ IR2_INST *la_vbstrc21i_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc21i_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19152,6 +20612,7 @@ IR2_INST *la_vbstrc21i_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbstrc21i_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19167,6 +20628,7 @@ IR2_INST *la_vbstrc21i_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsat_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -19182,6 +20644,7 @@ IR2_INST *la_vsat_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsat_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19197,6 +20660,7 @@ IR2_INST *la_vsat_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsat_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19212,6 +20676,7 @@ IR2_INST *la_vsat_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsat_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19227,6 +20692,7 @@ IR2_INST *la_vsat_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsat_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -19242,6 +20708,7 @@ IR2_INST *la_vsat_bu(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsat_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19257,6 +20724,7 @@ IR2_INST *la_vsat_hu(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsat_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19272,6 +20740,7 @@ IR2_INST *la_vsat_wu(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsat_du(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19287,6 +20756,7 @@ IR2_INST *la_vsat_du(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslli_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -19302,6 +20772,7 @@ IR2_INST *la_vslli_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslli_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19317,6 +20788,7 @@ IR2_INST *la_vslli_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslli_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19332,6 +20804,7 @@ IR2_INST *la_vslli_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vslli_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19347,6 +20820,7 @@ IR2_INST *la_vslli_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrli_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -19362,6 +20836,7 @@ IR2_INST *la_vsrli_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrli_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19377,6 +20852,7 @@ IR2_INST *la_vsrli_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrli_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19392,6 +20868,7 @@ IR2_INST *la_vsrli_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrli_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19407,6 +20884,7 @@ IR2_INST *la_vsrli_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrai_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -19422,6 +20900,7 @@ IR2_INST *la_vsrai_b(IR2_OPND vd, IR2_OPND vj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrai_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19437,6 +20916,7 @@ IR2_INST *la_vsrai_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrai_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19452,6 +20932,7 @@ IR2_INST *la_vsrai_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrai_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19467,6 +20948,7 @@ IR2_INST *la_vsrai_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrneni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19482,6 +20964,7 @@ IR2_INST *la_vsrlrneni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrneni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19497,6 +20980,7 @@ IR2_INST *la_vsrlrneni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrneni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19512,6 +20996,7 @@ IR2_INST *la_vsrlrneni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrneni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -19527,6 +21012,7 @@ IR2_INST *la_vsrlrneni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarneni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19542,6 +21028,7 @@ IR2_INST *la_vsrarneni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarneni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19557,6 +21044,7 @@ IR2_INST *la_vsrarneni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarneni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19572,6 +21060,7 @@ IR2_INST *la_vsrarneni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarneni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -19587,6 +21076,7 @@ IR2_INST *la_vsrarneni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19602,6 +21092,7 @@ IR2_INST *la_vsrlni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19617,6 +21108,7 @@ IR2_INST *la_vsrlni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19632,6 +21124,7 @@ IR2_INST *la_vsrlni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -19647,6 +21140,7 @@ IR2_INST *la_vsrlni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19662,6 +21156,7 @@ IR2_INST *la_vsrlrni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19677,6 +21172,7 @@ IR2_INST *la_vsrlrni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19692,6 +21188,7 @@ IR2_INST *la_vsrlrni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrlrni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -19707,6 +21204,7 @@ IR2_INST *la_vsrlrni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19722,6 +21220,7 @@ IR2_INST *la_vssrlni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19737,6 +21236,7 @@ IR2_INST *la_vssrlni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19752,6 +21252,7 @@ IR2_INST *la_vssrlni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -19767,6 +21268,7 @@ IR2_INST *la_vssrlni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19782,6 +21284,7 @@ IR2_INST *la_vssrlni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19797,6 +21300,7 @@ IR2_INST *la_vssrlni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19812,6 +21316,7 @@ IR2_INST *la_vssrlni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -19827,6 +21332,7 @@ IR2_INST *la_vssrlni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19842,6 +21348,7 @@ IR2_INST *la_vssrlrni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19857,6 +21364,7 @@ IR2_INST *la_vssrlrni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19872,6 +21380,7 @@ IR2_INST *la_vssrlrni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -19887,6 +21396,7 @@ IR2_INST *la_vssrlrni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19902,6 +21412,7 @@ IR2_INST *la_vssrlrni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19917,6 +21428,7 @@ IR2_INST *la_vssrlrni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19932,6 +21444,7 @@ IR2_INST *la_vssrlrni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -19947,6 +21460,7 @@ IR2_INST *la_vssrlrni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrani_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -19962,6 +21476,7 @@ IR2_INST *la_vsrani_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrani_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -19977,6 +21492,7 @@ IR2_INST *la_vsrani_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrani_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -19992,6 +21508,7 @@ IR2_INST *la_vsrani_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrani_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20007,6 +21524,7 @@ IR2_INST *la_vsrani_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20022,6 +21540,7 @@ IR2_INST *la_vsrarni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20037,6 +21556,7 @@ IR2_INST *la_vsrarni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20052,6 +21572,7 @@ IR2_INST *la_vsrarni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vsrarni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20067,6 +21588,7 @@ IR2_INST *la_vsrarni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrani_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20082,6 +21604,7 @@ IR2_INST *la_vssrani_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrani_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20097,6 +21620,7 @@ IR2_INST *la_vssrani_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrani_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20112,6 +21636,7 @@ IR2_INST *la_vssrani_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrani_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20127,6 +21652,7 @@ IR2_INST *la_vssrani_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrani_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20142,6 +21668,7 @@ IR2_INST *la_vssrani_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrani_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20157,6 +21684,7 @@ IR2_INST *la_vssrani_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrani_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20172,6 +21700,7 @@ IR2_INST *la_vssrani_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrani_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20187,6 +21716,7 @@ IR2_INST *la_vssrani_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20202,6 +21732,7 @@ IR2_INST *la_vssrarni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20217,6 +21748,7 @@ IR2_INST *la_vssrarni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20232,6 +21764,7 @@ IR2_INST *la_vssrarni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20247,6 +21780,7 @@ IR2_INST *la_vssrarni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20262,6 +21796,7 @@ IR2_INST *la_vssrarni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20277,6 +21812,7 @@ IR2_INST *la_vssrarni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20292,6 +21828,7 @@ IR2_INST *la_vssrarni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20307,6 +21844,7 @@ IR2_INST *la_vssrarni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrneni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20322,6 +21860,7 @@ IR2_INST *la_vssrlrneni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrneni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20337,6 +21876,7 @@ IR2_INST *la_vssrlrneni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrneni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20352,6 +21892,7 @@ IR2_INST *la_vssrlrneni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrneni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20367,6 +21908,7 @@ IR2_INST *la_vssrlrneni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrneni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20382,6 +21924,7 @@ IR2_INST *la_vssrlrneni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrneni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20397,6 +21940,7 @@ IR2_INST *la_vssrlrneni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrneni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20412,6 +21956,7 @@ IR2_INST *la_vssrlrneni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrlrneni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20427,6 +21972,7 @@ IR2_INST *la_vssrlrneni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarneni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20442,6 +21988,7 @@ IR2_INST *la_vssrarneni_b_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarneni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20457,6 +22004,7 @@ IR2_INST *la_vssrarneni_h_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarneni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20472,6 +22020,7 @@ IR2_INST *la_vssrarneni_w_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarneni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20487,6 +22036,7 @@ IR2_INST *la_vssrarneni_d_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarneni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -20502,6 +22052,7 @@ IR2_INST *la_vssrarneni_bu_h(IR2_OPND vd, IR2_OPND vj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarneni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -20517,6 +22068,7 @@ IR2_INST *la_vssrarneni_hu_w(IR2_OPND vd, IR2_OPND vj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarneni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -20532,6 +22084,7 @@ IR2_INST *la_vssrarneni_wu_d(IR2_OPND vd, IR2_OPND vj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vssrarneni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
 {
     assert(imm_ui7 <= 0x7f);
@@ -20547,6 +22100,7 @@ IR2_INST *la_vssrarneni_du_q(IR2_OPND vd, IR2_OPND vj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrins_d(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20562,6 +22116,7 @@ IR2_INST *la_vextrins_d(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrins_w(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20577,6 +22132,7 @@ IR2_INST *la_vextrins_w(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrins_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20592,6 +22148,7 @@ IR2_INST *la_vextrins_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vextrins_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20607,6 +22164,7 @@ IR2_INST *la_vextrins_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf4i_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20622,6 +22180,7 @@ IR2_INST *la_vshuf4i_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf4i_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20637,6 +22196,7 @@ IR2_INST *la_vshuf4i_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf4i_w(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20652,6 +22212,7 @@ IR2_INST *la_vshuf4i_w(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshuf4i_d(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20667,6 +22228,7 @@ IR2_INST *la_vshuf4i_d(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshufi1_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20682,6 +22244,7 @@ IR2_INST *la_vshufi1_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshufi2_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20697,6 +22260,7 @@ IR2_INST *la_vshufi2_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshufi3_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20712,6 +22276,7 @@ IR2_INST *la_vshufi3_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshufi4_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20727,6 +22292,7 @@ IR2_INST *la_vshufi4_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshufi1_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20742,6 +22308,7 @@ IR2_INST *la_vshufi1_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vshufi2_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20757,6 +22324,7 @@ IR2_INST *la_vshufi2_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseli_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20772,6 +22340,7 @@ IR2_INST *la_vseli_h(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseli_w(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20787,6 +22356,7 @@ IR2_INST *la_vseli_w(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vseli_d(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20802,6 +22372,7 @@ IR2_INST *la_vseli_d(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitseli_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20817,6 +22388,7 @@ IR2_INST *la_vbitseli_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitmvzi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20832,6 +22404,7 @@ IR2_INST *la_vbitmvzi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vbitmvnzi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20847,6 +22420,7 @@ IR2_INST *la_vbitmvnzi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vandi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20862,6 +22436,7 @@ IR2_INST *la_vandi_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vori_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20877,6 +22452,7 @@ IR2_INST *la_vori_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vxori_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20892,6 +22468,7 @@ IR2_INST *la_vxori_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vnori_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20907,6 +22484,7 @@ IR2_INST *la_vnori_b(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vldi(IR2_OPND vd, int imm_i13)
 {
     assert(imm_i13 <= 0x1fff);
@@ -20921,6 +22499,7 @@ IR2_INST *la_vldi(IR2_OPND vd, int imm_i13)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vpermi_w(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
 {
     assert(imm_ui8 <= 0xff);
@@ -20936,6 +22515,7 @@ IR2_INST *la_vpermi_w(IR2_OPND vd, IR2_OPND vj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseq_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -20949,6 +22529,7 @@ IR2_INST *la_xvseq_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseq_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -20962,6 +22543,7 @@ IR2_INST *la_xvseq_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseq_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -20975,6 +22557,7 @@ IR2_INST *la_xvseq_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseq_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -20988,6 +22571,7 @@ IR2_INST *la_xvseq_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsle_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21001,6 +22585,7 @@ IR2_INST *la_xvsle_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsle_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21014,6 +22599,7 @@ IR2_INST *la_xvsle_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsle_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21027,6 +22613,7 @@ IR2_INST *la_xvsle_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsle_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21040,6 +22627,7 @@ IR2_INST *la_xvsle_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsle_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21053,6 +22641,7 @@ IR2_INST *la_xvsle_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsle_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21066,6 +22655,7 @@ IR2_INST *la_xvsle_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsle_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21079,6 +22669,7 @@ IR2_INST *la_xvsle_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsle_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21092,6 +22683,7 @@ IR2_INST *la_xvsle_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslt_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21105,6 +22697,7 @@ IR2_INST *la_xvslt_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslt_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21118,6 +22711,7 @@ IR2_INST *la_xvslt_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslt_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21131,6 +22725,7 @@ IR2_INST *la_xvslt_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslt_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21144,6 +22739,7 @@ IR2_INST *la_xvslt_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslt_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21157,6 +22753,7 @@ IR2_INST *la_xvslt_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslt_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21170,6 +22767,7 @@ IR2_INST *la_xvslt_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslt_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21183,6 +22781,7 @@ IR2_INST *la_xvslt_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslt_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21196,6 +22795,7 @@ IR2_INST *la_xvslt_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21209,6 +22809,7 @@ IR2_INST *la_xvadd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21222,6 +22823,7 @@ IR2_INST *la_xvadd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21235,6 +22837,7 @@ IR2_INST *la_xvadd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21248,6 +22851,7 @@ IR2_INST *la_xvadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsub_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21261,6 +22865,7 @@ IR2_INST *la_xvsub_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsub_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21274,6 +22879,7 @@ IR2_INST *la_xvsub_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsub_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21287,6 +22893,7 @@ IR2_INST *la_xvsub_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21300,6 +22907,7 @@ IR2_INST *la_xvsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddw_h_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21313,6 +22921,7 @@ IR2_INST *la_xvaddw_h_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddw_w_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21326,6 +22935,7 @@ IR2_INST *la_xvaddw_w_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddw_d_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21339,6 +22949,7 @@ IR2_INST *la_xvaddw_d_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddw_h_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21352,6 +22963,7 @@ IR2_INST *la_xvaddw_h_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddw_w_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21365,6 +22977,7 @@ IR2_INST *la_xvaddw_w_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddw_d_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21378,6 +22991,7 @@ IR2_INST *la_xvaddw_d_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubw_h_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21391,6 +23005,7 @@ IR2_INST *la_xvsubw_h_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubw_w_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21404,6 +23019,7 @@ IR2_INST *la_xvsubw_w_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubw_d_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21417,6 +23033,7 @@ IR2_INST *la_xvsubw_d_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubw_h_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21430,6 +23047,7 @@ IR2_INST *la_xvsubw_h_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubw_w_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21443,6 +23061,7 @@ IR2_INST *la_xvsubw_w_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubw_d_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21456,6 +23075,7 @@ IR2_INST *la_xvsubw_d_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsaddw_h_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21469,6 +23089,7 @@ IR2_INST *la_xvsaddw_h_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsaddw_w_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21482,6 +23103,7 @@ IR2_INST *la_xvsaddw_w_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsaddw_d_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21495,6 +23117,7 @@ IR2_INST *la_xvsaddw_d_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsaddw_hu_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21508,6 +23131,7 @@ IR2_INST *la_xvsaddw_hu_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsaddw_wu_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21521,6 +23145,7 @@ IR2_INST *la_xvsaddw_wu_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsaddw_du_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21534,6 +23159,7 @@ IR2_INST *la_xvsaddw_du_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssubw_h_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21547,6 +23173,7 @@ IR2_INST *la_xvssubw_h_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssubw_w_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21560,6 +23187,7 @@ IR2_INST *la_xvssubw_w_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssubw_d_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21573,6 +23201,7 @@ IR2_INST *la_xvssubw_d_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssubw_hu_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21586,6 +23215,7 @@ IR2_INST *la_xvssubw_hu_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssubw_wu_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21599,6 +23229,7 @@ IR2_INST *la_xvssubw_wu_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssubw_du_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21612,6 +23243,7 @@ IR2_INST *la_xvssubw_du_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21625,6 +23257,7 @@ IR2_INST *la_xvaddwev_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21638,6 +23271,7 @@ IR2_INST *la_xvaddwev_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21651,6 +23285,7 @@ IR2_INST *la_xvaddwev_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21664,6 +23299,7 @@ IR2_INST *la_xvaddwev_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwev_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21677,6 +23313,7 @@ IR2_INST *la_xvsubwev_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwev_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21690,6 +23327,7 @@ IR2_INST *la_xvsubwev_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwev_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21703,6 +23341,7 @@ IR2_INST *la_xvsubwev_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwev_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21716,6 +23355,7 @@ IR2_INST *la_xvsubwev_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21729,6 +23369,7 @@ IR2_INST *la_xvaddwod_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21742,6 +23383,7 @@ IR2_INST *la_xvaddwod_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21755,6 +23397,7 @@ IR2_INST *la_xvaddwod_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21768,6 +23411,7 @@ IR2_INST *la_xvaddwod_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwod_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21781,6 +23425,7 @@ IR2_INST *la_xvsubwod_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwod_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21794,6 +23439,7 @@ IR2_INST *la_xvsubwod_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwod_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21807,6 +23453,7 @@ IR2_INST *la_xvsubwod_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwod_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21820,6 +23467,7 @@ IR2_INST *la_xvsubwod_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21833,6 +23481,7 @@ IR2_INST *la_xvaddwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21846,6 +23495,7 @@ IR2_INST *la_xvaddwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21859,6 +23509,7 @@ IR2_INST *la_xvaddwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21872,6 +23523,7 @@ IR2_INST *la_xvaddwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21885,6 +23537,7 @@ IR2_INST *la_xvsubwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21898,6 +23551,7 @@ IR2_INST *la_xvsubwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21911,6 +23565,7 @@ IR2_INST *la_xvsubwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21924,6 +23579,7 @@ IR2_INST *la_xvsubwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21937,6 +23593,7 @@ IR2_INST *la_xvaddwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21950,6 +23607,7 @@ IR2_INST *la_xvaddwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21963,6 +23621,7 @@ IR2_INST *la_xvaddwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21976,6 +23635,7 @@ IR2_INST *la_xvaddwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -21989,6 +23649,7 @@ IR2_INST *la_xvsubwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22002,6 +23663,7 @@ IR2_INST *la_xvsubwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22015,6 +23677,7 @@ IR2_INST *la_xvsubwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22028,6 +23691,7 @@ IR2_INST *la_xvsubwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22041,6 +23705,7 @@ IR2_INST *la_xvaddwev_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22054,6 +23719,7 @@ IR2_INST *la_xvaddwev_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22067,6 +23733,7 @@ IR2_INST *la_xvaddwev_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22080,6 +23747,7 @@ IR2_INST *la_xvaddwev_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwev_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22093,6 +23761,7 @@ IR2_INST *la_xvsubwev_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwev_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22106,6 +23775,7 @@ IR2_INST *la_xvsubwev_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwev_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22119,6 +23789,7 @@ IR2_INST *la_xvsubwev_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwev_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22132,6 +23803,7 @@ IR2_INST *la_xvsubwev_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22145,6 +23817,7 @@ IR2_INST *la_xvaddwod_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22158,6 +23831,7 @@ IR2_INST *la_xvaddwod_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22171,6 +23845,7 @@ IR2_INST *la_xvaddwod_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22184,6 +23859,7 @@ IR2_INST *la_xvaddwod_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwod_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22197,6 +23873,7 @@ IR2_INST *la_xvsubwod_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwod_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22210,6 +23887,7 @@ IR2_INST *la_xvsubwod_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwod_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22223,6 +23901,7 @@ IR2_INST *la_xvsubwod_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwod_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22236,6 +23915,7 @@ IR2_INST *la_xvsubwod_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22249,6 +23929,7 @@ IR2_INST *la_xvaddwl_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22262,6 +23943,7 @@ IR2_INST *la_xvaddwl_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22275,6 +23957,7 @@ IR2_INST *la_xvaddwl_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22288,6 +23971,7 @@ IR2_INST *la_xvaddwl_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwl_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22301,6 +23985,7 @@ IR2_INST *la_xvsubwl_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwl_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22314,6 +23999,7 @@ IR2_INST *la_xvsubwl_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwl_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22327,6 +24013,7 @@ IR2_INST *la_xvsubwl_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwl_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22340,6 +24027,7 @@ IR2_INST *la_xvsubwl_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22353,6 +24041,7 @@ IR2_INST *la_xvaddwh_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22366,6 +24055,7 @@ IR2_INST *la_xvaddwh_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22379,6 +24069,7 @@ IR2_INST *la_xvaddwh_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22392,6 +24083,7 @@ IR2_INST *la_xvaddwh_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwh_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22405,6 +24097,7 @@ IR2_INST *la_xvsubwh_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwh_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22418,6 +24111,7 @@ IR2_INST *la_xvsubwh_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwh_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22431,6 +24125,7 @@ IR2_INST *la_xvsubwh_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubwh_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22444,6 +24139,7 @@ IR2_INST *la_xvsubwh_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22457,6 +24153,7 @@ IR2_INST *la_xvaddwev_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22470,6 +24167,7 @@ IR2_INST *la_xvaddwev_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22483,6 +24181,7 @@ IR2_INST *la_xvaddwev_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwev_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22496,6 +24195,7 @@ IR2_INST *la_xvaddwev_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22509,6 +24209,7 @@ IR2_INST *la_xvaddwod_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22522,6 +24223,7 @@ IR2_INST *la_xvaddwod_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22535,6 +24237,7 @@ IR2_INST *la_xvaddwod_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwod_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22548,6 +24251,7 @@ IR2_INST *la_xvaddwod_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22561,6 +24265,7 @@ IR2_INST *la_xvaddwl_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22574,6 +24279,7 @@ IR2_INST *la_xvaddwl_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22587,6 +24293,7 @@ IR2_INST *la_xvaddwl_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwl_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22600,6 +24307,7 @@ IR2_INST *la_xvaddwl_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22613,6 +24321,7 @@ IR2_INST *la_xvaddwh_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22626,6 +24335,7 @@ IR2_INST *la_xvaddwh_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22639,6 +24349,7 @@ IR2_INST *la_xvaddwh_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddwh_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22652,6 +24363,7 @@ IR2_INST *la_xvaddwh_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22665,6 +24377,7 @@ IR2_INST *la_xvsadd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22678,6 +24391,7 @@ IR2_INST *la_xvsadd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22691,6 +24405,7 @@ IR2_INST *la_xvsadd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22704,6 +24419,7 @@ IR2_INST *la_xvsadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22717,6 +24433,7 @@ IR2_INST *la_xvssub_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22730,6 +24447,7 @@ IR2_INST *la_xvssub_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22743,6 +24461,7 @@ IR2_INST *la_xvssub_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22756,6 +24475,7 @@ IR2_INST *la_xvssub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadd_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22769,6 +24489,7 @@ IR2_INST *la_xvsadd_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadd_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22782,6 +24503,7 @@ IR2_INST *la_xvsadd_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadd_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22795,6 +24517,7 @@ IR2_INST *la_xvsadd_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadd_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22808,6 +24531,7 @@ IR2_INST *la_xvsadd_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22821,6 +24545,7 @@ IR2_INST *la_xvssub_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22834,6 +24559,7 @@ IR2_INST *la_xvssub_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22847,6 +24573,7 @@ IR2_INST *la_xvssub_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22860,6 +24587,7 @@ IR2_INST *la_xvssub_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_bu_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22873,6 +24601,7 @@ IR2_INST *la_xvssub_bu_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_hu_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22886,6 +24615,7 @@ IR2_INST *la_xvssub_hu_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_wu_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22899,6 +24629,7 @@ IR2_INST *la_xvssub_wu_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_du_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22912,6 +24643,7 @@ IR2_INST *la_xvssub_du_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_bu_b_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22925,6 +24657,7 @@ IR2_INST *la_xvssub_bu_b_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_hu_h_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22938,6 +24671,7 @@ IR2_INST *la_xvssub_hu_h_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_wu_w_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22951,6 +24685,7 @@ IR2_INST *la_xvssub_wu_w_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_du_d_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22964,6 +24699,7 @@ IR2_INST *la_xvssub_du_d_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_b_bu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22977,6 +24713,7 @@ IR2_INST *la_xvssub_b_bu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_h_hu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -22990,6 +24727,7 @@ IR2_INST *la_xvssub_h_hu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_w_wu_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23003,6 +24741,7 @@ IR2_INST *la_xvssub_w_wu_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssub_d_du_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23016,6 +24755,7 @@ IR2_INST *la_xvssub_d_du_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhaddw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23029,6 +24769,7 @@ IR2_INST *la_xvhaddw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhaddw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23042,6 +24783,7 @@ IR2_INST *la_xvhaddw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhaddw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23055,6 +24797,7 @@ IR2_INST *la_xvhaddw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhaddw_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23068,6 +24811,7 @@ IR2_INST *la_xvhaddw_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhsubw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23081,6 +24825,7 @@ IR2_INST *la_xvhsubw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhsubw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23094,6 +24839,7 @@ IR2_INST *la_xvhsubw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhsubw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23107,6 +24853,7 @@ IR2_INST *la_xvhsubw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhsubw_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23120,6 +24867,7 @@ IR2_INST *la_xvhsubw_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhaddw_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23133,6 +24881,7 @@ IR2_INST *la_xvhaddw_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhaddw_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23146,6 +24895,7 @@ IR2_INST *la_xvhaddw_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhaddw_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23159,6 +24909,7 @@ IR2_INST *la_xvhaddw_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhaddw_qu_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23172,6 +24923,7 @@ IR2_INST *la_xvhaddw_qu_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhsubw_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23185,6 +24937,7 @@ IR2_INST *la_xvhsubw_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhsubw_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23198,6 +24951,7 @@ IR2_INST *la_xvhsubw_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhsubw_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23211,6 +24965,7 @@ IR2_INST *la_xvhsubw_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhsubw_qu_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23224,6 +24979,7 @@ IR2_INST *la_xvhsubw_qu_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadda_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23237,6 +24993,7 @@ IR2_INST *la_xvadda_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadda_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23250,6 +25007,7 @@ IR2_INST *la_xvadda_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadda_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23263,6 +25021,7 @@ IR2_INST *la_xvadda_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadda_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23276,6 +25035,7 @@ IR2_INST *la_xvadda_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadda_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23289,6 +25049,7 @@ IR2_INST *la_xvsadda_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadda_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23302,6 +25063,7 @@ IR2_INST *la_xvsadda_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadda_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23315,6 +25077,7 @@ IR2_INST *la_xvsadda_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadda_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23328,6 +25091,7 @@ IR2_INST *la_xvsadda_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvabsd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23341,6 +25105,7 @@ IR2_INST *la_xvabsd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvabsd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23354,6 +25119,7 @@ IR2_INST *la_xvabsd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvabsd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23367,6 +25133,7 @@ IR2_INST *la_xvabsd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvabsd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23380,6 +25147,7 @@ IR2_INST *la_xvabsd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvabsd_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23393,6 +25161,7 @@ IR2_INST *la_xvabsd_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvabsd_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23406,6 +25175,7 @@ IR2_INST *la_xvabsd_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvabsd_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23419,6 +25189,7 @@ IR2_INST *la_xvabsd_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvabsd_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23432,6 +25203,7 @@ IR2_INST *la_xvabsd_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavg_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23445,6 +25217,7 @@ IR2_INST *la_xvavg_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavg_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23458,6 +25231,7 @@ IR2_INST *la_xvavg_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavg_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23471,6 +25245,7 @@ IR2_INST *la_xvavg_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavg_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23484,6 +25259,7 @@ IR2_INST *la_xvavg_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavg_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23497,6 +25273,7 @@ IR2_INST *la_xvavg_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavg_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23510,6 +25287,7 @@ IR2_INST *la_xvavg_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavg_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23523,6 +25301,7 @@ IR2_INST *la_xvavg_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavg_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23536,6 +25315,7 @@ IR2_INST *la_xvavg_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavgr_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23549,6 +25329,7 @@ IR2_INST *la_xvavgr_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavgr_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23562,6 +25343,7 @@ IR2_INST *la_xvavgr_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavgr_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23575,6 +25357,7 @@ IR2_INST *la_xvavgr_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavgr_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23588,6 +25371,7 @@ IR2_INST *la_xvavgr_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavgr_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23601,6 +25385,7 @@ IR2_INST *la_xvavgr_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavgr_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23614,6 +25399,7 @@ IR2_INST *la_xvavgr_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavgr_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23627,6 +25413,7 @@ IR2_INST *la_xvavgr_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvavgr_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23640,6 +25427,7 @@ IR2_INST *la_xvavgr_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhalfd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23653,6 +25441,7 @@ IR2_INST *la_xvhalfd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhalfd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23666,6 +25455,7 @@ IR2_INST *la_xvhalfd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhalfd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23679,6 +25469,7 @@ IR2_INST *la_xvhalfd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhalfd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23692,6 +25483,7 @@ IR2_INST *la_xvhalfd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhalfd_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23705,6 +25497,7 @@ IR2_INST *la_xvhalfd_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhalfd_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23718,6 +25511,7 @@ IR2_INST *la_xvhalfd_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhalfd_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23731,6 +25525,7 @@ IR2_INST *la_xvhalfd_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhalfd_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23744,6 +25539,7 @@ IR2_INST *la_xvhalfd_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmax_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23757,6 +25553,7 @@ IR2_INST *la_xvmax_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmax_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23770,6 +25567,7 @@ IR2_INST *la_xvmax_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmax_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23783,6 +25581,7 @@ IR2_INST *la_xvmax_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmax_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23796,6 +25595,7 @@ IR2_INST *la_xvmax_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmin_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23809,6 +25609,7 @@ IR2_INST *la_xvmin_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmin_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23822,6 +25623,7 @@ IR2_INST *la_xvmin_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmin_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23835,6 +25637,7 @@ IR2_INST *la_xvmin_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmin_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23848,6 +25651,7 @@ IR2_INST *la_xvmin_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmax_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23861,6 +25665,7 @@ IR2_INST *la_xvmax_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmax_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23874,6 +25679,7 @@ IR2_INST *la_xvmax_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmax_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23887,6 +25693,7 @@ IR2_INST *la_xvmax_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmax_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23900,6 +25707,7 @@ IR2_INST *la_xvmax_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmin_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23913,6 +25721,7 @@ IR2_INST *la_xvmin_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmin_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23926,6 +25735,7 @@ IR2_INST *la_xvmin_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmin_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23939,6 +25749,7 @@ IR2_INST *la_xvmin_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmin_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23952,6 +25763,7 @@ IR2_INST *la_xvmin_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxa_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23965,6 +25777,7 @@ IR2_INST *la_xvmaxa_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxa_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23978,6 +25791,7 @@ IR2_INST *la_xvmaxa_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxa_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -23991,6 +25805,7 @@ IR2_INST *la_xvmaxa_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxa_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24004,6 +25819,7 @@ IR2_INST *la_xvmaxa_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmina_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24017,6 +25833,7 @@ IR2_INST *la_xvmina_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmina_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24030,6 +25847,7 @@ IR2_INST *la_xvmina_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmina_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24043,6 +25861,7 @@ IR2_INST *la_xvmina_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmina_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24056,6 +25875,7 @@ IR2_INST *la_xvmina_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24069,6 +25889,7 @@ IR2_INST *la_xvsadw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24082,6 +25903,7 @@ IR2_INST *la_xvsadw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24095,6 +25917,7 @@ IR2_INST *la_xvsadw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadw_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24108,6 +25931,7 @@ IR2_INST *la_xvsadw_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadw_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24121,6 +25945,7 @@ IR2_INST *la_xvsadw_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsadw_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24134,6 +25959,7 @@ IR2_INST *la_xvsadw_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaccsadw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24147,6 +25973,7 @@ IR2_INST *la_xvaccsadw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaccsadw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24160,6 +25987,7 @@ IR2_INST *la_xvaccsadw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaccsadw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24173,6 +26001,7 @@ IR2_INST *la_xvaccsadw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaccsadw_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24186,6 +26015,7 @@ IR2_INST *la_xvaccsadw_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaccsadw_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24199,6 +26029,7 @@ IR2_INST *la_xvaccsadw_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaccsadw_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24212,6 +26043,7 @@ IR2_INST *la_xvaccsadw_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmul_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24225,6 +26057,7 @@ IR2_INST *la_xvmul_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmul_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24238,6 +26071,7 @@ IR2_INST *la_xvmul_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmul_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24251,6 +26085,7 @@ IR2_INST *la_xvmul_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmul_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24264,6 +26099,7 @@ IR2_INST *la_xvmul_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24277,6 +26113,7 @@ IR2_INST *la_xvmuh_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24290,6 +26127,7 @@ IR2_INST *la_xvmuh_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24303,6 +26141,7 @@ IR2_INST *la_xvmuh_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24316,6 +26155,7 @@ IR2_INST *la_xvmuh_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24329,6 +26169,7 @@ IR2_INST *la_xvmuh_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24342,6 +26183,7 @@ IR2_INST *la_xvmuh_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24355,6 +26197,7 @@ IR2_INST *la_xvmuh_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24368,6 +26211,7 @@ IR2_INST *la_xvmuh_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24381,6 +26225,7 @@ IR2_INST *la_xvmuh_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24394,6 +26239,7 @@ IR2_INST *la_xvmuh_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24407,6 +26253,7 @@ IR2_INST *la_xvmuh_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmuh_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24420,6 +26267,7 @@ IR2_INST *la_xvmuh_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulxw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24433,6 +26281,7 @@ IR2_INST *la_xvmulxw_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulxw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24446,6 +26295,7 @@ IR2_INST *la_xvmulxw_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulxw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24459,6 +26309,7 @@ IR2_INST *la_xvmulxw_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulxw_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24472,6 +26323,7 @@ IR2_INST *la_xvmulxw_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulxw_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24485,6 +26337,7 @@ IR2_INST *la_xvmulxw_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulxw_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24498,6 +26351,7 @@ IR2_INST *la_xvmulxw_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24511,6 +26365,7 @@ IR2_INST *la_xvmulwev_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24524,6 +26379,7 @@ IR2_INST *la_xvmulwev_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24537,6 +26393,7 @@ IR2_INST *la_xvmulwev_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24550,6 +26407,7 @@ IR2_INST *la_xvmulwev_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24563,6 +26421,7 @@ IR2_INST *la_xvmulwod_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24576,6 +26435,7 @@ IR2_INST *la_xvmulwod_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24589,6 +26449,7 @@ IR2_INST *la_xvmulwod_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24602,6 +26463,7 @@ IR2_INST *la_xvmulwod_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24615,6 +26477,7 @@ IR2_INST *la_xvmulwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24628,6 +26491,7 @@ IR2_INST *la_xvmulwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24641,6 +26505,7 @@ IR2_INST *la_xvmulwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24654,6 +26519,7 @@ IR2_INST *la_xvmulwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24667,6 +26533,7 @@ IR2_INST *la_xvmulwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24680,6 +26547,7 @@ IR2_INST *la_xvmulwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24693,6 +26561,7 @@ IR2_INST *la_xvmulwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24706,6 +26575,7 @@ IR2_INST *la_xvmulwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24719,6 +26589,7 @@ IR2_INST *la_xvmulwev_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24732,6 +26603,7 @@ IR2_INST *la_xvmulwev_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24745,6 +26617,7 @@ IR2_INST *la_xvmulwev_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24758,6 +26631,7 @@ IR2_INST *la_xvmulwev_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24771,6 +26645,7 @@ IR2_INST *la_xvmulwod_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24784,6 +26659,7 @@ IR2_INST *la_xvmulwod_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24797,6 +26673,7 @@ IR2_INST *la_xvmulwod_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24810,6 +26687,7 @@ IR2_INST *la_xvmulwod_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24823,6 +26701,7 @@ IR2_INST *la_xvmulwl_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24836,6 +26715,7 @@ IR2_INST *la_xvmulwl_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24849,6 +26729,7 @@ IR2_INST *la_xvmulwl_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24862,6 +26743,7 @@ IR2_INST *la_xvmulwl_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24875,6 +26757,7 @@ IR2_INST *la_xvmulwh_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24888,6 +26771,7 @@ IR2_INST *la_xvmulwh_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24901,6 +26785,7 @@ IR2_INST *la_xvmulwh_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24914,6 +26799,7 @@ IR2_INST *la_xvmulwh_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24927,6 +26813,7 @@ IR2_INST *la_xvmulwev_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24940,6 +26827,7 @@ IR2_INST *la_xvmulwev_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24953,6 +26841,7 @@ IR2_INST *la_xvmulwev_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwev_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24966,6 +26855,7 @@ IR2_INST *la_xvmulwev_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24979,6 +26869,7 @@ IR2_INST *la_xvmulwod_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -24992,6 +26883,7 @@ IR2_INST *la_xvmulwod_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25005,6 +26897,7 @@ IR2_INST *la_xvmulwod_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwod_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25018,6 +26911,7 @@ IR2_INST *la_xvmulwod_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25031,6 +26925,7 @@ IR2_INST *la_xvmulwl_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25044,6 +26939,7 @@ IR2_INST *la_xvmulwl_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25057,6 +26953,7 @@ IR2_INST *la_xvmulwl_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwl_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25070,6 +26967,7 @@ IR2_INST *la_xvmulwl_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25083,6 +26981,7 @@ IR2_INST *la_xvmulwh_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25096,6 +26995,7 @@ IR2_INST *la_xvmulwh_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25109,6 +27009,7 @@ IR2_INST *la_xvmulwh_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmulwh_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25122,6 +27023,7 @@ IR2_INST *la_xvmulwh_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmadd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25135,6 +27037,7 @@ IR2_INST *la_xvmadd_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmadd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25148,6 +27051,7 @@ IR2_INST *la_xvmadd_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmadd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25161,6 +27065,7 @@ IR2_INST *la_xvmadd_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25174,6 +27079,7 @@ IR2_INST *la_xvmadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmsub_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25187,6 +27093,7 @@ IR2_INST *la_xvmsub_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmsub_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25200,6 +27107,7 @@ IR2_INST *la_xvmsub_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmsub_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25213,6 +27121,7 @@ IR2_INST *la_xvmsub_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25226,6 +27135,7 @@ IR2_INST *la_xvmsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25239,6 +27149,7 @@ IR2_INST *la_xvmaddwev_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25252,6 +27163,7 @@ IR2_INST *la_xvmaddwev_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25265,6 +27177,7 @@ IR2_INST *la_xvmaddwev_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25278,6 +27191,7 @@ IR2_INST *la_xvmaddwev_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25291,6 +27205,7 @@ IR2_INST *la_xvmaddwod_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25304,6 +27219,7 @@ IR2_INST *la_xvmaddwod_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25317,6 +27233,7 @@ IR2_INST *la_xvmaddwod_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25330,6 +27247,7 @@ IR2_INST *la_xvmaddwod_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25343,6 +27261,7 @@ IR2_INST *la_xvmaddwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25356,6 +27275,7 @@ IR2_INST *la_xvmaddwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25369,6 +27289,7 @@ IR2_INST *la_xvmaddwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25382,6 +27303,7 @@ IR2_INST *la_xvmaddwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25395,6 +27317,7 @@ IR2_INST *la_xvmaddwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25408,6 +27331,7 @@ IR2_INST *la_xvmaddwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25421,6 +27345,7 @@ IR2_INST *la_xvmaddwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25434,6 +27359,7 @@ IR2_INST *la_xvmaddwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25447,6 +27373,7 @@ IR2_INST *la_xvmaddwev_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25460,6 +27387,7 @@ IR2_INST *la_xvmaddwev_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25473,6 +27401,7 @@ IR2_INST *la_xvmaddwev_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25486,6 +27415,7 @@ IR2_INST *la_xvmaddwev_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25499,6 +27429,7 @@ IR2_INST *la_xvmaddwod_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25512,6 +27443,7 @@ IR2_INST *la_xvmaddwod_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25525,6 +27457,7 @@ IR2_INST *la_xvmaddwod_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25538,6 +27471,7 @@ IR2_INST *la_xvmaddwod_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25551,6 +27485,7 @@ IR2_INST *la_xvmaddwl_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25564,6 +27499,7 @@ IR2_INST *la_xvmaddwl_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25577,6 +27513,7 @@ IR2_INST *la_xvmaddwl_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25590,6 +27527,7 @@ IR2_INST *la_xvmaddwl_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25603,6 +27541,7 @@ IR2_INST *la_xvmaddwh_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25616,6 +27555,7 @@ IR2_INST *la_xvmaddwh_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25629,6 +27569,7 @@ IR2_INST *la_xvmaddwh_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25642,6 +27583,7 @@ IR2_INST *la_xvmaddwh_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25655,6 +27597,7 @@ IR2_INST *la_xvmaddwev_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25668,6 +27611,7 @@ IR2_INST *la_xvmaddwev_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25681,6 +27625,7 @@ IR2_INST *la_xvmaddwev_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwev_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25694,6 +27639,7 @@ IR2_INST *la_xvmaddwev_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25707,6 +27653,7 @@ IR2_INST *la_xvmaddwod_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25720,6 +27667,7 @@ IR2_INST *la_xvmaddwod_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25733,6 +27681,7 @@ IR2_INST *la_xvmaddwod_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwod_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25746,6 +27695,7 @@ IR2_INST *la_xvmaddwod_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25759,6 +27709,7 @@ IR2_INST *la_xvmaddwl_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25772,6 +27723,7 @@ IR2_INST *la_xvmaddwl_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25785,6 +27737,7 @@ IR2_INST *la_xvmaddwl_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwl_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25798,6 +27751,7 @@ IR2_INST *la_xvmaddwl_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25811,6 +27765,7 @@ IR2_INST *la_xvmaddwh_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25824,6 +27779,7 @@ IR2_INST *la_xvmaddwh_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25837,6 +27793,7 @@ IR2_INST *la_xvmaddwh_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaddwh_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25850,6 +27807,7 @@ IR2_INST *la_xvmaddwh_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25863,6 +27821,7 @@ IR2_INST *la_xvdp2_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25876,6 +27835,7 @@ IR2_INST *la_xvdp2_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25889,6 +27849,7 @@ IR2_INST *la_xvdp2_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25902,6 +27863,7 @@ IR2_INST *la_xvdp2_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25915,6 +27877,7 @@ IR2_INST *la_xvdp2_hu_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25928,6 +27891,7 @@ IR2_INST *la_xvdp2_wu_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25941,6 +27905,7 @@ IR2_INST *la_xvdp2_du_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_qu_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25954,6 +27919,7 @@ IR2_INST *la_xvdp2_qu_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25967,6 +27933,7 @@ IR2_INST *la_xvdp2_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25980,6 +27947,7 @@ IR2_INST *la_xvdp2_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -25993,6 +27961,7 @@ IR2_INST *la_xvdp2_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26006,6 +27975,7 @@ IR2_INST *la_xvdp2_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26019,6 +27989,7 @@ IR2_INST *la_xvdp2add_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26032,6 +28003,7 @@ IR2_INST *la_xvdp2add_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26045,6 +28017,7 @@ IR2_INST *la_xvdp2add_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26058,6 +28031,7 @@ IR2_INST *la_xvdp2add_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26071,6 +28045,7 @@ IR2_INST *la_xvdp2add_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26084,6 +28059,7 @@ IR2_INST *la_xvdp2add_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26097,6 +28073,7 @@ IR2_INST *la_xvdp2add_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26110,6 +28087,7 @@ IR2_INST *la_xvdp2add_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26123,6 +28101,7 @@ IR2_INST *la_xvdp2add_h_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26136,6 +28115,7 @@ IR2_INST *la_xvdp2add_w_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26149,6 +28129,7 @@ IR2_INST *la_xvdp2add_d_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2add_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26162,6 +28143,7 @@ IR2_INST *la_xvdp2add_q_du_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2sub_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26175,6 +28157,7 @@ IR2_INST *la_xvdp2sub_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2sub_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26188,6 +28171,7 @@ IR2_INST *la_xvdp2sub_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2sub_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26201,6 +28185,7 @@ IR2_INST *la_xvdp2sub_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2sub_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26214,6 +28199,7 @@ IR2_INST *la_xvdp2sub_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2sub_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26227,6 +28213,7 @@ IR2_INST *la_xvdp2sub_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2sub_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26240,6 +28227,7 @@ IR2_INST *la_xvdp2sub_w_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2sub_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26253,6 +28241,7 @@ IR2_INST *la_xvdp2sub_d_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp2sub_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26266,6 +28255,7 @@ IR2_INST *la_xvdp2sub_q_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_w_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26279,6 +28269,7 @@ IR2_INST *la_xvdp4_w_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26292,6 +28283,7 @@ IR2_INST *la_xvdp4_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26305,6 +28297,7 @@ IR2_INST *la_xvdp4_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_w_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26318,6 +28311,7 @@ IR2_INST *la_xvdp4_w_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_d_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26331,6 +28325,7 @@ IR2_INST *la_xvdp4_d_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_q_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26344,6 +28339,7 @@ IR2_INST *la_xvdp4_q_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_w_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26357,6 +28353,7 @@ IR2_INST *la_xvdp4_w_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_d_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26370,6 +28367,7 @@ IR2_INST *la_xvdp4_d_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4_q_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26383,6 +28381,7 @@ IR2_INST *la_xvdp4_q_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_w_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26396,6 +28395,7 @@ IR2_INST *la_xvdp4add_w_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26409,6 +28409,7 @@ IR2_INST *la_xvdp4add_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26422,6 +28423,7 @@ IR2_INST *la_xvdp4add_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_w_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26435,6 +28437,7 @@ IR2_INST *la_xvdp4add_w_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_d_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26448,6 +28451,7 @@ IR2_INST *la_xvdp4add_d_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_q_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26461,6 +28465,7 @@ IR2_INST *la_xvdp4add_q_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_w_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26474,6 +28479,7 @@ IR2_INST *la_xvdp4add_w_bu_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_d_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26487,6 +28493,7 @@ IR2_INST *la_xvdp4add_d_hu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdp4add_q_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26500,6 +28507,7 @@ IR2_INST *la_xvdp4add_q_wu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdiv_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26513,6 +28521,7 @@ IR2_INST *la_xvdiv_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdiv_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26526,6 +28535,7 @@ IR2_INST *la_xvdiv_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdiv_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26539,6 +28549,7 @@ IR2_INST *la_xvdiv_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdiv_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26552,6 +28563,7 @@ IR2_INST *la_xvdiv_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmod_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26565,6 +28577,7 @@ IR2_INST *la_xvmod_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmod_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26578,6 +28591,7 @@ IR2_INST *la_xvmod_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmod_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26591,6 +28605,7 @@ IR2_INST *la_xvmod_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmod_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26604,6 +28619,7 @@ IR2_INST *la_xvmod_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdiv_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26617,6 +28633,7 @@ IR2_INST *la_xvdiv_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdiv_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26630,6 +28647,7 @@ IR2_INST *la_xvdiv_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdiv_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26643,6 +28661,7 @@ IR2_INST *la_xvdiv_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvdiv_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26656,6 +28675,7 @@ IR2_INST *la_xvdiv_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmod_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26669,6 +28689,7 @@ IR2_INST *la_xvmod_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmod_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26682,6 +28703,7 @@ IR2_INST *la_xvmod_hu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmod_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26695,6 +28717,7 @@ IR2_INST *la_xvmod_wu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmod_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26708,6 +28731,7 @@ IR2_INST *la_xvmod_du(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsll_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26721,6 +28745,7 @@ IR2_INST *la_xvsll_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsll_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26734,6 +28759,7 @@ IR2_INST *la_xvsll_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsll_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26747,6 +28773,7 @@ IR2_INST *la_xvsll_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsll_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26760,6 +28787,7 @@ IR2_INST *la_xvsll_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrl_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26773,6 +28801,7 @@ IR2_INST *la_xvsrl_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrl_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26786,6 +28815,7 @@ IR2_INST *la_xvsrl_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrl_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26799,6 +28829,7 @@ IR2_INST *la_xvsrl_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrl_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26812,6 +28843,7 @@ IR2_INST *la_xvsrl_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsra_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26825,6 +28857,7 @@ IR2_INST *la_xvsra_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsra_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26838,6 +28871,7 @@ IR2_INST *la_xvsra_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsra_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26851,6 +28885,7 @@ IR2_INST *la_xvsra_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsra_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26864,6 +28899,7 @@ IR2_INST *la_xvsra_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrotr_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26877,6 +28913,7 @@ IR2_INST *la_xvrotr_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrotr_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26890,6 +28927,7 @@ IR2_INST *la_xvrotr_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrotr_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26903,6 +28941,7 @@ IR2_INST *la_xvrotr_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrotr_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26916,6 +28955,7 @@ IR2_INST *la_xvrotr_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlr_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26929,6 +28969,7 @@ IR2_INST *la_xvsrlr_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlr_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26942,6 +28983,7 @@ IR2_INST *la_xvsrlr_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlr_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26955,6 +28997,7 @@ IR2_INST *la_xvsrlr_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlr_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26968,6 +29011,7 @@ IR2_INST *la_xvsrlr_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrar_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26981,6 +29025,7 @@ IR2_INST *la_xvsrar_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrar_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -26994,6 +29039,7 @@ IR2_INST *la_xvsrar_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrar_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27007,6 +29053,7 @@ IR2_INST *la_xvsrar_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrar_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27020,6 +29067,7 @@ IR2_INST *la_xvsrar_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrln_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27033,6 +29081,7 @@ IR2_INST *la_xvsrln_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrln_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27046,6 +29095,7 @@ IR2_INST *la_xvsrln_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrln_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27059,6 +29109,7 @@ IR2_INST *la_xvsrln_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsran_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27072,6 +29123,7 @@ IR2_INST *la_xvsran_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsran_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27085,6 +29137,7 @@ IR2_INST *la_xvsran_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsran_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27098,6 +29151,7 @@ IR2_INST *la_xvsran_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrn_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27111,6 +29165,7 @@ IR2_INST *la_xvsrlrn_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrn_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27124,6 +29179,7 @@ IR2_INST *la_xvsrlrn_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrn_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27137,6 +29193,7 @@ IR2_INST *la_xvsrlrn_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarn_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27150,6 +29207,7 @@ IR2_INST *la_xvsrarn_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarn_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27163,6 +29221,7 @@ IR2_INST *la_xvsrarn_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarn_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27176,6 +29235,7 @@ IR2_INST *la_xvsrarn_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrln_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27189,6 +29249,7 @@ IR2_INST *la_xvssrln_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrln_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27202,6 +29263,7 @@ IR2_INST *la_xvssrln_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrln_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27215,6 +29277,7 @@ IR2_INST *la_xvssrln_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssran_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27228,6 +29291,7 @@ IR2_INST *la_xvssran_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssran_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27241,6 +29305,7 @@ IR2_INST *la_xvssran_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssran_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27254,6 +29319,7 @@ IR2_INST *la_xvssran_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrn_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27267,6 +29333,7 @@ IR2_INST *la_xvssrlrn_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrn_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27280,6 +29347,7 @@ IR2_INST *la_xvssrlrn_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrn_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27293,6 +29361,7 @@ IR2_INST *la_xvssrlrn_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarn_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27306,6 +29375,7 @@ IR2_INST *la_xvssrarn_b_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarn_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27319,6 +29389,7 @@ IR2_INST *la_xvssrarn_h_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarn_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27332,6 +29403,7 @@ IR2_INST *la_xvssrarn_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrln_bu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27345,6 +29417,7 @@ IR2_INST *la_xvssrln_bu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrln_hu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27358,6 +29431,7 @@ IR2_INST *la_xvssrln_hu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrln_wu_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27371,6 +29445,7 @@ IR2_INST *la_xvssrln_wu_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssran_bu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27384,6 +29459,7 @@ IR2_INST *la_xvssran_bu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssran_hu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27397,6 +29473,7 @@ IR2_INST *la_xvssran_hu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssran_wu_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27410,6 +29487,7 @@ IR2_INST *la_xvssran_wu_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrn_bu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27423,6 +29501,7 @@ IR2_INST *la_xvssrlrn_bu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrn_hu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27436,6 +29515,7 @@ IR2_INST *la_xvssrlrn_hu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrn_wu_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27449,6 +29529,7 @@ IR2_INST *la_xvssrlrn_wu_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarn_bu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27462,6 +29543,7 @@ IR2_INST *la_xvssrarn_bu_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarn_hu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27475,6 +29557,7 @@ IR2_INST *la_xvssrarn_hu_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarn_wu_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27488,6 +29571,7 @@ IR2_INST *la_xvssrarn_wu_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitclr_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27501,6 +29585,7 @@ IR2_INST *la_xvbitclr_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitclr_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27514,6 +29599,7 @@ IR2_INST *la_xvbitclr_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitclr_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27527,6 +29613,7 @@ IR2_INST *la_xvbitclr_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitclr_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27540,6 +29627,7 @@ IR2_INST *la_xvbitclr_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitset_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27553,6 +29641,7 @@ IR2_INST *la_xvbitset_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitset_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27566,6 +29655,7 @@ IR2_INST *la_xvbitset_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitset_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27579,6 +29669,7 @@ IR2_INST *la_xvbitset_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitset_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27592,6 +29683,7 @@ IR2_INST *la_xvbitset_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitrev_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27605,6 +29697,7 @@ IR2_INST *la_xvbitrev_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitrev_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27618,6 +29711,7 @@ IR2_INST *la_xvbitrev_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitrev_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27631,6 +29725,7 @@ IR2_INST *la_xvbitrev_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitrev_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27644,6 +29739,7 @@ IR2_INST *la_xvbitrev_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc12_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27657,6 +29753,7 @@ IR2_INST *la_xvbstrc12_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc12_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27670,6 +29767,7 @@ IR2_INST *la_xvbstrc12_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc12_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27683,6 +29781,7 @@ IR2_INST *la_xvbstrc12_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc12_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27696,6 +29795,7 @@ IR2_INST *la_xvbstrc12_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc21_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27709,6 +29809,7 @@ IR2_INST *la_xvbstrc21_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc21_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27722,6 +29823,7 @@ IR2_INST *la_xvbstrc21_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc21_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27735,6 +29837,7 @@ IR2_INST *la_xvbstrc21_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc21_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27748,6 +29851,7 @@ IR2_INST *la_xvbstrc21_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpackev_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27761,6 +29865,7 @@ IR2_INST *la_xvpackev_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpackev_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27774,6 +29879,7 @@ IR2_INST *la_xvpackev_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpackev_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27787,6 +29893,7 @@ IR2_INST *la_xvpackev_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpackev_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27800,6 +29907,7 @@ IR2_INST *la_xvpackev_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpackod_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27813,6 +29921,7 @@ IR2_INST *la_xvpackod_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpackod_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27826,6 +29935,7 @@ IR2_INST *la_xvpackod_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpackod_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27839,6 +29949,7 @@ IR2_INST *la_xvpackod_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpackod_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27852,6 +29963,7 @@ IR2_INST *la_xvpackod_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvilvl_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27865,6 +29977,7 @@ IR2_INST *la_xvilvl_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvilvl_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27878,6 +29991,7 @@ IR2_INST *la_xvilvl_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvilvl_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27891,6 +30005,7 @@ IR2_INST *la_xvilvl_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvilvl_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27904,6 +30019,7 @@ IR2_INST *la_xvilvl_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvilvh_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27917,6 +30033,7 @@ IR2_INST *la_xvilvh_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvilvh_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27930,6 +30047,7 @@ IR2_INST *la_xvilvh_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvilvh_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27943,6 +30061,7 @@ IR2_INST *la_xvilvh_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvilvh_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27956,6 +30075,7 @@ IR2_INST *la_xvilvh_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickev_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27969,6 +30089,7 @@ IR2_INST *la_xvpickev_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickev_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27982,6 +30103,7 @@ IR2_INST *la_xvpickev_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickev_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -27995,6 +30117,7 @@ IR2_INST *la_xvpickev_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickev_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28008,6 +30131,7 @@ IR2_INST *la_xvpickev_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickod_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28021,6 +30145,7 @@ IR2_INST *la_xvpickod_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickod_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28034,6 +30159,7 @@ IR2_INST *la_xvpickod_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickod_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28047,6 +30173,7 @@ IR2_INST *la_xvpickod_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickod_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28060,6 +30187,7 @@ IR2_INST *la_xvpickod_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28073,6 +30201,7 @@ IR2_INST *la_xvreplve_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28086,6 +30215,7 @@ IR2_INST *la_xvreplve_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28099,6 +30229,7 @@ IR2_INST *la_xvreplve_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28112,6 +30243,7 @@ IR2_INST *la_xvreplve_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrcol_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28125,6 +30257,7 @@ IR2_INST *la_xvextrcol_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrcol_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28138,6 +30271,7 @@ IR2_INST *la_xvextrcol_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrcol_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28151,6 +30285,7 @@ IR2_INST *la_xvextrcol_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrcol_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28164,6 +30299,7 @@ IR2_INST *la_xvextrcol_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvand_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28177,6 +30313,7 @@ IR2_INST *la_xvand_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvor_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28190,6 +30327,7 @@ IR2_INST *la_xvor_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvxor_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28203,6 +30341,7 @@ IR2_INST *la_xvxor_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvnor_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28216,6 +30355,7 @@ IR2_INST *la_xvnor_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvandn_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28229,6 +30369,7 @@ IR2_INST *la_xvandn_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvorn_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28242,6 +30383,7 @@ IR2_INST *la_xvorn_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrandsign_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28255,6 +30397,7 @@ IR2_INST *la_xvrandsign_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrandsign_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28268,6 +30411,7 @@ IR2_INST *la_xvrandsign_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrorsign_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28281,6 +30425,7 @@ IR2_INST *la_xvrorsign_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrorsign_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28294,6 +30439,7 @@ IR2_INST *la_xvrorsign_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrstp_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28307,6 +30453,7 @@ IR2_INST *la_xvfrstp_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrstp_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28320,6 +30467,7 @@ IR2_INST *la_xvfrstp_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclrstrr_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28333,6 +30481,7 @@ IR2_INST *la_xvclrstrr_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND rk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclrstrv_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28346,6 +30495,7 @@ IR2_INST *la_xvclrstrv_v(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvadd_q(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28359,6 +30509,7 @@ IR2_INST *la_xvadd_q(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsub_q(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28372,6 +30523,7 @@ IR2_INST *la_xvsub_q(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsigncov_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28385,6 +30537,7 @@ IR2_INST *la_xvsigncov_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsigncov_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28398,6 +30551,7 @@ IR2_INST *la_xvsigncov_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsigncov_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28411,6 +30565,7 @@ IR2_INST *la_xvsigncov_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsigncov_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28424,6 +30579,7 @@ IR2_INST *la_xvsigncov_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28437,6 +30593,7 @@ IR2_INST *la_xvfadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28450,6 +30607,7 @@ IR2_INST *la_xvfadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28463,6 +30621,7 @@ IR2_INST *la_xvfsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28476,6 +30635,7 @@ IR2_INST *la_xvfsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfaddsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28489,6 +30649,7 @@ IR2_INST *la_xvfaddsub_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfaddsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28502,6 +30663,7 @@ IR2_INST *la_xvfaddsub_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfsubadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28515,6 +30677,7 @@ IR2_INST *la_xvfsubadd_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfsubadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28528,6 +30691,7 @@ IR2_INST *la_xvfsubadd_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmul_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28541,6 +30705,7 @@ IR2_INST *la_xvfmul_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmul_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28554,6 +30719,7 @@ IR2_INST *la_xvfmul_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfdiv_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28567,6 +30733,7 @@ IR2_INST *la_xvfdiv_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfdiv_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28580,6 +30747,7 @@ IR2_INST *la_xvfdiv_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmax_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28593,6 +30761,7 @@ IR2_INST *la_xvfmax_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmax_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28606,6 +30775,7 @@ IR2_INST *la_xvfmax_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmin_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28619,6 +30789,7 @@ IR2_INST *la_xvfmin_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmin_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28632,6 +30803,7 @@ IR2_INST *la_xvfmin_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmaxa_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28645,6 +30817,7 @@ IR2_INST *la_xvfmaxa_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmaxa_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28658,6 +30831,7 @@ IR2_INST *la_xvfmaxa_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmina_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28671,6 +30845,7 @@ IR2_INST *la_xvfmina_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfmina_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28684,6 +30859,7 @@ IR2_INST *la_xvfmina_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfscaleb_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28697,6 +30873,7 @@ IR2_INST *la_xvfscaleb_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfscaleb_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28710,6 +30887,7 @@ IR2_INST *la_xvfscaleb_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfcvt_h_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28723,6 +30901,7 @@ IR2_INST *la_xvfcvt_h_s(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfcvt_s_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28736,6 +30915,7 @@ IR2_INST *la_xvfcvt_s_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvffint_s_l(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28749,6 +30929,7 @@ IR2_INST *la_xvffint_s_l(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftint_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28762,6 +30943,7 @@ IR2_INST *la_xvftint_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrm_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28775,6 +30957,7 @@ IR2_INST *la_xvftintrm_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrp_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28788,6 +30971,7 @@ IR2_INST *la_xvftintrp_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrz_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28801,6 +30985,7 @@ IR2_INST *la_xvftintrz_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrne_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28814,6 +30999,7 @@ IR2_INST *la_xvftintrne_w_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhadd4_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28827,6 +31013,7 @@ IR2_INST *la_xvhadd4_h_bu(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf4_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28840,6 +31027,7 @@ IR2_INST *la_xvshuf4_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf2_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28853,6 +31041,7 @@ IR2_INST *la_xvshuf2_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmul_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28866,6 +31055,7 @@ IR2_INST *la_xvpmul_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmul_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28879,6 +31069,7 @@ IR2_INST *la_xvpmul_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmuh_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28892,6 +31083,7 @@ IR2_INST *la_xvpmuh_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmuh_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28905,6 +31097,7 @@ IR2_INST *la_xvpmuh_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulacc_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28918,6 +31111,7 @@ IR2_INST *la_xvpmulacc_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulacc_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28931,6 +31125,7 @@ IR2_INST *la_xvpmulacc_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmuhacc_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28944,6 +31139,7 @@ IR2_INST *la_xvpmuhacc_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmuhacc_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28957,6 +31153,7 @@ IR2_INST *la_xvpmuhacc_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28970,6 +31167,7 @@ IR2_INST *la_xvpmulwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28983,6 +31181,7 @@ IR2_INST *la_xvpmulwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -28996,6 +31195,7 @@ IR2_INST *la_xvpmulwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29009,6 +31209,7 @@ IR2_INST *la_xvpmulwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29022,6 +31223,7 @@ IR2_INST *la_xvpmulwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29035,6 +31237,7 @@ IR2_INST *la_xvpmulwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29048,6 +31251,7 @@ IR2_INST *la_xvpmulwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmulwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29061,6 +31265,7 @@ IR2_INST *la_xvpmulwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmaddwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29074,6 +31279,7 @@ IR2_INST *la_xvpmaddwl_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmaddwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29087,6 +31293,7 @@ IR2_INST *la_xvpmaddwl_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmaddwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29100,6 +31307,7 @@ IR2_INST *la_xvpmaddwl_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmaddwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29113,6 +31321,7 @@ IR2_INST *la_xvpmaddwl_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmaddwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29126,6 +31335,7 @@ IR2_INST *la_xvpmaddwh_h_b(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmaddwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29139,6 +31349,7 @@ IR2_INST *la_xvpmaddwh_w_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmaddwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29152,6 +31363,7 @@ IR2_INST *la_xvpmaddwh_d_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpmaddwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29165,6 +31377,7 @@ IR2_INST *la_xvpmaddwh_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpdp2_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29178,6 +31391,7 @@ IR2_INST *la_xvpdp2_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpdp2add_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29191,6 +31405,7 @@ IR2_INST *la_xvpdp2add_q_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvcdp4_re_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29204,6 +31419,7 @@ IR2_INST *la_xvcdp4_re_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvcdp4_im_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29217,6 +31433,7 @@ IR2_INST *la_xvcdp4_im_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvcdp4add_re_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29230,6 +31447,7 @@ IR2_INST *la_xvcdp4add_re_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvcdp4add_im_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29243,6 +31461,7 @@ IR2_INST *la_xvcdp4add_im_d_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvcdp2_re_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29256,6 +31475,7 @@ IR2_INST *la_xvcdp2_re_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvcdp2_im_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29269,6 +31489,7 @@ IR2_INST *la_xvcdp2_im_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvcdp2add_re_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29282,6 +31503,7 @@ IR2_INST *la_xvcdp2add_re_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvcdp2add_im_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29295,6 +31517,7 @@ IR2_INST *la_xvcdp2add_im_q_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsignsel_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29308,6 +31531,7 @@ IR2_INST *la_xvsignsel_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsignsel_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29321,6 +31545,7 @@ IR2_INST *la_xvsignsel_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29334,6 +31559,7 @@ IR2_INST *la_xvshuf_h(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29347,6 +31573,7 @@ IR2_INST *la_xvshuf_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29360,6 +31587,7 @@ IR2_INST *la_xvshuf_d(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvperm_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -29373,6 +31601,7 @@ IR2_INST *la_xvperm_w(IR2_OPND xd, IR2_OPND xj, IR2_OPND xk)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseqi_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29388,6 +31617,7 @@ IR2_INST *la_xvseqi_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseqi_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29403,6 +31633,7 @@ IR2_INST *la_xvseqi_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseqi_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29418,6 +31649,7 @@ IR2_INST *la_xvseqi_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseqi_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29433,6 +31665,7 @@ IR2_INST *la_xvseqi_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslei_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29448,6 +31681,7 @@ IR2_INST *la_xvslei_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslei_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29463,6 +31697,7 @@ IR2_INST *la_xvslei_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslei_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29478,6 +31713,7 @@ IR2_INST *la_xvslei_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslei_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29493,6 +31729,7 @@ IR2_INST *la_xvslei_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslei_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29508,6 +31745,7 @@ IR2_INST *la_xvslei_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslei_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29523,6 +31761,7 @@ IR2_INST *la_xvslei_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslei_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29538,6 +31777,7 @@ IR2_INST *la_xvslei_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslei_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29553,6 +31793,7 @@ IR2_INST *la_xvslei_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslti_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29568,6 +31809,7 @@ IR2_INST *la_xvslti_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslti_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29583,6 +31825,7 @@ IR2_INST *la_xvslti_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslti_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29598,6 +31841,7 @@ IR2_INST *la_xvslti_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslti_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29613,6 +31857,7 @@ IR2_INST *la_xvslti_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslti_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29628,6 +31873,7 @@ IR2_INST *la_xvslti_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslti_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29643,6 +31889,7 @@ IR2_INST *la_xvslti_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslti_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29658,6 +31905,7 @@ IR2_INST *la_xvslti_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslti_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29673,6 +31921,7 @@ IR2_INST *la_xvslti_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddi_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29688,6 +31937,7 @@ IR2_INST *la_xvaddi_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddi_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29703,6 +31953,7 @@ IR2_INST *la_xvaddi_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddi_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29718,6 +31969,7 @@ IR2_INST *la_xvaddi_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvaddi_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29733,6 +31985,7 @@ IR2_INST *la_xvaddi_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubi_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29748,6 +32001,7 @@ IR2_INST *la_xvsubi_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubi_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29763,6 +32017,7 @@ IR2_INST *la_xvsubi_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubi_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29778,6 +32033,7 @@ IR2_INST *la_xvsubi_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsubi_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29793,6 +32049,7 @@ IR2_INST *la_xvsubi_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbsll_v(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29808,6 +32065,7 @@ IR2_INST *la_xvbsll_v(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbsrl_v(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29823,6 +32081,7 @@ IR2_INST *la_xvbsrl_v(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxi_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29838,6 +32097,7 @@ IR2_INST *la_xvmaxi_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxi_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29853,6 +32113,7 @@ IR2_INST *la_xvmaxi_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxi_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29868,6 +32129,7 @@ IR2_INST *la_xvmaxi_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxi_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29883,6 +32145,7 @@ IR2_INST *la_xvmaxi_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmini_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29898,6 +32161,7 @@ IR2_INST *la_xvmini_b(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmini_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29913,6 +32177,7 @@ IR2_INST *la_xvmini_h(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmini_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29928,6 +32193,7 @@ IR2_INST *la_xvmini_w(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmini_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
 {
     assert(imm_si5 <= 0x1f);
@@ -29943,6 +32209,7 @@ IR2_INST *la_xvmini_d(IR2_OPND xd, IR2_OPND xj, int imm_si5)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxi_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29958,6 +32225,7 @@ IR2_INST *la_xvmaxi_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxi_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29973,6 +32241,7 @@ IR2_INST *la_xvmaxi_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxi_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -29988,6 +32257,7 @@ IR2_INST *la_xvmaxi_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmaxi_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30003,6 +32273,7 @@ IR2_INST *la_xvmaxi_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmini_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30018,6 +32289,7 @@ IR2_INST *la_xvmini_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmini_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30033,6 +32305,7 @@ IR2_INST *la_xvmini_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmini_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30048,6 +32321,7 @@ IR2_INST *la_xvmini_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmini_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30063,6 +32337,7 @@ IR2_INST *la_xvmini_du(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrandsigni_b(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30078,6 +32353,7 @@ IR2_INST *la_xvrandsigni_b(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrandsigni_h(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30093,6 +32369,7 @@ IR2_INST *la_xvrandsigni_h(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrorsigni_b(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30108,6 +32385,7 @@ IR2_INST *la_xvrorsigni_b(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrorsigni_h(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30123,6 +32401,7 @@ IR2_INST *la_xvrorsigni_h(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrstpi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30138,6 +32417,7 @@ IR2_INST *la_xvfrstpi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrstpi_h(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30153,6 +32433,7 @@ IR2_INST *la_xvfrstpi_h(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclrstri_v(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30168,6 +32449,7 @@ IR2_INST *la_xvclrstri_v(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmepatmsk_v(IR2_OPND xd, int imm_mode, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -30184,6 +32466,7 @@ IR2_INST *la_xvmepatmsk_v(IR2_OPND xd, int imm_mode, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclo_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30196,6 +32479,7 @@ IR2_INST *la_xvclo_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclo_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30208,6 +32492,7 @@ IR2_INST *la_xvclo_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclo_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30220,6 +32505,7 @@ IR2_INST *la_xvclo_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclo_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30232,6 +32518,7 @@ IR2_INST *la_xvclo_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclz_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30244,6 +32531,7 @@ IR2_INST *la_xvclz_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclz_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30256,6 +32544,7 @@ IR2_INST *la_xvclz_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclz_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30268,6 +32557,7 @@ IR2_INST *la_xvclz_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclz_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30280,6 +32570,7 @@ IR2_INST *la_xvclz_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpcnt_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30292,6 +32583,7 @@ IR2_INST *la_xvpcnt_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpcnt_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30304,6 +32596,7 @@ IR2_INST *la_xvpcnt_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpcnt_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30316,6 +32609,7 @@ IR2_INST *la_xvpcnt_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpcnt_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30328,6 +32622,7 @@ IR2_INST *la_xvpcnt_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvneg_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30340,6 +32635,7 @@ IR2_INST *la_xvneg_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvneg_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30352,6 +32648,7 @@ IR2_INST *la_xvneg_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvneg_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30364,6 +32661,7 @@ IR2_INST *la_xvneg_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvneg_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30376,6 +32674,7 @@ IR2_INST *la_xvneg_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmskltz_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30388,6 +32687,7 @@ IR2_INST *la_xvmskltz_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmskltz_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30400,6 +32700,7 @@ IR2_INST *la_xvmskltz_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmskltz_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30412,6 +32713,7 @@ IR2_INST *la_xvmskltz_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmskltz_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30424,6 +32726,7 @@ IR2_INST *la_xvmskltz_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmskgez_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30436,6 +32739,7 @@ IR2_INST *la_xvmskgez_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmsknz_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30448,6 +32752,7 @@ IR2_INST *la_xvmsknz_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmskcopy_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30460,6 +32765,7 @@ IR2_INST *la_xvmskcopy_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvmskfill_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30472,6 +32778,7 @@ IR2_INST *la_xvmskfill_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrstm_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30484,6 +32791,7 @@ IR2_INST *la_xvfrstm_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrstm_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30496,6 +32804,7 @@ IR2_INST *la_xvfrstm_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseteqz_v(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30508,6 +32817,7 @@ IR2_INST *la_xvseteqz_v(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetnez_v(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30520,6 +32830,7 @@ IR2_INST *la_xvsetnez_v(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetanyeqz_b(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30532,6 +32843,7 @@ IR2_INST *la_xvsetanyeqz_b(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetanyeqz_h(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30544,6 +32856,7 @@ IR2_INST *la_xvsetanyeqz_h(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetanyeqz_w(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30556,6 +32869,7 @@ IR2_INST *la_xvsetanyeqz_w(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetanyeqz_d(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30568,6 +32882,7 @@ IR2_INST *la_xvsetanyeqz_d(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetallnez_b(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30580,6 +32895,7 @@ IR2_INST *la_xvsetallnez_b(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetallnez_h(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30592,6 +32908,7 @@ IR2_INST *la_xvsetallnez_h(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetallnez_w(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30604,6 +32921,7 @@ IR2_INST *la_xvsetallnez_w(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsetallnez_d(IR2_OPND cd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30616,6 +32934,7 @@ IR2_INST *la_xvsetallnez_d(IR2_OPND cd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvflogb_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30628,6 +32947,7 @@ IR2_INST *la_xvflogb_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvflogb_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30640,6 +32960,7 @@ IR2_INST *la_xvflogb_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfclass_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30652,6 +32973,7 @@ IR2_INST *la_xvfclass_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfclass_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30664,6 +32986,7 @@ IR2_INST *la_xvfclass_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfsqrt_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30676,6 +32999,7 @@ IR2_INST *la_xvfsqrt_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfsqrt_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30688,6 +33012,7 @@ IR2_INST *la_xvfsqrt_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrecip_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30700,6 +33025,7 @@ IR2_INST *la_xvfrecip_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrecip_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30712,6 +33038,7 @@ IR2_INST *la_xvfrecip_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrsqrt_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30724,6 +33051,7 @@ IR2_INST *la_xvfrsqrt_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrsqrt_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30736,6 +33064,7 @@ IR2_INST *la_xvfrsqrt_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrint_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30748,6 +33077,7 @@ IR2_INST *la_xvfrint_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrint_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30760,6 +33090,7 @@ IR2_INST *la_xvfrint_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrintrm_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30772,6 +33103,7 @@ IR2_INST *la_xvfrintrm_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrintrm_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30784,6 +33116,7 @@ IR2_INST *la_xvfrintrm_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrintrp_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30796,6 +33129,7 @@ IR2_INST *la_xvfrintrp_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrintrp_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30808,6 +33142,7 @@ IR2_INST *la_xvfrintrp_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrintrz_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30820,6 +33155,7 @@ IR2_INST *la_xvfrintrz_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrintrz_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30832,6 +33168,7 @@ IR2_INST *la_xvfrintrz_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrintrne_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30844,6 +33181,7 @@ IR2_INST *la_xvfrintrne_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfrintrne_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30856,6 +33194,7 @@ IR2_INST *la_xvfrintrne_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextl_w_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30868,6 +33207,7 @@ IR2_INST *la_xvextl_w_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextl_d_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30880,6 +33220,7 @@ IR2_INST *la_xvextl_d_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextl_d_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30892,6 +33233,7 @@ IR2_INST *la_xvextl_d_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextl_w_bu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30904,6 +33246,7 @@ IR2_INST *la_xvextl_w_bu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextl_d_bu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30916,6 +33259,7 @@ IR2_INST *la_xvextl_d_bu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextl_d_hu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30928,6 +33272,7 @@ IR2_INST *la_xvextl_d_hu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhadd8_d_bu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30940,6 +33285,7 @@ IR2_INST *la_xvhadd8_d_bu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhminpos_w_hu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30952,6 +33298,7 @@ IR2_INST *la_xvhminpos_w_hu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhminpos_d_hu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30964,6 +33311,7 @@ IR2_INST *la_xvhminpos_d_hu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhminpos_q_hu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30976,6 +33324,7 @@ IR2_INST *la_xvhminpos_q_hu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclrtail_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -30988,6 +33337,7 @@ IR2_INST *la_xvclrtail_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvclrtail_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31000,6 +33350,7 @@ IR2_INST *la_xvclrtail_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfcvtl_s_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31012,6 +33363,7 @@ IR2_INST *la_xvfcvtl_s_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfcvth_s_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31024,6 +33376,7 @@ IR2_INST *la_xvfcvth_s_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfcvtl_d_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31036,6 +33389,7 @@ IR2_INST *la_xvfcvtl_d_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvfcvth_d_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31048,6 +33402,7 @@ IR2_INST *la_xvfcvth_d_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvffint_s_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31060,6 +33415,7 @@ IR2_INST *la_xvffint_s_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvffint_s_wu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31072,6 +33428,7 @@ IR2_INST *la_xvffint_s_wu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvffint_d_l(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31084,6 +33441,7 @@ IR2_INST *la_xvffint_d_l(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvffint_d_lu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31096,6 +33454,7 @@ IR2_INST *la_xvffint_d_lu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvffintl_d_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31108,6 +33467,7 @@ IR2_INST *la_xvffintl_d_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvffinth_d_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31120,6 +33480,7 @@ IR2_INST *la_xvffinth_d_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftint_w_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31132,6 +33493,7 @@ IR2_INST *la_xvftint_w_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftint_l_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31144,6 +33506,7 @@ IR2_INST *la_xvftint_l_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrm_w_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31156,6 +33519,7 @@ IR2_INST *la_xvftintrm_w_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrm_l_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31168,6 +33532,7 @@ IR2_INST *la_xvftintrm_l_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrp_w_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31180,6 +33545,7 @@ IR2_INST *la_xvftintrp_w_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrp_l_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31192,6 +33558,7 @@ IR2_INST *la_xvftintrp_l_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrz_w_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31204,6 +33571,7 @@ IR2_INST *la_xvftintrz_w_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrz_l_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31216,6 +33584,7 @@ IR2_INST *la_xvftintrz_l_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrne_w_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31228,6 +33597,7 @@ IR2_INST *la_xvftintrne_w_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrne_l_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31240,6 +33610,7 @@ IR2_INST *la_xvftintrne_l_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftint_wu_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31252,6 +33623,7 @@ IR2_INST *la_xvftint_wu_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftint_lu_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31264,6 +33636,7 @@ IR2_INST *la_xvftint_lu_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrz_wu_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31276,6 +33649,7 @@ IR2_INST *la_xvftintrz_wu_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrz_lu_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31288,6 +33662,7 @@ IR2_INST *la_xvftintrz_lu_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintl_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31300,6 +33675,7 @@ IR2_INST *la_xvftintl_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftinth_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31312,6 +33688,7 @@ IR2_INST *la_xvftinth_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrml_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31324,6 +33701,7 @@ IR2_INST *la_xvftintrml_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrmh_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31336,6 +33714,7 @@ IR2_INST *la_xvftintrmh_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrpl_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31348,6 +33727,7 @@ IR2_INST *la_xvftintrpl_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrph_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31360,6 +33740,7 @@ IR2_INST *la_xvftintrph_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrzl_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31372,6 +33753,7 @@ IR2_INST *la_xvftintrzl_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrzh_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31384,6 +33766,7 @@ IR2_INST *la_xvftintrzh_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrnel_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31396,6 +33779,7 @@ IR2_INST *la_xvftintrnel_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvftintrneh_l_s(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31408,6 +33792,7 @@ IR2_INST *la_xvftintrneh_l_s(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvexth_h_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31420,6 +33805,7 @@ IR2_INST *la_xvexth_h_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvexth_w_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31432,6 +33818,7 @@ IR2_INST *la_xvexth_w_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvexth_d_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31444,6 +33831,7 @@ IR2_INST *la_xvexth_d_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvexth_q_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31456,6 +33844,7 @@ IR2_INST *la_xvexth_q_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvexth_hu_bu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31468,6 +33857,7 @@ IR2_INST *la_xvexth_hu_bu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvexth_wu_hu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31480,6 +33870,7 @@ IR2_INST *la_xvexth_wu_hu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvexth_du_wu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31492,6 +33883,7 @@ IR2_INST *la_xvexth_du_wu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvexth_qu_du(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31504,6 +33896,7 @@ IR2_INST *la_xvexth_qu_du(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplgr2vr_b(IR2_OPND xd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31516,6 +33909,7 @@ IR2_INST *la_xvreplgr2vr_b(IR2_OPND xd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplgr2vr_h(IR2_OPND xd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31528,6 +33922,7 @@ IR2_INST *la_xvreplgr2vr_h(IR2_OPND xd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplgr2vr_w(IR2_OPND xd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31540,6 +33935,7 @@ IR2_INST *la_xvreplgr2vr_w(IR2_OPND xd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplgr2vr_d(IR2_OPND xd, IR2_OPND rj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31552,6 +33948,7 @@ IR2_INST *la_xvreplgr2vr_d(IR2_OPND xd, IR2_OPND rj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_h_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31564,6 +33961,7 @@ IR2_INST *la_vext2xv_h_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_w_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31576,6 +33974,7 @@ IR2_INST *la_vext2xv_w_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_d_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31588,6 +33987,7 @@ IR2_INST *la_vext2xv_d_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_w_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31600,6 +34000,7 @@ IR2_INST *la_vext2xv_w_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_d_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31612,6 +34013,7 @@ IR2_INST *la_vext2xv_d_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_d_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31624,6 +34026,7 @@ IR2_INST *la_vext2xv_d_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_hu_bu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31636,6 +34039,7 @@ IR2_INST *la_vext2xv_hu_bu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_wu_bu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31648,6 +34052,7 @@ IR2_INST *la_vext2xv_wu_bu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_du_bu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31660,6 +34065,7 @@ IR2_INST *la_vext2xv_du_bu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_wu_hu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31672,6 +34078,7 @@ IR2_INST *la_vext2xv_wu_hu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_du_hu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31684,6 +34091,7 @@ IR2_INST *la_vext2xv_du_hu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_vext2xv_du_wu(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -31696,6 +34104,7 @@ IR2_INST *la_vext2xv_du_wu(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvhseli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -31711,6 +34120,7 @@ IR2_INST *la_xvhseli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrotri_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -31726,6 +34136,7 @@ IR2_INST *la_xvrotri_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrotri_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -31741,6 +34152,7 @@ IR2_INST *la_xvrotri_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrotri_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -31756,6 +34168,7 @@ IR2_INST *la_xvrotri_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrotri_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -31771,6 +34184,7 @@ IR2_INST *la_xvrotri_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlri_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -31786,6 +34200,7 @@ IR2_INST *la_xvsrlri_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlri_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -31801,6 +34216,7 @@ IR2_INST *la_xvsrlri_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlri_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -31816,6 +34232,7 @@ IR2_INST *la_xvsrlri_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlri_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -31831,6 +34248,7 @@ IR2_INST *la_xvsrlri_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrari_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -31846,6 +34264,7 @@ IR2_INST *la_xvsrari_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrari_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -31861,6 +34280,7 @@ IR2_INST *la_xvsrari_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrari_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -31876,6 +34296,7 @@ IR2_INST *la_xvsrari_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrari_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -31891,6 +34312,7 @@ IR2_INST *la_xvsrari_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvinsgr2vr_w(IR2_OPND xd, IR2_OPND rj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -31906,6 +34328,7 @@ IR2_INST *la_xvinsgr2vr_w(IR2_OPND xd, IR2_OPND rj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvinsgr2vr_d(IR2_OPND xd, IR2_OPND rj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -31921,6 +34344,7 @@ IR2_INST *la_xvinsgr2vr_d(IR2_OPND xd, IR2_OPND rj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickve2gr_w(IR2_OPND rd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -31936,6 +34360,7 @@ IR2_INST *la_xvpickve2gr_w(IR2_OPND rd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickve2gr_d(IR2_OPND rd, IR2_OPND xj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -31951,6 +34376,7 @@ IR2_INST *la_xvpickve2gr_d(IR2_OPND rd, IR2_OPND xj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickve2gr_wu(IR2_OPND rd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -31966,6 +34392,7 @@ IR2_INST *la_xvpickve2gr_wu(IR2_OPND rd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickve2gr_du(IR2_OPND rd, IR2_OPND xj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -31981,6 +34408,7 @@ IR2_INST *la_xvpickve2gr_du(IR2_OPND rd, IR2_OPND xj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrepl128vei_b(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -31996,6 +34424,7 @@ IR2_INST *la_xvrepl128vei_b(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrepl128vei_h(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32011,6 +34440,7 @@ IR2_INST *la_xvrepl128vei_h(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrepl128vei_w(IR2_OPND xd, IR2_OPND xj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -32026,6 +34456,7 @@ IR2_INST *la_xvrepl128vei_w(IR2_OPND xd, IR2_OPND xj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvrepl128vei_d(IR2_OPND xd, IR2_OPND xj, int imm_ui1)
 {
     assert(imm_ui1 <= 0x1);
@@ -32041,6 +34472,7 @@ IR2_INST *la_xvrepl128vei_d(IR2_OPND xd, IR2_OPND xj, int imm_ui1)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrcoli_b(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32056,6 +34488,7 @@ IR2_INST *la_xvextrcoli_b(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrcoli_h(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32071,6 +34504,7 @@ IR2_INST *la_xvextrcoli_h(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrcoli_w(IR2_OPND xd, IR2_OPND xj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -32086,6 +34520,7 @@ IR2_INST *la_xvextrcoli_w(IR2_OPND xd, IR2_OPND xj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrcoli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui1)
 {
     assert(imm_ui1 <= 0x1);
@@ -32101,6 +34536,7 @@ IR2_INST *la_xvextrcoli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui1)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvinsve0_w(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32116,6 +34552,7 @@ IR2_INST *la_xvinsve0_w(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvinsve0_d(IR2_OPND xd, IR2_OPND xj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -32131,6 +34568,7 @@ IR2_INST *la_xvinsve0_d(IR2_OPND xd, IR2_OPND xj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickve_w(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32146,6 +34584,7 @@ IR2_INST *la_xvpickve_w(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpickve_d(IR2_OPND xd, IR2_OPND xj, int imm_ui2)
 {
     assert(imm_ui2 <= 0x3);
@@ -32161,6 +34600,7 @@ IR2_INST *la_xvpickve_d(IR2_OPND xd, IR2_OPND xj, int imm_ui2)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve0_b(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32173,6 +34613,7 @@ IR2_INST *la_xvreplve0_b(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve0_h(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32185,6 +34626,7 @@ IR2_INST *la_xvreplve0_h(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve0_w(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32197,6 +34639,7 @@ IR2_INST *la_xvreplve0_w(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve0_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32209,6 +34652,7 @@ IR2_INST *la_xvreplve0_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvreplve0_q(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32221,6 +34665,7 @@ IR2_INST *la_xvreplve0_q(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsllwil_h_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32236,6 +34681,7 @@ IR2_INST *la_xvsllwil_h_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsllwil_w_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32251,6 +34697,7 @@ IR2_INST *la_xvsllwil_w_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsllwil_d_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32266,6 +34713,7 @@ IR2_INST *la_xvsllwil_d_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextl_q_d(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32278,6 +34726,7 @@ IR2_INST *la_xvextl_q_d(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsllwil_hu_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32293,6 +34742,7 @@ IR2_INST *la_xvsllwil_hu_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsllwil_wu_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32308,6 +34758,7 @@ IR2_INST *la_xvsllwil_wu_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsllwil_du_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32323,6 +34774,7 @@ IR2_INST *la_xvsllwil_du_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextl_qu_du(IR2_OPND xd, IR2_OPND xj)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32335,6 +34787,7 @@ IR2_INST *la_xvextl_qu_du(IR2_OPND xd, IR2_OPND xj)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitclri_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32350,6 +34803,7 @@ IR2_INST *la_xvbitclri_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitclri_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32365,6 +34819,7 @@ IR2_INST *la_xvbitclri_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitclri_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32380,6 +34835,7 @@ IR2_INST *la_xvbitclri_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitclri_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -32395,6 +34851,7 @@ IR2_INST *la_xvbitclri_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitseti_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32410,6 +34867,7 @@ IR2_INST *la_xvbitseti_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitseti_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32425,6 +34883,7 @@ IR2_INST *la_xvbitseti_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitseti_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32440,6 +34899,7 @@ IR2_INST *la_xvbitseti_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitseti_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -32455,6 +34915,7 @@ IR2_INST *la_xvbitseti_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitrevi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32470,6 +34931,7 @@ IR2_INST *la_xvbitrevi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitrevi_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32485,6 +34947,7 @@ IR2_INST *la_xvbitrevi_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitrevi_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32500,6 +34963,7 @@ IR2_INST *la_xvbitrevi_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitrevi_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -32515,6 +34979,7 @@ IR2_INST *la_xvbitrevi_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc12i_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32530,6 +34995,7 @@ IR2_INST *la_xvbstrc12i_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc12i_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32545,6 +35011,7 @@ IR2_INST *la_xvbstrc12i_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc12i_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32560,6 +35027,7 @@ IR2_INST *la_xvbstrc12i_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc12i_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -32575,6 +35043,7 @@ IR2_INST *la_xvbstrc12i_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc21i_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32590,6 +35059,7 @@ IR2_INST *la_xvbstrc21i_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc21i_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32605,6 +35075,7 @@ IR2_INST *la_xvbstrc21i_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc21i_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32620,6 +35091,7 @@ IR2_INST *la_xvbstrc21i_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbstrc21i_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -32635,6 +35107,7 @@ IR2_INST *la_xvbstrc21i_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsat_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32650,6 +35123,7 @@ IR2_INST *la_xvsat_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsat_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32665,6 +35139,7 @@ IR2_INST *la_xvsat_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsat_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32680,6 +35155,7 @@ IR2_INST *la_xvsat_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsat_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -32695,6 +35171,7 @@ IR2_INST *la_xvsat_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsat_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32710,6 +35187,7 @@ IR2_INST *la_xvsat_bu(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsat_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32725,6 +35203,7 @@ IR2_INST *la_xvsat_hu(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsat_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32740,6 +35219,7 @@ IR2_INST *la_xvsat_wu(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsat_du(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     assert(imm_ui6 <= 0x3f);
@@ -32755,6 +35235,7 @@ IR2_INST *la_xvsat_du(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslli_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     assert(imm_ui3 <= 0x7);
@@ -32770,6 +35251,7 @@ IR2_INST *la_xvslli_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslli_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     assert(imm_ui4 <= 0xf);
@@ -32785,6 +35267,7 @@ IR2_INST *la_xvslli_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslli_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     assert(imm_ui5l <= 0x1f);
@@ -32800,6 +35283,7 @@ IR2_INST *la_xvslli_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvslli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32814,6 +35298,7 @@ IR2_INST *la_xvslli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrli_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32828,6 +35313,7 @@ IR2_INST *la_xvsrli_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrli_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32842,6 +35328,7 @@ IR2_INST *la_xvsrli_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrli_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32856,6 +35343,7 @@ IR2_INST *la_xvsrli_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32870,6 +35358,7 @@ IR2_INST *la_xvsrli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrai_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32884,6 +35373,7 @@ IR2_INST *la_xvsrai_b(IR2_OPND xd, IR2_OPND xj, int imm_ui3)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrai_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32898,6 +35388,7 @@ IR2_INST *la_xvsrai_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrai_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32912,6 +35403,7 @@ IR2_INST *la_xvsrai_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrai_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32926,6 +35418,7 @@ IR2_INST *la_xvsrai_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrneni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32940,6 +35433,7 @@ IR2_INST *la_xvsrlrneni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrneni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32954,6 +35448,7 @@ IR2_INST *la_xvsrlrneni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrneni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32968,6 +35463,7 @@ IR2_INST *la_xvsrlrneni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrneni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32982,6 +35478,7 @@ IR2_INST *la_xvsrlrneni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarneni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -32996,6 +35493,7 @@ IR2_INST *la_xvsrarneni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarneni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33010,6 +35508,7 @@ IR2_INST *la_xvsrarneni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarneni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33024,6 +35523,7 @@ IR2_INST *la_xvsrarneni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarneni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33038,6 +35538,7 @@ IR2_INST *la_xvsrarneni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33052,6 +35553,7 @@ IR2_INST *la_xvsrlni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33066,6 +35568,7 @@ IR2_INST *la_xvsrlni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33080,6 +35583,7 @@ IR2_INST *la_xvsrlni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33094,6 +35598,7 @@ IR2_INST *la_xvsrlni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33108,6 +35613,7 @@ IR2_INST *la_xvsrlrni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33122,6 +35628,7 @@ IR2_INST *la_xvsrlrni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33136,6 +35643,7 @@ IR2_INST *la_xvsrlrni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrlrni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33150,6 +35658,7 @@ IR2_INST *la_xvsrlrni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33164,6 +35673,7 @@ IR2_INST *la_xvssrlni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33178,6 +35688,7 @@ IR2_INST *la_xvssrlni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33192,6 +35703,7 @@ IR2_INST *la_xvssrlni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33206,6 +35718,7 @@ IR2_INST *la_xvssrlni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33220,6 +35733,7 @@ IR2_INST *la_xvssrlni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33234,6 +35748,7 @@ IR2_INST *la_xvssrlni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33248,6 +35763,7 @@ IR2_INST *la_xvssrlni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33262,6 +35778,7 @@ IR2_INST *la_xvssrlni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33276,6 +35793,7 @@ IR2_INST *la_xvssrlrni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33290,6 +35808,7 @@ IR2_INST *la_xvssrlrni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33304,6 +35823,7 @@ IR2_INST *la_xvssrlrni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33318,6 +35838,7 @@ IR2_INST *la_xvssrlrni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33332,6 +35853,7 @@ IR2_INST *la_xvssrlrni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33346,6 +35868,7 @@ IR2_INST *la_xvssrlrni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33360,6 +35883,7 @@ IR2_INST *la_xvssrlrni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33374,6 +35898,7 @@ IR2_INST *la_xvssrlrni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrani_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33388,6 +35913,7 @@ IR2_INST *la_xvsrani_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrani_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33402,6 +35928,7 @@ IR2_INST *la_xvsrani_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrani_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33416,6 +35943,7 @@ IR2_INST *la_xvsrani_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrani_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33430,6 +35958,7 @@ IR2_INST *la_xvsrani_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33444,6 +35973,7 @@ IR2_INST *la_xvsrarni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33458,6 +35988,7 @@ IR2_INST *la_xvsrarni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33472,6 +36003,7 @@ IR2_INST *la_xvsrarni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvsrarni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33486,6 +36018,7 @@ IR2_INST *la_xvsrarni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrani_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33500,6 +36033,7 @@ IR2_INST *la_xvssrani_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrani_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33514,6 +36048,7 @@ IR2_INST *la_xvssrani_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrani_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33528,6 +36063,7 @@ IR2_INST *la_xvssrani_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrani_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33542,6 +36078,7 @@ IR2_INST *la_xvssrani_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrani_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33556,6 +36093,7 @@ IR2_INST *la_xvssrani_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrani_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33570,6 +36108,7 @@ IR2_INST *la_xvssrani_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrani_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33584,6 +36123,7 @@ IR2_INST *la_xvssrani_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrani_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33598,6 +36138,7 @@ IR2_INST *la_xvssrani_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33612,6 +36153,7 @@ IR2_INST *la_xvssrarni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33626,6 +36168,7 @@ IR2_INST *la_xvssrarni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33640,6 +36183,7 @@ IR2_INST *la_xvssrarni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33654,6 +36198,7 @@ IR2_INST *la_xvssrarni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33668,6 +36213,7 @@ IR2_INST *la_xvssrarni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33682,6 +36228,7 @@ IR2_INST *la_xvssrarni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33696,6 +36243,7 @@ IR2_INST *la_xvssrarni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33710,6 +36258,7 @@ IR2_INST *la_xvssrarni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrneni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33724,6 +36273,7 @@ IR2_INST *la_xvssrlrneni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrneni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33738,6 +36288,7 @@ IR2_INST *la_xvssrlrneni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrneni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33752,6 +36303,7 @@ IR2_INST *la_xvssrlrneni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrneni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33766,6 +36318,7 @@ IR2_INST *la_xvssrlrneni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrneni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33780,6 +36333,7 @@ IR2_INST *la_xvssrlrneni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrneni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33794,6 +36348,7 @@ IR2_INST *la_xvssrlrneni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrneni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33808,6 +36363,7 @@ IR2_INST *la_xvssrlrneni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrlrneni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33822,6 +36378,7 @@ IR2_INST *la_xvssrlrneni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarneni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33836,6 +36393,7 @@ IR2_INST *la_xvssrarneni_b_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarneni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33850,6 +36408,7 @@ IR2_INST *la_xvssrarneni_h_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarneni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33864,6 +36423,7 @@ IR2_INST *la_xvssrarneni_w_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarneni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33878,6 +36438,7 @@ IR2_INST *la_xvssrarneni_d_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarneni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33892,6 +36453,7 @@ IR2_INST *la_xvssrarneni_bu_h(IR2_OPND xd, IR2_OPND xj, int imm_ui4)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarneni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33906,6 +36468,7 @@ IR2_INST *la_xvssrarneni_hu_w(IR2_OPND xd, IR2_OPND xj, int imm_ui5l)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarneni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33920,6 +36483,7 @@ IR2_INST *la_xvssrarneni_wu_d(IR2_OPND xd, IR2_OPND xj, int imm_ui6)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvssrarneni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33934,6 +36498,7 @@ IR2_INST *la_xvssrarneni_du_q(IR2_OPND xd, IR2_OPND xj, int imm_ui7)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrins_d(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33948,6 +36513,7 @@ IR2_INST *la_xvextrins_d(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrins_w(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33962,6 +36528,7 @@ IR2_INST *la_xvextrins_w(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrins_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33976,6 +36543,7 @@ IR2_INST *la_xvextrins_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvextrins_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -33990,6 +36558,7 @@ IR2_INST *la_xvextrins_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf4i_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34004,6 +36573,7 @@ IR2_INST *la_xvshuf4i_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf4i_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34018,6 +36588,7 @@ IR2_INST *la_xvshuf4i_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf4i_w(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34032,6 +36603,7 @@ IR2_INST *la_xvshuf4i_w(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshuf4i_d(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34046,6 +36618,7 @@ IR2_INST *la_xvshuf4i_d(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshufi1_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34060,6 +36633,7 @@ IR2_INST *la_xvshufi1_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshufi2_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34074,6 +36648,7 @@ IR2_INST *la_xvshufi2_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshufi3_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34088,6 +36663,7 @@ IR2_INST *la_xvshufi3_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshufi4_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34102,6 +36678,7 @@ IR2_INST *la_xvshufi4_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshufi1_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34116,6 +36693,7 @@ IR2_INST *la_xvshufi1_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvshufi2_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34130,6 +36708,7 @@ IR2_INST *la_xvshufi2_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseli_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34144,6 +36723,7 @@ IR2_INST *la_xvseli_h(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseli_w(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34158,6 +36738,7 @@ IR2_INST *la_xvseli_w(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvseli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34172,6 +36753,7 @@ IR2_INST *la_xvseli_d(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitseli_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34186,6 +36768,7 @@ IR2_INST *la_xvbitseli_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitmvzi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34200,6 +36783,7 @@ IR2_INST *la_xvbitmvzi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvbitmvnzi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34214,6 +36798,7 @@ IR2_INST *la_xvbitmvnzi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvandi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34228,6 +36813,7 @@ IR2_INST *la_xvandi_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvori_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34242,6 +36828,7 @@ IR2_INST *la_xvori_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvxori_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34256,6 +36843,7 @@ IR2_INST *la_xvxori_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvnori_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34270,6 +36858,7 @@ IR2_INST *la_xvnori_b(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvldi(IR2_OPND xd, int imm_i13)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34283,6 +36872,7 @@ IR2_INST *la_xvldi(IR2_OPND xd, int imm_i13)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpermi_w(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34297,6 +36887,7 @@ IR2_INST *la_xvpermi_w(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpermi_d(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();
@@ -34311,6 +36902,7 @@ IR2_INST *la_xvpermi_d(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
     return pir2;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *la_xvpermi_q(IR2_OPND xd, IR2_OPND xj, int imm_ui8)
 {
     IR2_INST *pir2 = ir2_allocate();

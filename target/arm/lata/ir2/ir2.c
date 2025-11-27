@@ -66,6 +66,7 @@ static const char *ir2_name(int value)
 #endif
 }
 
+inline __attribute__ ((always_inline))
 void ir2_opnd_build_none(IR2_OPND *opnd)
 {
     opnd->_type = IR2_OPND_NONE;
@@ -73,6 +74,7 @@ void ir2_opnd_build_none(IR2_OPND *opnd)
     opnd->_assist = 0;
 }
 
+inline __attribute__ ((always_inline))
 IR2_OPND ir2_opnd_new_none(void)
 {
     IR2_OPND opnd;
@@ -80,6 +82,7 @@ IR2_OPND ir2_opnd_new_none(void)
     return opnd;
 }
 
+inline __attribute__ ((always_inline))
 void ir2_opnd_build_type(IR2_OPND *opnd, IR2_OPND_TYPE t)
 {
     lsassert(t == IR2_OPND_LABEL);
@@ -87,6 +90,7 @@ void ir2_opnd_build_type(IR2_OPND *opnd, IR2_OPND_TYPE t)
     opnd->_label_id = ++(lsenv->tr_data->label_num);
 }
 
+inline __attribute__ ((always_inline))
 IR2_OPND ir2_opnd_new_type(IR2_OPND_TYPE t)
 {
     IR2_OPND opnd;
@@ -94,6 +98,7 @@ IR2_OPND ir2_opnd_new_type(IR2_OPND_TYPE t)
     return opnd;
 }
 
+inline __attribute__ ((always_inline))
 void ir2_opnd_build(IR2_OPND *opnd, IR2_OPND_TYPE t, int value)
 {
     if (t == IR2_OPND_GPR || t == IR2_OPND_FPR || t == IR2_OPND_FCSR ||
@@ -109,6 +114,7 @@ void ir2_opnd_build(IR2_OPND *opnd, IR2_OPND_TYPE t, int value)
     }
 }
 
+inline __attribute__ ((always_inline))
 IR2_OPND ir2_opnd_new(IR2_OPND_TYPE type, int value)
 {
     IR2_OPND opnd;
@@ -118,6 +124,7 @@ IR2_OPND ir2_opnd_new(IR2_OPND_TYPE type, int value)
     return opnd;
 }
 
+inline __attribute__ ((always_inline))
 void ir2_opnd_build2(IR2_OPND *opnd, IR2_OPND_TYPE type, int base, int16 offset)
 {
     lsassert(type == IR2_OPND_MEM);
@@ -126,6 +133,7 @@ void ir2_opnd_build2(IR2_OPND *opnd, IR2_OPND_TYPE type, int base, int16 offset)
     opnd->_offset = offset;
 }
 
+inline __attribute__ ((always_inline))
 IR2_OPND ir2_opnd_new2(IR2_OPND_TYPE type, int base, int16 offset)
 {
     IR2_OPND opnd;
@@ -135,11 +143,13 @@ IR2_OPND ir2_opnd_new2(IR2_OPND_TYPE type, int base, int16 offset)
     return opnd;
 }
 
+inline __attribute__ ((always_inline))
 int32 ir2_opnd_imm(const IR2_OPND *opnd)
 {
     return opnd->_imm32;
 }
 
+inline __attribute__ ((always_inline))
 int32 ir2_opnd_offset(const IR2_OPND *opnd)
 {
     lsassertm(ir2_opnd_is_mem(opnd), "This IR2 must be a MEM type!");
@@ -147,73 +157,87 @@ int32 ir2_opnd_offset(const IR2_OPND *opnd)
 }
 
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_is_ireg(const IR2_OPND *opnd)
 {
     return opnd->_type == IR2_OPND_GPR;
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_is_freg(const IR2_OPND *opnd)
 {
     return opnd->_type == IR2_OPND_FPR;
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_is_creg(const IR2_OPND *opnd)
 {
     return opnd->_type == IR2_OPND_FCSR;
 }
 
+inline __attribute__ ((always_inline))
 int32 ir2_opnd_label_id(const IR2_OPND *opnd)
 {
     return opnd->_label_id;
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_is_itemp(const IR2_OPND *opnd)
 {
     return (ir2_opnd_is_ireg(opnd) &&
             (reg_itemp_reverse_map[ir2_opnd_base_reg_num(opnd)] >= 0));
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_is_ftemp(const IR2_OPND *opnd)
 {
     return (ir2_opnd_is_freg(opnd) &&
             (reg_ftemp_reverse_map[ir2_opnd_base_reg_num(opnd)] >= 0));
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_is_mem(const IR2_OPND *opnd)
 {
     return opnd->_type == IR2_OPND_MEM;
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_is_imm(const IR2_OPND *opnd)
 {
     return opnd->_type == IR2_OPND_IMM;
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_is_label(const IR2_OPND *opnd)
 {
     return opnd->_type == IR2_OPND_LABEL;
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_base_reg_num(const IR2_OPND *opnd)
 {
     return opnd->_reg_num;
 }
 
+inline __attribute__ ((always_inline))
 IR2_OPND_TYPE ir2_opnd_type(const IR2_OPND *opnd)
 {
     return (IR2_OPND_TYPE)opnd->_type;
 }
 
+inline __attribute__ ((always_inline))
 void ir2_set_opnd_type(IR2_OPND *opnd, const IR2_OPND_TYPE type)
 {
     opnd->_type = type;
 }
 
+inline __attribute__ ((always_inline))
 int ir2_opnd_cmp(const IR2_OPND *opnd1, const IR2_OPND *opnd2)
 {
     return opnd1->_type == opnd2->_type && opnd1->val == opnd2->val;
 }
 
+inline __attribute__ ((always_inline))
 void ir2_opnd_convert_label_to_imm(IR2_OPND *opnd, int imm)
 {
     lsassert(ir2_opnd_is_label(opnd));
@@ -290,12 +314,14 @@ int ir2_opnd_to_string(IR2_OPND *opnd, char *str, bool hex)
     }
 }
 
+inline __attribute__ ((always_inline))
 bool ir2_opcode_is_branch(IR2_OPCODE opcode)
 {
     return (opcode >= LISA_BEQZ && opcode <= LISA_BCNEZ) ||
            (opcode >= LISA_B && opcode <= LISA_BGEU);
 }
 
+inline __attribute__ ((always_inline))
 bool ir2_opcode_is_branch_with_3opnds(IR2_OPCODE opcode)
 {
     if (opcode >= LISA_BEQ && opcode <= LISA_BGEU) {
@@ -304,11 +330,13 @@ bool ir2_opcode_is_branch_with_3opnds(IR2_OPCODE opcode)
     return false;
 }
 
+inline __attribute__ ((always_inline))
 bool ir2_opcode_is_branch_with_2opnds(IR2_OPCODE opcode)
 {
     return (opcode == LISA_BEQZ || opcode == LISA_BNEZ);
 }
 
+inline __attribute__ ((always_inline))
 bool ir2_opcode_is_f_branch(IR2_OPCODE opcode)
 {
     return (opcode == LISA_BCEQZ || opcode == LISA_BCNEZ);
@@ -333,31 +361,37 @@ bool ir2_opcode_is_convert(IR2_OPCODE opcode)
     }
 }
 
+inline __attribute__ ((always_inline))
 bool ir2_opcode_is_fcmp(IR2_OPCODE opcode)
 {
     return (opcode == LISA_FCMP_COND_S || opcode == LISA_FCMP_COND_D);
 }
 
+inline __attribute__ ((always_inline))
 void ir2_set_id(IR2_INST *ir2, int id)
 {
     ir2->_id = id;
 }
 
+inline __attribute__ ((always_inline))
 int ir2_get_id(const IR2_INST *ir2)
 {
     return ir2->_id;
 }
 
+inline __attribute__ ((always_inline))
 IR2_OPCODE ir2_opcode(const IR2_INST *ir2)
 {
     return (IR2_OPCODE)(ir2->_opcode);
 }
 
+inline __attribute__ ((always_inline))
 void ir2_set_opcode(IR2_INST *ir2, IR2_OPCODE type)
 {
     ir2->_opcode = type;
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *ir2_prev(const IR2_INST *ir2)
 {
     if (ir2->_prev == -1) {
@@ -367,6 +401,7 @@ IR2_INST *ir2_prev(const IR2_INST *ir2)
     }
 }
 
+inline __attribute__ ((always_inline))
 IR2_INST *ir2_next(const IR2_INST *ir2)
 {
     if (ir2->_next == -1) {
@@ -434,6 +469,7 @@ int ir2_dump(IR2_INST *ir2)
     return size;
 }
 
+inline __attribute__ ((always_inline))
 void ir2_build(IR2_INST *ir2, IR2_OPCODE opcode, IR2_OPND opnd0, IR2_OPND opnd1,
                IR2_OPND opnd2)
 {
@@ -629,6 +665,7 @@ bool la_ir2_opcode_is_store(IR2_OPCODE opcode)
     return false;
 }
 
+inline __attribute__ ((always_inline))
 IR2_OPND create_immh_opnd(int val)
 {
     IR2_OPND res;
