@@ -1353,6 +1353,10 @@ static void tcg_context_init(unsigned max_cpus)
     tcg_debug_assert(!tcg_regset_test_reg(s->reserved_regs, TCG_AREG0));
     ts = tcg_global_reg_new_internal(s, TCG_TYPE_PTR, TCG_AREG0, "env");
     cpu_env = temp_tcgv_ptr(ts);
+    
+    tcg_ctx->gen_insn_data =
+        tcg_malloc(sizeof(uint64_t) * 50 * TCG_MAX_INSNS *
+                   TARGET_INSN_START_WORDS);
 }
 
 void tcg_init(size_t tb_size, int splitwx, unsigned max_cpus)
@@ -1373,21 +1377,19 @@ TranslationBlock *tcg_tb_alloc(TCGContext *s)
 
  retry:
  #ifdef CONFIG_SPLIT_TB
-    tb = (void *)ROUND_UP((uintptr_t)s->tb_gen_head, align);
-    void *next_tb = (void *)ROUND_UP((uintptr_t)(tb + 1), align);
-    if (unlikely(next_tb > s->tb_gen_highwater)) {
-        if (tcg_region_alloc(s)) {
-            return NULL;
-        }
-        goto retry;
-    }
-    qatomic_set(&s->tb_gen_head, next_tb);
-    next = (void *)ROUND_UP((uintptr_t)s->code_gen_ptr, align);
+     tb = (void *)ROUND_UP((uintptr_t)s->tb_gen_head, align);
+     next = (void *)ROUND_UP((uintptr_t)(tb + 1), align);
+     if (unlikely(next > s->tb_head_highwater)) {
+         if (tcg_region_alloc(s)) {
+             return NULL;
+         }
+         goto retry;
+     }
+    qatomic_set(&s->tb_gen_head, next);
 #else
 
     tb = (void *)ROUND_UP((uintptr_t)s->code_gen_ptr, align);
     next = (void *)ROUND_UP((uintptr_t)(tb + 1), align);
-#endif
 
     if (unlikely(next > s->code_gen_highwater)) {
         if (tcg_region_alloc(s)) {
@@ -1396,6 +1398,8 @@ TranslationBlock *tcg_tb_alloc(TCGContext *s)
         goto retry;
     }
     qatomic_set(&s->code_gen_ptr, next);
+#endif
+
     s->data_gen_ptr = NULL;
     return tb;
 }
@@ -1412,21 +1416,19 @@ TranslationBlock *tcg_tb_alloc_full(TCGContext *s)
  #ifdef CONFIG_SPLIT_TB
     tb = (void *)ROUND_UP((uintptr_t)s->tb_gen_head, align);
     new_s_data = (void *)ROUND_UP((uintptr_t)(tb + 1), align);
-    void *next_tb = (void *)ROUND_UP((uintptr_t)(new_s_data + 1), align);
-    if (unlikely(next_tb > s->tb_gen_highwater)) {
+    next = (void *)ROUND_UP((uintptr_t)(new_s_data + 1), align);
+    if (unlikely(next > s->tb_head_highwater)) {
         if (tcg_region_alloc(s)) {
             return NULL;
         }
         goto retry;
     }
-    qatomic_set(&s->tb_gen_head, next_tb);
-    next = (void *)ROUND_UP((uintptr_t)s->code_gen_ptr, align);
+    qatomic_set(&s->tb_gen_head, next);
 #else
 
     tb = (void *)ROUND_UP((uintptr_t)s->code_gen_ptr, align);
     new_s_data = (void *)ROUND_UP((uintptr_t)(tb + 1), align);
     next = (void *)ROUND_UP((uintptr_t)(new_s_data + 1), align);
-#endif
 
     if (unlikely(next > s->code_gen_highwater)) {
         if (tcg_region_alloc(s)) {
@@ -1435,6 +1437,8 @@ TranslationBlock *tcg_tb_alloc_full(TCGContext *s)
         goto retry;
     }
     qatomic_set(&s->code_gen_ptr, next);
+#endif
+
     s->data_gen_ptr = NULL;
     tb->s_data = new_s_data;
     return tb;

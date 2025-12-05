@@ -90,6 +90,8 @@ int translate_tb_in_tu(struct TranslationBlock *tb)
 {
     tb->tc.ptr = tcg_splitwx_to_rx(tcg_ctx->code_gen_ptr);
     tcg_ctx->gen_tb = tb;
+    if(tb->last_ir1_type == IR1_TYPE_PROXY)
+        return gen_func_wrap(tb);
     return tr_translate_tb(tb);
 }
 
@@ -103,9 +105,6 @@ static inline void tu_enough_space(CPUState *cpu)
         cpu->exception_index = EXCP_INTERRUPT;
         cpu_loop_exit(cpu);
     }
-    tcg_ctx->gen_insn_data =
-        tcg_malloc(sizeof(uint64_t) * MAX_TB_IN_TU * TCG_MAX_INSNS *
-                   TARGET_INSN_START_WORDS);
 }
 
 static void tu_reset_tb(TranslationBlock *tb)
@@ -139,6 +138,8 @@ static void tu_reset_tb(TranslationBlock *tb)
     tb->tu_unlink_stub_offset = TU_UNLINK_STUB_INVALID;
 }
 
+#include "android.h"
+
 /* Create a TB and initialize it. */
 static TranslationBlock *tb_create(CPUState *cpu, uint64_t pc, uint64_t cs_base,
                                    uint32_t flags, int cflags, int max_insns,
@@ -163,9 +164,18 @@ static TranslationBlock *tb_create(CPUState *cpu, uint64_t pc, uint64_t cs_base,
     tb->cflags = cflags;
     tb->last_ir1_type = 0;
     tb->env = cpu->env_ptr;
-    target_disasm(tb, &max_insns, cpu);
+    tb->next_tb[TU_TB_INDEX_NEXT] = NULL;
+    tb->next_tb[TU_TB_INDEX_TARGET] = NULL;
+    uint64_t berberis_pc = (uint64_t)g_hash_table_lookup(berberis_guest_host,
+                                                (gpointer)pc);
+    if (unlikely(berberis_pc)) {
+        tb->last_ir1_type = IR1_TYPE_PROXY;
+        tb->icount = 0;
+    } else {
+        target_disasm(tb, &max_insns, cpu);
+    }
 
-    if (tb->icount == 0 || tb->s_data->tu_tb_mode == TU_TB_MODE_BROKEN) {
+    if (tb->icount == 0 && tb->last_ir1_type != IR1_TYPE_PROXY || tb->s_data->tu_tb_mode == TU_TB_MODE_BROKEN) {
         return NULL;
     }
 
@@ -199,7 +209,6 @@ static inline void get_tu_queue(CPUState *cpu, target_ulong cs_base,
         ir1_target_pc = tb->target_pc;
         switch (tb->last_ir1_type) {
         case IR1_TYPE_BRANCH:
-        case IR1_TYPE_CALL:
             /* Jcc next tb should be translated without checking */
             lsassert(ir1_next_pc);
             if (get_page(tb->pc) == get_page(ir1_next_pc)) {
@@ -259,7 +268,7 @@ static inline void get_tu_queue(CPUState *cpu, target_ulong cs_base,
                     target_tb = tb_htable_lookup(cpu, ir1_target_pc, cs_base,
                                                  flags, cflags);
                 }
-                if (get_page(tb->pc) == get_page(ir1_target_pc) && !target_tb) {
+                if (!target_tb) {
                     target_tb = tb_create(cpu, ir1_target_pc, cs_base, flags,
                                           cflags, max_insns, 0);
                     tu_push_back(target_tb);
@@ -269,6 +278,7 @@ static inline void get_tu_queue(CPUState *cpu, target_ulong cs_base,
                 tb->next_tb[TU_TB_INDEX_TARGET] = NULL;
             }
             break;
+        case IR1_TYPE_CALL:
         case IR1_TYPE_CALLIN:
         case IR1_TYPE_NORMAL:
         case IR1_TYPE_SYSCALL:
@@ -291,6 +301,9 @@ static inline void get_tu_queue(CPUState *cpu, target_ulong cs_base,
             break;
         case IR1_TYPE_RET:
         case IR1_TYPE_JMPIN:
+        case IR1_TYPE_PROXY:
+            tb->next_tb[TU_TB_INDEX_NEXT] = NULL;
+            tb->next_tb[TU_TB_INDEX_TARGET] = NULL;
             break;
         default:
             lsassert(0);
@@ -499,14 +512,33 @@ void translate_tu(TranslationBlock **tb_list)
         tb = tb_list[i];
         tb->tu_unlink_stub_offset = TU_UNLINK_STUB_INVALID;
         gen_code_size = translate_tb_in_tu(tb);
-        lata_fast_jmp_cache_add(tb->env, tb->pc, (uint64_t)(tb->tc.ptr));
+        // lata_fast_jmp_cache_add(tb->env, tb->pc, (uint64_t)(tb->tc.ptr));
         tu_data->curr_insns = tb->icount;
+#ifdef CONFIG_SPLIT_TB
+        search_size = encode_search(tb, (void *)(tcg_ctx->tb_gen_tail));
+#else
+        search_size =
+            encode_search(tb, (void *)(tcg_ctx->code_gen_ptr) + gen_code_size);
+#endif
+        search_buff_offset[i] = search_size;
+        tb->tc.size = gen_code_size;
+        tb->tc.offset_in_tu = tb->tc.ptr - tb_list[0]->tc.ptr;
+#ifdef CONFIG_SPLIT_TB
         qatomic_set(
             &tcg_ctx->code_gen_ptr,
             (void *)ROUND_UP((uintptr_t)tcg_ctx->code_gen_ptr + gen_code_size,
                              CODE_GEN_ALIGN));
-        tb->tc.size = gen_code_size;
-        tb->tc.offset_in_tu = tb->tc.ptr - tb_list[0]->tc.ptr;
+        qatomic_set(
+            &tcg_ctx->tb_gen_tail,
+            (void *)ROUND_UP((uintptr_t)tcg_ctx->tb_gen_tail + search_size,
+                             CODE_GEN_ALIGN));
+#else
+        qatomic_set(&tcg_ctx->code_gen_ptr,
+                    (void *)ROUND_UP((uintptr_t)tcg_ctx->code_gen_ptr +
+                                         gen_code_size + search_size,
+                                     CODE_GEN_ALIGN));
+#endif
+
         /* init original jump addresses which have been set during
          * tcg_gen_code() */
         if (tb->jmp_reset_offset[0] != TB_JMP_OFFSET_INVALID) {
@@ -516,9 +548,6 @@ void translate_tu(TranslationBlock **tb_list)
             tb_reset_jump(tb, 1);
         }
 
-        search_buff_offset[i] = search_size;
-        search_size += encode_search(tb, (void *)(tcg_ctx->tb_gen_tail) +
-                                             search_buff_offset[i]);
     }
 
     tb_list[0]->s_data->tu_size = tcg_ctx->code_gen_ptr - tb_list[0]->tc.ptr;
@@ -544,8 +573,13 @@ void translate_tu(TranslationBlock **tb_list)
     /*search data*/
     for (int i = 0; i < tb_num_in_tu; i++) {
         tb = tb_list[i];
+#ifdef CONFIG_SPLIT_TB
         tb->tu_search_addr =
             (uint8_t *)((void *)(tcg_ctx->tb_gen_tail) + search_buff_offset[i]);
+#else
+        tb->tu_search_addr = (uint8_t *)((void *)(tcg_ctx->code_gen_ptr) +
+                                         gen_code_size + search_buff_offset[i]);
+#endif
     }
     tb_list[0]->s_data->tu_size = tcg_ctx->code_gen_ptr - tb_list[0]->tc.ptr;
 }

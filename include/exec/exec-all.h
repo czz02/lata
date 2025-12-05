@@ -47,6 +47,7 @@ bool cpu_unwind_state_data(CPUState *cpu, uintptr_t host_pc, uint64_t *data);
  * Attempt to trasnslate tb from ir1 to ir2
  */
 int tr_translate_tb(struct TranslationBlock *tb);
+int gen_func_wrap(struct TranslationBlock *tb);
 
 TranslationBlock *tb_htable_lookup(CPUState *cpu, vaddr pc,
                                           uint64_t cs_base, uint32_t flags,

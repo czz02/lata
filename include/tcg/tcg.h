@@ -532,6 +532,7 @@ struct TCGContext {
     void *tb_gen_head;
     void *tb_gen_tail;
     void *tb_gen_highwater;
+    void *tb_head_highwater;
 #endif
     /* Threshold to flush the translated code buffer.  */
     void *code_gen_highwater;

@@ -19,6 +19,7 @@
 #include "qemu/osdep.h"
 #include "env.h"
 #include "la-ir2.h"
+#include "lata.h"
 #include "reg-alloc.h"
 
 #ifdef CONFIG_LATA
@@ -249,14 +250,14 @@ static void lata_unallocated_encoding(DisasContext *s)
 static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
                                 int tbi)
 {
-#ifndef CONFIG_ANDROID
+// #ifndef CONFIG_ANDROID
     if (tbi == 0) {
         /* Load unmodified address */
     } else {
         /* lata only support user-mode, we don't need Sign-extend */
         la_bstrpick_d(*dst, *src, 56, 0);
     }
-#endif
+// #endif
 }
 
 
@@ -739,19 +740,22 @@ void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
 
     la_st_d(s5_ir2_opnd, env_ir2_opnd, env_offset_pc());
 
-    for (int i = 0; i <= 31; ++i) {
-        if (arm_la_map[i] > 0 && arm_abi_map[i] > 0) {
-            la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
-                    env_offset_gpr(i));
-        }
-    }
+    // for (int i = 0; i <= 31; ++i) {
+    //     if (arm_la_map[i] > 0 && arm_abi_map[i] > 0) {
+    //         la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+    //                 env_offset_gpr(i));
+    //     }
+    // }
 
-    for (int i = 0; i <= 31; ++i) {
-        if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 0) {
-            la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
-                   env_offset_fpr(i));
-        }
-    }
+    // for (int i = 0; i <= 31; ++i) {
+    //     if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 0) {
+    //         la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+    //                env_offset_fpr(i));
+    //     }
+    // }
+    //
+
+    lata_gen_call_helper_prologue(tcg_ctx);
 
     la_mov64(a1_ir2_opnd, env_ir2_opnd);
 
@@ -761,20 +765,22 @@ void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
     li_d(temp, host_func);
     la_jirl(ra_ir2_opnd, temp, 0);
 
+    lata_gen_call_helper_epilogue(tcg_ctx);
 
-    for (int i = 0; i <= 31; ++i) {
-        if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 1) {
-            la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
-                   env_offset_fpr(i));
-        }
-    }
 
-    for (int i = 0; i <= 31; ++i) {
-        if (arm_la_map[i] > 0 && arm_abi_map[i] > 1) {
-            la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
-                    env_offset_gpr(i));
-        }
-    }
+    // for (int i = 0; i <= 31; ++i) {
+    //     if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 1) {
+    //         la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+    //                env_offset_fpr(i));
+    //     }
+    // }
+
+    // for (int i = 0; i <= 31; ++i) {
+    //     if (arm_la_map[i] > 0 && arm_abi_map[i] > 1) {
+    //         la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+    //                 env_offset_gpr(i));
+    //     }
+    // }
 
     IR2_OPND ir2_opnd_addr;
     int64_t curr_ins_pos =
@@ -1205,7 +1211,8 @@ static bool trans_MSR_i_DIT(DisasContext *s)
 
 static bool trans_MSR_i_TCO(DisasContext *s)
 {
-    assert(0);
+    // assert(0);
+    return true;
 }
 
 static bool trans_MSR_i_DAIFSET(DisasContext *s)
@@ -1352,16 +1359,17 @@ static void lata_helper_dc_zva(DisasContext *s, int rt)
 
 static G_NORETURN void never_reach(const char *msg)
 {
-    lsassertm(0, "%s\n", msg);
+    // lsassertm(0, "%s\n", msg);
+    assert(0);
 }
 
-static void gen_never_reach(DisasContext *ctx, const char *msg)
+static void gen_never_reach(const char *msg)
 {
     IR2_OPND temp = ra_alloc_itemp();
 
     li_d(a0_ir2_opnd, (uint64_t)msg);
     li_d(temp, (uint64_t)never_reach);
-    la_jirl(ra_ir2_opnd, temp, 0);
+    la_jirl(zero_ir2_opnd, temp, 0);
 
     free_alloc_gpr(temp);
 
@@ -1389,7 +1397,7 @@ static void handle_sys(DisasContext *s, bool isread, unsigned int op0,
         /* Unknown register; this might be a guest error or a QEMU
          * unimplemented feature.
          */
-        gen_never_reach(s, "Unknown register");
+        gen_never_reach("Unknown register");
         return;
     }
 
@@ -12073,7 +12081,7 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
         assert(0);
         break;
     case 0x17: /* UABDL, UABDL2 */
-        assert(0);
+        gen_never_reach("uadbl");
         break;
     case 0x18: /* UMLAL, UMLAL2 */
     case 0x1a: /* UMLSL, UMLSL2 */
@@ -13724,7 +13732,7 @@ static void handle_rev(DisasContext *s, int opcode, bool u, bool is_q, int size,
         }
         break;
     case 2: /* REV16 */
-        assert(0);
+        gen_never_reach("rev 16 not support");
         break;
     }
 
@@ -15049,7 +15057,7 @@ static void disas_crypto_aes(DisasContext *s, uint32_t insn)
  */
 static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
 {
-    assert(0);
+    gen_never_reach("disas_crypto_three_reg_sha");
 }
 
 /* Crypto two-reg SHA
@@ -15060,7 +15068,7 @@ static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
  */
 static void disas_crypto_two_reg_sha(DisasContext *s, uint32_t insn)
 {
-    assert(0);
+    gen_never_reach("disas_crypto_two_reg_sha");
 }
 
 /* Crypto three-reg SHA512

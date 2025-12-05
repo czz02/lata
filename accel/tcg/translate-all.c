@@ -266,29 +266,6 @@ void page_init(void)
     page_table_config_init();
 }
 
-/*
-    trasnlate ir1->ir2->host instractions
-*/
-int tr_translate_tb(struct TranslationBlock *tb)
-{
-#ifdef CONFIG_LATA
-    tr_init(tb);
-    tcg_insn_unit *gen_code_buf;
-    gen_code_buf = tcg_ctx->code_gen_ptr;
-    tr_ir2_generate(tb);
-    int gen_code_size = tr_ir2_assemble(gen_code_buf) * 4;
-    tb->codesize = gen_code_size;
-    free(((DisasContext *)tb->ir1)->base);
-    free(tb->ir1);
-    tr_fini();
-
-    return gen_code_size;
-#else
-    return tcg_gen_code(tcg_ctx, tb, tb->pc);
-#endif
-}
-
-
 #ifdef CONFIG_ANDROID
 #include "android.h"
 
@@ -308,22 +285,51 @@ static inline int tr_translate_wrap(struct TranslationBlock *tb,
     return gen_code_size;
 }
 
-static inline int gen_func_wrap(TranslationBlock *tb, vaddr pc)
+int gen_func_wrap(TranslationBlock *tb)
 {
     uint64_t berberis_pc =
-        (uint64_t)g_hash_table_lookup(berberis_guest_host, (gpointer)pc);
+        (uint64_t)g_hash_table_lookup(berberis_guest_host, (gpointer)tb->pc);
 
-    if (!berberis_pc)
-        return 0;
+    // if (likely(!berberis_pc))
+    //     return 0;
 
     uint64_t callee =
-        (uint64_t)g_hash_table_lookup(berberis_guest_callee, (gpointer)pc);
+        (uint64_t)g_hash_table_lookup(berberis_guest_callee, (gpointer)tb->pc);
     // printf("before wrap host_pc : %p , pc : %p, callee : %p\n",
     //        (void *)pc, (void *)berberis_pc, (void *)callee);
     return tr_translate_wrap(tb, berberis_pc, callee);
 }
 
 #endif
+
+/*
+    trasnlate ir1->ir2->host instractions
+*/
+int tr_translate_tb(struct TranslationBlock *tb)
+{
+    int gen_code_size;
+#ifdef CONFIG_LATA
+// #ifdef CONFIG_ANDROID
+//     gen_code_size = gen_func_wrap(tb, tb->pc);
+//     if(unlikely(gen_code_size)) return gen_code_size;
+// #endif
+    tr_init(tb);
+    tcg_insn_unit *gen_code_buf;
+    gen_code_buf = tcg_ctx->code_gen_ptr;
+    tr_ir2_generate(tb);
+    gen_code_size = tr_ir2_assemble(gen_code_buf) * 4;
+    tb->codesize = gen_code_size;
+    free(((DisasContext *)tb->ir1)->base);
+    free(tb->ir1);
+    tr_fini();
+
+    return gen_code_size;
+#else
+    return tcg_gen_code(tcg_ctx, tb, tb->pc);
+#endif
+}
+
+
 /*
  * Isolate the portion of code gen which can setjmp/longjmp.
  * Return the size of the generated code, or negative on error.
@@ -339,8 +345,8 @@ static int setjmp_gen_code(CPUArchState *env, TranslationBlock *tb, vaddr pc,
     tcg_func_start(tcg_ctx);
 
     tcg_ctx->cpu = env_cpu(env);
-    tcg_ctx->gen_insn_data =
-        tcg_malloc(sizeof(uint64_t) * (*max_insns) * tcg_ctx->insn_start_words);
+    // tcg_ctx->gen_insn_data =
+    //     tcg_malloc(sizeof(uint64_t) * (*max_insns) * tcg_ctx->insn_start_words);
 
 #ifdef CONFIG_LATA
     target_disasm(tb, max_insns, env_cpu(env));
@@ -353,11 +359,6 @@ static int setjmp_gen_code(CPUArchState *env, TranslationBlock *tb, vaddr pc,
 
     return tr_translate_tb(tb);
 }
-
-
-#ifdef CONFIG_ANDROID
-#include "android.h"
-#endif
 
 /* Called with mmap_lock held for user mode emulation.  */
 TranslationBlock *tb_gen_code(CPUState *cpu, vaddr pc, uint64_t cs_base,
@@ -439,31 +440,6 @@ buffer_overflow:
     tb->nzcv_save[1] = TB_JMP_OFFSET_INVALID;
     tb->nzcv_use = true;
 #endif
-#endif
-
-    // push_queue(&q4pc, pc);
-
-#ifdef CONFIG_ANDROID
-    gen_code_size = gen_func_wrap(tb, pc);
-    if (gen_code_size) {
-        gen_code_buf = tcg_ctx->code_gen_ptr;
-        tb->tc.ptr = tcg_splitwx_to_rx(gen_code_buf);
-        tb->tc.size = gen_code_size;
-        // tb_link_page(tb);
-        qatomic_set(&tcg_ctx->code_gen_ptr,
-                    (void *)ROUND_UP((uintptr_t)gen_code_buf + gen_code_size,
-                                     CODE_GEN_ALIGN));
-        qemu_spin_init(&tb->jmp_lock);
-        tb->jmp_list_head = (uintptr_t)NULL;
-        tb->jmp_list_next[0] = (uintptr_t)NULL;
-        tb->jmp_list_next[1] = (uintptr_t)NULL;
-        tb->jmp_dest[0] = (uintptr_t)NULL;
-        tb->jmp_dest[1] = (uintptr_t)NULL;
-
-        tcg_tb_insert(tb);
-
-        return tb;
-    }
 #endif
 
 restart_translate:
@@ -634,6 +610,10 @@ restart_translate:
     qatomic_set(&tcg_ctx->code_gen_ptr,
                 (void *)ROUND_UP(((uintptr_t)gen_code_buf + gen_code_size),
                                  CODE_GEN_ALIGN));
+    qatomic_set(
+        &tcg_ctx->tb_gen_tail,
+        (void *)ROUND_UP(((uintptr_t)tcg_ctx->tb_gen_tail + search_size),
+                         CODE_GEN_ALIGN));
 #else
     qatomic_set(
         &tcg_ctx->code_gen_ptr,

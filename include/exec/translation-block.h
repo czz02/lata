@@ -71,6 +71,7 @@ typedef enum AARCH64_TYPE {
     IR1_TYPE_JMPIN,
     IR1_TYPE_RET,
     IR1_TYPE_SYSCALL,
+    IR1_TYPE_PROXY,
 } AARCH64_TYPE;
 #endif
 

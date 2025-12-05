@@ -181,6 +181,9 @@ void lsenv_register_thread(CPUArchState *env)
     lsenv = &lsenv_real;
     lsenv->cpu_state = env;
     lsenv->tr_data = &tr_data_real;
+#ifdef CONFIG_LATA_TU
+    tu_control_init();
+#endif
 }
 
 void tr_init(void *tb)

@@ -684,7 +684,7 @@ static bool alloc_tb_gen_head(size_t size)
     qemu_madvise(buf, size, QEMU_MADV_HUGEPAGE);
 
     tcg_ctx->tb_gen_head = buf;
-    tcg_ctx->tb_gen_highwater = buf + size - 1024;
+    tcg_ctx->tb_head_highwater = buf + size - 1024;
     return true;
 }
 
