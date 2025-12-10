@@ -269,35 +269,19 @@ void page_init(void)
 #ifdef CONFIG_ANDROID
 #include "android.h"
 
-static inline int tr_translate_wrap(struct TranslationBlock *tb,
+static int tr_translate_wrap(struct TranslationBlock *tb,
                                     uint64_t host_pc, uint64_t callee)
 {
     tr_init(tb);
     tcg_insn_unit *gen_code_buf;
     gen_code_buf = tcg_ctx->code_gen_ptr;
-    // printf("host_pc : %p callee : %p\n", (void*)host_pc, (void*)callee);
     lata_gen_func_wrap(tb, host_pc, callee);
+    tb->icount = 0;
     int gen_code_size = tr_ir2_assemble(gen_code_buf) * 4;
     tb->codesize = gen_code_size;
-    // assert(!tb->ir1);
     tr_fini();
 
     return gen_code_size;
-}
-
-int gen_func_wrap(TranslationBlock *tb)
-{
-    uint64_t berberis_pc =
-        (uint64_t)g_hash_table_lookup(berberis_guest_host, (gpointer)tb->pc);
-
-    // if (likely(!berberis_pc))
-    //     return 0;
-
-    uint64_t callee =
-        (uint64_t)g_hash_table_lookup(berberis_guest_callee, (gpointer)tb->pc);
-    // printf("before wrap host_pc : %p , pc : %p, callee : %p\n",
-    //        (void *)pc, (void *)berberis_pc, (void *)callee);
-    return tr_translate_wrap(tb, berberis_pc, callee);
 }
 
 #endif
@@ -309,18 +293,23 @@ int tr_translate_tb(struct TranslationBlock *tb)
 {
     int gen_code_size;
 #ifdef CONFIG_LATA
-// #ifdef CONFIG_ANDROID
-//     gen_code_size = gen_func_wrap(tb, tb->pc);
-//     if(unlikely(gen_code_size)) return gen_code_size;
-// #endif
+#ifdef CONFIG_ANDROID
+    gpointer pc_key = (gpointer)tb->pc;
+    uint64_t berberis_pc =
+        (uint64_t)g_hash_table_lookup(berberis_guest_host, pc_key);
+
+    if (unlikely(berberis_pc != 0)) {
+        uint64_t callee =
+            (uint64_t)g_hash_table_lookup(berberis_guest_callee, pc_key);
+        return tr_translate_wrap(tb, berberis_pc, callee);
+    }
+#endif
     tr_init(tb);
     tcg_insn_unit *gen_code_buf;
     gen_code_buf = tcg_ctx->code_gen_ptr;
     tr_ir2_generate(tb);
     gen_code_size = tr_ir2_assemble(gen_code_buf) * 4;
     tb->codesize = gen_code_size;
-    free(((DisasContext *)tb->ir1)->base);
-    free(tb->ir1);
     tr_fini();
 
     return gen_code_size;
@@ -345,8 +334,8 @@ static int setjmp_gen_code(CPUArchState *env, TranslationBlock *tb, vaddr pc,
     tcg_func_start(tcg_ctx);
 
     tcg_ctx->cpu = env_cpu(env);
-    // tcg_ctx->gen_insn_data =
-    //     tcg_malloc(sizeof(uint64_t) * (*max_insns) * tcg_ctx->insn_start_words);
+    tcg_ctx->gen_insn_data =
+        tcg_malloc(sizeof(uint64_t) * (*max_insns) * tcg_ctx->insn_start_words);
 
 #ifdef CONFIG_LATA
     target_disasm(tb, max_insns, env_cpu(env));
