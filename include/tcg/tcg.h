@@ -35,6 +35,7 @@
 #include "tcg-target.h"
 #include "tcg/tcg-cond.h"
 #include "tcg/debug-assert.h"
+#include <stdint.h>
 
 /* XXX: make safe guess about sizes */
 #define MAX_OP_PER_INSTR 266
@@ -537,6 +538,8 @@ struct TCGContext {
     /* Threshold to flush the translated code buffer.  */
     void *code_gen_highwater;
 
+    uint64_t try_inline;
+
     /* Track which vCPU triggers events */
     CPUState *cpu;                      /* *_trans */
 
@@ -593,6 +596,7 @@ extern uintptr_t tcg_splitwx_diff;
 extern TCGv_env cpu_env;
 
 bool in_code_gen_buffer(const void *p);
+uint64_t code_gen_buffer_offset(const void *p);
 
 #ifdef CONFIG_DEBUG_TCG
 const void *tcg_splitwx_to_rx(void *rw);

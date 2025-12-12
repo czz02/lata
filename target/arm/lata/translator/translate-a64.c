@@ -803,8 +803,18 @@ static bool trans_BL(DisasContext *s)
         }
     }
 
+    struct TranslationBlock *curr_tb = s->base->tb;
+    vaddr next_pc = s->base->pc_next;
+    vaddr target_pc = s->pc_curr + a->imm;
+
+    TranslationBlock *next_tb = tb_htable_lookup(current_cpu, target_pc, curr_tb->cs_base, curr_tb->flags, curr_tb->cflags);
+    if(next_tb && next_tb->last_ir1_type == IR1_TYPE_RET){
+       tcg_ctx->try_inline = target_pc; 
+       return true;
+    }
+
     IR2_OPND x30 = alloc_gpr_dst(30);
-    li_d(x30, s->base->pc_next); /* BL setting X30 to PC+4 */
+    li_d(x30, next_pc); /* BL setting X30 to PC+4 */
     store_gpr_dst(30, x30);
 
     gen_goto_tb(s, 1, a->imm);
@@ -15431,36 +15441,36 @@ static void disas_a64_legacy(DisasContext *s, uint32_t insn)
     }
 }
 
-#ifdef CONFIG_LATA_TU
-void get_last_info(TranslationBlock *tb, DisasContext *s)
+// #ifdef CONFIG_LATA_TU
+static void get_last_info(TranslationBlock *tb, DisasContext *s)
 {
     switch (s->insn_type) {
     case AARCH64_A64_B:
         tb->last_ir1_type = IR1_TYPE_JMP;
-        tb->target_pc = s->pc_curr + ((arg_i)(s->arg.f_i)).imm;
+        // tb->target_pc = s->pc_curr + ((arg_i)(s->arg.f_i)).imm;
         break;
     case AARCH64_A64_BR:
         tb->last_ir1_type = IR1_TYPE_JMPIN;
         break;
     case AARCH64_A64_BL:
         tb->last_ir1_type = IR1_TYPE_CALL;
-        tb->target_pc = s->pc_curr + ((arg_i)(s->arg.f_i)).imm;
+        // tb->target_pc = s->pc_curr + ((arg_i)(s->arg.f_i)).imm;
         break;
     case AARCH64_A64_BLR:
         tb->last_ir1_type = IR1_TYPE_CALLIN;
         break;
     case AARCH64_A64_B_cond:
         tb->last_ir1_type = IR1_TYPE_BRANCH;
-        tb->target_pc =
-            s->pc_curr + ((arg_B_cond)(s->arg.f_decode_insn3211)).imm;
+        // tb->target_pc =
+        //     s->pc_curr + ((arg_B_cond)(s->arg.f_decode_insn3211)).imm;
         break;
     case AARCH64_A64_TBZ:
         tb->last_ir1_type = IR1_TYPE_BRANCH;
-        tb->target_pc = s->pc_curr + ((arg_tbz)(s->arg.f_tbz)).imm;
+        // tb->target_pc = s->pc_curr + ((arg_tbz)(s->arg.f_tbz)).imm;
         break;
     case AARCH64_A64_CBZ:
         tb->last_ir1_type = IR1_TYPE_BRANCH;
-        tb->target_pc = s->pc_curr + ((arg_cbz)(s->arg.f_cbz)).imm;
+        // tb->target_pc = s->pc_curr + ((arg_cbz)(s->arg.f_cbz)).imm;
         break;
     case AARCH64_A64_RET:
         tb->last_ir1_type = IR1_TYPE_RET;
@@ -15473,7 +15483,7 @@ void get_last_info(TranslationBlock *tb, DisasContext *s)
         break;
     }
 }
-#endif
+// #endif
 
 static void set_base_isjump(DisasContext *s)
 {
@@ -15526,17 +15536,7 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
         aarch64_tr_init_disas_context(pir1, cpu);
         tcg_debug_assert(db->is_jmp == DISAS_NEXT); /* no early exit */
 
-        /* Disassemble one instruction.  The translate_insn hook should
-           update db->pc_next and db->is_jmp to indicate what should be
-           done next -- either exiting this loop or locate the start of
-           the next instruction.  */
-        if (db->num_insns == db->max_insns && (cflags & CF_LAST_IO)) {
-            translate_aarch64_insn(pir1, cpu);
-        } else {
-            /* we should only see CF_MEMI_ONLY for io_recompile */
-            tcg_debug_assert(!(cflags & CF_MEMI_ONLY));
-            translate_aarch64_insn(pir1, cpu);
-        }
+        translate_aarch64_insn(pir1, cpu);
 
 #ifdef CONFIG_LATA_TU
         if (pir1->insn_type == AARCH64_A64_NULL) {
@@ -15556,10 +15556,10 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
 
         /* Stop translation if the output buffer is full,
            or we have executed all of the allowed instructions.  */
-        if (db->num_insns >= db->max_insns) {
-            db->is_jmp = DISAS_TOO_MANY;
-            break;
-        }
+        // if (db->num_insns >= db->max_insns) {
+        //     db->is_jmp = DISAS_TOO_MANY;
+        //     break;
+        // }
     }
 
     tb->size = db->pc_next - db->pc_first;
@@ -15590,12 +15590,64 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
     }
 #endif
 
+    get_last_info(tb, pir1);
 #ifdef CONFIG_LATA_TU
     tb->next_pc = db->pc_next;
     get_last_info(tb, pir1);
 #endif
 
     return ir1_list;
+}
+
+/*
+    generate ir1_list
+*/
+static void get_more_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
+                           int max_insns)
+{
+    // DisasContext *ir1_list =
+    DisasContext *pir1 = NULL;
+
+    /* Initialize DisasContextBase */
+    DisasContextBase *db = &db_rel;
+    bool resume_ret = false;
+    vaddr pc_restore = db->pc_next;    
+    
+    db->pc_next = pc;
+
+    while (true) {
+        max_insns = db->num_insns;
+        pir1 = &ir1_list[max_insns];
+        pir1->base = db;
+        pir1->insn_type = AARCH64_A64_NULL;
+        aarch64_tr_init_disas_context(pir1, cpu);
+
+        translate_aarch64_insn(pir1, cpu);
+
+        db->num_insns++;
+
+        /* Stop translation if translate_insn so indicated.  */
+        if (db->is_jmp != DISAS_NEXT && resume_ret) {
+            break;
+        }
+
+        if (ir1_is_ret(pir1) && !resume_ret) {
+            resume_ret = true;
+            db->pc_next = pc_restore;
+            db->is_jmp = DISAS_NEXT;
+            db->num_insns --;
+        }
+
+        // /* Stop translation if the output buffer is full,
+        //    or we have executed all of the allowed instructions.  */
+        // if (db->num_insns >= db->max_insns) {
+        //     db->is_jmp = DISAS_TOO_MANY;
+        //     break;
+        // }
+    }
+
+    tb->size = db->pc_next - db->pc_first;
+    tb->icount = db->num_insns;
 }
 
 /*
@@ -15706,6 +15758,13 @@ bool tr_ir2_generate(struct TranslationBlock *tb)
         tcg_ctx->gen_insn_data[i * TARGET_INSN_START_WORDS] = pir1->pc_curr;
 #endif
         pir1++;
+
+        if (unlikely(tcg_ctx->try_inline)) {
+            assert(i == ir1_nr + start - 1);
+            get_more_ir1_list(current_cpu, tb, tcg_ctx->try_inline, i);
+            ir1_nr = tb->icount;
+            tcg_ctx->try_inline = 0;
+        }
     }
 
 #ifdef CONFIG_LATA_TU

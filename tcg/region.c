@@ -33,6 +33,7 @@
 #include "tcg/tcg.h"
 #include "exec/translation-block.h"
 #include "tcg-internal.h"
+#include <stdint.h>
 
 
 struct tcg_region_tree {
@@ -81,6 +82,16 @@ bool in_code_gen_buffer(const void *p)
      * a pointer to the byte past the end of the code gen buffer.
      */
     return (size_t)(p - region.start_aligned) <= region.total_size;
+}
+
+uint64_t code_gen_buffer_offset(const void *p)
+{
+    /*
+     * Much like it is valid to have a pointer to the byte past the
+     * end of an array (so long as you don't dereference it), allow
+     * a pointer to the byte past the end of the code gen buffer.
+     */
+    return (uint64_t)(p - region.start_aligned);
 }
 
 #ifdef CONFIG_DEBUG_TCG

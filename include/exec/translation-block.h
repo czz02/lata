@@ -41,6 +41,18 @@ struct tb_tc {
 #endif
 };
 
+typedef enum AARCH64_TYPE {
+    IR1_TYPE_NORMAL = 0,
+    IR1_TYPE_BRANCH,
+    IR1_TYPE_CALL,
+    IR1_TYPE_CALLIN,
+    IR1_TYPE_JMP,
+    IR1_TYPE_JMPIN,
+    IR1_TYPE_RET,
+    IR1_TYPE_SYSCALL,
+    IR1_TYPE_PROXY,
+} AARCH64_TYPE;
+
 #ifdef CONFIG_LATA_TU
 #define TU_TB_INDEX_NEXT 0
 #define TU_TB_INDEX_TARGET 1
@@ -181,6 +193,7 @@ struct TranslationBlock {
     uintptr_t jmp_list_head;
     uintptr_t jmp_list_next[2];
     uintptr_t jmp_dest[2];
+    AARCH64_TYPE last_ir1_type;
 #ifdef CONFIG_LATA
     void *ir1;
     int codesize;
