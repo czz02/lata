@@ -267,19 +267,24 @@ void page_init(void)
 }
 
 #ifdef CONFIG_ANDROID
-#include "android.h"
 
-static int tr_translate_wrap(struct TranslationBlock *tb,
-                                    uint64_t host_pc, uint64_t callee)
+int tr_translate_wrap(struct TranslationBlock *tb, uint64_t host_pc,
+                      uint64_t callee)
 {
     tr_init(tb);
     tcg_insn_unit *gen_code_buf;
-    gen_code_buf = tcg_ctx->code_gen_ptr;
+    gen_code_buf = tcg_ctx->trace_gen_ptr;
+    tb->tc.ptr = tcg_splitwx_to_rx(gen_code_buf);
     lata_gen_func_wrap(tb, host_pc, callee);
     tb->icount = 0;
     int gen_code_size = tr_ir2_assemble(gen_code_buf) * 4;
     tb->codesize = gen_code_size;
     tr_fini();
+
+    qatomic_set(
+        &tcg_ctx->trace_gen_ptr,
+        (void *)ROUND_UP(((uintptr_t)tcg_ctx->trace_gen_ptr + gen_code_size),
+                         CODE_GEN_ALIGN));
 
     return gen_code_size;
 }
@@ -293,17 +298,6 @@ int tr_translate_tb(struct TranslationBlock *tb)
 {
     int gen_code_size;
 #ifdef CONFIG_LATA
-#ifdef CONFIG_ANDROID
-    gpointer pc_key = (gpointer)tb->pc;
-    uint64_t berberis_pc =
-        (uint64_t)g_hash_table_lookup(berberis_guest_host, pc_key);
-
-    if (unlikely(berberis_pc != 0)) {
-        uint64_t callee =
-            (uint64_t)g_hash_table_lookup(berberis_guest_callee, pc_key);
-        return tr_translate_wrap(tb, berberis_pc, callee);
-    }
-#endif
     tr_init(tb);
     tcg_insn_unit *gen_code_buf;
     gen_code_buf = tcg_ctx->code_gen_ptr;

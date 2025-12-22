@@ -236,6 +236,7 @@ uintptr_t tcg_splitwx_diff;
 
 #ifndef CONFIG_TCG_INTERPRETER
 tcg_prologue_fn *tcg_qemu_tb_exec;
+tcg_prologue_fn *tcg_qemu_tb_exec_trace;
 #endif
 
 static TCGRegSet tcg_target_available_regs[TCG_TYPE_COUNT];
@@ -1448,7 +1449,7 @@ TranslationBlock *tcg_tb_alloc_full(TCGContext *s)
 #ifdef CONFIG_LATA
 void lata_prologue_init(TCGContext *s)
 {
-    int ins_nr;
+    int ins_nr, trace_ins_nr;
 
     s->code_ptr = s->code_gen_ptr;  // rw
     /* tcg_splitwx_to_rx(gen_code_buf); // rx */
@@ -1458,6 +1459,13 @@ void lata_prologue_init(TCGContext *s)
     s->code_ptr += ins_nr;
     ins_nr = lata_gen_epilogue(s);
     s->code_ptr += ins_nr;
+
+    s->trace_code_ptr = s->trace_gen_ptr;  // rw
+    /* tcg_splitwx_to_rx(gen_code_buf); // rx */
+    tcg_qemu_tb_exec_trace = (tcg_prologue_fn *)tcg_splitwx_to_rx(s->trace_code_ptr);
+
+    trace_ins_nr = lata_gen_wrap_epilogue(s);
+    s->trace_code_ptr += trace_ins_nr;
     // s->code_gen_ptr = s->code_ptr; // tcg_region_prologue_set() will set this
     // TODO: find out the effort of fuction.
     tcg_region_prologue_set(s);

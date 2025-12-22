@@ -250,14 +250,14 @@ static void lata_unallocated_encoding(DisasContext *s)
 static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
                                 int tbi)
 {
-// #ifndef CONFIG_ANDROID
+    // #ifndef CONFIG_ANDROID
     if (tbi == 0) {
         /* Load unmodified address */
     } else {
         /* lata only support user-mode, we don't need Sign-extend */
         la_bstrpick_d(*dst, *src, 56, 0);
     }
-// #endif
+    // #endif
 }
 
 
@@ -740,22 +740,22 @@ void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
 
     la_st_d(s5_ir2_opnd, env_ir2_opnd, env_offset_pc());
 
-    // for (int i = 0; i <= 31; ++i) {
-    //     if (arm_la_map[i] > 0 && arm_abi_map[i] > 0) {
-    //         la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
-    //                 env_offset_gpr(i));
-    //     }
-    // }
+     for (int i = 0; i <= 31; ++i) {
+         if (arm_la_map[i] > 0 && arm_abi_map[i] > 0) {
+             la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+                     env_offset_gpr(i));
+         }
+     }
 
-    // for (int i = 0; i <= 31; ++i) {
-    //     if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 0) {
-    //         la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
-    //                env_offset_fpr(i));
-    //     }
-    // }
-    //
+     for (int i = 0; i <= 31; ++i) {
+         if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 0) {
+             la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+                    env_offset_fpr(i));
+         }
+     }
+    
 
-    lata_gen_call_helper_prologue(tcg_ctx);
+    // lata_gen_call_helper_prologue(tcg_ctx);
 
     la_mov64(a1_ir2_opnd, env_ir2_opnd);
 
@@ -765,32 +765,40 @@ void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
     li_d(temp, host_func);
     la_jirl(ra_ir2_opnd, temp, 0);
 
-    lata_gen_call_helper_epilogue(tcg_ctx);
+    // lata_gen_call_helper_epilogue(tcg_ctx);
 
 
-    // for (int i = 0; i <= 31; ++i) {
-    //     if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 1) {
-    //         la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
-    //                env_offset_fpr(i));
-    //     }
-    // }
+    for (int i = 0; i <= 31; ++i) {
+        if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 1) {
+            la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+                   env_offset_fpr(i));
+        }
+    }
 
-    // for (int i = 0; i <= 31; ++i) {
-    //     if (arm_la_map[i] > 0 && arm_abi_map[i] > 1) {
-    //         la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
-    //                 env_offset_gpr(i));
-    //     }
-    // }
+    for (int i = 0; i <= 31; ++i) {
+        if (arm_la_map[i] > 0 && arm_abi_map[i] > 1) {
+            la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+                    env_offset_gpr(i));
+        }
+    }
 
     IR2_OPND ir2_opnd_addr;
     int64_t curr_ins_pos =
         (unsigned long)tb->tc.ptr + (lsenv->tr_data->real_ir2_inst_num << 2);
-    int64_t exit_offset = context_switch_native_to_bt_ret_0 - curr_ins_pos;
+    int64_t exit_offset = trace_context_switch_native_to_bt_ret_0 - curr_ins_pos;
     ir2_opnd_build(&ir2_opnd_addr, IR2_OPND_IMM, exit_offset >> 2);
     la_b(ir2_opnd_addr);
 
     free_alloc_gpr(temp);
 }
+
+// #include "android.h"
+
+// static void do_something()
+// {
+//     printf("hello world \n");
+//     return;
+// }
 
 static bool trans_BL(DisasContext *s)
 {
@@ -807,11 +815,20 @@ static bool trans_BL(DisasContext *s)
     vaddr next_pc = s->base->pc_next;
     vaddr target_pc = s->pc_curr + a->imm;
 
-    TranslationBlock *next_tb = tb_htable_lookup(current_cpu, target_pc, curr_tb->cs_base, curr_tb->flags, curr_tb->cflags);
-    if(next_tb && next_tb->last_ir1_type == IR1_TYPE_RET){
-       tcg_ctx->try_inline = target_pc; 
-       return true;
+    TranslationBlock *next_tb =
+        tb_htable_lookup(current_cpu, target_pc, curr_tb->cs_base,
+                         curr_tb->flags, curr_tb->cflags);
+    if (next_tb && next_tb->last_ir1_type == IR1_TYPE_RET) {
+        tcg_ctx->try_inline = target_pc;
+        return true;
     }
+
+    // uint64_t berberis_pc =
+    //     (uint64_t)g_hash_table_lookup(berberis_guest_host, (gpointer)target_pc);
+
+    // if (berberis_pc) {
+    //     do_something();
+    // }
 
     IR2_OPND x30 = alloc_gpr_dst(30);
     li_d(x30, next_pc); /* BL setting X30 to PC+4 */
@@ -15514,7 +15531,8 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
     uint32_t cflags = tb_cflags(tb);
 
     /* Initialize DisasContextBase */
-    // DisasContextBase *db = (DisasContextBase *)malloc(sizeof(DisasContextBase));
+    // DisasContextBase *db = (DisasContextBase
+    // *)malloc(sizeof(DisasContextBase));
     DisasContextBase *db = &db_rel;
     db->tb = tb;
     db->pc_first = pc;
@@ -15556,10 +15574,10 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
 
         /* Stop translation if the output buffer is full,
            or we have executed all of the allowed instructions.  */
-        // if (db->num_insns >= db->max_insns) {
-        //     db->is_jmp = DISAS_TOO_MANY;
-        //     break;
-        // }
+        if (db->num_insns >= db->max_insns) {
+            db->is_jmp = DISAS_TOO_MANY;
+            break;
+        }
     }
 
     tb->size = db->pc_next - db->pc_first;
@@ -15603,7 +15621,7 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
     generate ir1_list
 */
 static void get_more_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
-                           int max_insns)
+                              int max_insns)
 {
     // DisasContext *ir1_list =
     DisasContext *pir1 = NULL;
@@ -15611,8 +15629,8 @@ static void get_more_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
     /* Initialize DisasContextBase */
     DisasContextBase *db = &db_rel;
     bool resume_ret = false;
-    vaddr pc_restore = db->pc_next;    
-    
+    vaddr pc_restore = db->pc_next;
+
     db->pc_next = pc;
 
     while (true) {
@@ -15635,7 +15653,7 @@ static void get_more_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
             resume_ret = true;
             db->pc_next = pc_restore;
             db->is_jmp = DISAS_NEXT;
-            db->num_insns --;
+            db->num_insns--;
         }
 
         // /* Stop translation if the output buffer is full,

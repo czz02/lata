@@ -1087,19 +1087,46 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
 
 pthread_mutex_t tb_add_mutex = PTHREAD_MUTEX_INITIALIZER;
 static vaddr exit_pc;
+extern CPUState *main_cpu;
 
 void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg)
 {
     if (host_pc == -1) {
         exit_pc = guest_pc;
+        return;
     }
 
-    pthread_mutex_lock(&tb_add_mutex);
-    g_hash_table_insert(berberis_guest_host, (gpointer)guest_pc,
-                        (gpointer)host_pc);
-    g_hash_table_insert(berberis_guest_callee, (gpointer)guest_pc,
-                        (gpointer)arg);
-    pthread_mutex_unlock(&tb_add_mutex);
+    mmap_lock();
+    TranslationBlock *tb = tcg_tb_alloc(tcg_ctx);
+    assert(tb);
+
+    uint64_t pc;
+
+    cpu_get_tb_cpu_state(main_cpu->env_ptr, &pc, &tb->cs_base, &tb->flags);
+
+    tb->pc = guest_pc;
+
+    tb->cflags = curr_cflags(main_cpu);
+    tb_set_page_addr0(tb, guest_pc);
+    tb_set_page_addr1(tb, -1);
+    tb->jmp_reset_offset[0] = TB_JMP_OFFSET_INVALID;
+    tb->jmp_reset_offset[1] = TB_JMP_OFFSET_INVALID;
+    tb->jmp_insn_offset[0] = TB_JMP_OFFSET_INVALID;
+    tb->jmp_insn_offset[1] = TB_JMP_OFFSET_INVALID;
+
+    qemu_spin_init(&tb->jmp_lock);
+    tb->jmp_list_head = (uintptr_t)NULL;
+    tb->jmp_list_next[0] = (uintptr_t)NULL;
+    tb->jmp_list_next[1] = (uintptr_t)NULL;
+    tb->jmp_dest[0] = (uintptr_t)NULL;
+    tb->jmp_dest[1] = (uintptr_t)NULL;
+
+    tr_translate_wrap(tb, host_pc, arg);
+
+    tcg_tb_insert(tb);
+    tb_link_page(tb);
+
+    mmap_unlock();
 }
 
 #endif

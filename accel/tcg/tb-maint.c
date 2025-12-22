@@ -793,6 +793,7 @@ done:
 
 void tb_flush(CPUState *cpu)
 {
+    assert(0);
     if (tcg_enabled()) {
         unsigned tb_flush_count = qatomic_read(&tb_ctx.tb_flush_count);
 

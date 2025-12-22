@@ -108,6 +108,10 @@ uint64_t context_switch_bt_to_native;
 uint64_t context_switch_native_to_bt_ret_0;
 uint64_t context_switch_native_to_bt;
 
+uint64_t trace_context_switch_bt_to_native;
+uint64_t trace_context_switch_native_to_bt_ret_0;
+uint64_t trace_context_switch_native_to_bt;
+
 static void global_register_init(void)
 {
     env_ir2_opnd = INIT_RA(IR2_OPND_GPR, reg_statics_map[S_ENV]);
@@ -245,6 +249,55 @@ void tr_fini(void)
 #define RA_EXTRA_SPACE (FP_EXTRA_SPACE + REG_LEN)
 #define FCSR_EXTRA_SPACE (RA_EXTRA_SPACE + REG_LEN)
 
+static void trace_generate_context_switch_bt_to_native(void)
+{
+    la_addi_d(sp_ir2_opnd, sp_ir2_opnd, -256);
+
+    /* save callee-saved LA registers. s0-s8 */
+    la_st_d(s0_ir2_opnd, sp_ir2_opnd, S0_EXTRA_SPACE);
+    la_st_d(s1_ir2_opnd, sp_ir2_opnd, S1_EXTRA_SPACE);
+    la_st_d(s2_ir2_opnd, sp_ir2_opnd, S2_EXTRA_SPACE);
+    la_st_d(s3_ir2_opnd, sp_ir2_opnd, S3_EXTRA_SPACE);
+    la_st_d(s4_ir2_opnd, sp_ir2_opnd, S4_EXTRA_SPACE);
+    la_st_d(s5_ir2_opnd, sp_ir2_opnd, S5_EXTRA_SPACE);
+    la_st_d(s6_ir2_opnd, sp_ir2_opnd, S6_EXTRA_SPACE);
+    la_st_d(s7_ir2_opnd, sp_ir2_opnd, S7_EXTRA_SPACE);
+    la_st_d(s8_ir2_opnd, sp_ir2_opnd, S8_EXTRA_SPACE);
+
+    /* save fp and ra */
+    la_st_d(fp_ir2_opnd, sp_ir2_opnd, FP_EXTRA_SPACE);
+    la_st_d(ra_ir2_opnd, sp_ir2_opnd, RA_EXTRA_SPACE);
+
+    /* set env_opnd */
+    la_mov64(env_ir2_opnd, a0_ir2_opnd);
+    la_mov64(a0_ir2_opnd, a1_ir2_opnd);
+
+    /* jmp to tb */
+    la_jirl(zero_ir2_opnd, a0_ir2_opnd, 0);
+}
+
+static void trace_generate_context_switch_native_to_bt(void)
+{
+    la_mov64(a0_ir2_opnd, zero_ir2_opnd);
+    /* load callee-saved LA registers. s0-s8 */
+    la_ld_d(s0_ir2_opnd, sp_ir2_opnd, S0_EXTRA_SPACE);
+    la_ld_d(s1_ir2_opnd, sp_ir2_opnd, S1_EXTRA_SPACE);
+    la_ld_d(s2_ir2_opnd, sp_ir2_opnd, S2_EXTRA_SPACE);
+    la_ld_d(s3_ir2_opnd, sp_ir2_opnd, S3_EXTRA_SPACE);
+    la_ld_d(s4_ir2_opnd, sp_ir2_opnd, S4_EXTRA_SPACE);
+    la_ld_d(s5_ir2_opnd, sp_ir2_opnd, S5_EXTRA_SPACE);
+    la_ld_d(s6_ir2_opnd, sp_ir2_opnd, S6_EXTRA_SPACE);
+    la_ld_d(s7_ir2_opnd, sp_ir2_opnd, S7_EXTRA_SPACE);
+    la_ld_d(s8_ir2_opnd, sp_ir2_opnd, S8_EXTRA_SPACE);
+
+    /* load fp and ra */
+    la_ld_d(fp_ir2_opnd, sp_ir2_opnd, FP_EXTRA_SPACE);
+    la_ld_d(ra_ir2_opnd, sp_ir2_opnd, RA_EXTRA_SPACE);
+
+    la_addi_d(sp_ir2_opnd, sp_ir2_opnd, 256);
+
+    la_jirl(zero_ir2_opnd, ra_ir2_opnd, 0);
+}
 
 static void generate_context_switch_bt_to_native(void)
 {
@@ -361,6 +414,22 @@ static void generate_context_switch_native_to_bt(void)
     la_jirl(zero_ir2_opnd, ra_ir2_opnd, 0);
 }
 
+/* native -> bt */
+int lata_gen_wrap_epilogue(TCGContext *tcg_ctx)
+{
+    lsassert(trace_context_switch_native_to_bt == 0);
+    void *code_buf_rw = tcg_ctx->trace_code_ptr;
+    const void *code_buf_rx = tcg_splitwx_to_rx(code_buf_rw);
+    trace_context_switch_native_to_bt_ret_0 = (uint64_t)code_buf_rx;
+    trace_context_switch_native_to_bt = (uint64_t)code_buf_rx + 4;
+
+    tr_init(NULL);
+    generate_context_switch_native_to_bt();
+    int ins_nr = tr_ir2_assemble(code_buf_rw);
+    tr_fini();
+
+    return ins_nr;
+}
 
 /* bt -> native */
 int lata_gen_prologue(TCGContext *tcg_ctx)

@@ -513,6 +513,7 @@ struct TCGContext {
     TranslationBlock *gen_tb;     /* tb for which code is being generated */
     tcg_insn_unit *code_buf;      /* pointer for start of tb */
     tcg_insn_unit *code_ptr;      /* pointer for running end of tb */
+    tcg_insn_unit *trace_code_ptr;
 
 #ifdef CONFIG_DEBUG_TCG
     int goto_tb_issue_mask;
@@ -527,6 +528,11 @@ struct TCGContext {
     size_t code_gen_buffer_size;
     void *code_gen_ptr;
     void *data_gen_ptr;
+
+    void *trace_gen_buffer;
+    void *trace_gen_ptr;
+    size_t trace_gen_buffer_size;
+    bool try_trace;
 
 #ifdef CONFIG_SPLIT_TB
     /* split TB code and TB ptr*/
@@ -1133,6 +1139,7 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, const void *tb_ptr);
 #else
 typedef uintptr_t tcg_prologue_fn(CPUArchState *env, const void *tb_ptr);
 extern tcg_prologue_fn *tcg_qemu_tb_exec;
+extern tcg_prologue_fn *tcg_qemu_tb_exec_trace;
 #endif
 
 void tcg_register_jit(const void *buf, size_t buf_size);

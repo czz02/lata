@@ -54,6 +54,8 @@ struct tcg_region_state {
     /* fields set at init time */
     void *start_aligned;
     void *after_prologue;
+    void *trace_start_aligned;
+    void *trace_after_prologue;
     size_t n;
     size_t size; /* size of one region */
     size_t stride; /* .size + guard size */
@@ -343,6 +345,10 @@ static void tcg_region_assign(TCGContext *s, size_t curr_region)
     s->code_gen_ptr = start;
     s->code_gen_buffer_size = end - start;
     s->code_gen_highwater = end - TCG_HIGHWATER;
+
+    s->trace_gen_buffer = region.trace_after_prologue;
+    s->trace_gen_ptr = region.trace_after_prologue; 
+    s->trace_gen_buffer_size = region.size;
 }
 
 static bool tcg_region_alloc__locked(TCGContext *s)
@@ -413,7 +419,7 @@ void tcg_region_reset_all(void)
 static size_t tcg_n_regions(size_t tb_size, unsigned max_cpus)
 {
 #ifdef CONFIG_USER_ONLY
-    return 1;
+    return 2;
 #else
     size_t n_regions;
 
@@ -468,7 +474,7 @@ static size_t tcg_n_regions(size_t tb_size, unsigned max_cpus)
  * of the translator don't go too nuts with our default code gen
  * buffer lest we make things too hard for the OS.
  */
-#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (128 * MiB)
+#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (256 * MiB)
 #else
 /*
  * We expect most system emulation to run one or two guests per host.
@@ -560,6 +566,7 @@ static int alloc_code_gen_buffer_anon(size_t size, int prot,
     }
 
     region.start_aligned = buf;
+    region.trace_start_aligned = buf + 128 * MiB;
     region.total_size = size;
     return prot;
 }
@@ -846,6 +853,7 @@ void tcg_region_init(size_t tb_size, int splitwx, unsigned max_cpus)
      * the page boundary.
      */
     region.after_prologue = region.start_aligned;
+    region.trace_after_prologue = region.trace_start_aligned;
 
     /* init the region struct */
     qemu_mutex_init(&region.lock);
@@ -902,6 +910,7 @@ void tcg_region_prologue_set(TCGContext *s)
     /* Deduct the prologue from the first region.  */
     g_assert(region.start_aligned == s->code_gen_buffer);
     region.after_prologue = s->code_ptr;
+    region.trace_after_prologue = s->trace_code_ptr;
 
     /* Recompute boundaries of the first region. */
     tcg_region_assign(s, 0);
