@@ -940,7 +940,7 @@ typedef struct {
 
     uint64_t from_pc;
     uint64_t to_pc;
-    
+
 } TBEdge;
 
 #define LOG_BUFFER_SIZE 4096
@@ -950,16 +950,18 @@ static TBEdge log_buffer[LOG_BUFFER_SIZE];
 static int buffer_index = 0;
 static QemuMutex log_mutex;
 
-void tb_log_init(const char *filename) {
+void tb_log_init(const char *filename)
+{
     qemu_mutex_init(&log_mutex);
-    log_file = fopen(filename, "w"); 
+    log_file = fopen(filename, "w");
     if (!log_file) {
         fprintf(stderr, "Failed to open TB log file: %s\n", filename);
     }
 }
 
 #include <dlfcn.h>
-static uint64_t get_relative_offset(void* target_addr) {
+static uint64_t get_relative_offset(void *target_addr)
+{
     Dl_info info;
 
     if (dladdr(target_addr, &info) != 0) {
@@ -971,34 +973,36 @@ static uint64_t get_relative_offset(void* target_addr) {
     }
 
     return 0;
-
 }
 
-static void flush_buffer(void) {
+static void flush_buffer(void)
+{
     if (log_file && buffer_index > 0) {
         for (int i = 0; i < buffer_index; i++) {
             // 格式示例: 0x1000 -> 0x1020
-            fprintf(log_file, "%016" PRIx64 ",%016" PRIx64 ",%016" PRIx64 ",%016" PRIx64 "\n", 
-                    log_buffer[i].from_addr, 
-                    log_buffer[i].to_addr,
-                    log_buffer[i].from_pc, 
-                    log_buffer[i].to_pc);
+            fprintf(log_file,
+                    "%016" PRIx64 ",%016" PRIx64 ",%016" PRIx64 ",%016" PRIx64
+                    "\n",
+                    log_buffer[i].from_addr, log_buffer[i].to_addr,
+                    log_buffer[i].from_pc, log_buffer[i].to_pc);
         }
         // 也可以选择在这里调用 fflush(log_file) 确保落盘，但会进一步降低性能
         buffer_index = 0;
     }
 }
 
-void tb_log_edge(uint64_t from, uint64_t to, uint64_t from_pc, uint64_t to_pc) {
-    if (!log_file) return;
+void tb_log_edge(uint64_t from, uint64_t to, uint64_t from_pc, uint64_t to_pc)
+{
+    if (!log_file)
+        return;
 
-    assert(in_code_gen_buffer((void*) from));
-    assert(in_code_gen_buffer((void*) to));
+    assert(in_code_gen_buffer((void *)from));
+    assert(in_code_gen_buffer((void *)to));
 
     qemu_mutex_lock(&log_mutex);
-    
-    log_buffer[buffer_index].from_addr = code_gen_buffer_offset((void*) from);
-    log_buffer[buffer_index].to_addr = code_gen_buffer_offset((void*) to);
+
+    log_buffer[buffer_index].from_addr = code_gen_buffer_offset((void *)from);
+    log_buffer[buffer_index].to_addr = code_gen_buffer_offset((void *)to);
     log_buffer[buffer_index].from_pc = from_pc;
     log_buffer[buffer_index].to_pc = to_pc;
     buffer_index++;
@@ -1006,11 +1010,12 @@ void tb_log_edge(uint64_t from, uint64_t to, uint64_t from_pc, uint64_t to_pc) {
     if (buffer_index >= LOG_BUFFER_SIZE) {
         flush_buffer();
     }
-    
+
     qemu_mutex_unlock(&log_mutex);
 }
 
-void tb_log_close(void) {
+void tb_log_close(void)
+{
     qemu_mutex_lock(&log_mutex);
     flush_buffer(); // 写入剩余数据
     if (log_file) {
@@ -1089,7 +1094,8 @@ pthread_mutex_t tb_add_mutex = PTHREAD_MUTEX_INITIALIZER;
 static vaddr exit_pc;
 extern CPUState *main_cpu;
 
-void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg)
+void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg,
+                    bool is_special)
 {
     if (host_pc == -1) {
         exit_pc = guest_pc;
@@ -1121,7 +1127,7 @@ void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg)
     tb->jmp_dest[0] = (uintptr_t)NULL;
     tb->jmp_dest[1] = (uintptr_t)NULL;
 
-    tr_translate_wrap(tb, host_pc, arg);
+    tr_translate_wrap(tb, host_pc, arg, is_special);
 
     tcg_tb_insert(tb);
     tb_link_page(tb);

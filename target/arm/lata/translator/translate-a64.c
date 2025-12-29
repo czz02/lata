@@ -733,54 +733,66 @@ static bool trans_B(DisasContext *s)
     return true;
 }
 
+static void stub_func(void){
+}
+
 void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
-                        uint64_t callee)
+                        uint64_t callee, bool is_special)
 {
     IR2_OPND temp = ra_alloc_itemp();
 
     la_st_d(s5_ir2_opnd, env_ir2_opnd, env_offset_pc());
-
-     for (int i = 0; i <= 31; ++i) {
-         if (arm_la_map[i] > 0 && arm_abi_map[i] > 0) {
-             la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
-                     env_offset_gpr(i));
-         }
-     }
-
-     for (int i = 0; i <= 31; ++i) {
-         if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 0) {
-             la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
-                    env_offset_fpr(i));
-         }
-     }
     
-
     // lata_gen_call_helper_prologue(tcg_ctx);
 
-    la_mov64(a1_ir2_opnd, env_ir2_opnd);
-
-    if (callee)
-        li_d(a0_ir2_opnd, callee);
-
-    li_d(temp, host_func);
-    la_jirl(ra_ir2_opnd, temp, 0);
+    // li_d(temp, (uint64_t)&stub_func);
+    // la_jirl(ra_ir2_opnd, temp, 0);
 
     // lata_gen_call_helper_epilogue(tcg_ctx);
 
-
-    for (int i = 0; i <= 31; ++i) {
-        if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 1) {
-            la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
-                   env_offset_fpr(i));
+    if (!is_special) {
+        for (int i = 0; i <= 31; ++i) {
+            if (arm_la_map[i] > 0 && arm_abi_map[i] > 0) {
+                la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+                        env_offset_gpr(i));
+            }
         }
-    }
 
-    for (int i = 0; i <= 31; ++i) {
-        if (arm_la_map[i] > 0 && arm_abi_map[i] > 1) {
-            la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
-                    env_offset_gpr(i));
+        for (int i = 0; i <= 31; ++i) {
+            if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 0) {
+                la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+                       env_offset_fpr(i));
+            }
         }
+        // lata_gen_call_helper_prologue(tcg_ctx);
+
+        la_mov64(a1_ir2_opnd, env_ir2_opnd);
+
+        if (callee)
+            li_d(a0_ir2_opnd, callee);
+
+        li_d(temp, host_func);
+        la_jirl(ra_ir2_opnd, temp, 0);
+
+
+        for (int i = 0; i <= 31; ++i) {
+            if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 1) {
+                la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
+                       env_offset_fpr(i));
+            }
+        }
+
+        for (int i = 0; i <= 31; ++i) {
+            if (arm_la_map[i] > 0 && arm_abi_map[i] > 1) {
+                la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
+                        env_offset_gpr(i));
+            }
+        }
+    } else {
+        li_d(temp, callee);
+        la_jirl(ra_ir2_opnd, temp, 0);
     }
+    // lata_gen_call_helper_epilogue(tcg_ctx);
 
     IR2_OPND ir2_opnd_addr;
     int64_t curr_ins_pos =

@@ -318,7 +318,7 @@ struct AndroidRuntimeCallbacks {
     uint64_t (*get_reg)(void *cpu_env, int reg_index);
     void (*set_tls)(void *cpu_env, uint64_t tls);
     void (*clone_env)(void *clone_env, void *env);
-    void (*add_tb)(uint64_t guest_pc, uint64_t host_pc, uint64_t arg);
+    void (*add_tb)(uint64_t guest_pc, uint64_t host_pc, uint64_t arg, bool is_special);
     void (*add_state_kv)(void *berberis_state, void *env);
     abi_long (*target_mmap)(abi_ulong start, abi_ulong len, int target_prot,
                             int flags, int fd, off_t offset);

@@ -17,7 +17,7 @@
 // t0-t5--itemp
 // FLAG---pstate
 const int arm_la_map[] = {
-    [armv8_x0] = la_ra,  [armv8_x1] = la_a1,  [armv8_x2] = la_a2,
+    [armv8_x0] = la_s7,  [armv8_x1] = la_a1,  [armv8_x2] = la_a2,
     [armv8_x3] = la_a3,  [armv8_x4] = la_a4,  [armv8_x5] = la_a5,
     [armv8_x6] = la_a6,  [armv8_x7] = la_a7,  [armv8_x8] = la_fp,
     [armv8_x9] = la_t8,  [armv8_x10] = la_t6, [armv8_x11] = -1,
@@ -26,7 +26,7 @@ const int arm_la_map[] = {
     [armv8_x18] = -1,    [armv8_x19] = la_s6, [armv8_x20] = la_s0,
     [armv8_x21] = la_s1, [armv8_x22] = la_s2, [armv8_x23] = la_s3,
     [armv8_x24] = la_s4, [armv8_x25] = -1,    [armv8_x26] = -1,
-    [armv8_x27] = -1,    [armv8_x28] = la_s7, [armv8_x29] = la_t7,
+    [armv8_x27] = -1,    [armv8_x28] = -1,    [armv8_x29] = la_t7,
     [armv8_x30] = la_s5, [armv8_xzr] = la_r21
 };
 
@@ -43,13 +43,13 @@ const int arm_abi_map[] = {
 };
 
 const int arm_la_reverse_map[] = {
-    [la_zero] = -1,      [la_ra] = armv8_x0,  [la_sp] = -1,
+    [la_zero] = -1,      [la_ra] = -1,        [la_sp] = -1,
     [la_t7] = armv8_x29, [la_s0] = armv8_x20, [la_s1] = armv8_x21,
     [la_s8] = -1,        [la_t8] = armv8_x9,  [la_a2] = armv8_x2,
     [la_a3] = armv8_x3,  [la_a4] = armv8_x4,  [la_a5] = armv8_x5,
     [la_a6] = armv8_x6,  [la_a7] = armv8_x7,  [la_s2] = armv8_x22,
     [la_s3] = armv8_x23, [la_s4] = armv8_x24, [la_s5] = armv8_x30,
-    [la_s6] = armv8_x19, [la_s7] = armv8_x28, [la_t4] = -1,
+    [la_s6] = armv8_x19, [la_s7] = armv8_x0,  [la_t4] = -1,
     [la_t5] = -1,        [la_t6] = armv8_x10, [la_r21] = armv8_xzr,
     [la_tp] = -1,        [la_a0] = -1,        [la_a1] = armv8_x1,
     [la_t0] = -1,        [la_t1] = -1,        [la_t2] = -1,

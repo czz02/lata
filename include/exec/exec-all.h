@@ -49,7 +49,7 @@ bool cpu_unwind_state_data(CPUState *cpu, uintptr_t host_pc, uint64_t *data);
 int tr_translate_tb(struct TranslationBlock *tb);
 int gen_func_wrap(struct TranslationBlock *tb);
 int tr_translate_wrap(struct TranslationBlock *tb, uint64_t host_pc,
-                      uint64_t callee);
+                      uint64_t callee, bool is_special);
 
 TranslationBlock *tb_htable_lookup(CPUState *cpu, vaddr pc,
                                           uint64_t cs_base, uint32_t flags,

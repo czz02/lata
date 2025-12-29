@@ -3,6 +3,7 @@
 
 #include <glib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "android/param.h"
 
@@ -38,7 +39,8 @@ extern BerberisCallbacks *berberis_cb;
 
 // extern int android_exec_loop(void *state);
 // extern int android_cpu_exec_loop(void* state);
-extern void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg);
+extern void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg,
+                           bool is_special);
 
 extern void android_jni_run(void *state);
 
@@ -51,7 +53,7 @@ extern void handle_android_syscall(CPUARMState *env);
 #define MX_QUEUE 64
 typedef struct {
     uint64_t data[MX_QUEUE];
-    int head;  // 指向下一个将被写入的位置
+    int head; // 指向下一个将被写入的位置
     int count; // 当前队列中有效元素的数量
 } CircularQueue;
 

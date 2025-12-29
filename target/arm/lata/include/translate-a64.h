@@ -17,7 +17,7 @@ void get_last_info(TranslationBlock *tb, DisasContext *s);
 
 #ifdef CONFIG_ANDROID
 void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
-                        uint64_t callee);
+                        uint64_t callee, bool is_special);
 #endif
 
 static inline void assert_fp_access_checked(DisasContext *s)
