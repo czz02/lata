@@ -75,9 +75,9 @@ char real_exec_path[PATH_MAX];
 #ifdef CONFIG_LATA
 int indirect_jmp_opt_profile = 0;
 #ifdef CONFIG_LATA_INDIRECT_JMP
-int option_fam_jmp_cache = 0;
+const int option_fam_jmp_cache = 0;
 #else
-int option_fam_jmp_cache = 0;
+const int option_fam_jmp_cache = 0;
 #endif
 #endif
 
@@ -245,13 +245,15 @@ CPUArchState *cpu_copy(CPUArchState *env)
 
 BerberisCallbacks *berberis_cb;
 GHashTable *berberis_to_qemu;
-void *berberis_guest_host;
-void *berberis_guest_callee;
 ENV *lsenv_debug;
 
 CPUState *main_cpu;
 
-void *android_create_cpu(void)
+static void android_destory_cpu(void* dummy){
+    
+}
+
+static void *android_create_cpu(void)
 {
     pthread_mutex_lock(&create_lock);
     CPUArchState *new_env = cpu_copy(main_cpu->env_ptr);
@@ -262,95 +264,33 @@ void *android_create_cpu(void)
 
     new_cpu->opaque = ts;
 
-    // thread_cpu = new_cpu;
-
     return (void *)new_env;
 }
 
-static void android_destory_cpu(void *env)
-{
-}
-
-void android_set_tls(void *env, uint64_t tls)
-{
-    assert(env);
-    CPUArchState *_env = (CPUArchState *)env;
-    _env->cp15.tpidr_el[0] = tls;
-}
-
-void android_add_state_kv(void *berberis_state, void *env)
+static void android_add_state_kv(void *berberis_state, void *env)
 {
     CPUArchState *_env = (CPUArchState *)env;
-    // printf("pid : %d, berberis_state : %p, qemu_state : %p\n", getpid(),
-    // berberis_state, _env);
     pthread_mutex_lock(&b2q_mutex);
     g_hash_table_insert(berberis_to_qemu, berberis_state, env_cpu(_env));
     g_hash_table_insert(berberis_to_qemu, env_cpu(_env), berberis_state);
     pthread_mutex_unlock(&b2q_mutex);
 }
 
-static void init_queue(CircularQueue *q) {
-    q->head = 0;
-    q->count = 0;
+static void android_set_tls(void *env, uint64_t tls)
+{
+    assert(env);
+    CPUArchState *_env = (CPUArchState *)env;
+    _env->cp15.tpidr_el[0] = tls;
 }
 
-void push_queue(CircularQueue *q, uint64_t val) {
-    q->data[q->head] = val; // 写入数据
-
-    q->head = (q->head + 1) % MX_QUEUE;
-    if (q->count < MX_QUEUE) {
-        q->count++;
-    }
-
-}
-
-CircularQueue q4pc;
-
-extern void *android_init(BerberisCallbacks *cbs);
-
-struct AndroidRuntimeCallbacks {
-    void *(*initialize)(BerberisCallbacks *cbs);
-    void *(*create_cpu)(void);
-    void (*destroy_cpu)(void *);
-    void *(*translate)(void *cpu_env, uint64_t guest_pc);
-    void (*exec)(void *berberis_state);
-    void (*set_reg)(void *cpu_env, int reg_index, uint64_t value);
-    uint64_t (*get_reg)(void *cpu_env, int reg_index);
-    void (*set_tls)(void *cpu_env, uint64_t tls);
-    void (*clone_env)(void *clone_env, void *env);
-    void (*add_tb)(uint64_t guest_pc, uint64_t host_pc, uint64_t arg);
-    void (*add_state_kv)(void *berberis_state, void *env);
-    abi_long (*target_mmap)(abi_ulong start, abi_ulong len, int target_prot,
-                            int flags, int fd, off_t offset);
-    int (*target_munmap)(abi_ulong start, abi_ulong len);
-    const void *epilogue;
-} android_runtime_callbacks = {
-    &android_init,
-    &android_create_cpu,
-    &android_destory_cpu,
-    NULL,
-    &android_jni_run,
-    NULL,
-    NULL,
-    &android_set_tls,
-    NULL,
-    &android_add_tb,
-    &android_add_state_kv,
-    &target_mmap,
-    &target_munmap,
-    NULL,
-};
-
-// Config by berberis
-AndroidConfig android_config;
-
-void *android_init(BerberisCallbacks *cbs)
+static void *android_init(BerberisCallbacks *cbs)
 {
     assert(cbs);
 
-    init_queue(&q4pc);
-
     berberis_cb = cbs;
+
+    func_wrap_init();
+    android_log_init();
 
     module_call_init(MODULE_INIT_TRACE);
     qemu_init_cpu_list();
@@ -411,10 +351,43 @@ void *android_init(BerberisCallbacks *cbs)
     tcg_prologue_init(tcg_ctx);
 #endif
 
-
     berberis_to_qemu = g_hash_table_new(g_direct_hash, g_direct_equal);
-    berberis_guest_host = g_hash_table_new(g_direct_hash, g_direct_equal);
-    berberis_guest_callee = g_hash_table_new(g_direct_hash, g_direct_equal);
 
     return main_cpu->env_ptr;
 }
+
+__attribute__((visibility("default"))) AndroidConfig android_config;
+
+__attribute__((visibility("default"))) struct AndroidRuntimeCallbacks {
+    void *(*initialize)(BerberisCallbacks *cbs);
+    void *(*create_cpu)(void);
+    void (*destroy_cpu)(void *);
+    void *(*translate)(void *cpu_env, uint64_t guest_pc);
+    void (*exec)(void *berberis_state);
+    void (*set_reg)(void *cpu_env, int reg_index, uint64_t value);
+    uint64_t (*get_reg)(void *cpu_env, int reg_index);
+    void (*set_tls)(void *cpu_env, uint64_t tls);
+    void (*clone_env)(void *clone_env, void *env);
+    void (*add_tb)(uint64_t guest_pc, uint64_t host_pc, uint64_t arg,
+                   const char *name);
+    void (*add_state_kv)(void *berberis_state, void *env);
+    abi_long (*target_mmap)(abi_ulong start, abi_ulong len, int target_prot,
+                            int flags, int fd, off_t offset);
+    int (*target_munmap)(abi_ulong start, abi_ulong len);
+    const void *epilogue;
+} android_runtime_callbacks = {
+    &android_init,
+    &android_create_cpu,
+    &android_destory_cpu,
+    NULL,
+    &android_jni_run,
+    NULL,
+    NULL,
+    &android_set_tls,
+    NULL,
+    &android_add_tb,
+    &android_add_state_kv,
+    &target_mmap,
+    &target_munmap,
+    NULL,
+};

@@ -59,6 +59,10 @@
 #include "exec/user/guest-base.h"
 #endif
 
+#include "android/android.h"
+#include "android/utils/function_wrap.h"
+#include "android/utils/elf_loader.h"
+
 /* Forward declarations for functions declared in tcg-target.c.inc and
    used here. */
 static void tcg_target_init(TCGContext *s);
@@ -1458,6 +1462,11 @@ void lata_prologue_init(TCGContext *s)
     s->code_ptr += ins_nr;
     ins_nr = lata_gen_epilogue(s);
     s->code_ptr += ins_nr;
+
+    s->code_ptr = (void *)ROUND_UP((uintptr_t)s->code_ptr, 0xf);
+    ins_nr = elf_loader("/data/local/tmp/test.o", s->code_ptr);
+    s->code_ptr += ins_nr;
+
     // s->code_gen_ptr = s->code_ptr; // tcg_region_prologue_set() will set this
     // TODO: find out the effort of fuction.
     tcg_region_prologue_set(s);

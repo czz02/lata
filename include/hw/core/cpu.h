@@ -1023,6 +1023,8 @@ void cpu_exec_initfn(CPUState *cpu);
 void cpu_exec_realizefn(CPUState *cpu, Error **errp);
 void cpu_exec_unrealizefn(CPUState *cpu);
 
+void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg,
+                    const char* name);
 /**
  * target_words_bigendian:
  * Returns true if the (default) endianness of the target is big endian,

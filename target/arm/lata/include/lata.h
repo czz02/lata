@@ -74,7 +74,7 @@ extern const int arm_abi_map[];
 extern const int arm_abi_fmap[];
 extern __thread TRANSLATION_DATA *tr_data;
 extern __thread ENV *lsenv;
-extern bool lata_dump;
+extern const bool lata_dump;
 
 extern uint64_t context_switch_bt_to_native;
 extern uint64_t context_switch_native_to_bt_ret_0;

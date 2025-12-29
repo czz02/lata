@@ -1,7 +1,7 @@
 #include "clear-high.h"
 #include "lata.h"
 
-bool clearGprHigh = 1;
+const bool clearGprHigh = 1;
 
 void set_w_write_flag(int i, int sf)
 {

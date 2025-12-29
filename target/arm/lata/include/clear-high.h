@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-extern bool clearGprHigh;
+extern const bool clearGprHigh;
 
 void set_w_write_flag(int i, int is_w);
 void clear_gpr_high(int i);

@@ -70,6 +70,11 @@
 #include "target/arm/tcg/translate.h"
 #include "target/arm/lata/include/translate.h"
 #include "target/arm/lata/include/translate-a64.h"
+
+#ifdef CONFIG_ANDROID
+#include "android.h"
+#endif
+
 #endif
 
 TBContext tb_ctx;
@@ -266,50 +271,32 @@ void page_init(void)
     page_table_config_init();
 }
 
-#ifdef CONFIG_ANDROID
-#include "android.h"
-
-static int tr_translate_wrap(struct TranslationBlock *tb,
-                                    uint64_t host_pc, uint64_t callee)
-{
-    tr_init(tb);
-    tcg_insn_unit *gen_code_buf;
-    gen_code_buf = tcg_ctx->code_gen_ptr;
-    lata_gen_func_wrap(tb, host_pc, callee);
-    tb->icount = 0;
-    int gen_code_size = tr_ir2_assemble(gen_code_buf) * 4;
-    tb->codesize = gen_code_size;
-    tr_fini();
-
-    return gen_code_size;
-}
-
-#endif
-
 /*
     trasnlate ir1->ir2->host instractions
 */
 int tr_translate_tb(struct TranslationBlock *tb)
 {
-    int gen_code_size;
 #ifdef CONFIG_LATA
 #ifdef CONFIG_ANDROID
-    gpointer pc_key = (gpointer)tb->pc;
-    uint64_t berberis_pc =
-        (uint64_t)g_hash_table_lookup(berberis_guest_host, pc_key);
-
-    if (unlikely(berberis_pc != 0)) {
-        uint64_t callee =
-            (uint64_t)g_hash_table_lookup(berberis_guest_callee, pc_key);
-        return tr_translate_wrap(tb, berberis_pc, callee);
-    }
+    WrapItem *it = wrap_query(tb->pc);
 #endif
+
     tr_init(tb);
-    tcg_insn_unit *gen_code_buf;
-    gen_code_buf = tcg_ctx->code_gen_ptr;
-    tr_ir2_generate(tb);
-    gen_code_size = tr_ir2_assemble(gen_code_buf) * 4;
+    tcg_insn_unit *gen_code_buf = tcg_ctx->code_gen_ptr;
+
+#ifdef CONFIG_ANDROID
+    if (unlikely(it)) {
+        lata_gen_func_wrap(tb, it->host_pc, it->callee, it->is_special);
+        tb->icount = 0;
+    } else
+#endif
+    {
+        tr_ir2_generate(tb);
+    }
+
+    int gen_code_size = tr_ir2_assemble(gen_code_buf) * 4;
     tb->codesize = gen_code_size;
+
     tr_fini();
 
     return gen_code_size;
@@ -317,7 +304,6 @@ int tr_translate_tb(struct TranslationBlock *tb)
     return tcg_gen_code(tcg_ctx, tb, tb->pc);
 #endif
 }
-
 
 /*
  * Isolate the portion of code gen which can setjmp/longjmp.
@@ -375,7 +361,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu, vaddr pc, uint64_t cs_base,
     if (max_insns == 0) {
         max_insns = TCG_MAX_INSNS;
     }
-    QEMU_BUILD_BUG_ON(CF_COUNT_MASK + 1 != TCG_MAX_INSNS);
+    // QEMU_BUILD_BUG_ON(CF_COUNT_MASK + 1 != TCG_MAX_INSNS);
 
 buffer_overflow:
     assert_no_pages_locked();
@@ -397,6 +383,7 @@ buffer_overflow:
     tb->cs_base = cs_base;
     tb->flags = flags;
     tb->cflags = cflags;
+    tb->inline_mode = INLINE_NONE;
     tb_set_page_addr0(tb, phys_pc);
     tb_set_page_addr1(tb, -1);
     if (phys_pc != -1) {

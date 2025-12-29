@@ -46,6 +46,9 @@
 #ifdef CONFIG_LATA_TU
 #include "tu.h"
 #endif
+
+#include "android.h"
+
 /* -icount align implementation. */
 
 typedef struct SyncClocks {
@@ -458,6 +461,17 @@ cpu_tb_exec(CPUState *cpu, TranslationBlock *itb, int *tb_exit)
      * If we insist on touching both the RX and the RW pages, we
      * double the host TLB pressure.
      */
+    if (itb->inline_mode == INLINE_BL_PLT) {
+        WrapItem *it = wrap_query(env->pc);
+        if (it) {
+            func_wrap_add(itb->target_pc, it->host_pc, it->callee,
+                          it->is_special);
+            itb->inline_mode = INLINE_DISABLE_LINK;
+        } else {
+            itb->inline_mode = INLINE_ENABLE_LINK;
+        }
+    }
+
 #ifdef CONFIG_SPLIT_TB
     last_tb = (void *)(ret & ~TB_EXIT_MASK);
 #else
@@ -932,99 +946,13 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
     return false;
 }
 
-#define LOG_BUFFER_SIZE 4096
-
-typedef struct {
-    uint64_t from_addr;
-    uint64_t to_addr;
-
-    uint64_t from_pc;
-    uint64_t to_pc;
-    
-} TBEdge;
-
-#define LOG_BUFFER_SIZE 4096
-
-static FILE *log_file = NULL;
-static TBEdge log_buffer[LOG_BUFFER_SIZE];
-static int buffer_index = 0;
-static QemuMutex log_mutex;
-
-void tb_log_init(const char *filename) {
-    qemu_mutex_init(&log_mutex);
-    log_file = fopen(filename, "w"); 
-    if (!log_file) {
-        fprintf(stderr, "Failed to open TB log file: %s\n", filename);
-    }
-}
-
-#include <dlfcn.h>
-static uint64_t get_relative_offset(void* target_addr) {
-    Dl_info info;
-
-    if (dladdr(target_addr, &info) != 0) {
-        uintptr_t base_addr = (uintptr_t)info.dli_fbase;
-        uintptr_t current_addr = (uintptr_t)target_addr;
-
-        uintptr_t offset = current_addr - base_addr;
-        return offset;
-    }
-
-    return 0;
-
-}
-
-static void flush_buffer(void) {
-    if (log_file && buffer_index > 0) {
-        for (int i = 0; i < buffer_index; i++) {
-            // 格式示例: 0x1000 -> 0x1020
-            fprintf(log_file, "%016" PRIx64 ",%016" PRIx64 ",%016" PRIx64 ",%016" PRIx64 "\n", 
-                    log_buffer[i].from_addr, 
-                    log_buffer[i].to_addr,
-                    log_buffer[i].from_pc, 
-                    log_buffer[i].to_pc);
-        }
-        // 也可以选择在这里调用 fflush(log_file) 确保落盘，但会进一步降低性能
-        buffer_index = 0;
-    }
-}
-
-void tb_log_edge(uint64_t from, uint64_t to, uint64_t from_pc, uint64_t to_pc) {
-    if (!log_file) return;
-
-    assert(in_code_gen_buffer((void*) from));
-    assert(in_code_gen_buffer((void*) to));
-
-    qemu_mutex_lock(&log_mutex);
-    
-    log_buffer[buffer_index].from_addr = code_gen_buffer_offset((void*) from);
-    log_buffer[buffer_index].to_addr = code_gen_buffer_offset((void*) to);
-    log_buffer[buffer_index].from_pc = from_pc;
-    log_buffer[buffer_index].to_pc = to_pc;
-    buffer_index++;
-
-    if (buffer_index >= LOG_BUFFER_SIZE) {
-        flush_buffer();
-    }
-    
-    qemu_mutex_unlock(&log_mutex);
-}
-
-void tb_log_close(void) {
-    qemu_mutex_lock(&log_mutex);
-    flush_buffer(); // 写入剩余数据
-    if (log_file) {
-        fclose(log_file);
-        log_file = NULL;
-    }
-    qemu_mutex_unlock(&log_mutex);
-    qemu_mutex_destroy(&log_mutex);
-}
-
 __thread uint64_t pre_ptr = 0;
 __thread uint64_t pre_pc = 0;
 
-#include "android.h"
+static void add_addr(void *addr)
+{
+    berberis_cb->log_dl_info(addr);
+}
 
 static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
                                     vaddr pc, TranslationBlock **last_tb,
@@ -1033,13 +961,17 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
     int32_t insns_left;
 
     trace_exec_tb(tb, pc);
-    // uint64_t ptr = (uint64_t) tb->tc.ptr;
-    // push_queue(&q4pc, pc);
-    // if(likely(pre_ptr)){
-    //     tb_log_edge(pre_ptr, ptr, pre_pc, pc);
+    // uint64_t ptr = (uint64_t)tb->tc.ptr;
+    // pc_queue_push(pc);
+    // if (likely(pre_ptr)) {
+    //     tb_log_push(code_gen_buffer_offset((void *)pre_ptr),
+    //                 code_gen_buffer_offset((void *)ptr), pre_pc, pc);
     // }
     // pre_ptr = ptr;
     // pre_pc = pc;
+    //
+    // add_addr((void *)pc);
+
     tb = cpu_tb_exec(cpu, tb, tb_exit);
     if (*tb_exit != TB_EXIT_REQUESTED) {
         *last_tb = tb;
@@ -1088,18 +1020,16 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
 pthread_mutex_t tb_add_mutex = PTHREAD_MUTEX_INITIALIZER;
 static vaddr exit_pc;
 
-void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t arg)
+void android_add_tb(uint64_t guest_pc, uint64_t host_pc, uint64_t callee,
+                    const char *name)
 {
     if (host_pc == -1) {
         exit_pc = guest_pc;
     }
 
-    pthread_mutex_lock(&tb_add_mutex);
-    g_hash_table_insert(berberis_guest_host, (gpointer)guest_pc,
-                        (gpointer)host_pc);
-    g_hash_table_insert(berberis_guest_callee, (gpointer)guest_pc,
-                        (gpointer)arg);
-    pthread_mutex_unlock(&tb_add_mutex);
+    vaddr special_addr = wrap_name_query(name);
+    func_wrap_add(guest_pc, host_pc, special_addr ? special_addr : callee,
+                  special_addr ? true : false);
 }
 
 #endif
@@ -1259,8 +1189,6 @@ void tcg_exec_realizefn(CPUState *cpu, Error **errp)
 {
     static bool tcg_target_initialized;
     CPUClass *cc = CPU_GET_CLASS(cpu);
-
-    tb_log_init("/data/local/tmp/tb_log.txt");
 
     if (!tcg_target_initialized) {
         cc->tcg_ops->initialize();

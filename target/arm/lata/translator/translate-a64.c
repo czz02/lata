@@ -39,6 +39,8 @@
 #include "semihosting/semihost.h"
 #include "cpregs.h"
 
+#include "android.h"
+
 uint32 curr_insn = -1;
 
 enum a64_shift_type {
@@ -250,188 +252,33 @@ static void lata_unallocated_encoding(DisasContext *s)
 static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
                                 int tbi)
 {
-// #ifndef CONFIG_ANDROID
     if (tbi == 0) {
         /* Load unmodified address */
-    } else {
-        /* lata only support user-mode, we don't need Sign-extend */
+        la_mov64(*dst, *src);
+    } else if (!regime_has_2_ranges(s->mmu_idx)) {
+        /* Force tag byte to all zero */
         la_bstrpick_d(*dst, *src, 56, 0);
+    } else {
+        /* Sign-extend from bit 55.  */
+        la_slli_d(*dst, *src, 8);
+        la_srai_d(*dst, *dst, 8);
+
+        switch (tbi) {
+        case 1:
+            /* tbi0 but !tbi1: only use the extension if positive */
+            la_and(*dst, *dst, *src);
+            break;
+        case 2:
+            /* !tbi0 but tbi1: only use the extension if negative */
+            la_or(*dst, *dst, *src);
+            break;
+        case 3:
+            /* tbi0 and tbi1: always use the extension */
+            break;
+        default:
+            g_assert_not_reached();
+        }
     }
-// #endif
-}
-
-
-// check saturate
-static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
-{
-    assert(0);
-    IR2_OPND vtemp = ra_alloc_ftemp();
-    IR2_OPND temp = ra_alloc_itemp();
-    IR2_OPND set_qc = ir2_opnd_new_type(IR2_OPND_LABEL);
-    IR2_OPND exit = ir2_opnd_new_type(IR2_OPND_LABEL);
-
-    uint64_t *upper;
-    uint64_t *lower;
-
-    static uint64_t s_upper[] = { INT8_MAX, INT16_MAX, INT32_MAX, INT64_MAX };
-    static uint64_t s_lower[] = { INT8_MIN, INT16_MIN, INT32_MIN, INT64_MIN };
-
-    static uint64_t u_upper[] = { UINT8_MAX, UINT16_MAX, UINT32_MAX,
-                                  UINT64_MAX };
-    static uint64_t u_lower[] = { 0, 0, 0, 0 };
-
-    if (!is_u)
-        upper = s_upper, lower = s_lower;
-    else
-        upper = u_upper, lower = u_lower;
-
-    li_d(temp, upper[size]);
-    la_vinsgr2vr_d(vtemp, temp, 0);
-
-    switch (size) {
-    case 0:
-        la_vreplvei_b(vtemp, vtemp, 0);
-        la_vseq_b(vtemp, vtemp, vreg);
-        break;
-    case 1:
-        la_vreplvei_h(vtemp, vtemp, 0);
-        la_vseq_h(vtemp, vtemp, vreg);
-        break;
-    case 2:
-        la_vreplvei_w(vtemp, vtemp, 0);
-        la_vseq_w(vtemp, vtemp, vreg);
-        break;
-    case 3:
-        la_vreplvei_d(vtemp, vtemp, 0);
-        la_vseq_d(vtemp, vtemp, vreg);
-        break;
-    default:
-        assert(0);
-    }
-
-    la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
-    la_bcnez(fcc1_ir2_opnd, set_qc);
-
-    li_d(temp, lower[size]);
-    la_vinsgr2vr_d(vtemp, temp, 0);
-
-    switch (size) {
-    case 0:
-        la_vreplvei_b(vtemp, vtemp, 0);
-        la_vseq_b(vtemp, vtemp, vreg);
-        break;
-    case 1:
-        la_vreplvei_h(vtemp, vtemp, 0);
-        la_vseq_h(vtemp, vtemp, vreg);
-        break;
-    case 2:
-        la_vreplvei_w(vtemp, vtemp, 0);
-        la_vseq_w(vtemp, vtemp, vreg);
-        break;
-    case 3:
-        la_vreplvei_d(vtemp, vtemp, 0);
-        la_vseq_d(vtemp, vtemp, vreg);
-        break;
-    default:
-        assert(0);
-    }
-
-    la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
-    la_bcnez(fcc1_ir2_opnd, set_qc);
-
-    la_b(exit);
-
-
-    la_label(set_qc);
-
-    li_d(temp, 1);
-    la_st_w(temp, env_ir2_opnd, env_offset_QC());
-
-    la_label(exit);
-
-
-    free_alloc_gpr(temp);
-    free_alloc_fpr(vtemp);
-}
-
-static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d,
-                                          IR2_OPND vreg1, IR2_OPND vreg2,
-                                          int rd)
-{
-    assert(0);
-    IR2_OPND temp = ra_alloc_itemp();
-
-    // li_d(temp, ctx->base->pc_next);
-    // la_st_d(temp, env_ir2_opnd, env_offset_pc());
-
-    lata_gen_call_helper_prologue(tcg_ctx);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s64);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_d(a1_ir2_opnd, vreg1, 0);
-    la_vpickve2gr_d(a2_ir2_opnd, vreg2, 0);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_d(vreg_d, a0_ir2_opnd, 0);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s64);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_d(a1_ir2_opnd, vreg1, 1);
-    la_vpickve2gr_d(a2_ir2_opnd, vreg2, 1);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_d(vreg_d, a0_ir2_opnd, 1);
-
-    if (rd != -1)
-        la_vst(vreg_d, env_ir2_opnd, env_offset_fpr(rd));
-
-    lata_gen_call_helper_epilogue(tcg_ctx);
-
-    free_alloc_gpr(temp);
-}
-
-static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d,
-                                          IR2_OPND vreg1, IR2_OPND vreg2,
-                                          int rd)
-{
-    assert(0);
-    IR2_OPND temp = ra_alloc_itemp();
-
-    // li_d(temp, ctx->base->pc_next);
-    // la_st_d(temp, env_ir2_opnd, env_offset_pc());
-
-    lata_gen_call_helper_prologue(tcg_ctx);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 0);
-    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 0);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 0);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 1);
-    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 1);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 1);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 2);
-    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 2);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 2);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 3);
-    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 3);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 3);
-    if (rd != -1)
-        la_vst(vreg_d, env_ir2_opnd, env_offset_fpr(rd));
-
-    lata_gen_call_helper_epilogue(tcg_ctx);
-    free_alloc_gpr(temp);
 }
 
 static void gen_goto_tb_indirect(DisasContext *s, IR2_OPND reg_n)
@@ -708,6 +555,74 @@ static inline AArch64DecodeFn *lookup_disas_fn(const AArch64DecodeTable *table,
     return NULL;
 }
 
+static void lata_gen_func_wrap_common(struct TranslationBlock *tb,
+                                      uint64_t host_func, uint64_t callee,
+                                      bool is_special, bool with_exit)
+{
+    IR2_OPND temp = ra_alloc_itemp();
+
+    if (with_exit) {
+        la_st_d(s5_ir2_opnd, env_ir2_opnd, env_offset_pc());
+    }
+
+    if (!is_special) {
+        lata_gen_call_helper_prologue(tcg_ctx);
+        la_mov64(a1_ir2_opnd, env_ir2_opnd);
+        if (callee) {
+            li_d(a0_ir2_opnd, callee);
+        }
+        li_d(temp, host_func);
+        la_jirl(ra_ir2_opnd, temp, 0);
+        lata_gen_call_helper_epilogue(tcg_ctx);
+    } else {
+        int64_t curr_ins_pos =
+            (uint64_t)tb->tc.ptr + (lsenv->tr_data->real_ir2_inst_num << 2);
+        int64_t bl_offset = callee - curr_ins_pos;
+
+        IR2_OPND ir2_opnd_addr;
+        ir2_opnd_build(&ir2_opnd_addr, IR2_OPND_IMM, bl_offset >> 2);
+        la_bl(ir2_opnd_addr);
+    }
+
+    if (with_exit) {
+        int64_t curr_ins_pos =
+            (uint64_t)tb->tc.ptr + (lsenv->tr_data->real_ir2_inst_num << 2);
+        int64_t exit_offset = context_switch_native_to_bt_ret_0 - curr_ins_pos;
+
+        IR2_OPND ir2_opnd_addr;
+        ir2_opnd_build(&ir2_opnd_addr, IR2_OPND_IMM, exit_offset >> 2);
+        la_b(ir2_opnd_addr);
+    }
+
+    free_alloc_gpr(temp);
+}
+
+void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
+                        uint64_t callee, bool is_special)
+{
+    lata_gen_func_wrap_common(tb, host_func, callee, is_special, true);
+}
+
+static void lata_gen_func_wrap_inline(struct TranslationBlock *tb,
+                                      uint64_t host_func, uint64_t callee,
+                                      bool is_special)
+{
+    lata_gen_func_wrap_common(tb, host_func, callee, is_special, false);
+}
+
+static inline bool check_plt(vaddr pc)
+{
+    __uint128_t data = *(__uint128_t *)pc;
+
+    const static __uint128_t MASK =
+        ((__uint128_t)0xFFFFFC1F7FC00000ULL << 64) | 0xFFC000009F000000ULL;
+
+    const static __uint128_t EXPECTED =
+        ((__uint128_t)0xD61F000011000000ULL << 64) | 0xF940000090000000ULL;
+
+    return (data & MASK) == EXPECTED;
+}
+
 /*
  * The instruction disassembly implemented here matches
  * the instruction encoding classifications in chapter C4
@@ -727,69 +642,35 @@ static bool trans_B(DisasContext *s)
         }
     }
 
+    struct TranslationBlock *curr_tb = s->base->tb;
+    vaddr next_pc = s->base->pc_next;
+    vaddr target_pc = s->pc_curr + a->imm;
+
+    curr_tb->target_pc = target_pc;
+    curr_tb->next_pc = next_pc;
+
+    if (unlikely(check_plt(target_pc))) {
+        WrapItem *it = wrap_query(target_pc);
+        if (it && it->callee) {
+            IR2_OPND ir2_opnd_addr;
+            lata_gen_func_wrap_inline(curr_tb, it->host_pc, it->callee,
+                                      it->is_special);
+            la_st_d(s5_ir2_opnd, env_ir2_opnd, env_offset_pc());
+            int64_t curr_ins_pos = (unsigned long)curr_tb->tc.ptr +
+                                   (lsenv->tr_data->real_ir2_inst_num << 2);
+            int64_t exit_offset =
+                context_switch_native_to_bt_ret_0 - curr_ins_pos;
+
+            ir2_opnd_build(&ir2_opnd_addr, IR2_OPND_IMM, exit_offset >> 2);
+            la_b(ir2_opnd_addr);
+            return true;
+        }
+    }
+
     gen_goto_tb(s, 1, a->imm);
     // s->base->is_jmp = DISAS_NORETURN;
 
     return true;
-}
-
-void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
-                        uint64_t callee)
-{
-    IR2_OPND temp = ra_alloc_itemp();
-
-    la_st_d(s5_ir2_opnd, env_ir2_opnd, env_offset_pc());
-
-    // for (int i = 0; i <= 31; ++i) {
-    //     if (arm_la_map[i] > 0 && arm_abi_map[i] > 0) {
-    //         la_st_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
-    //                 env_offset_gpr(i));
-    //     }
-    // }
-
-    // for (int i = 0; i <= 31; ++i) {
-    //     if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 0) {
-    //         la_vst(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
-    //                env_offset_fpr(i));
-    //     }
-    // }
-    //
-
-    lata_gen_call_helper_prologue(tcg_ctx);
-
-    la_mov64(a1_ir2_opnd, env_ir2_opnd);
-
-    if (callee)
-        li_d(a0_ir2_opnd, callee);
-
-    li_d(temp, host_func);
-    la_jirl(ra_ir2_opnd, temp, 0);
-
-    lata_gen_call_helper_epilogue(tcg_ctx);
-
-
-    // for (int i = 0; i <= 31; ++i) {
-    //     if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 1) {
-    //         la_vld(ir2_opnd_new(IR2_OPND_FPR, arm_la_fmap[i]), env_ir2_opnd,
-    //                env_offset_fpr(i));
-    //     }
-    // }
-
-    // for (int i = 0; i <= 31; ++i) {
-    //     if (arm_la_map[i] > 0 && arm_abi_map[i] > 1) {
-    //         la_ld_d(ir2_opnd_new(IR2_OPND_GPR, arm_la_map[i]), env_ir2_opnd,
-    //                 env_offset_gpr(i));
-    //     }
-    // }
-
-    IR2_OPND ir2_opnd_addr;
-    int64_t curr_ins_pos =
-        (unsigned long)tb->tc.ptr + (lsenv->tr_data->real_ir2_inst_num << 2);
-    int64_t exit_offset = context_switch_native_to_bt_ret_0 - curr_ins_pos;
-    ir2_opnd_build(&ir2_opnd_addr, IR2_OPND_IMM, exit_offset >> 2);
-    la_b(ir2_opnd_addr);
-
-    free_alloc_gpr(temp);
 }
 
 static bool trans_BL(DisasContext *s)
@@ -807,10 +688,33 @@ static bool trans_BL(DisasContext *s)
     vaddr next_pc = s->base->pc_next;
     vaddr target_pc = s->pc_curr + a->imm;
 
-    TranslationBlock *next_tb = tb_htable_lookup(current_cpu, target_pc, curr_tb->cs_base, curr_tb->flags, curr_tb->cflags);
-    if(next_tb && next_tb->last_ir1_type == IR1_TYPE_RET){
-       tcg_ctx->try_inline = target_pc; 
-       return true;
+    curr_tb->target_pc = target_pc;
+    curr_tb->next_pc = next_pc;
+
+    TranslationBlock *next_tb =
+        tb_htable_lookup(current_cpu, target_pc, curr_tb->cs_base,
+                         curr_tb->flags, curr_tb->cflags);
+    if (next_tb && next_tb->last_ir1_type == IR1_TYPE_RET) {
+        curr_tb->inline_mode = INLINE_SHORT_CODE;
+        tcg_ctx->try_inline = target_pc;
+        return true;
+    }
+
+    if (check_plt(target_pc)) {
+        WrapItem *it = wrap_query(target_pc);
+        if (it && it->callee) {
+            curr_tb->inline_mode = INLINE_FUNC_WRAP;
+            tcg_ctx->try_inline = next_pc;
+            lata_gen_func_wrap_inline(curr_tb, it->host_pc, it->callee,
+                                      it->is_special);
+            return true;
+        }
+        curr_tb->inline_mode = INLINE_BL_PLT;
+        tcg_ctx->try_inline = target_pc;
+        IR2_OPND x30 = alloc_gpr_dst(30);
+        li_d(x30, next_pc);
+        store_gpr_dst(30, x30);
+        return true;
     }
 
     IR2_OPND x30 = alloc_gpr_dst(30);
@@ -2506,6 +2410,8 @@ static bool trans_LDP_v(DisasContext *s)
         clear_gpr_high(a->rn);
     }
 
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
+
     if (!a->w && offset) { // wback = false && offset!=0
         la_addi_d(temp, reg_n, offset);
         switch (dbytes) {
@@ -2661,8 +2567,6 @@ static bool trans_STR_i(DisasContext *s)
         clear_gpr_high(a->rt);
     }
 
-    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
-
     if (!a->w && offset) { // postindex = false
         /* Unsigned offset立即数是uimm12位，
         la_addi_d立即数是imm12，需要将立即数加载到寄存器
@@ -2746,8 +2650,6 @@ static bool trans_LDR_i(DisasContext *s)
 
     IR2_OPND reg_n = alloc_gpr_src_sp(a->rn);
     IR2_OPND reg_t = alloc_gpr_dst(a->rt);
-
-    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
 
     /*  # LDR (immediate)
         ## Post-index                       ## Pre-index ## Unsigned offset
@@ -2873,8 +2775,6 @@ static bool trans_STR_v_i(DisasContext *s)
     if (clearGprHigh && arm_la_map[a->rn] >= 0) { /* all reg_n is 64-bit size*/
         clear_gpr_high(a->rn);
     }
-
-    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
 
     if (!a->w && offset) { // postindex = false
         /* Unsigned offset立即数是uimm12位，
@@ -11899,15 +11799,15 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s32(s, vzero, vzero, vzero, -1);
-                lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero, rd);
+                la_vsadd_w(vzero, vzero, vzero);
+                la_vsadd_w(vreg_d, vreg_d, vzero);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, -1);
-                lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero, rd);
+                la_vsadd_d(vzero, vzero, vzero);
+                la_vsadd_d(vreg_d, vreg_d, vzero);
                 break;
             default:
                 assert(0);
@@ -11934,25 +11834,17 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s32(s, vzero, vzero, vzero, -1);
-                // la_vsadd_w(vzero, vzero, vzero);
-                // gen_sat_q(vzero, 1, false);
+                la_vsadd_w(vzero, vzero, vzero);
                 la_vneg_w(vzero, vzero);
-                lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero, rd);
-                // la_vsadd_w(vreg_d, vreg_d, vzero);
-                // gen_sat_q(vreg_d, 1, false);
+                la_vsadd_w(vreg_d, vreg_d, vzero);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, -1);
-                // la_vsadd_d(vzero, vzero, vzero);
-                // gen_sat_q(vreg_d, 2, false);
+                la_vsadd_d(vzero, vzero, vzero);
                 la_vneg_d(vzero, vzero);
-                lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero, rd);
-                // la_vsadd_d(vreg_d, vreg_d, vzero);
-                // gen_sat_q(vreg_d, 2, false);
+                la_vsadd_d(vreg_d, vreg_d, vzero);
                 break;
             default:
                 assert(0);
@@ -11979,13 +11871,13 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s32(s, vreg_d, vzero, vzero, rd);
+                la_vsadd_w(vreg_d, vzero, vzero);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, rd);
+                la_vsadd_d(vreg_d, vzero, vzero);
                 break;
             default:
                 assert(0);
@@ -15514,7 +15406,8 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
     uint32_t cflags = tb_cflags(tb);
 
     /* Initialize DisasContextBase */
-    // DisasContextBase *db = (DisasContextBase *)malloc(sizeof(DisasContextBase));
+    // DisasContextBase *db = (DisasContextBase
+    // *)malloc(sizeof(DisasContextBase));
     DisasContextBase *db = &db_rel;
     db->tb = tb;
     db->pc_first = pc;
@@ -15556,10 +15449,10 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
 
         /* Stop translation if the output buffer is full,
            or we have executed all of the allowed instructions.  */
-        // if (db->num_insns >= db->max_insns) {
-        //     db->is_jmp = DISAS_TOO_MANY;
-        //     break;
-        // }
+        if (db->num_insns >= db->max_insns) {
+            db->is_jmp = DISAS_TOO_MANY;
+            break;
+        }
     }
 
     tb->size = db->pc_next - db->pc_first;
@@ -15603,7 +15496,7 @@ DisasContext *get_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
     generate ir1_list
 */
 static void get_more_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
-                           int max_insns)
+                              int max_insns)
 {
     // DisasContext *ir1_list =
     DisasContext *pir1 = NULL;
@@ -15611,9 +15504,10 @@ static void get_more_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
     /* Initialize DisasContextBase */
     DisasContextBase *db = &db_rel;
     bool resume_ret = false;
-    vaddr pc_restore = db->pc_next;    
-    
+    vaddr pc_restore = db->pc_next;
+
     db->pc_next = pc;
+    db->is_jmp = DISAS_NEXT;
 
     while (true) {
         max_insns = db->num_insns;
@@ -15627,15 +15521,17 @@ static void get_more_ir1_list(CPUState *cpu, TranslationBlock *tb, vaddr pc,
         db->num_insns++;
 
         /* Stop translation if translate_insn so indicated.  */
-        if (db->is_jmp != DISAS_NEXT && resume_ret) {
+        if (db->is_jmp != DISAS_NEXT &&
+            (tb->inline_mode != INLINE_SHORT_CODE || resume_ret)) {
             break;
         }
 
-        if (ir1_is_ret(pir1) && !resume_ret) {
+        if (tb->inline_mode == INLINE_SHORT_CODE && ir1_is_ret(pir1) &&
+            !resume_ret) {
             resume_ret = true;
             db->pc_next = pc_restore;
             db->is_jmp = DISAS_NEXT;
-            db->num_insns --;
+            db->num_insns--;
         }
 
         // /* Stop translation if the output buffer is full,
@@ -15724,6 +15620,11 @@ void translate_aarch64_insn(DisasContext *s, CPUState *cpu)
 
     // Determine whether the instruction is a jump type
     set_base_isjump(s);
+}
+
+static void add_addr(void *addr)
+{
+    berberis_cb->log_dl_info(addr);
 }
 
 /*ir1 -> ir2*/

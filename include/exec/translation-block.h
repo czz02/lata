@@ -87,6 +87,13 @@ typedef enum AARCH64_TYPE {
 } AARCH64_TYPE;
 #endif
 
+#define INLINE_NONE -1
+#define INLINE_SHORT_CODE 1
+#define INLINE_BL_PLT 2
+#define INLINE_FUNC_WRAP 3
+#define INLINE_DISABLE_LINK 4
+#define INLINE_ENABLE_LINK 5
+
 struct TranslationBlock {
     /*
      * Guest PC corresponding to this block.  This must be the true
@@ -197,6 +204,10 @@ struct TranslationBlock {
 #ifdef CONFIG_LATA
     void *ir1;
     int codesize;
+
+    int inline_mode;
+    uint64_t target_pc;
+    uint64_t next_pc;
 #endif
 #ifdef CONFIG_LATA_TU
 #define TU_UNLINK_STUB_INVALID 0xffffffff /* TU no unlink stub. */
