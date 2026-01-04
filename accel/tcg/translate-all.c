@@ -273,7 +273,8 @@ int tr_translate_wrap(struct TranslationBlock *tb, uint64_t host_pc,
 {
     tr_init(tb);
     tcg_insn_unit *gen_code_buf;
-    gen_code_buf = tcg_ctx->trace_gen_ptr;
+    // gen_code_buf = tcg_ctx->trace_gen_ptr;
+    gen_code_buf = tcg_ctx->code_gen_ptr;
     tb->tc.ptr = tcg_splitwx_to_rx(gen_code_buf);
     lata_gen_func_wrap(tb, host_pc, callee, is_special);
     tb->icount = 0;
@@ -282,8 +283,8 @@ int tr_translate_wrap(struct TranslationBlock *tb, uint64_t host_pc,
     tr_fini();
 
     qatomic_set(
-        &tcg_ctx->trace_gen_ptr,
-        (void *)ROUND_UP(((uintptr_t)tcg_ctx->trace_gen_ptr + gen_code_size),
+        &tcg_ctx->code_gen_ptr,
+        (void *)ROUND_UP(((uintptr_t)tcg_ctx->code_gen_ptr + gen_code_size),
                          CODE_GEN_ALIGN));
 
     return gen_code_size;

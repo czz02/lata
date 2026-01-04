@@ -774,6 +774,7 @@ void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
         li_d(temp, host_func);
         la_jirl(ra_ir2_opnd, temp, 0);
 
+        // lata_gen_call_helper_epilogue(tcg_ctx);
 
         for (int i = 0; i <= 31; ++i) {
             if (arm_la_fmap[i] >= 0 && arm_abi_fmap[i] > 1) {
@@ -792,12 +793,11 @@ void lata_gen_func_wrap(struct TranslationBlock *tb, uint64_t host_func,
         li_d(temp, callee);
         la_jirl(ra_ir2_opnd, temp, 0);
     }
-    // lata_gen_call_helper_epilogue(tcg_ctx);
 
     IR2_OPND ir2_opnd_addr;
     int64_t curr_ins_pos =
         (unsigned long)tb->tc.ptr + (lsenv->tr_data->real_ir2_inst_num << 2);
-    int64_t exit_offset = trace_context_switch_native_to_bt_ret_0 - curr_ins_pos;
+    int64_t exit_offset = context_switch_native_to_bt_ret_0 - curr_ins_pos;
     ir2_opnd_build(&ir2_opnd_addr, IR2_OPND_IMM, exit_offset >> 2);
     la_b(ir2_opnd_addr);
 

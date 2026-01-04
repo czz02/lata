@@ -66,6 +66,7 @@ extern __thread CPUState *thread_cpu;
 // extern CPUState *thread_cpu;
 // G_NORETURN void cpu_loop(CPUArchState *env);
 void cpu_loop(CPUArchState *env);
+void android_jni_run(void *state);
 abi_long get_errno(abi_long ret);
 const char *target_strerror(int err);
 int get_osversion(void);

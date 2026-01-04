@@ -26,5 +26,6 @@ android_ss.add(libdw)
 syscall_nr_generators = {}
 
 subdir('arm')
+subdir('utils')
 
 specific_ss.add_all(when: 'CONFIG_ANDROID', if_true: android_ss)
