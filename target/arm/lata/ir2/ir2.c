@@ -98,7 +98,6 @@ IR2_OPND ir2_opnd_new_type(IR2_OPND_TYPE t)
     return opnd;
 }
 
-inline __attribute__ ((always_inline))
 void ir2_opnd_build(IR2_OPND *opnd, IR2_OPND_TYPE t, int value)
 {
     if (t == IR2_OPND_GPR || t == IR2_OPND_FPR || t == IR2_OPND_FCSR ||
@@ -324,10 +323,7 @@ bool ir2_opcode_is_branch(IR2_OPCODE opcode)
 inline __attribute__ ((always_inline))
 bool ir2_opcode_is_branch_with_3opnds(IR2_OPCODE opcode)
 {
-    if (opcode >= LISA_BEQ && opcode <= LISA_BGEU) {
-        return true;
-    }
-    return false;
+    return opcode >= LISA_BEQ && opcode <= LISA_BGEU;
 }
 
 inline __attribute__ ((always_inline))
@@ -391,24 +387,18 @@ void ir2_set_opcode(IR2_INST *ir2, IR2_OPCODE type)
     ir2->_opcode = type;
 }
 
-inline __attribute__ ((always_inline))
 IR2_INST *ir2_prev(const IR2_INST *ir2)
 {
-    if (ir2->_prev == -1) {
+    if (ir2->_prev == -1)
         return NULL;
-    } else {
-        return lsenv->tr_data->ir2_inst_array + ir2->_prev;
-    }
+    return lsenv->tr_data->ir2_inst_array + ir2->_prev;
 }
 
-inline __attribute__ ((always_inline))
 IR2_INST *ir2_next(const IR2_INST *ir2)
 {
-    if (ir2->_next == -1) {
+    if (ir2->_next == -1)
         return NULL;
-    } else {
-        return lsenv->tr_data->ir2_inst_array + ir2->_next;
-    }
+    return lsenv->tr_data->ir2_inst_array + ir2->_next;
 }
 
 int ir2_to_string(IR2_INST *ir2, char *str)
@@ -570,28 +560,30 @@ void ir2_insert_after(IR2_INST *ir2, IR2_INST *prev)
     }
 }
 
+__attribute__((noinline))
+static void ir2_get_space(void)
+{
+    TRANSLATION_DATA *t = lsenv->tr_data;
+    int bytes = sizeof(IR2_INST) * t->ir2_inst_num_max;
+
+    /* 1.2. double the array */
+    t->ir2_inst_num_max *= 2;
+    IR2_INST *back_ir2_inst_array = t->ir2_inst_array;
+    t->ir2_inst_array = (IR2_INST *)mm_realloc(t->ir2_inst_array, bytes << 1);
+    t->first_ir2 = (IR2_INST *)((ADDR)t->first_ir2 - (ADDR)back_ir2_inst_array +
+                                (ADDR)t->ir2_inst_array);
+    t->last_ir2 = (IR2_INST *)((ADDR)t->last_ir2 - (ADDR)back_ir2_inst_array +
+                               (ADDR)t->ir2_inst_array);
+}
+
+inline __attribute__((always_inline))
 IR2_INST *ir2_allocate(void)
 {
     TRANSLATION_DATA *t = lsenv->tr_data;
 
     /* 1. make sure we have enough space */
-    if (t->ir2_inst_num_current == t->ir2_inst_num_max) {
-        /* printf("[LATX] [error] not implemented in %s : %d", __func__, */
-        /* __LINE__); exit(-1); 1.1. current array size in bytes */
-        int bytes = sizeof(IR2_INST) * t->ir2_inst_num_max;
-
-        /* 1.2. double the array */
-        t->ir2_inst_num_max *= 2;
-        IR2_INST *back_ir2_inst_array = t->ir2_inst_array;
-        t->ir2_inst_array =
-            (IR2_INST *)mm_realloc(t->ir2_inst_array, bytes << 1);
-        t->first_ir2 =
-            (IR2_INST *)((ADDR)t->first_ir2 - (ADDR)back_ir2_inst_array +
-                         (ADDR)t->ir2_inst_array);
-        t->last_ir2 =
-            (IR2_INST *)((ADDR)t->last_ir2 - (ADDR)back_ir2_inst_array +
-                         (ADDR)t->ir2_inst_array);
-    }
+    if (unlikely(t->ir2_inst_num_current == t->ir2_inst_num_max))
+        ir2_get_space();
 
     /* 2. allocate one */
     IR2_INST *p = t->ir2_inst_array + t->ir2_inst_num_current;

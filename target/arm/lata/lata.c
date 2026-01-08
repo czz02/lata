@@ -103,7 +103,7 @@ uint64_t *fam_cache;
 static __thread TRANSLATION_DATA tr_data_real;
 __thread TRANSLATION_DATA *tr_data;
 
-bool lata_dump = 0;
+const bool lata_dump = 0;
 uint64_t context_switch_bt_to_native;
 uint64_t context_switch_native_to_bt_ret_0;
 uint64_t context_switch_native_to_bt;

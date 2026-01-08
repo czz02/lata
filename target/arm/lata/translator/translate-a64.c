@@ -250,188 +250,15 @@ static void lata_unallocated_encoding(DisasContext *s)
 static void lata_clean_data_tbi(DisasContext *s, IR2_OPND *dst, IR2_OPND *src,
                                 int tbi)
 {
+    la_bstrpick_d(*dst, *src, 56, 0);
     // #ifndef CONFIG_ANDROID
-    if (tbi == 0) {
-        /* Load unmodified address */
-    } else {
-        /* lata only support user-mode, we don't need Sign-extend */
-        la_bstrpick_d(*dst, *src, 56, 0);
-    }
+    // if (tbi == 0) {
+    //     /* Load unmodified address */
+    // } else {
+    //     /* lata only support user-mode, we don't need Sign-extend */
+    //     la_bstrpick_d(*dst, *src, 56, 0);
+    // }
     // #endif
-}
-
-
-// check saturate
-static inline void gen_sat_q(IR2_OPND vreg, int size, int is_u)
-{
-    assert(0);
-    IR2_OPND vtemp = ra_alloc_ftemp();
-    IR2_OPND temp = ra_alloc_itemp();
-    IR2_OPND set_qc = ir2_opnd_new_type(IR2_OPND_LABEL);
-    IR2_OPND exit = ir2_opnd_new_type(IR2_OPND_LABEL);
-
-    uint64_t *upper;
-    uint64_t *lower;
-
-    static uint64_t s_upper[] = { INT8_MAX, INT16_MAX, INT32_MAX, INT64_MAX };
-    static uint64_t s_lower[] = { INT8_MIN, INT16_MIN, INT32_MIN, INT64_MIN };
-
-    static uint64_t u_upper[] = { UINT8_MAX, UINT16_MAX, UINT32_MAX,
-                                  UINT64_MAX };
-    static uint64_t u_lower[] = { 0, 0, 0, 0 };
-
-    if (!is_u)
-        upper = s_upper, lower = s_lower;
-    else
-        upper = u_upper, lower = u_lower;
-
-    li_d(temp, upper[size]);
-    la_vinsgr2vr_d(vtemp, temp, 0);
-
-    switch (size) {
-    case 0:
-        la_vreplvei_b(vtemp, vtemp, 0);
-        la_vseq_b(vtemp, vtemp, vreg);
-        break;
-    case 1:
-        la_vreplvei_h(vtemp, vtemp, 0);
-        la_vseq_h(vtemp, vtemp, vreg);
-        break;
-    case 2:
-        la_vreplvei_w(vtemp, vtemp, 0);
-        la_vseq_w(vtemp, vtemp, vreg);
-        break;
-    case 3:
-        la_vreplvei_d(vtemp, vtemp, 0);
-        la_vseq_d(vtemp, vtemp, vreg);
-        break;
-    default:
-        assert(0);
-    }
-
-    la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
-    la_bcnez(fcc1_ir2_opnd, set_qc);
-
-    li_d(temp, lower[size]);
-    la_vinsgr2vr_d(vtemp, temp, 0);
-
-    switch (size) {
-    case 0:
-        la_vreplvei_b(vtemp, vtemp, 0);
-        la_vseq_b(vtemp, vtemp, vreg);
-        break;
-    case 1:
-        la_vreplvei_h(vtemp, vtemp, 0);
-        la_vseq_h(vtemp, vtemp, vreg);
-        break;
-    case 2:
-        la_vreplvei_w(vtemp, vtemp, 0);
-        la_vseq_w(vtemp, vtemp, vreg);
-        break;
-    case 3:
-        la_vreplvei_d(vtemp, vtemp, 0);
-        la_vseq_d(vtemp, vtemp, vreg);
-        break;
-    default:
-        assert(0);
-    }
-
-    la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
-    la_bcnez(fcc1_ir2_opnd, set_qc);
-
-    la_b(exit);
-
-
-    la_label(set_qc);
-
-    li_d(temp, 1);
-    la_st_w(temp, env_ir2_opnd, env_offset_QC());
-
-    la_label(exit);
-
-
-    free_alloc_gpr(temp);
-    free_alloc_fpr(vtemp);
-}
-
-static void lata_helper_addl_saturate_s64(DisasContext *ctx, IR2_OPND vreg_d,
-                                          IR2_OPND vreg1, IR2_OPND vreg2,
-                                          int rd)
-{
-    assert(0);
-    IR2_OPND temp = ra_alloc_itemp();
-
-    // li_d(temp, ctx->base->pc_next);
-    // la_st_d(temp, env_ir2_opnd, env_offset_pc());
-
-    lata_gen_call_helper_prologue(tcg_ctx);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s64);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_d(a1_ir2_opnd, vreg1, 0);
-    la_vpickve2gr_d(a2_ir2_opnd, vreg2, 0);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_d(vreg_d, a0_ir2_opnd, 0);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s64);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_d(a1_ir2_opnd, vreg1, 1);
-    la_vpickve2gr_d(a2_ir2_opnd, vreg2, 1);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_d(vreg_d, a0_ir2_opnd, 1);
-
-    if (rd != -1)
-        la_vst(vreg_d, env_ir2_opnd, env_offset_fpr(rd));
-
-    lata_gen_call_helper_epilogue(tcg_ctx);
-
-    free_alloc_gpr(temp);
-}
-
-static void lata_helper_addl_saturate_s32(DisasContext *ctx, IR2_OPND vreg_d,
-                                          IR2_OPND vreg1, IR2_OPND vreg2,
-                                          int rd)
-{
-    assert(0);
-    IR2_OPND temp = ra_alloc_itemp();
-
-    // li_d(temp, ctx->base->pc_next);
-    // la_st_d(temp, env_ir2_opnd, env_offset_pc());
-
-    lata_gen_call_helper_prologue(tcg_ctx);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 0);
-    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 0);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 0);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 1);
-    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 1);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 1);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 2);
-    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 2);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 2);
-
-    li_d(temp, (uint64_t)helper_neon_addl_saturate_s32);
-    la_mov64(a0_ir2_opnd, env_ir2_opnd);
-    la_vpickve2gr_w(a1_ir2_opnd, vreg1, 3);
-    la_vpickve2gr_w(a2_ir2_opnd, vreg2, 3);
-    la_jirl(ra_ir2_opnd, temp, 0);
-    la_vinsgr2vr_w(vreg_d, a0_ir2_opnd, 3);
-    if (rd != -1)
-        la_vst(vreg_d, env_ir2_opnd, env_offset_fpr(rd));
-
-    lata_gen_call_helper_epilogue(tcg_ctx);
-    free_alloc_gpr(temp);
 }
 
 static void gen_goto_tb_indirect(DisasContext *s, IR2_OPND reg_n)
@@ -2535,6 +2362,8 @@ static bool trans_LDP_v(DisasContext *s)
         clear_gpr_high(a->rn);
     }
 
+    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
+
     if (!a->w && offset) { // wback = false && offset!=0
         la_addi_d(temp, reg_n, offset);
         switch (dbytes) {
@@ -2625,6 +2454,7 @@ static bool trans_STGP(DisasContext *s)
 static void assist_trans_STR_i(IR2_OPND *reg_t, IR2_OPND *reg_n,
                                uint64_t offset, uint64_t sz)
 {
+    lata_clean_data_tbi(NULL, reg_n, reg_n, 1);
     switch (sz) {
     case 0:
         la_st_b(*reg_t, *reg_n, offset);
@@ -2690,8 +2520,6 @@ static bool trans_STR_i(DisasContext *s)
         clear_gpr_high(a->rt);
     }
 
-    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
-
     if (!a->w && offset) { // postindex = false
         /* Unsigned offset立即数是uimm12位，
         la_addi_d立即数是imm12，需要将立即数加载到寄存器
@@ -2725,6 +2553,7 @@ static void assist_trans_LDR_i(IR2_OPND *reg_t, IR2_OPND *reg_n,
                                uint64_t offset, uint64_t sz, uint64_t sign,
                                bool iss_sf)
 {
+    lata_clean_data_tbi(NULL, reg_n, reg_n, 1);
     switch (sz) {
     case 0:
         if (sign) { // LDRSB_i
@@ -2775,8 +2604,6 @@ static bool trans_LDR_i(DisasContext *s)
 
     IR2_OPND reg_n = alloc_gpr_src_sp(a->rn);
     IR2_OPND reg_t = alloc_gpr_dst(a->rt);
-
-    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
 
     /*  # LDR (immediate)
         ## Post-index                       ## Pre-index ## Unsigned offset
@@ -2851,6 +2678,7 @@ static bool trans_LDR_i(DisasContext *s)
 static void assist_trans_STR_v_i(IR2_OPND *vreg_t, IR2_OPND *reg_n,
                                  uint64_t offset, uint64_t sz)
 {
+    lata_clean_data_tbi(NULL, reg_n, reg_n, 1);
     IR2_OPND temp = ra_alloc_itemp();
     switch (sz) {
     case 0:
@@ -2903,8 +2731,6 @@ static bool trans_STR_v_i(DisasContext *s)
         clear_gpr_high(a->rn);
     }
 
-    lata_clean_data_tbi(s, &reg_n, &reg_n, s->tbid);
-
     if (!a->w && offset) { // postindex = false
         /* Unsigned offset立即数是uimm12位，
         la_addi_d立即数是imm12，需要将立即数加载到寄存器
@@ -2940,6 +2766,7 @@ static bool trans_STR_v_i(DisasContext *s)
 static void assist_trans_LDR_v_i(IR2_OPND *vreg_t, IR2_OPND *reg_n,
                                  uint64_t offset, uint64_t sz)
 {
+    lata_clean_data_tbi(NULL, reg_n, reg_n, 1);
     IR2_OPND temp = ra_alloc_itemp();
     switch (sz) {
     case 0:
@@ -11928,15 +11755,15 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s32(s, vzero, vzero, vzero, -1);
-                lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero, rd);
+                la_vsadd_w(vzero, vzero, vzero);
+                la_vsadd_w(vreg_d, vreg_d, vzero);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, -1);
-                lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero, rd);
+                la_vsadd_d(vzero, vzero, vzero);
+                la_vsadd_d(vreg_d, vreg_d, vzero);
                 break;
             default:
                 assert(0);
@@ -11963,25 +11790,17 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s32(s, vzero, vzero, vzero, -1);
-                // la_vsadd_w(vzero, vzero, vzero);
-                // gen_sat_q(vzero, 1, false);
+                la_vsadd_w(vzero, vzero, vzero);
                 la_vneg_w(vzero, vzero);
-                lata_helper_addl_saturate_s32(s, vreg_d, vreg_d, vzero, rd);
-                // la_vsadd_w(vreg_d, vreg_d, vzero);
-                // gen_sat_q(vreg_d, 1, false);
+                la_vsadd_w(vreg_d, vreg_d, vzero);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, -1);
-                // la_vsadd_d(vzero, vzero, vzero);
-                // gen_sat_q(vreg_d, 2, false);
+                la_vsadd_d(vzero, vzero, vzero);
                 la_vneg_d(vzero, vzero);
-                lata_helper_addl_saturate_s64(s, vreg_d, vreg_d, vzero, rd);
-                // la_vsadd_d(vreg_d, vreg_d, vzero);
-                // gen_sat_q(vreg_d, 2, false);
+                la_vsadd_d(vreg_d, vreg_d, vzero);
                 break;
             default:
                 assert(0);
@@ -12008,13 +11827,13 @@ static void handle_3rd_widening(DisasContext *s, int is_q, int is_u, int size,
                 la_vilvl_h(vtemp, vzero, vreg_n);
                 la_vilvl_h(vtemp1, vzero, vreg_m);
                 la_vmulwev_w_h(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s32(s, vreg_d, vzero, vzero, rd);
+                la_vsadd_w(vreg_d, vzero, vzero);
                 break;
             case 2:
                 la_vilvl_w(vtemp, vzero, vreg_n);
                 la_vilvl_w(vtemp1, vzero, vreg_m);
                 la_vmulwev_d_w(vzero, vtemp, vtemp1);
-                lata_helper_addl_saturate_s64(s, vzero, vzero, vzero, rd);
+                la_vsadd_d(vreg_d, vzero, vzero);
                 break;
             default:
                 assert(0);
