@@ -561,10 +561,6 @@ static void lata_gen_func_wrap_common(struct TranslationBlock *tb,
 {
     IR2_OPND temp = ra_alloc_itemp();
 
-    if (with_exit) {
-        la_st_d(s5_ir2_opnd, env_ir2_opnd, env_offset_pc());
-    }
-
     if (!is_special) {
         lata_gen_call_helper_prologue(tcg_ctx);
         la_mov64(a1_ir2_opnd, env_ir2_opnd);
@@ -585,6 +581,7 @@ static void lata_gen_func_wrap_common(struct TranslationBlock *tb,
     }
 
     if (with_exit) {
+        la_st_d(s5_ir2_opnd, env_ir2_opnd, env_offset_pc());
         int64_t curr_ins_pos =
             (uint64_t)tb->tc.ptr + (lsenv->tr_data->real_ir2_inst_num << 2);
         int64_t exit_offset = context_switch_native_to_bt_ret_0 - curr_ins_pos;
@@ -1393,7 +1390,8 @@ static void handle_sys(DisasContext *s, bool isread, unsigned int op0,
     }
 
     if (ri->type & ARM_CP_IO) {
-        assert(0);
+        need_exit_tb = true;
+        // assert(0);
         /* I/O operations must end the TB here (whether read or write) */
     }
 

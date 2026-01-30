@@ -316,12 +316,12 @@ static void plugin_insn_append(abi_ptr pc, const void *from, size_t size)
 uint8_t translator_ldub(CPUArchState *env, DisasContextBase *db, abi_ptr pc)
 {
     uint8_t ret;
-    void *p = translator_access(env, db, pc, sizeof(ret));
+    // void *p = translator_access(env, db, pc, sizeof(ret));
 
-    if (p) {
-        plugin_insn_append(pc, p, sizeof(ret));
-        return ldub_p(p);
-    }
+    // if (p) {
+    //     plugin_insn_append(pc, p, sizeof(ret));
+    //     return ldub_p(p);
+    // }
     ret = cpu_ldub_code(env, pc);
     plugin_insn_append(pc, &ret, sizeof(ret));
     return ret;
@@ -330,12 +330,12 @@ uint8_t translator_ldub(CPUArchState *env, DisasContextBase *db, abi_ptr pc)
 uint16_t translator_lduw(CPUArchState *env, DisasContextBase *db, abi_ptr pc)
 {
     uint16_t ret, plug;
-    void *p = translator_access(env, db, pc, sizeof(ret));
+    // void *p = translator_access(env, db, pc, sizeof(ret));
 
-    if (p) {
-        plugin_insn_append(pc, p, sizeof(ret));
-        return lduw_p(p);
-    }
+    // if (p) {
+    //     plugin_insn_append(pc, p, sizeof(ret));
+    //     return lduw_p(p);
+    // }
     ret = cpu_lduw_code(env, pc);
     plug = tswap16(ret);
     plugin_insn_append(pc, &plug, sizeof(ret));
@@ -345,12 +345,12 @@ uint16_t translator_lduw(CPUArchState *env, DisasContextBase *db, abi_ptr pc)
 uint32_t translator_ldl(CPUArchState *env, DisasContextBase *db, abi_ptr pc)
 {
     uint32_t ret, plug;
-    void *p = translator_access(env, db, pc, sizeof(ret));
+    // void *p = translator_access(env, db, pc, sizeof(ret));
 
-    if (p) {
-        plugin_insn_append(pc, p, sizeof(ret));
-        return ldl_p(p);
-    }
+    // if (p) {
+    //     plugin_insn_append(pc, p, sizeof(ret));
+    //     return ldl_p(p);
+    // }
     ret = cpu_ldl_code(env, pc);
     plug = tswap32(ret);
     plugin_insn_append(pc, &plug, sizeof(ret));
@@ -360,12 +360,12 @@ uint32_t translator_ldl(CPUArchState *env, DisasContextBase *db, abi_ptr pc)
 uint64_t translator_ldq(CPUArchState *env, DisasContextBase *db, abi_ptr pc)
 {
     uint64_t ret, plug;
-    void *p = translator_access(env, db, pc, sizeof(ret));
+    // void *p = translator_access(env, db, pc, sizeof(ret));
 
-    if (p) {
-        plugin_insn_append(pc, p, sizeof(ret));
-        return ldq_p(p);
-    }
+    // if (p) {
+    //     plugin_insn_append(pc, p, sizeof(ret));
+    //     return ldq_p(p);
+    // }
     ret = cpu_ldq_code(env, pc);
     plug = tswap64(ret);
     plugin_insn_append(pc, &plug, sizeof(ret));
