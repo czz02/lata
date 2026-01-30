@@ -2103,7 +2103,41 @@ static bool trans_LD_lit(DisasContext *s)
 static bool trans_LD_lit_v(DisasContext *s)
 {
     /* Load register (literal), vector version */
-    assert(0);
+    arg_ldlit *a = &(s->arg.f_ldlit);
+    uint64_t addr;
+    IR2_OPND reg_d;
+    IR2_OPND vreg_t;
+
+    if (!fp_access_check(s)) {
+        return true;
+    }
+
+    addr = s->pc_curr + a->imm;
+    reg_d = alloc_gpr_dst(a->rt);
+    vreg_t = alloc_fpr_dst(a->rt);
+
+    li_d(reg_d, addr);
+
+    switch (a->sz) {
+    case 2:
+        la_fld_s(vreg_t, reg_d, 0);
+        la_vand_v(vreg_t, vreg_t, fsmask_ir2_opnd);
+        break;
+    case 3:
+        la_fld_d(vreg_t, reg_d, 0);
+        /* 高64位清零 */
+        la_vinsgr2vr_d(vreg_t, zero_ir2_opnd, 1);
+        break;
+    case 4:
+        la_vld(vreg_t, reg_d, 0);
+        break;
+    default:
+        assert(0);
+    }
+
+    store_fpr_dst(a->rt, vreg_t);
+    free_alloc_fpr(vreg_t);
+    free_alloc_gpr(reg_d);
     return true;
 }
 
