@@ -2076,15 +2076,20 @@ static bool trans_LD_lit(DisasContext *s)
 {
     arg_ldlit *a = &(s->arg.f_ldlit);
     IR2_OPND reg_d = alloc_gpr_dst(a->rt);
-    MemOp memop = a->sz + a->sign * MO_SIGN;
     uint64_t addr = s->pc_curr + a->imm;
     li_d(reg_d, addr);
-    switch (memop) {
-    case MO_64:
-        la_ld_d(reg_d, reg_d, 0);
+    switch (a->sz) {
+    case 2:
+        if (a->sign) {
+            /* LDRSW */
+            la_ld_w(reg_d, reg_d, 0);
+        } else {
+            /* LDR Wt */
+            la_ld_wu(reg_d, reg_d, 0);
+        }
         break;
-    case MO_32:
-        la_ld_w(reg_d, reg_d, 0);
+    case 3:
+        la_ld_d(reg_d, reg_d, 0);
         break;
     default:
         assert(0);
@@ -10847,33 +10852,30 @@ static void handle_fcvt(DisasContext *s, int opcode, bool is_u, int size,
     if (size == MO_64) {
         switch (opcode) {
         case 0x1a: /* FCVTNS */
-            assert(0);
+            la_vftintrne_l_d(vreg_d, vreg_n);
             break;
         case 0x1b: /* FCVTMS */
-            assert(0);
+            la_vftintrm_l_d(vreg_d, vreg_n);
             break;
         case 0x3a: /* FCVTPS */
-            assert(0);
+            la_vftintrp_l_d(vreg_d, vreg_n);
             break;
         case 0x3b: /* FCVTZS */
-            assert(0);
+            la_vftintrz_l_d(vreg_d, vreg_n);
             break;
-        case 0x5a: /* FCVTNU */
-            assert(0);
-            break;
+
         case 0x5b: /* FCVTMU */
-            assert(0);
-            break;
+        case 0x5c: /* FCVTAU */
         case 0x7a: /* FCVTPU */
+            /* TODO: Helpers for unsigned rounding specific modes (Nearest,
+               Minus, Plus) might not be directly exposed. Using assert until
+               confirmed or helpers added. */
             assert(0);
             break;
         case 0x7b: /* FCVTZU */
-            assert(0);
+            la_vftintrz_lu_d(vreg_d, vreg_n);
             break;
         case 0x1c: /* FCVTAS */
-            assert(0);
-            break;
-        case 0x5c: /* FCVTAU */
             assert(0);
             break;
         default:
@@ -10882,33 +10884,27 @@ static void handle_fcvt(DisasContext *s, int opcode, bool is_u, int size,
     } else {
         switch (opcode) {
         case 0x1a: /* FCVTNS */
-            assert(0);
+            la_vftintrne_w_s(vreg_d, vreg_n);
             break;
         case 0x1b: /* FCVTMS */
-            assert(0);
+            la_vftintrm_w_s(vreg_d, vreg_n);
             break;
         case 0x3a: /* FCVTPS */
-            assert(0);
+            la_vftintrp_w_s(vreg_d, vreg_n);
             break;
         case 0x3b: /* FCVTZS */
             la_vftintrz_w_s(vreg_d, vreg_n);
             break;
         case 0x5a: /* FCVTNU */
-            assert(0);
-            break;
         case 0x5b: /* FCVTMU */
-            assert(0);
-            break;
+        case 0x5c: /* FCVTAU */
         case 0x7a: /* FCVTPU */
             assert(0);
             break;
         case 0x7b: /* FCVTZU */
-            assert(0);
+            la_vftintrz_wu_s(vreg_d, vreg_n);
             break;
         case 0x1c: /* FCVTAS */
-            assert(0);
-            break;
-        case 0x5c: /* FCVTAU */
             assert(0);
             break;
         default:
@@ -10916,7 +10912,11 @@ static void handle_fcvt(DisasContext *s, int opcode, bool is_u, int size,
         }
     }
 
+    if (size == MO_32) {
+        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
+    }
 
+    store_fpr_dst(rd, vreg_d);
     free_alloc_fpr(vreg_d);
     free_alloc_fpr(vreg_n);
 }
@@ -12998,7 +12998,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
         vtemp1 = ra_alloc_ftemp();
         vzero = ra_alloc_ftemp();
         la_vandi_b(vzero, vzero, 0);
-    } else if (opcode == 0x05) {
+    } else if (opcode == 0x05 || opcode == 0x01) {
         vtemp = ra_alloc_ftemp();
         vtemp1 = ra_alloc_ftemp();
         temp = ra_alloc_itemp();
@@ -13009,11 +13009,62 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
     switch (opcode) {
     case 0x01: /* SQADD, UQADD */
         if (u) {
-            assert(0);
+            switch (size) {
+            case 0:
+                la_vsadd_bu(vtemp1, vreg_n, vreg_m);
+                la_vadd_b(vtemp, vreg_n, vreg_m);
+                break;
+            case 1:
+                la_vsadd_hu(vtemp1, vreg_n, vreg_m);
+                la_vadd_h(vtemp, vreg_n, vreg_m);
+                break;
+            case 2:
+                la_vsadd_wu(vtemp1, vreg_n, vreg_m);
+                la_vadd_w(vtemp, vreg_n, vreg_m);
+                break;
+            case 3:
+                la_vsadd_du(vtemp1, vreg_n, vreg_m);
+                la_vadd_d(vtemp, vreg_n, vreg_m);
+                break;
+            default:
+                g_assert_not_reached();
+            }
         } else {
-            assert(0);
+            switch (size) {
+            case 0:
+                la_vsadd_b(vtemp1, vreg_n, vreg_m);
+                la_vadd_b(vtemp, vreg_n, vreg_m);
+                break;
+            case 1:
+                la_vsadd_h(vtemp1, vreg_n, vreg_m);
+                la_vadd_h(vtemp, vreg_n, vreg_m);
+                break;
+            case 2:
+                la_vsadd_w(vtemp1, vreg_n, vreg_m);
+                la_vadd_w(vtemp, vreg_n, vreg_m);
+                break;
+            case 3:
+                la_vsadd_d(vtemp1, vreg_n, vreg_m);
+                la_vadd_d(vtemp, vreg_n, vreg_m);
+                break;
+            default:
+                g_assert_not_reached();
+            }
         }
-        return;
+
+        la_vseq_d(vtemp, vtemp1, vtemp);
+        la_vsetanyeqz_b(fcc1_ir2_opnd, vtemp);
+        la_bcnez(fcc1_ir2_opnd, set_qc);
+        la_b(exit);
+
+        la_label(set_qc);
+        li_d(temp, 1);
+        la_st_w(temp, env_ir2_opnd, env_offset_QC());
+
+        la_label(exit);
+
+        la_vor_v(vreg_d, vtemp1, vtemp1);
+        break;
     case 0x05: /* SQSUB, UQSUB */
         if (u) {
             switch (size) {
