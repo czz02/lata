@@ -2078,17 +2078,13 @@ static bool trans_LD_lit(DisasContext *s)
     IR2_OPND reg_d = alloc_gpr_dst(a->rt);
     MemOp memop = a->sz + a->sign * MO_SIGN;
     uint64_t addr = s->pc_curr + a->imm;
+    li_d(reg_d, addr);
     switch (memop) {
     case MO_64:
-        // ld_d只能处理si12
-        la_lu12i_w(reg_d, addr >> 12);
-        if (addr & 0x800) {
-            la_ori(reg_d, reg_d, addr & 0xfff);
-            la_ld_d(reg_d, reg_d, 0);
-        } else {
-            la_ld_d(reg_d, reg_d, addr & 0x7ff);
-        }
-
+        la_ld_d(reg_d, reg_d, 0);
+        break;
+    case MO_32:
+        la_ld_w(reg_d, reg_d, 0);
         break;
     default:
         assert(0);
@@ -9922,7 +9918,95 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
                                          bool is_q, bool is_u, int immh,
                                          int immb, int rn, int rd)
 {
-    assert(0);
+    int size, elements, fracbits;
+    int immhb = immh << 3 | immb;
+
+    if (immh & 8) {
+        size = MO_64;
+        if (!is_scalar && !is_q) {
+            lata_unallocated_encoding(s);
+            return;
+        }
+    } else if (immh & 4) {
+        size = MO_32;
+    } else if (immh & 2) {
+        size = MO_16;
+        if (!dc_isar_feature(aa64_fp16, s)) {
+            lata_unallocated_encoding(s);
+            return;
+        }
+    } else {
+        /* immh == 0 would be a failure of the decode logic */
+        g_assert(immh == 1);
+        lata_unallocated_encoding(s);
+        return;
+    }
+
+    if (is_scalar) {
+        elements = 1;
+    } else {
+        elements = (8 << is_q) >> size;
+    }
+    fracbits = (16 << size) - immhb;
+
+    if (!fp_access_check(s)) {
+        return;
+    }
+
+    IR2_OPND vreg_d = alloc_fpr_dst(rd);
+    IR2_OPND vreg_n = alloc_fpr_src(rn);
+
+    if (fracbits > 0) {
+        IR2_OPND vfactor = ra_alloc_ftemp();
+        IR2_OPND factor_gpr = ra_alloc_itemp();
+
+        if (size == MO_64) {
+            uint64_t val = (uint64_t)(1023 + fracbits) << 52;
+            li_d(factor_gpr, val);
+            la_vreplgr2vr_d(vfactor, factor_gpr);
+            la_vfmul_d(vreg_d, vreg_n, vfactor);
+        } else if (size == MO_32) {
+            uint32_t val = (uint32_t)(127 + fracbits) << 23;
+            li_w(factor_gpr, val);
+            la_vreplgr2vr_w(vfactor, factor_gpr);
+            la_vfmul_s(vreg_d, vreg_n, vfactor);
+        } else {
+            assert(0);
+        }
+        free_alloc_gpr(factor_gpr);
+        free_alloc_fpr(vfactor);
+    }
+
+    IR2_OPND input_opnd = (fracbits > 0) ? vreg_d : vreg_n;
+
+    if (is_u) {
+        if (size == MO_64) {
+            la_vftintrz_lu_d(vreg_d, input_opnd);
+        } else if (size == MO_32) {
+            la_vftintrz_wu_s(vreg_d, input_opnd);
+        } else {
+            assert(0);
+        }
+    } else {
+        if (size == MO_64) {
+            la_vftintrz_l_d(vreg_d, input_opnd);
+        } else if (size == MO_32) {
+            la_vftintrz_w_s(vreg_d, input_opnd);
+        } else {
+            assert(0);
+        }
+    }
+
+    if (elements * (8 << size) < 128) {
+        la_vinsgr2vr_d(vreg_d, zero_ir2_opnd, 1);
+        if (is_scalar && size == MO_32) {
+            la_vinsgr2vr_w(vreg_d, zero_ir2_opnd, 1);
+        }
+    }
+
+    store_fpr_dst(rd, vreg_d);
+    free_alloc_fpr(vreg_d);
+    free_alloc_fpr(vreg_n);
 }
 
 /* AdvSIMD scalar shift by immediate
