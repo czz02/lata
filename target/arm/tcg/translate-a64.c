@@ -14074,3 +14074,54 @@ const TranslatorOps aarch64_translator_ops = {
     .tb_stop = aarch64_tr_tb_stop,
     .disas_log = aarch64_tr_disas_log,
 };
+
+#ifdef CONFIG_ANDROID
+
+int tcg_gen_func_wrap(TranslationBlock *tb, uint64_t host_pc, uint64_t callee,
+                      bool is_special)
+{
+    tcg_func_start(tcg_ctx);
+
+    if (is_special) {
+        /*
+         * Special handling: call/jump to callee directly.
+         * Assumes void(void) signature for now or preserving regs.
+         * TCGHelperInfo info = { .func = (void*)callee ... };
+         */
+        TCGHelperInfo info = { .flags = TCG_CALL_NO_RWG,
+                               .typemask = 0, /* void(void) */
+                               .func = (void *)callee,
+                               .name = "func_wrap_special" };
+        tcg_gen_call0(&info, NULL);
+    } else {
+        /*
+         * General handling: host_func(callee, env)
+         * Signature: void func(uint64, void*)
+         * Typemask: void(0) | i64(0x20) | ptr(0x180) = 0x1A0
+         */
+        TCGHelperInfo info = { .flags = TCG_CALL_NO_RWG,
+                               .typemask = 0x1A0,
+                               .func = (void *)host_pc,
+                               .name = "func_wrap_dynamic" };
+
+        TCGv_i64 t_callee = tcg_constant_i64(callee);
+        /* create a temporary for env to pass as argument */
+        TCGv_ptr t_env = tcg_temp_new_ptr();
+        tcg_gen_mov_ptr(t_env, cpu_env);
+
+        tcg_gen_call2(&info, NULL, tcgv_i64_temp(t_callee),
+                      tcgv_ptr_temp(t_env));
+    }
+
+    /* Restore Return Address (RA/LR) to PC to return to caller */
+    TCGv_i64 t_ra = tcg_temp_new_i64();
+    /* x30 is the Link Register (LR) in ARM64 */
+    tcg_gen_ld_i64(t_ra, cpu_env, offsetof(CPUARMState, xregs[30]));
+    tcg_gen_st_i64(t_ra, cpu_env, offsetof(CPUARMState, pc));
+
+    /* Wrap usually implies end of TB */
+    tcg_gen_exit_tb(NULL, 0);
+
+    return tcg_gen_code(tcg_ctx, tb, tb->pc);
+}
+#endif

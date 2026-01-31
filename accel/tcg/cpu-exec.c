@@ -461,6 +461,7 @@ cpu_tb_exec(CPUState *cpu, TranslationBlock *itb, int *tb_exit)
      * If we insist on touching both the RX and the RW pages, we
      * double the host TLB pressure.
      */
+#ifdef CONFIG_FUNC_WRAP
     if (itb->inline_mode == INLINE_BL_PLT) {
         WrapItem *it = wrap_query(env->pc);
         if (it) {
@@ -471,6 +472,7 @@ cpu_tb_exec(CPUState *cpu, TranslationBlock *itb, int *tb_exit)
             itb->inline_mode = INLINE_ENABLE_LINK;
         }
     }
+#endif
 
 #ifdef CONFIG_SPLIT_TB
     last_tb = (void *)(ret & ~TB_EXIT_MASK);
@@ -1043,7 +1045,9 @@ static int __attribute__((noinline)) cpu_exec_loop(CPUState *cpu,
 
 #ifdef CONFIG_ANDROID
     tcg_register_thread();
+#ifdef CONFIG_LATA
     lsenv_register_thread(cpu->env_ptr);
+#endif
 #endif
     /* if an exception is pending, we execute it here */
     while (!cpu_handle_exception(cpu, &ret)) {

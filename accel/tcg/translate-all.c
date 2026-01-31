@@ -65,6 +65,14 @@
 #include "internal.h"
 #include "perf.h"
 #include "tcg/insn-start-words.h"
+/* Ensure android.h and ARM CPU state are available */
+#ifdef CONFIG_ANDROID
+#include "android/android.h"
+#ifndef CONFIG_LATA
+int tcg_gen_func_wrap(TranslationBlock *tb, uint64_t host_pc, uint64_t callee,
+                      bool is_special);
+#endif
+#endif
 
 #ifdef CONFIG_LATA
 #include "target/arm/tcg/translate.h"
@@ -301,6 +309,12 @@ int tr_translate_tb(struct TranslationBlock *tb)
 
     return gen_code_size;
 #else
+#ifdef CONFIG_ANDROID
+    WrapItem *it = wrap_query(tb->pc);
+    if (unlikely(it)) {
+        return tcg_gen_func_wrap(tb, it->host_pc, it->callee, it->is_special);
+    }
+#endif
     return tcg_gen_code(tcg_ctx, tb, tb->pc);
 #endif
 }
@@ -383,7 +397,9 @@ buffer_overflow:
     tb->cs_base = cs_base;
     tb->flags = flags;
     tb->cflags = cflags;
+#ifdef CONFIG_FUNC_WRAP
     tb->inline_mode = INLINE_NONE;
+#endif
     tb_set_page_addr0(tb, phys_pc);
     tb_set_page_addr1(tb, -1);
     if (phys_pc != -1) {

@@ -754,7 +754,10 @@ static inline void rewind_if_in_safe_syscall(void *puc)
     }
 }
 
+#ifdef CONFIG_LATA
 extern long context_switch_native_to_bt_ret_0;
+#endif
+
 static void host_signal_handler(int host_sig, siginfo_t *info, void *puc)
 {
     CPUArchState *env = thread_cpu->env_ptr;
@@ -780,7 +783,9 @@ static void host_signal_handler(int host_sig, siginfo_t *info, void *puc)
 
         host_addr = (uintptr_t)info->si_addr;
 
+#ifdef CONFIG_LATA
         uc->uc_mcontext.sc_pc = context_switch_native_to_bt_ret_0;
+#endif
 
         /*
          * Convert forcefully to guest address space: addresses outside

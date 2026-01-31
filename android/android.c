@@ -245,7 +245,7 @@ CPUArchState *cpu_copy(CPUArchState *env)
 
 BerberisCallbacks *berberis_cb;
 GHashTable *berberis_to_qemu;
-ENV *lsenv_debug;
+// ENV *lsenv_debug;
 
 CPUState *main_cpu;
 
@@ -296,8 +296,7 @@ static void *android_init(BerberisCallbacks *cbs)
     qemu_init_cpu_list();
     module_call_init(MODULE_INIT_QOM);
 
-    cpu_model = cpu_get_model(0);
-    cpu_type = parse_cpu_option(cpu_model);
+    cpu_type = "max-arm-cpu";
 
     /* init tcg before creating CPUs and to get qemu_host_page_size */
     {
@@ -305,8 +304,6 @@ static void *android_init(BerberisCallbacks *cbs)
         AccelClass *ac = ACCEL_GET_CLASS(accel);
 
         accel_init_interfaces(ac);
-        object_property_set_bool(OBJECT(accel), "one-insn-per-tb",
-                                 opt_one_insn_per_tb, &error_abort);
         ac->init_machine(NULL);
     }
 
